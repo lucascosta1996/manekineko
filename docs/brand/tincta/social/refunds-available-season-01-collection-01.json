@@ -1,0 +1,37 @@
+{
+  "status": "design-preview",
+  "template": "refunds-available",
+  "seasonNumber": 1,
+  "seasonName": "Crimson & Blood Orange",
+  "collectionNumber": 1,
+  "collectionName": "Velvet Ember",
+  "collectionColor": "#330000",
+  "colors": [
+    "#330000",
+    "#660000",
+    "#990000",
+    "#CC0000",
+    "#FF0000",
+    "#663300",
+    "#993300",
+    "#CC3300",
+    "#FF3300",
+    "#FF6600"
+  ],
+  "width": 1600,
+  "height": 900,
+  "alt": "Tincta — Unsold collection refunds — Season 01, Velvet Ember. Refunds are open. DEADLINE EXPIRED · COLLECTION UNSOLD. Design preview with fictional event data.",
+  "headline": [
+    "Refunds",
+    "are open."
+  ],
+  "detail": "DEADLINE EXPIRED · COLLECTION UNSOLD",
+  "metrics": [],
+  "post": "Season 01 · Velvet Ember did not sell out before its deadline.\n\nNFT holders can now claim a refund of 0.01 ETH per NFT.\n\nRefund link and details in the thread.",
+  "replies": [
+    "Crimson & Blood Orange · Collection 01\n\nCurrent NFT holders can claim their mint-price refund here:\nhttps://example.invalid/refunds",
+    "Refunds require a claim from the current NFT holder. Each refunded NFT is burned. Network gas is not refunded. This unsold collection distributes no prizes or affiliate commissions."
+  ],
+  "repeatReplies": [],
+  "publishWhen": "The collection is unsold and its canonical refund state is active. Late randomness for a sold-out collection never qualifies. Do not imply refunds were automatically transferred."
+}

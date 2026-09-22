@@ -1,0 +1,22 @@
+// Stable public read/write surface. The runtime is independently pinned before use.
+export const WINNER_CREDIT_ABI = [
+  "function WINNER_CREDITS_VERSION() view returns(string)",
+  "function previousRegistry() view returns(address)",
+  "function lifetimeRewardUsed(address wallet) view returns(bool)",
+  "function redeemedAwardRank(address wallet) view returns(uint256)",
+  "function creditsForAward(address sourceRound,uint256 rank) view returns((address beneficiary,uint256 sourceSequence,uint256 earnedAt,address redeemedIn,uint256 redeemedTokenId))",
+  "function claimAwardCredit(address sourceRound,uint256 rank)",
+  "function redeemAward(address sourceRound,uint256 rank,address targetRound) returns(uint256)",
+  "function claimAndRedeemAward(address sourceRound,uint256 rank,address targetRound) returns(uint256)",
+  "function redeemedSource(address wallet) view returns(address)",
+  "function legacyMerkleRoot() view returns(bytes32)",
+  "function approvedFactoryCodeHash(address) view returns(bytes32)",
+  "function collections(address) view returns(address factory,uint256 roundId,uint256 sequence,uint256 registeredAt,bytes32 codeHash,bool rewardsOnly)",
+  "function credits(address) view returns(address beneficiary,uint256 sourceSequence,uint256 earnedAt,address redeemedIn,uint256 redeemedTokenId)",
+  "function registerCollection(address factory,uint256 id) returns(address)",
+  "function totalSponsorBalance() view returns(uint256)",
+  "function sponsorBalance(address) view returns(uint256)",
+  "function redeem(address sourceRound,address targetRound) returns(uint256)",
+  "function claimAndRedeem(address sourceRound,address targetRound) returns(uint256)",
+  "function redeemLegacy((address sourceRound,address holder,uint256 tokenId,uint256 paidAt,bytes32 transactionHash) win,bytes32[] proof,address targetRound) returns(uint256)",
+];

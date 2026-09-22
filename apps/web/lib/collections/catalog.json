@@ -1,0 +1,40 @@
+{
+  "network": {
+    "chainId": 11155111,
+    "networkName": "Sepolia",
+    "nativeCurrency": { "symbol": "ETH", "decimals": 18 },
+    "explorerUrl": "https://sepolia.etherscan.io"
+  },
+  "series": {
+    "id": "551c5df8-224c-4dca-b972-2fcaf01dc689",
+    "name": "Manekineko"
+  },
+  "collections": [
+    {
+      "id": "8fa5f8c0-6ef4-47f6-9af3-60b8101c9321",
+      "slug": "manekineko-round-1",
+      "name": "Manekineko Round 1",
+      "symbol": "NEKO",
+      "description": "Four numbers. One greatest result. A finite collection of tickets, with every rule and every pixel destined for the chain.",
+      "roundId": "1",
+      "maxSupply": 1000,
+      "mintPriceWei": "10000000000000000",
+      "mintDurationSeconds": 604800,
+      "revealDelayBlocks": 5,
+      "updatedAt": "2026-09-10T00:00:00.000Z"
+    },
+    {
+      "id": "bd7a641e-125b-4d83-a7ec-9a5c87622002",
+      "slug": "manekineko-round-2",
+      "name": "Manekineko Round 2",
+      "symbol": "NEKO",
+      "description": "A fresh collection. A new sealed set of combinations. The next round is configured and ready for a future deployment.",
+      "roundId": "2",
+      "maxSupply": 500,
+      "mintPriceWei": "20000000000000000",
+      "mintDurationSeconds": 604800,
+      "revealDelayBlocks": 5,
+      "updatedAt": "2026-09-10T00:00:00.000Z"
+    }
+  ]
+}

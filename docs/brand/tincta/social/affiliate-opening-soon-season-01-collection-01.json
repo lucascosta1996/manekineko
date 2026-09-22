@@ -1,0 +1,36 @@
+{
+  "status": "design-preview",
+  "template": "affiliate-opening-soon",
+  "seasonNumber": 1,
+  "seasonName": "Crimson & Blood Orange",
+  "collectionNumber": 1,
+  "collectionName": "Velvet Ember",
+  "collectionColor": "#330000",
+  "colors": [
+    "#330000",
+    "#660000",
+    "#990000",
+    "#CC0000",
+    "#FF0000",
+    "#663300",
+    "#993300",
+    "#CC3300",
+    "#FF3300",
+    "#FF6600"
+  ],
+  "width": 1600,
+  "height": 900,
+  "alt": "Tincta — Affiliate enrollment opening soon — Season 01, Velvet Ember. Enrollment opens in 24h. 24 SEP 2026 · 16:00 UTC. Design preview with fictional event data.",
+  "headline": [
+    "Enrollment",
+    "opens in 24h."
+  ],
+  "detail": "24 SEP 2026 · 16:00 UTC",
+  "metrics": [],
+  "post": "Season 01 · Velvet Ember\n\nAffiliate enrollment opens in 24h.\n24 Sep 2026, 16:00 UTC\n\nCheck eligibility and get ready. Guide in the thread.",
+  "replies": [
+    "Crimson & Blood Orange · Collection 01\n\nRead the eligibility, qualification and commission terms before joining:\nhttps://example.invalid/affiliate-guide"
+  ],
+  "repeatReplies": [],
+  "publishWhen": "An approved future enrollment opening and working admission configuration exist. Recompute the countdown immediately before publication; discard the post if stale."
+}

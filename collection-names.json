@@ -1,0 +1,976 @@
+[
+  {
+    "season": 1,
+    "collections": [
+      {
+        "color": "#330000",
+        "name": "Velvet Ember"
+      },
+      {
+        "color": "#660000",
+        "name": "Garnet Veil"
+      },
+      {
+        "color": "#990000",
+        "name": "Ruby Current"
+      },
+      {
+        "color": "#CC0000",
+        "name": "Crimson Pulse"
+      },
+      {
+        "color": "#FF0000",
+        "name": "Scarlet Signal"
+      },
+      {
+        "color": "#663300",
+        "name": "Smoked Ochre"
+      },
+      {
+        "color": "#993300",
+        "name": "Rust Horizon"
+      },
+      {
+        "color": "#CC3300",
+        "name": "Copper Flare"
+      },
+      {
+        "color": "#FF3300",
+        "name": "Vermilion Glow"
+      },
+      {
+        "color": "#FF6600",
+        "name": "Citrus Blaze"
+      }
+    ]
+  },
+  {
+    "season": 2,
+    "collections": [
+      {
+        "color": "#996600",
+        "name": "Golden Earth"
+      },
+      {
+        "color": "#CC6600",
+        "name": "Sienna Kiln"
+      },
+      {
+        "color": "#CC9900",
+        "name": "Ochre Terrace"
+      },
+      {
+        "color": "#FF9900",
+        "name": "Apricot Fire"
+      },
+      {
+        "color": "#FFCC00",
+        "name": "Marigold Sun"
+      },
+      {
+        "color": "#663333",
+        "name": "Clay Shadow"
+      },
+      {
+        "color": "#993333",
+        "name": "Brick Reverie"
+      },
+      {
+        "color": "#CC3333",
+        "name": "Terracotta Heat"
+      },
+      {
+        "color": "#FF3333",
+        "name": "Coral Spark"
+      },
+      {
+        "color": "#996633",
+        "name": "Canyon Dust"
+      }
+    ]
+  },
+  {
+    "season": 3,
+    "collections": [
+      {
+        "color": "#CC6633",
+        "name": "Amber Dune"
+      },
+      {
+        "color": "#FF6633",
+        "name": "Persimmon Sun"
+      },
+      {
+        "color": "#CC9933",
+        "name": "Desert Honey"
+      },
+      {
+        "color": "#FF9933",
+        "name": "Tangerine Haze"
+      },
+      {
+        "color": "#FFCC33",
+        "name": "Saffron Drift"
+      },
+      {
+        "color": "#996666",
+        "name": "Rose Sand"
+      },
+      {
+        "color": "#CC6666",
+        "name": "Dusty Adobe"
+      },
+      {
+        "color": "#FF6666",
+        "name": "Papaya Bloom"
+      },
+      {
+        "color": "#CC9966",
+        "name": "Sandstone Silk"
+      },
+      {
+        "color": "#FF9966",
+        "name": "Peach Mirage"
+      }
+    ]
+  },
+  {
+    "season": 4,
+    "collections": [
+      {
+        "color": "#FFFF00",
+        "name": "Solar Noon"
+      },
+      {
+        "color": "#FFFF33",
+        "name": "Lemon Halo"
+      },
+      {
+        "color": "#FFFF66",
+        "name": "Primrose Light"
+      },
+      {
+        "color": "#FFFF99",
+        "name": "Buttercup Air"
+      },
+      {
+        "color": "#FFFFCC",
+        "name": "Vanilla Dawn"
+      },
+      {
+        "color": "#CCCC00",
+        "name": "Citron Gold"
+      },
+      {
+        "color": "#CCCC33",
+        "name": "Golden Pollen"
+      },
+      {
+        "color": "#CCCC66",
+        "name": "Wheat Gleam"
+      },
+      {
+        "color": "#CCCC99",
+        "name": "Champagne Mist"
+      },
+      {
+        "color": "#FFCC66",
+        "name": "Honey Silk"
+      }
+    ]
+  },
+  {
+    "season": 5,
+    "collections": [
+      {
+        "color": "#333300",
+        "name": "Olive Night"
+      },
+      {
+        "color": "#666600",
+        "name": "Antique Grove"
+      },
+      {
+        "color": "#666633",
+        "name": "Lichen Stone"
+      },
+      {
+        "color": "#999900",
+        "name": "Moss Lantern"
+      },
+      {
+        "color": "#999933",
+        "name": "Dried Laurel"
+      },
+      {
+        "color": "#999966",
+        "name": "Sage Dust"
+      },
+      {
+        "color": "#669900",
+        "name": "Fern Gold"
+      },
+      {
+        "color": "#669933",
+        "name": "Meadow Olive"
+      },
+      {
+        "color": "#99CC00",
+        "name": "Lime Canopy"
+      },
+      {
+        "color": "#99CC33",
+        "name": "Orchard Light"
+      }
+    ]
+  },
+  {
+    "season": 6,
+    "collections": [
+      {
+        "color": "#336600",
+        "name": "Cedar Lime"
+      },
+      {
+        "color": "#339900",
+        "name": "Orchard Shade"
+      },
+      {
+        "color": "#33CC00",
+        "name": "Leaf Voltage"
+      },
+      {
+        "color": "#33FF00",
+        "name": "Neon Sprout"
+      },
+      {
+        "color": "#66CC00",
+        "name": "Lime Rush"
+      },
+      {
+        "color": "#66FF00",
+        "name": "Electric Zest"
+      },
+      {
+        "color": "#99FF00",
+        "name": "Chartreuse Flash"
+      },
+      {
+        "color": "#99FF33",
+        "name": "Acid Dew"
+      },
+      {
+        "color": "#CCFF00",
+        "name": "Citron Beam"
+      },
+      {
+        "color": "#CCFF33",
+        "name": "Lemon Current"
+      }
+    ]
+  },
+  {
+    "season": 7,
+    "collections": [
+      {
+        "color": "#CCFF66",
+        "name": "Early Bud"
+      },
+      {
+        "color": "#CCFF99",
+        "name": "Linden Veil"
+      },
+      {
+        "color": "#CCFFCC",
+        "name": "Pear Blossom"
+      },
+      {
+        "color": "#99CC66",
+        "name": "Willow Field"
+      },
+      {
+        "color": "#99CC99",
+        "name": "Sage Meadow"
+      },
+      {
+        "color": "#66CC33",
+        "name": "Spring Shoot"
+      },
+      {
+        "color": "#66CC66",
+        "name": "Clover Breeze"
+      },
+      {
+        "color": "#33CC33",
+        "name": "Grass Pulse"
+      },
+      {
+        "color": "#339933",
+        "name": "Garden Fern"
+      },
+      {
+        "color": "#336633",
+        "name": "Laurel Shade"
+      }
+    ]
+  },
+  {
+    "season": 8,
+    "collections": [
+      {
+        "color": "#003300",
+        "name": "Forest Floor"
+      },
+      {
+        "color": "#006600",
+        "name": "Pine Heart"
+      },
+      {
+        "color": "#009900",
+        "name": "Emerald Thicket"
+      },
+      {
+        "color": "#00CC00",
+        "name": "Canopy Rise"
+      },
+      {
+        "color": "#00FF00",
+        "name": "Wild Chlorophyll"
+      },
+      {
+        "color": "#003333",
+        "name": "Cypress Night"
+      },
+      {
+        "color": "#006633",
+        "name": "Juniper Shadow"
+      },
+      {
+        "color": "#009933",
+        "name": "Woodland Jade"
+      },
+      {
+        "color": "#00CC33",
+        "name": "Rainleaf"
+      },
+      {
+        "color": "#00FF33",
+        "name": "Verdant Flame"
+      }
+    ]
+  },
+  {
+    "season": 9,
+    "collections": [
+      {
+        "color": "#00FF66",
+        "name": "Spearmint Spark"
+      },
+      {
+        "color": "#00FF99",
+        "name": "Jade Fountain"
+      },
+      {
+        "color": "#33FF66",
+        "name": "Mint Leaf"
+      },
+      {
+        "color": "#33FF99",
+        "name": "Green Lagoon"
+      },
+      {
+        "color": "#66FF66",
+        "name": "Apple Frost"
+      },
+      {
+        "color": "#66FF99",
+        "name": "Mint Sorbet"
+      },
+      {
+        "color": "#99FF66",
+        "name": "Pear Glimmer"
+      },
+      {
+        "color": "#99FF99",
+        "name": "Spring Foam"
+      },
+      {
+        "color": "#00CC66",
+        "name": "Jade Creek"
+      },
+      {
+        "color": "#33CC66",
+        "name": "Garden Dew"
+      }
+    ]
+  },
+  {
+    "season": 10,
+    "collections": [
+      {
+        "color": "#003366",
+        "name": "Pelagic Night"
+      },
+      {
+        "color": "#006666",
+        "name": "Deep Estuary"
+      },
+      {
+        "color": "#006699",
+        "name": "Trench Blue"
+      },
+      {
+        "color": "#009966",
+        "name": "Kelp Current"
+      },
+      {
+        "color": "#009999",
+        "name": "Teal Abyss"
+      },
+      {
+        "color": "#336666",
+        "name": "Harbor Slate"
+      },
+      {
+        "color": "#339966",
+        "name": "Tidal Moss"
+      },
+      {
+        "color": "#339999",
+        "name": "Stillwater"
+      },
+      {
+        "color": "#003399",
+        "name": "Sapphire Trench"
+      },
+      {
+        "color": "#0033CC",
+        "name": "Deepwater Beacon"
+      }
+    ]
+  },
+  {
+    "season": 11,
+    "collections": [
+      {
+        "color": "#00CC99",
+        "name": "Turquoise Tide"
+      },
+      {
+        "color": "#00CCCC",
+        "name": "Cyan Reef"
+      },
+      {
+        "color": "#00CCFF",
+        "name": "Aqua Voltage"
+      },
+      {
+        "color": "#00FFCC",
+        "name": "Lagoon Flash"
+      },
+      {
+        "color": "#00FFFF",
+        "name": "Liquid Neon"
+      },
+      {
+        "color": "#33CCCC",
+        "name": "Reef Glass"
+      },
+      {
+        "color": "#33CCFF",
+        "name": "Cyan Arc"
+      },
+      {
+        "color": "#33FFCC",
+        "name": "Mint Current"
+      },
+      {
+        "color": "#33FFFF",
+        "name": "Electric Foam"
+      },
+      {
+        "color": "#66FFFF",
+        "name": "Luminous Tide"
+      }
+    ]
+  },
+  {
+    "season": 12,
+    "collections": [
+      {
+        "color": "#66CCCC",
+        "name": "Glacier Glass"
+      },
+      {
+        "color": "#66CCFF",
+        "name": "Polar Sky"
+      },
+      {
+        "color": "#66FFCC",
+        "name": "Frozen Lagoon"
+      },
+      {
+        "color": "#99CCCC",
+        "name": "Sea Mist"
+      },
+      {
+        "color": "#99CCFF",
+        "name": "Arctic Veil"
+      },
+      {
+        "color": "#99FFCC",
+        "name": "Frosted Mint"
+      },
+      {
+        "color": "#99FFFF",
+        "name": "Ice Halo"
+      },
+      {
+        "color": "#CCFFFF",
+        "name": "Snowmelt"
+      },
+      {
+        "color": "#3399CC",
+        "name": "Meltwater Blue"
+      },
+      {
+        "color": "#336699",
+        "name": "Glacial Depth"
+      }
+    ]
+  },
+  {
+    "season": 13,
+    "collections": [
+      {
+        "color": "#0066CC",
+        "name": "Cerulean Flight"
+      },
+      {
+        "color": "#0066FF",
+        "name": "Azure Rush"
+      },
+      {
+        "color": "#0099CC",
+        "name": "Coastal Sky"
+      },
+      {
+        "color": "#0099FF",
+        "name": "Open Atmosphere"
+      },
+      {
+        "color": "#3366CC",
+        "name": "Blue Altitude"
+      },
+      {
+        "color": "#3366FF",
+        "name": "Sky Frequency"
+      },
+      {
+        "color": "#3399FF",
+        "name": "Horizon Signal"
+      },
+      {
+        "color": "#6699CC",
+        "name": "Denim Cloud"
+      },
+      {
+        "color": "#6699FF",
+        "name": "Periwinkle Air"
+      },
+      {
+        "color": "#666699",
+        "name": "Dusk Haze"
+      }
+    ]
+  },
+  {
+    "season": 14,
+    "collections": [
+      {
+        "color": "#000033",
+        "name": "Ink Below"
+      },
+      {
+        "color": "#000066",
+        "name": "Navy Silence"
+      },
+      {
+        "color": "#000099",
+        "name": "Cobalt Depth"
+      },
+      {
+        "color": "#0000CC",
+        "name": "Ultramarine Core"
+      },
+      {
+        "color": "#0000FF",
+        "name": "Blue Voltage"
+      },
+      {
+        "color": "#330033",
+        "name": "Aubergine Night"
+      },
+      {
+        "color": "#330066",
+        "name": "Indigo Vault"
+      },
+      {
+        "color": "#330099",
+        "name": "Iris Depth"
+      },
+      {
+        "color": "#3300CC",
+        "name": "Violet Reactor"
+      },
+      {
+        "color": "#3300FF",
+        "name": "Indigo Flash"
+      }
+    ]
+  },
+  {
+    "season": 15,
+    "collections": [
+      {
+        "color": "#0033FF",
+        "name": "Midnight Signal"
+      },
+      {
+        "color": "#6666CC",
+        "name": "Steel Iris"
+      },
+      {
+        "color": "#6666FF",
+        "name": "Twilight Current"
+      },
+      {
+        "color": "#9999CC",
+        "name": "Blue Alloy"
+      },
+      {
+        "color": "#9999FF",
+        "name": "Moonlit Periwinkle"
+      },
+      {
+        "color": "#CCCCFF",
+        "name": "Silver Cloud"
+      },
+      {
+        "color": "#333366",
+        "name": "Naval Ink"
+      },
+      {
+        "color": "#333399",
+        "name": "Nightwatch"
+      },
+      {
+        "color": "#3333CC",
+        "name": "Cobalt Steel"
+      },
+      {
+        "color": "#3333FF",
+        "name": "Afterhours Blue"
+      }
+    ]
+  },
+  {
+    "season": 16,
+    "collections": [
+      {
+        "color": "#660033",
+        "name": "Royal Mulberry"
+      },
+      {
+        "color": "#660066",
+        "name": "Velvet Plum"
+      },
+      {
+        "color": "#660099",
+        "name": "Indigo Throne"
+      },
+      {
+        "color": "#6600CC",
+        "name": "Violet Scepter"
+      },
+      {
+        "color": "#6600FF",
+        "name": "Imperial Light"
+      },
+      {
+        "color": "#990033",
+        "name": "Wine Brocade"
+      },
+      {
+        "color": "#990066",
+        "name": "Berry Crown"
+      },
+      {
+        "color": "#990099",
+        "name": "Royal Orchid"
+      },
+      {
+        "color": "#9900CC",
+        "name": "Amethyst Reign"
+      },
+      {
+        "color": "#9900FF",
+        "name": "Violet Coronation"
+      }
+    ]
+  },
+  {
+    "season": 17,
+    "collections": [
+      {
+        "color": "#CC0033",
+        "name": "Garnet Seal"
+      },
+      {
+        "color": "#CC0066",
+        "name": "Raspberry Jewel"
+      },
+      {
+        "color": "#CC0099",
+        "name": "Magenta Diadem"
+      },
+      {
+        "color": "#CC00CC",
+        "name": "Orchid Majesty"
+      },
+      {
+        "color": "#CC00FF",
+        "name": "Amethyst Flare"
+      },
+      {
+        "color": "#663366",
+        "name": "Plum Chamber"
+      },
+      {
+        "color": "#663399",
+        "name": "Violet Tapestry"
+      },
+      {
+        "color": "#6633CC",
+        "name": "Iris Gem"
+      },
+      {
+        "color": "#6633FF",
+        "name": "Purple Radiance"
+      },
+      {
+        "color": "#993366",
+        "name": "Damson Silk"
+      }
+    ]
+  },
+  {
+    "season": 18,
+    "collections": [
+      {
+        "color": "#993399",
+        "name": "Wild Mulberry"
+      },
+      {
+        "color": "#9933CC",
+        "name": "Orchid Grove"
+      },
+      {
+        "color": "#9933FF",
+        "name": "Violet Bloom"
+      },
+      {
+        "color": "#CC3366",
+        "name": "Berry Nectar"
+      },
+      {
+        "color": "#CC3399",
+        "name": "Bramble Flower"
+      },
+      {
+        "color": "#CC33CC",
+        "name": "Orchid Pulse"
+      },
+      {
+        "color": "#CC33FF",
+        "name": "Wisteria Spark"
+      },
+      {
+        "color": "#996699",
+        "name": "Heather Veil"
+      },
+      {
+        "color": "#9966CC",
+        "name": "Lilac Garden"
+      },
+      {
+        "color": "#9966FF",
+        "name": "Lavender Drift"
+      }
+    ]
+  },
+  {
+    "season": 19,
+    "collections": [
+      {
+        "color": "#FF0033",
+        "name": "Cherry Flash"
+      },
+      {
+        "color": "#FF0066",
+        "name": "Raspberry Voltage"
+      },
+      {
+        "color": "#FF0099",
+        "name": "Hot Pink Horizon"
+      },
+      {
+        "color": "#FF00CC",
+        "name": "Fuchsia Fever"
+      },
+      {
+        "color": "#FF00FF",
+        "name": "Magenta Pulse"
+      },
+      {
+        "color": "#FF3366",
+        "name": "Guava Flare"
+      },
+      {
+        "color": "#FF3399",
+        "name": "Dragonfruit Glow"
+      },
+      {
+        "color": "#FF33CC",
+        "name": "Pink Frequency"
+      },
+      {
+        "color": "#FF33FF",
+        "name": "Orchid Neon"
+      },
+      {
+        "color": "#CC6699",
+        "name": "Roseberry Silk"
+      }
+    ]
+  },
+  {
+    "season": 20,
+    "collections": [
+      {
+        "color": "#CC66CC",
+        "name": "Mauve Candy"
+      },
+      {
+        "color": "#CC66FF",
+        "name": "Lilac Pop"
+      },
+      {
+        "color": "#FF6699",
+        "name": "Coral Kiss"
+      },
+      {
+        "color": "#FF66CC",
+        "name": "Bubblegum Cloud"
+      },
+      {
+        "color": "#FF66FF",
+        "name": "Orchid Sorbet"
+      },
+      {
+        "color": "#CC99CC",
+        "name": "Mallow Mist"
+      },
+      {
+        "color": "#CC99FF",
+        "name": "Lavender Foam"
+      },
+      {
+        "color": "#FF99CC",
+        "name": "Rose Macaron"
+      },
+      {
+        "color": "#FF99FF",
+        "name": "Pink Marshmallow"
+      },
+      {
+        "color": "#FFCCFF",
+        "name": "Cotton Bloom"
+      }
+    ]
+  },
+  {
+    "season": 21,
+    "collections": [
+      {
+        "color": "#669966",
+        "name": "Eucalyptus Shade"
+      },
+      {
+        "color": "#669999",
+        "name": "Patina Quiet"
+      },
+      {
+        "color": "#CC9999",
+        "name": "Rose Clay"
+      },
+      {
+        "color": "#FFCC99",
+        "name": "Nude Apricot"
+      },
+      {
+        "color": "#FFCCCC",
+        "name": "Blush Linen"
+      },
+      {
+        "color": "#330011",
+        "name": "Burgundy Ink"
+      },
+      {
+        "color": "#331100",
+        "name": "Espresso Velvet"
+      },
+      {
+        "color": "#110033",
+        "name": "Blackberry Night"
+      },
+      {
+        "color": "#001133",
+        "name": "Inkstone Blue"
+      },
+      {
+        "color": "#003311",
+        "name": "Evergreen Ink"
+      }
+    ]
+  },
+  {
+    "season": 22,
+    "collections": [
+      {
+        "color": "#000000",
+        "name": "Absolute Night"
+      },
+      {
+        "color": "#333333",
+        "name": "Graphite Form"
+      },
+      {
+        "color": "#666666",
+        "name": "Slate Silence"
+      },
+      {
+        "color": "#999999",
+        "name": "Silver Grain"
+      },
+      {
+        "color": "#CCCCCC",
+        "name": "Pearl Haze"
+      },
+      {
+        "color": "#FFFFFF",
+        "name": "Pure Light"
+      }
+    ]
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "status": "design-preview",
+  "template": "upcoming-season",
+  "season": 1,
+  "theme": "Crimson & Blood Orange",
+  "colors": [
+    "#330000",
+    "#660000",
+    "#990000",
+    "#CC0000",
+    "#FF0000",
+    "#663300",
+    "#993300",
+    "#CC3300",
+    "#FF3300",
+    "#FF6600"
+  ],
+  "width": 1600,
+  "height": 900,
+  "alt": "Tincta. Upcoming Season 01: Crimson & Blood Orange. 10 vertical bands show the season palette, with its geometric linework. Color, collected."
+}

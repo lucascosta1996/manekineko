@@ -1,0 +1,37 @@
+{
+  "status": "design-preview",
+  "template": "collection-live",
+  "seasonNumber": 1,
+  "seasonName": "Crimson & Blood Orange",
+  "collectionNumber": 1,
+  "collectionName": "Velvet Ember",
+  "collectionColor": "#330000",
+  "colors": [
+    "#330000",
+    "#660000",
+    "#990000",
+    "#CC0000",
+    "#FF0000",
+    "#663300",
+    "#993300",
+    "#CC3300",
+    "#FF3300",
+    "#FF6600"
+  ],
+  "width": 1600,
+  "height": 900,
+  "alt": "Tincta — Collection minting is live — Season 01, Velvet Ember. Minting is live. 1,000 NFTs · 0.01 ETH · 6 × 1 ETH PRIZES. Design preview with fictional event data.",
+  "headline": [
+    "Minting",
+    "is live."
+  ],
+  "detail": "1,000 NFTs · 0.01 ETH · 6 × 1 ETH PRIZES",
+  "metrics": [],
+  "post": "Season 01 · Velvet Ember is live.\n\n1,000 NFTs · 0.01 ETH each.\n6 prizes of 1 ETH after sellout and the verified draw.\n\nDeadline: 24 Oct 2026, 16:15 UTC.\nMint link in the thread.",
+  "replies": [
+    "Crimson & Blood Orange · Collection 01\n\nMint and read the collection terms:\nhttps://example.invalid/mint",
+    "Prizes are claimed by the winning NFT holders after the verified draw. Qualified affiliates can claim commissions after sellout. If the collection expires unsold, NFT holders can claim mint-price refunds."
+  ],
+  "repeatReplies": [],
+  "publishWhen": "Confirmed activation, chain time within the immutable sale window, and remaining supply. Read price, supply and prizes from this collection's version-specific frozen terms. Countdown zero alone is insufficient."
+}

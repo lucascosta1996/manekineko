@@ -1,0 +1,47 @@
+{
+  "status": "design-preview",
+  "template": "winners-revealed",
+  "seasonNumber": 1,
+  "seasonName": "Crimson & Blood Orange",
+  "collectionNumber": 1,
+  "collectionName": "Velvet Ember",
+  "collectionColor": "#330000",
+  "colors": [
+    "#330000",
+    "#660000",
+    "#990000",
+    "#CC0000",
+    "#FF0000",
+    "#663300",
+    "#993300",
+    "#CC3300",
+    "#FF3300",
+    "#FF6600"
+  ],
+  "width": 1600,
+  "height": 900,
+  "alt": "Tincta — Verified winning NFTs — Season 01, Velvet Ember. Winners revealed. 6 WINNING NFTs · 1 ETH EACH. Design preview with fictional event data.",
+  "headline": [
+    "Winners",
+    "revealed."
+  ],
+  "detail": "6 WINNING NFTs · 1 ETH EACH",
+  "metrics": [],
+  "post": "Season 01 · Velvet Ember\n\nThe draw is verified: 6 winning NFTs, 1 ETH each.\nWinning NFT holders can claim their prizes.\n\nResults and claim link in the thread.",
+  "replies": [
+    "Crimson & Blood Orange · Collection 01\n\nView the verified results and claim an unclaimed prize if you hold a winning NFT:\nhttps://example.invalid/prize-claims"
+  ],
+  "repeatReplies": [
+    {
+      "forEach": "verifiedWinningNft",
+      "when": "After verified draw only. Use the current holder at the pinned block, not the minter or a guessed payment recipient. Emit one reply per award, even if a wallet holds multiple winners.",
+      "text": "Award #{{rank}} · NFT #{{tokenId}} · {{awardEth}} ETH\nHolder at block {{holderBlock}}: {{holderWallet}}\n\nVerified NFT:\n{{nftUrl}}"
+    },
+    {
+      "forEach": "confirmedPrizeClaim",
+      "when": "Only after a successful, confirmed canonical prize-claim receipt. A winning NFT or a pending transaction does not prove payment. Publish once per collection/rank/claim transaction.",
+      "text": "Prize claimed · Award #{{rank}} · NFT #{{tokenId}}\n{{awardEth}} ETH\nClaimant: {{claimantWallet}}\nRecipient: {{recipientWallet}}\n\nConfirmed receipt:\n{{receiptUrl}}"
+    }
+  ],
+  "publishWhen": "The canonical draw is finalized and verified. List actual winning token IDs and holder addresses at the stated confirmed block. This claim-open version requires unclaimed prizes; switch wording if all prizes were already claimed."
+}

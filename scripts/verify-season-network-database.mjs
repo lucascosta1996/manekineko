@@ -1,0 +1,32 @@
+import assert from 'node:assert/strict';
+import {randomUUID} from 'node:crypto';
+import {readFile,readdir} from 'node:fs/promises';
+import pg from 'pg';
+import {defaultAutomationForm,payloadFromAutomationForm} from '../apps/launch/components/automations/form-values.ts';
+import {createLaunchAutomation,updateLaunchAutomation,listLaunchAutomations,prepareLaunchAutomation} from '../apps/launch/lib/launch-automation-store.ts';
+import {organizeSeasonDraft} from './season-network-plans.mjs';
+import {catalogSeasonOrders} from '../apps/launch/lib/season-catalog-order.ts';
+const url=new URL(process.env.DATABASE_URL??'postgresql://manekineko:manekineko-local-only@127.0.0.1:54329/manekineko');
+assert(['localhost','127.0.0.1','[::1]'].includes(url.hostname));
+const name=`tincta_network_test_${randomUUID().replaceAll('-','')}`,admin=new pg.Client({connectionString:url.href});let db,created=false;
+try {
+ await admin.connect();await admin.query(`CREATE DATABASE ${name}`);created=true;url.pathname=`/${name}`;db=new pg.Client({connectionString:url.href});await db.connect();
+ const dir=new URL('../database/migrations/',import.meta.url);
+ for(const f of (await readdir(dir)).filter(f=>f.endsWith('.sql')&&!f.startsWith('023')).sort())await db.query(await readFile(new URL(f,dir),'utf8'));
+ await db.query("ALTER TABLE manekineko_launch_automations ADD CONSTRAINT manekineko_launch_automations_staging_chain CHECK (plan->>'chainId'='11155111')");
+ const actor={userId:randomUUID()};await db.query("INSERT INTO manekineko_launch_users(id,username,password_hash) VALUES($1,'operator',$2)",[actor.userId,`scrypt$131072$8$1$${'A'.repeat(22)}$${'A'.repeat(86)}`]);
+ const seasonId=Object.keys(catalogSeasonOrders)[0];const form=defaultAutomationForm([randomUUID()], '11155111',seasonId);form.name='Preserved season';form.steps[0].form.name='Preserved artwork';form.steps[0].form.collectionColor='#330000';form.steps[0].form.minAffiliateReferrals='100';
+ const saved=await createLaunchAutomation(db,actor,{plan:payloadFromAutomationForm(form)});
+ const mainnet=organizeSeasonDraft(saved);assert.equal(mainnet.chainId,'1');assert.equal(mainnet.seasonId,saved.plan.seasonId);assert.equal(mainnet.name,saved.plan.name);assert.equal(mainnet.steps[0].payload.contract.collectionColor,'#330000');assert.equal(mainnet.steps[0].payload.contract.minAffiliateReferrals,'1');
+ await assert.rejects(()=>updateLaunchAutomation(db,actor,saved.id,{plan:mainnet,revision:saved.revision}),e=>e.code==='23514');
+ await db.query(await readFile(new URL('023_season_network_planning.sql',dir),'utf8'));
+ const moved=await updateLaunchAutomation(db,actor,saved.id,{plan:mainnet,revision:saved.revision});assert.equal(moved.revision,2);
+ assert.equal((await listLaunchAutomations(db,null,'1')).automations.length,1);assert.equal((await listLaunchAutomations(db,null,'11155111')).automations.length,0);
+ assert.deepEqual(organizeSeasonDraft(moved),moved.plan,'Migration is idempotent.');
+ await assert.rejects(()=>updateLaunchAutomation(db,actor,saved.id,{plan:mainnet,revision:1}),/another session/);
+ process.env.MANEKINEKO_CHAIN_ID='11155111';await assert.rejects(()=>prepareLaunchAutomation(db,actor,saved.id,2),/only supports Ethereum Sepolia/);delete process.env.MANEKINEKO_CHAIN_ID;
+ const rows=(await db.query("SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint WHERE conname='manekineko_launch_automations_staging_chain'")).rows;assert.match(rows[0].definition,/status = 'draft'/);
+ const malformed=structuredClone(mainnet);malformed.steps[0].payload.contract.chainId='11155111';await assert.rejects(()=>db.query('UPDATE manekineko_launch_automations SET plan=$2,revision=revision+1,updated_by=$3 WHERE id=$1',[saved.id,malformed,actor.userId]),e=>e.code==='23514');
+ await assert.rejects(()=>db.query("UPDATE manekineko_launch_automations SET status='prepared',revision=revision+1,updated_by=$2,prepared_by=$2,prepared_at=now(),prepared_artifact=$3,content_hash=$4 WHERE id=$1",[saved.id,actor.userId,{schemaVersion:1,kind:'launch-automation',contractVersion:'affiliate-v9',...mainnet},`0x${'ab'.repeat(32)}`]));
+ console.log('Passed: staging migration, Mainnet draft persistence, network filtering, immutable preparation boundary, mixed-network rejection, revision conflicts, idempotency, names/colors preserved.');
+}finally{await db?.end();if(created)await admin.query(`DROP DATABASE ${name}`);await admin.end();}

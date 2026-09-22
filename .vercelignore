@@ -1,0 +1,35 @@
+# Upload application source, never local credentials or deployment journals.
+**/.env
+**/.env.*
+.private
+**/.private
+**/*.wallet-vault.enc
+.git
+.vercel
+**/.vercel
+**/node_modules
+**/.next
+**/.turbo
+**/*.log
+**/*.tsbuildinfo
+apps/contracts/artifacts
+apps/contracts/cache
+apps/contracts/deployments
+apps/contracts/ignition/deployments
+coverage
+# Frontend/indexer deployments do not need operator tools or test fixtures.
+/.agents
+/.codex
+/docs
+/database
+/scripts
+**/test
+**/tests
+**/*.test.*
+**/*.fixture.*
+**/*.example.*
+apps/contracts/contracts
+apps/contracts/scripts
+apps/contracts/types
+/compose.yaml
+/skills-lock.json

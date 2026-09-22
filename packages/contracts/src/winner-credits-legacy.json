@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "chains": [
+    {
+      "chainId": 11155111,
+      "root": "0x4f1e5b1d0ba2da324aad43722a213ac1a872695ee4a92fc23ae960c6a74e49f7",
+      "entries": [
+        {
+          "sourceRound": "0xaffd7dc1b6a0d8974040f3216316240b724715a9",
+          "holder": "0xf0ad291922a954e035323d37f79702e02912e12a",
+          "tokenId": "3",
+          "paidAt": "1789696536",
+          "transactionHash": "0x722606a5d1865bdd271a087a530c98ecde4d966bdb808c19c8dcda733a1dac55",
+          "proof": []
+        }
+      ]
+    }
+  ]
+}

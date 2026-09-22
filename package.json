@@ -1,0 +1,78 @@
+{
+  "name": "manekineko",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "npm@10.9.3",
+  "engines": {
+    "node": ">=22.20.0 <23",
+    "npm": ">=10"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --filter=@manekineko/web --filter=@manekineko/landing-page",
+    "dev:web": "npm run dev --workspace @manekineko/web",
+    "dev:landing": "npm run dev --workspace @manekineko/landing-page",
+    "build": "turbo run build",
+    "build:web": "npm run build --workspace @manekineko/web",
+    "build:landing": "npm run build --workspace @manekineko/landing-page",
+    "contracts:compile": "npm run build --workspace @manekineko/contracts",
+    "contracts:test": "npm run test --workspace @manekineko/contracts",
+    "contracts:node": "npm run node --workspace @manekineko/contracts",
+    "contracts:deploy:local": "npm run deploy:local --workspace @manekineko/contracts",
+    "contracts:export": "npm run export --workspace @manekineko/contracts",
+    "typecheck": "turbo run typecheck",
+    "web:test": "npm run test --workspace @manekineko/web",
+    "db:up": "docker-compose up -d database",
+    "db:stop": "docker-compose stop database",
+    "db:migrate": "node --env-file-if-exists=apps/web/.env.local scripts/database.mjs migrate",
+    "db:seed": "node --env-file-if-exists=apps/web/.env.local scripts/database.mjs seed",
+    "db:setup": "node --env-file-if-exists=apps/web/.env.local scripts/database.mjs setup",
+    "db:test": "node --env-file-if-exists=apps/web/.env.local scripts/verify-history-database.mjs",
+    "db:test:affiliates": "node --env-file-if-exists=apps/web/.env.local scripts/verify-affiliate-database.mjs",
+    "db:prune:affiliates": "node --env-file-if-exists=apps/web/.env.local scripts/prune-affiliate-enrollment.mjs",
+    "test": "npm run contracts:test && npm run web:test && npm run launch:test && npm run indexer:test && npm run credits:test && npm run eligibility:test",
+    "check": "npm run test && npm run typecheck && npm run build",
+    "dev:launch": "npm run dev --workspace @manekineko/launch",
+    "dev:indexer": "npm run dev --workspace @manekineko/indexer",
+    "build:indexer": "npm run build --workspace @manekineko/indexer",
+    "indexer:test": "npm run test --workspace @manekineko/indexer",
+    "build:launch": "npm run build --workspace @manekineko/launch",
+    "launch:test": "npm run test --workspace @manekineko/launch && node --import tsx --test scripts/prepare-launch.test.mjs",
+    "launch:account": "node --env-file-if-exists=apps/launch/.env.local scripts/launch-account.mjs",
+    "launch:db:migrate": "node --env-file-if-exists=apps/launch/.env.local scripts/database.mjs migrate",
+    "launch:prepare": "node scripts/prepare-launch.mjs",
+    "launch:prepare:current": "node scripts/prepare-launch.mjs --expected-version affiliate-v10",
+    "launch:db:test:auth": "node --env-file-if-exists=apps/launch/.env.local scripts/verify-launch-auth-database.mjs",
+    "launch:db:test:config": "TEST_LAUNCH_DATABASE=1 node --env-file-if-exists=apps/launch/.env.local --experimental-strip-types --test apps/launch/test/launch-config-database.test.ts",
+    "launch:db:test:automations": "TEST_LAUNCH_DATABASE=1 node --env-file-if-exists=apps/launch/.env.local --experimental-strip-types --test apps/launch/test/launch-automation-database.test.ts",
+    "staging:check": "node scripts/staging-environment.mjs check",
+    "staging:env": "node scripts/staging-environment.mjs export",
+    "staging:db:check": "node scripts/staging-database.mjs check",
+    "staging:db:provision": "node scripts/staging-database.mjs provision",
+    "staging:providers:check": "node scripts/staging-provider-check.mjs",
+    "staging:test": "node --test scripts/staging-*.test.mjs",
+    "indexer:test:chain": "node --conditions=react-server --import tsx scripts/verify-indexer-chain.mjs",
+    "credits:test": "node --import tsx --test scripts/winner-credit-*.test.mjs",
+    "eligibility:test": "node --import tsx --test scripts/affiliate-eligibility-*.test.mjs",
+    "season:run": "node --import tsx -- scripts/season-runner/cli.ts",
+    "season:run:sepolia": "node --import tsx -- scripts/season-runner/sepolia.ts",
+    "season:run:mainnet": "node --import tsx -- scripts/season-runner/mainnet.ts",
+    "season:test": "node --import tsx --test scripts/season-runner/*.test.ts",
+    "season:typecheck": "tsc --noEmit --target es2022 --module esnext --moduleResolution bundler --allowImportingTsExtensions --resolveJsonModule --esModuleInterop --skipLibCheck scripts/season-runner/*.ts"
+  },
+  "devDependencies": {
+    "turbo": "2.10.12"
+  },
+  "overrides": {
+    "solc": {
+      "tmp": "0.2.7"
+    },
+    "mocha": {
+      "serialize-javascript": "7.1.1",
+      "diff": "8.0.3"
+    }
+  }
+}

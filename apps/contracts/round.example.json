@@ -1,0 +1,8 @@
+{
+  "name": "Manekineko Round 1",
+  "symbol": "NEKO",
+  "maxSupply": "1000",
+  "mintPriceWei": "10000000000000000",
+  "mintDurationSeconds": "604800",
+  "revealDelayBlocks": "5"
+}

@@ -1,0 +1,129 @@
+{
+  "version": 1,
+  "status": "design-and-copy-review",
+  "scope": "Local image and thread templates. Not connected to a publisher or the Launch template parser.",
+  "templates": [
+    {
+      "id": "upcoming-season",
+      "label": "Upcoming season",
+      "image": "approved-season-announcement",
+      "publishWhen": "The season identity and palette are explicitly approved for public announcement. Do not disclose unpublished names automatically.",
+      "post": "Coming next: Season {{seasonNumber}}.\n{{seasonName}}.\n\n{{collectionCount}} colors. One new season of Tincta.\n\nColor, collected.",
+      "replies": []
+    },
+    {
+      "id": "affiliate-opening-soon",
+      "label": "Affiliate enrollment opening soon",
+      "header": "AFFILIATE ENROLLMENT",
+      "headline": ["Enrollment", "opens in {{enrollmentCountdown}}."],
+      "detail": "{{enrollmentOpensAtImage}}",
+      "footer": "Get ready. Affiliate guide in the thread.",
+      "publishWhen": "An approved future enrollment opening and working admission configuration exist. Recompute the countdown immediately before publication; discard the post if stale.",
+      "post": "Season {{seasonNumber}} · {{collectionName}}\n\nAffiliate enrollment opens in {{enrollmentCountdown}}.\n{{enrollmentOpensAtText}}\n\nCheck eligibility and get ready. Guide in the thread.",
+      "replies": [
+        "{{seasonName}} · Collection {{collectionNumber}}\n\nRead the eligibility, qualification and commission terms before joining:\n{{docsUrl}}"
+      ]
+    },
+    {
+      "id": "affiliate-enrollment-open",
+      "label": "Affiliate enrollment is open",
+      "header": "AFFILIATE ENROLLMENT",
+      "headline": ["Enrollment", "is open."],
+      "detail": "MINT SCHEDULED · {{saleStartAtImage}}",
+      "footer": "Join the affiliate program through the thread.",
+      "publishWhen": "Enrollment is currently available, with unfilled positions, a working admission service and chain time before saleStartAt. A permit alone is not enrollment. A filled program does not move minting earlier.",
+      "post": "Season {{seasonNumber}} · {{collectionName}}\n\nAffiliate enrollment is open.\nMinting is scheduled in {{mintCountdown}}: {{saleStartAtText}}.\n\nJoin through the link in the thread.",
+      "replies": [
+        "{{seasonName}} · Collection {{collectionNumber}}\n\nCheck eligibility and enroll:\n{{affiliateUrl}}",
+        "Enrollment closes at {{saleStartAtText}}, or earlier if all positions fill. Minting cannot begin before its scheduled opening and requires activation."
+      ]
+    },
+    {
+      "id": "collection-live",
+      "label": "Collection minting is live",
+      "header": "MINT IS LIVE",
+      "headline": ["Minting", "is live."],
+      "detail": "{{supply}} NFTs · {{mintPriceEth}} ETH · {{winnerCount}} × {{prizePerWinnerEth}} ETH PRIZES",
+      "footer": "Deadline: {{mintDeadlineText}}.",
+      "publishWhen": "Confirmed activation, chain time within the immutable sale window, and remaining supply. Read price, supply and prizes from this collection's version-specific frozen terms. Countdown zero alone is insufficient.",
+      "post": "Season {{seasonNumber}} · {{collectionName}} is live.\n\n{{supply}} NFTs · {{mintPriceEth}} ETH each.\n{{winnerCount}} prizes of {{prizePerWinnerEth}} ETH after sellout and the verified draw.\n\nDeadline: {{mintDeadlineText}}.\nMint link in the thread.",
+      "replies": [
+        "{{seasonName}} · Collection {{collectionNumber}}\n\nMint and read the collection terms:\n{{mintUrl}}",
+        "Prizes are claimed by the winning NFT holders after the verified draw. Qualified affiliates can claim commissions after sellout. If the collection expires unsold, NFT holders can claim mint-price refunds."
+      ]
+    },
+    {
+      "id": "collection-sold-out",
+      "label": "Collection sold out; draw pending",
+      "header": "COLLECTION SOLD OUT",
+      "headline": ["Sold out.", "Draw next."],
+      "detail": "{{supply}} / {{supply}} NFTs MINTED",
+      "footer": "Affiliate commission claims in the thread.",
+      "publishWhen": "Confirmed canonical sellout and affiliate entitlements. This variant is for a draw that is still pending; do not publish stale 'Draw next' copy after reveal. Do not imply prizes were paid or invent winner identities.",
+      "post": "Season {{seasonNumber}} · {{collectionName}} is sold out.\n{{supply}} / {{supply}} NFTs minted.\n\nThe verified draw is next. Qualified affiliates can claim their commissions.\n\nClaim link in the thread.",
+      "replies": [
+        "{{seasonName}} · Collection {{collectionNumber}}\n\nQualified affiliates: check your earned balance and claim:\n{{commissionUrl}}",
+        "Winning NFTs will be announced after the draw is verified. Prize claims are separate from sellout. Follow the collection here:\n{{collectionUrl}}"
+      ]
+    },
+    {
+      "id": "winners-revealed",
+      "label": "Verified winning NFTs",
+      "header": "VERIFIED DRAW",
+      "headline": ["Winners", "revealed."],
+      "detail": "{{winnerCount}} WINNING NFTs · {{prizePerWinnerEth}} ETH EACH",
+      "footer": "Results and prize claims in the thread.",
+      "publishWhen": "The canonical draw is finalized and verified. List actual winning token IDs and holder addresses at the stated confirmed block. This claim-open version requires unclaimed prizes; switch wording if all prizes were already claimed.",
+      "post": "Season {{seasonNumber}} · {{collectionName}}\n\nThe draw is verified: {{winnerCount}} winning NFTs, {{prizePerWinnerEth}} ETH each.\nWinning NFT holders can claim their prizes.\n\nResults and claim link in the thread.",
+      "replies": [
+        "{{seasonName}} · Collection {{collectionNumber}}\n\nView the verified results and claim an unclaimed prize if you hold a winning NFT:\n{{prizeClaimUrl}}"
+      ],
+      "repeatReplies": [
+        {
+          "forEach": "verifiedWinningNft",
+          "when": "After verified draw only. Use the current holder at the pinned block, not the minter or a guessed payment recipient. Emit one reply per award, even if a wallet holds multiple winners.",
+          "text": "Award #{{rank}} · NFT #{{tokenId}} · {{awardEth}} ETH\nHolder at block {{holderBlock}}: {{holderWallet}}\n\nVerified NFT:\n{{nftUrl}}"
+        },
+        {
+          "forEach": "confirmedPrizeClaim",
+          "when": "Only after a successful, confirmed canonical prize-claim receipt. A winning NFT or a pending transaction does not prove payment. Publish once per collection/rank/claim transaction.",
+          "text": "Prize claimed · Award #{{rank}} · NFT #{{tokenId}}\n{{awardEth}} ETH\nClaimant: {{claimantWallet}}\nRecipient: {{recipientWallet}}\n\nConfirmed receipt:\n{{receiptUrl}}"
+        }
+      ]
+    },
+    {
+      "id": "refunds-available",
+      "label": "Unsold collection refunds",
+      "header": "REFUNDS AVAILABLE",
+      "headline": ["Refunds", "are open."],
+      "detail": "DEADLINE EXPIRED · COLLECTION UNSOLD",
+      "footer": "Claim your mint-price refund through the thread.",
+      "publishWhen": "The collection is unsold and its canonical refund state is active. Late randomness for a sold-out collection never qualifies. Do not imply refunds were automatically transferred.",
+      "post": "Season {{seasonNumber}} · {{collectionName}} did not sell out before its deadline.\n\nNFT holders can now claim a refund of {{mintPriceEth}} ETH per NFT.\n\nRefund link and details in the thread.",
+      "replies": [
+        "{{seasonName}} · Collection {{collectionNumber}}\n\nCurrent NFT holders can claim their mint-price refund here:\n{{refundUrl}}",
+        "Refunds require a claim from the current NFT holder. Each refunded NFT is burned. Network gas is not refunded. This unsold collection distributes no prizes or affiliate commissions."
+      ]
+    },
+    {
+      "id": "season-complete",
+      "label": "Season complete with statistics",
+      "header": "SEASON COMPLETE",
+      "headline": ["Season {{seasonNumber}}", "complete."],
+      "layout": "statistics",
+      "footer": "Color, collected. Thank you for being part of it.",
+      "metrics": [
+        { "value": "{{collectionsSoldOut}} / {{collectionCount}}", "label": "COLLECTIONS SOLD OUT" },
+        { "value": "{{seasonNftsMinted}}", "label": "NFTs MINTED" },
+        { "value": "{{seasonPrizesClaimedEth}} ETH", "label": "PRIZES CLAIMED" },
+        { "value": "{{seasonAffiliateClaimedEth}} ETH", "label": "COMMISSIONS CLAIMED" }
+      ],
+      "publishWhen": "Explicit season closure after all intended collection outcomes are terminal and all required draws verified. Reconcile one chain/currency at a stated confirmed block. 'Claimed' totals sum actual successful claim events, not allocations. Completion does not imply outstanding claims vanish.",
+      "post": "Season {{seasonNumber}} is complete.\n{{seasonName}}.\n\n{{collectionsSoldOut}}/{{collectionCount}} collections sold out · {{seasonNftsMinted}} NFTs minted.\n{{seasonPrizesClaimedEth}} ETH in prizes claimed.\n{{seasonAffiliateClaimedEth}} ETH in affiliate commissions claimed.\n\nColor, collected. Thank you.",
+      "replies": [
+        "Season results and collection history:\n{{seasonUrl}}",
+        "Totals as of {{seasonSnapshotAtText}} · {{networkName}}, block {{seasonSnapshotBlock}}. Claimed amounts reflect confirmed transfers. Any outstanding prize, commission or refund claims remain subject to each collection's terms."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "status": "design-preview",
+  "template": "affiliate-enrollment-open",
+  "seasonNumber": 1,
+  "seasonName": "Crimson & Blood Orange",
+  "collectionNumber": 1,
+  "collectionName": "Velvet Ember",
+  "collectionColor": "#330000",
+  "colors": [
+    "#330000",
+    "#660000",
+    "#990000",
+    "#CC0000",
+    "#FF0000",
+    "#663300",
+    "#993300",
+    "#CC3300",
+    "#FF3300",
+    "#FF6600"
+  ],
+  "width": 1600,
+  "height": 900,
+  "alt": "Tincta — Affiliate enrollment is open — Season 01, Velvet Ember. Enrollment is open. MINT SCHEDULED · 24 SEP 2026 · 16:15 UTC. Design preview with fictional event data.",
+  "headline": [
+    "Enrollment",
+    "is open."
+  ],
+  "detail": "MINT SCHEDULED · 24 SEP 2026 · 16:15 UTC",
+  "metrics": [],
+  "post": "Season 01 · Velvet Ember\n\nAffiliate enrollment is open.\nMinting is scheduled in 15m: 24 Sep 2026, 16:15 UTC.\n\nJoin through the link in the thread.",
+  "replies": [
+    "Crimson & Blood Orange · Collection 01\n\nCheck eligibility and enroll:\nhttps://example.invalid/enroll",
+    "Enrollment closes at 24 Sep 2026, 16:15 UTC, or earlier if all positions fill. Minting cannot begin before its scheduled opening and requires activation."
+  ],
+  "repeatReplies": [],
+  "publishWhen": "Enrollment is currently available, with unfilled positions, a working admission service and chain time before saleStartAt. A permit alone is not enrollment. A filled program does not move minting earlier."
+}

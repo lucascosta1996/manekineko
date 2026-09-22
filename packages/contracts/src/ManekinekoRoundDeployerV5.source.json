@@ -1,0 +1,5 @@
+{
+  "contractName": "ManekinekoRoundDeployerV5",
+  "compiler": "0.8.37",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity 0.8.37;\n\nimport {ManekinekoRoundV5} from \"./ManekinekoRoundV5.sol\";\n\n/// @notice A fixed creation template. Only its creating factory may deploy complete independent rounds.\n/// @dev This is not a proxy: no delegatecall, mutable implementation or arbitrary creation code exists.\ncontract ManekinekoRoundDeployerV5 {\n    address public immutable factory;\n    error OnlyFactory();\n    constructor() { factory = msg.sender; }\n    function deploy(ManekinekoRoundV5.Config calldata config, address renderer) external returns (address) {\n        if (msg.sender != factory) revert OnlyFactory();\n        return address(new ManekinekoRoundV5(config, renderer));\n    }\n}\n"
+}

@@ -1,0 +1,151 @@
+[
+  {
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "OnlyFactory",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "seasonId",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "string",
+            "name": "seasonName",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "collectionColor",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "textColor",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "roundId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxSupply",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "mintPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "mintDeadline",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "initialOwner",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "vrfCoordinator",
+            "type": "address"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "keyHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint16",
+            "name": "requestConfirmations",
+            "type": "uint16"
+          },
+          {
+            "internalType": "uint32",
+            "name": "callbackGasLimit",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxAffiliateSlots",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "enrollmentSigner",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "prizeBps",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "affiliatePoolBps",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "affiliateEligibility",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct ManekinekoRoundV6.Config",
+        "name": "config",
+        "type": "tuple"
+      },
+      {
+        "internalType": "address",
+        "name": "renderer",
+        "type": "address"
+      }
+    ],
+    "name": "deploy",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "factory",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

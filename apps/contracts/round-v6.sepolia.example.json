@@ -1,0 +1,22 @@
+{
+  "chainId": "11155111",
+  "name": "Manekineko V6 Sepolia",
+  "seasonId": "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "seasonName": "Genesis",
+  "collectionColor": "#173C2C",
+  "textColor": "#FFFFFF",
+  "symbol": "NEKO6",
+  "maxSupply": "1000",
+  "mintPriceWei": "100000000000000",
+  "mintDurationSeconds": "604800",
+  "initialOwner": "0x0000000000000000000000000000000000000000",
+  "requestConfirmations": "64",
+  "callbackGasLimit": "200000",
+  "randomnessFundingWei": "100000000000000000",
+  "activateSale": false,
+  "maxAffiliateSlots": "10",
+  "enrollmentSigner": "0x0000000000000000000000000000000000000000",
+  "prizeBps": "5000",
+  "affiliatePoolBps": "1000",
+  "algorithmVersion": "unique-rank-v3"
+}

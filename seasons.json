@@ -1,0 +1,177 @@
+[
+  {
+    "season": 1,
+    "theme": "Crimson & Blood Orange",
+    "collections": [
+      "#330000", "#660000", "#990000", "#CC0000", "#FF0000",
+      "#663300", "#993300", "#CC3300", "#FF3300", "#FF6600"
+    ]
+  },
+  {
+    "season": 2,
+    "theme": "Burnt Sienna & Terracotta",
+    "collections": [
+      "#996600", "#CC6600", "#CC9900", "#FF9900", "#FFCC00",
+      "#663333", "#993333", "#CC3333", "#FF3333", "#996633"
+    ]
+  },
+  {
+    "season": 3,
+    "theme": "Desert Sand & Warm Amber",
+    "collections": [
+      "#CC6633", "#FF6633", "#CC9933", "#FF9933", "#FFCC33",
+      "#996666", "#CC6666", "#FF6666", "#CC9966", "#FF9966"
+    ]
+  },
+  {
+    "season": 4,
+    "theme": "Solar Yellow & Pastel Gold",
+    "collections": [
+      "#FFFF00", "#FFFF33", "#FFFF66", "#FFFF99", "#FFFFCC",
+      "#CCCC00", "#CCCC33", "#CCCC66", "#CCCC99", "#FFCC66"
+    ]
+  },
+  {
+    "season": 5,
+    "theme": "Olive & Dried Moss",
+    "collections": [
+      "#333300", "#666600", "#666633", "#999900", "#999933",
+      "#999966", "#669900", "#669933", "#99CC00", "#99CC33"
+    ]
+  },
+  {
+    "season": 6,
+    "theme": "Vivid Lime & Chartreuse",
+    "collections": [
+      "#336600", "#339900", "#33CC00", "#33FF00", "#66CC00",
+      "#66FF00", "#99FF00", "#99FF33", "#CCFF00", "#CCFF33"
+    ]
+  },
+  {
+    "season": 7,
+    "theme": "Spring Foliage & Meadow",
+    "collections": [
+      "#CCFF66", "#CCFF99", "#CCFFCC", "#99CC66", "#99CC99",
+      "#66CC33", "#66CC66", "#33CC33", "#339933", "#336633"
+    ]
+  },
+  {
+    "season": 8,
+    "theme": "Deep Forest & Pine",
+    "collections": [
+      "#003300", "#006600", "#009900", "#00CC00", "#00FF00",
+      "#003333", "#006633", "#009933", "#00CC33", "#00FF33"
+    ]
+  },
+  {
+    "season": 9,
+    "theme": "Spearmint & Crisp Jade",
+    "collections": [
+      "#00FF66", "#00FF99", "#33FF66", "#33FF99", "#66FF66",
+      "#66FF99", "#99FF66", "#99FF99", "#00CC66", "#33CC66"
+    ]
+  },
+  {
+    "season": 10,
+    "theme": "Abyssal Waters & Dark Teal",
+    "collections": [
+      "#003366", "#006666", "#006699", "#009966", "#009999",
+      "#336666", "#339966", "#339999", "#003399", "#0033CC"
+    ]
+  },
+  {
+    "season": 11,
+    "theme": "Electric Cyan & Turquoise",
+    "collections": [
+      "#00CC99", "#00CCCC", "#00CCFF", "#00FFCC", "#00FFFF",
+      "#33CCCC", "#33CCFF", "#33FFCC", "#33FFFF", "#66FFFF"
+    ]
+  },
+  {
+    "season": 12,
+    "theme": "Glacier & Pure Aquamarine",
+    "collections": [
+      "#66CCCC", "#66CCFF", "#66FFCC", "#99CCCC", "#99CCFF",
+      "#99FFCC", "#99FFFF", "#CCFFFF", "#3399CC", "#336699"
+    ]
+  },
+  {
+    "season": 13,
+    "theme": "Cerulean & Sky Blue",
+    "collections": [
+      "#0066CC", "#0066FF", "#0099CC", "#0099FF", "#3366CC",
+      "#3366FF", "#3399FF", "#6699CC", "#6699FF", "#666699"
+    ]
+  },
+  {
+    "season": 14,
+    "theme": "Cobalt & Deep Azure",
+    "collections": [
+      "#000033", "#000066", "#000099", "#0000CC", "#0000FF",
+      "#330033", "#330066", "#330099", "#3300CC", "#3300FF"
+    ]
+  },
+  {
+    "season": 15,
+    "theme": "Midnight Navy & Steel",
+    "collections": [
+      "#0033FF", "#6666CC", "#6666FF", "#9999CC", "#9999FF",
+      "#CCCCFF", "#333366", "#333399", "#3333CC", "#3333FF"
+    ]
+  },
+  {
+    "season": 16,
+    "theme": "Royal Violet & Indigo",
+    "collections": [
+      "#660033", "#660066", "#660099", "#6600CC", "#6600FF",
+      "#990033", "#990066", "#990099", "#9900CC", "#9900FF"
+    ]
+  },
+  {
+    "season": 17,
+    "theme": "Imperial Amethyst & Plum",
+    "collections": [
+      "#CC0033", "#CC0066", "#CC0099", "#CC00CC", "#CC00FF",
+      "#663366", "#663399", "#6633CC", "#6633FF", "#993366"
+    ]
+  },
+  {
+    "season": 18,
+    "theme": "Orchid & Wild Berry",
+    "collections": [
+      "#993399", "#9933CC", "#9933FF", "#CC3366", "#CC3399",
+      "#CC33CC", "#CC33FF", "#996699", "#9966CC", "#9966FF"
+    ]
+  },
+  {
+    "season": 19,
+    "theme": "Vivid Fuchsia & Magenta",
+    "collections": [
+      "#FF0033", "#FF0066", "#FF0099", "#FF00CC", "#FF00FF",
+      "#FF3366", "#FF3399", "#FF33CC", "#FF33FF", "#CC6699"
+    ]
+  },
+  {
+    "season": 20,
+    "theme": "Bubblegum & Pastel Coral",
+    "collections": [
+      "#CC66CC", "#CC66FF", "#FF6699", "#FF66CC", "#FF66FF",
+      "#CC99CC", "#CC99FF", "#FF99CC", "#FF99FF", "#FFCCFF"
+    ]
+  },
+  {
+    "season": 21,
+    "theme": "Warm Neutral & Blush Tints",
+    "collections": [
+      "#669966", "#669999", "#CC9999", "#FFCC99", "#FFCCCC",
+      "#330011", "#331100", "#110033", "#001133", "#003311"
+    ]
+  },
+  {
+    "season": 22,
+    "theme": "The Monochromatic Zenith",
+    "collections": [
+      "#000000", "#333333", "#666666", "#999999", "#CCCCCC", "#FFFFFF"
+    ]
+  }
+]

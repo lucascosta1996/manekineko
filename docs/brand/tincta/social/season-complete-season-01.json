@@ -1,0 +1,59 @@
+{
+  "status": "design-preview",
+  "template": "season-complete",
+  "seasonNumber": 1,
+  "seasonName": "Crimson & Blood Orange",
+  "colors": [
+    "#330000",
+    "#660000",
+    "#990000",
+    "#CC0000",
+    "#FF0000",
+    "#663300",
+    "#993300",
+    "#CC3300",
+    "#FF3300",
+    "#FF6600"
+  ],
+  "width": 1600,
+  "height": 900,
+  "alt": "Tincta — Season complete with statistics — Season 01. Season 01 complete. COLLECTIONS SOLD OUT: 10 / 10; NFTs MINTED: 10,000; PRIZES CLAIMED: 60 ETH; COMMISSIONS CLAIMED: 12 ETH. Design preview with fictional event data.",
+  "headline": [
+    "Season 01",
+    "complete."
+  ],
+  "detail": null,
+  "metrics": [
+    {
+      "value": "10 / 10",
+      "label": "COLLECTIONS SOLD OUT",
+      "valueSize": 44,
+      "labelSize": 16
+    },
+    {
+      "value": "10,000",
+      "label": "NFTs MINTED",
+      "valueSize": 44,
+      "labelSize": 16
+    },
+    {
+      "value": "60 ETH",
+      "label": "PRIZES CLAIMED",
+      "valueSize": 44,
+      "labelSize": 16
+    },
+    {
+      "value": "12 ETH",
+      "label": "COMMISSIONS CLAIMED",
+      "valueSize": 44,
+      "labelSize": 16
+    }
+  ],
+  "post": "Season 01 is complete.\nCrimson & Blood Orange.\n\n10/10 collections sold out · 10,000 NFTs minted.\n60 ETH in prizes claimed.\n12 ETH in affiliate commissions claimed.\n\nColor, collected. Thank you.",
+  "replies": [
+    "Season results and collection history:\nhttps://example.invalid/season",
+    "Totals as of 30 Oct 2026, 18:00 UTC · Ethereum, block 12345678. Claimed amounts reflect confirmed transfers. Any outstanding prize, commission or refund claims remain subject to each collection's terms."
+  ],
+  "repeatReplies": [],
+  "publishWhen": "Explicit season closure after all intended collection outcomes are terminal and all required draws verified. Reconcile one chain/currency at a stated confirmed block. 'Claimed' totals sum actual successful claim events, not allocations. Completion does not imply outstanding claims vanish."
+}
