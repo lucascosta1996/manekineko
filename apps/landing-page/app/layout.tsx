@@ -3,8 +3,9 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Tincta | Permanent numbers, verifiable results",
-  description: "Preview Tincta V10: permanent Solidity-generated NFT combinations and artwork from mint, with scores and winning NFTs determined by one post-sellout VRF draw.",
+  title: "Tincta — Real art. Real rewards.",
+  description:
+    "Original onchain art. Real ETH prizes. Rewards for growing the community. Discover the rewards planned across 22 Tincta seasons and join the launch list.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

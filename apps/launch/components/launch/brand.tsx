@@ -1,3 +1,5 @@
+import { TinctaWordmark } from "../tincta-logo";
+
 export function LaunchBrand() {
-  return <span className="launch-brand">Tincta</span>;
+  return <TinctaWordmark className="launch-brand" />;
 }

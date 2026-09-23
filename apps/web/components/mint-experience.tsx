@@ -25,6 +25,7 @@ import { collectionResponse } from "../lib/live-data/responses";
 import { useLiveData } from "./use-live-data";
 import { LiveDataNotice } from "./live-data-notice";
 import { CollectionActivity } from "./collection-activity";
+import { TinctaWordmark } from "./tincta-logo";
 
 export function MintExperience({
   collection: initialCollection,
@@ -186,7 +187,7 @@ export function MintExperience({
                   ? "AN EXAMPLE. NOT YOUR RESULT."
                   : "COLOR, COLLECTED. ENTIRELY ON-CHAIN."}
               </span>
-              <span className="preview-signature">Tincta</span>
+              <TinctaWordmark className="preview-signature" />
             </div>
           </div>
           {!permanent && <div

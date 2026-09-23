@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { BrandMark } from "./brand-mark";
+import { TinctaWordmark } from "./tincta-logo";
 import { SiteNavigation, type SiteSection } from "./site-navigation";
 
 export function SiteShell({ children, section = "seasons", chainId = null, className = "" }: { children: ReactNode; section?: SiteSection; chainId?: number | null; className?: string }) {
@@ -15,7 +15,7 @@ export function SiteShell({ children, section = "seasons", chainId = null, class
           href="/mint"
           aria-label="Tincta home"
         >
-          <span>Tincta</span>
+          <TinctaWordmark className="tincta-wordmark" title="" />
         </Link>
         <SiteNavigation section={section} />
         {section === "docs" ? <Link href="/mint" className="docs-open-app">Open app <span aria-hidden="true">↗</span></Link> : <span className="environment-badge">
@@ -25,9 +25,9 @@ export function SiteShell({ children, section = "seasons", chainId = null, class
       </header>
       <main id="main">{children}</main>
       <footer className="mint-footer">
-        <Link href="/mint">
-          <BrandMark />
-          <span>Tincta<span className="footer-tagline">Earn prizes by adding color to your wallet.</span></span>
+        <Link href="/mint" aria-label="Tincta home">
+          <TinctaWordmark className="tincta-wordmark" title="" />
+          <span className="footer-tagline">Earn prizes by adding color to your wallet.</span>
         </Link>
         <span>Color, collected. Entirely on-chain.</span>
       </footer>

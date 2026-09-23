@@ -63,14 +63,11 @@
 }
 
 .launch-brand {
-  display: inline-flex;
-  gap: 10px;
-  align-items: center;
-  font-weight: 650;
-  font-size: 27px;
-  letter-spacing: -1.8px;
-  line-height: 1;
-  white-space: nowrap;
+  display: block;
+  width: 110px;
+  height: auto;
+  aspect-ratio: 45 / 14;
+  flex-shrink: 0;
 }
 
 .launch-app-label {
@@ -1335,9 +1332,8 @@
   .launch-header {
     gap: 16px;
   }
-  .launch-brand svg {
-    width: 25px;
-    height: 25px;
+  .launch-brand {
+    width: 100px;
   }
   .launch-app-label {
     font-size: 11px;

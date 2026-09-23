@@ -1,0 +1,44 @@
+[
+  {
+    "file": "/artwork/season-01-collection-10.svg",
+    "color": "#FF6600",
+    "season": 1,
+    "collection": 10,
+    "tokenId": 42
+  },
+  {
+    "file": "/artwork/season-06-collection-09.svg",
+    "color": "#CCFF00",
+    "season": 6,
+    "collection": 9,
+    "tokenId": 128
+  },
+  {
+    "file": "/artwork/season-11-collection-03.svg",
+    "color": "#00CCFF",
+    "season": 11,
+    "collection": 3,
+    "tokenId": 256
+  },
+  {
+    "file": "/artwork/season-14-collection-05.svg",
+    "color": "#0000FF",
+    "season": 14,
+    "collection": 5,
+    "tokenId": 384
+  },
+  {
+    "file": "/artwork/season-16-collection-10.svg",
+    "color": "#9900FF",
+    "season": 16,
+    "collection": 10,
+    "tokenId": 512
+  },
+  {
+    "file": "/artwork/season-20-collection-08.svg",
+    "color": "#FF99CC",
+    "season": 20,
+    "collection": 8,
+    "tokenId": 640
+  }
+]

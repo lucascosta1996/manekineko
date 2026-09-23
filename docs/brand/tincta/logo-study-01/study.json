@@ -1,0 +1,82 @@
+{
+  "status": "exploratory-design-study",
+  "date": "2026-09-23",
+  "recommended": "03-contour-t",
+  "alternative": "02-ribbon-t",
+  "concepts": [
+    {
+      "id": "01",
+      "key": "edition-t",
+      "name": "Edition T",
+      "tone": "Continuity",
+      "idea": "A sequence of editions, collected into one initial.",
+      "short": [
+        "A repeated band, an offset, one initial.",
+        "The closest evolution of the current mark."
+      ],
+      "risk": "The stepped bars can still read as a technical or signal symbol."
+    },
+    {
+      "id": "02",
+      "key": "ribbon-t",
+      "name": "Ribbon T",
+      "tone": "Expressive",
+      "idea": "A color band turns into a flowing, asymmetric T.",
+      "short": [
+        "A color band bends into a signature.",
+        "More movement; a softer collectible voice."
+      ],
+      "risk": "The curved stem can suggest an umbrella or a J before a T."
+    },
+    {
+      "id": "03",
+      "key": "contour-t",
+      "name": "Contour T",
+      "tone": "Recommended",
+      "idea": "A T inside a T: a permanent identity surrounded by its edition.",
+      "short": [
+        "An outer T holds a second T in the counter.",
+        "The artwork’s contour language, made compact."
+      ],
+      "risk": "The internal channel needs optical adjustment below 24 px."
+    },
+    {
+      "id": "04",
+      "key": "four-fields",
+      "name": "Four fields",
+      "tone": "Conceptual",
+      "idea": "Four independent fields leave a shared T-shaped space.",
+      "short": [
+        "Four fields around a shared negative-space T.",
+        "A nod to identity without using literal numbers."
+      ],
+      "risk": "The symbol is more abstract; the upper split can make it read as a cross."
+    },
+    {
+      "id": "05",
+      "key": "edition-seal",
+      "name": "Edition seal",
+      "tone": "Collectible",
+      "idea": "A compact portrait edition with an inset T, like a publisher’s seal.",
+      "short": [
+        "A portrait frame becomes a publisher’s seal.",
+        "An art-edition reading, with a compact footprint."
+      ],
+      "risk": "The surrounding frame is generic; it may compete with the NFT frame."
+    },
+    {
+      "id": "06",
+      "key": "drawn-signature",
+      "name": "Drawn signature",
+      "tone": "Typographic",
+      "idea": "A bespoke lowercase signature with repeated t geometry and a square i dot.",
+      "short": [
+        "A drawn lowercase wordmark with shared t forms.",
+        "Let the lettering carry the entire identity."
+      ],
+      "risk": "The wordmark cannot serve as a favicon; its t is only a provisional companion."
+    }
+  ],
+  "paletteSource": "seasons.json",
+  "assetsChanged": false
+}
