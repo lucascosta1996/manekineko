@@ -3,9 +3,9 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Tincta — Real art. Real rewards.",
+  title: "Tincta — Autonomous rewards. Verifiable onchain.",
   description:
-    "Original onchain art. Real ETH prizes. Rewards for growing the community. Discover the rewards planned across 22 Tincta seasons and join the launch list.",
+    "Prizes and affiliate commissions controlled by smart contracts. Explore planned ETH rewards, onchain rules, and direct claims. Join the Tincta launch list.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

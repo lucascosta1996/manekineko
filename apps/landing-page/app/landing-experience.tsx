@@ -125,8 +125,8 @@ function ColorSculpture({ colors }: { colors: string[] }) {
           letterSpacing=".8"
           textAnchor="middle"
         >
-          <text y="-13">COLOR IS JUST</text>
-          <text y="1">THE BEGINNING.</text>
+          <text y="-13">AUTONOMOUS</text>
+          <text y="1">ONCHAIN REWARDS.</text>
         </g>
         <path
           d="M0 15c0 8-3 11-11 11 8 0 11 3 11 11 0-8 3-11 11-11-8 0-11-3-11-11Z"
@@ -147,6 +147,21 @@ function ColorSculpture({ colors }: { colors: string[] }) {
 
 const faqs = (plannedRewards: PlannedRewards) => [
   {
+    question: "Can the team withdraw my prize or commission?",
+    answer:
+      "No. The contract reserves unpaid prizes and earned affiliate commissions for their recipients. The operator cannot withdraw those funds or claim them for you. Unallocated affiliate budget is a separate reserve that the operator can withdraw after the draw; it is not an earned commission.",
+  },
+  {
+    question: "How can I verify the contract?",
+    answer:
+      "At launch, every collection will link to its deployed Ethereum contract and verified source code. You will be able to inspect the fixed terms, draw results, prize claims, and commission claims on the blockchain before and after participating. V10 deployment and source verification are still pending.",
+  },
+  {
+    question: "Are rewards sent to my wallet automatically?",
+    answer:
+      "The contract determines entitlement and executes payment, without team approval. You submit a claim transaction from the wallet holding the winning NFT or the qualifying affiliate wallet. Sale activation and draw progression also require transactions; autonomous rewards does not mean the entire launch runs without external services or transaction submissions.",
+  },
+  {
     question: "How do I win a prize?",
     answer:
       "Each NFT enters the draw for its own collection. When all NFTs sell out, one verifiable Chainlink VRF draw selects distinct winning NFTs. Under the planned default terms, six winning NFTs each receive 1 ETH, claimed by their holders. One wallet can hold more than one winning NFT. A win is never guaranteed.",
@@ -154,12 +169,12 @@ const faqs = (plannedRewards: PlannedRewards) => [
   {
     question: "What are my chances?",
     answer:
-      "In a sold-out collection of 1,000 NFTs with six prizes, each NFT has a 6 in 1,000 (0.6%) chance of winning a prize. There are six distinct winning NFTs, selected without replacement. Each NFT participates only in its own collection, not in every season or collection. The collection’s final supply and winner count determine its actual odds.",
+      "In a sold-out collection of 1,000 NFTs with six prizes, each NFT has a 6 in 1,000 chance of winning a prize. There are six distinct winning NFTs, selected without replacement. Each NFT participates only in its own collection, not in every season or collection. The collection’s final supply and winner count determine its actual odds.",
   },
   {
     question: "How do affiliate rewards work?",
     answer:
-      "Eligible holders of an NFT from an earlier official completed collection can enroll before minting opens, subject to available positions; the first collection has a bootstrap exception. With the default terms, one attributed paid mint qualifies you. Qualifying affiliates share equally, capped at 30% of the lowest qualifier’s referred mint revenue. Growth collections budget 20% of mint revenue (2 ETH at default sellout); Standard collections budget 10% (1 ETH). The budget is not guaranteed earnings: unused funds remain in the growth reserve.",
+      "Eligible holders of an NFT from an earlier official completed collection can enroll before minting opens, subject to available positions; the first collection has a bootstrap exception. With the default terms, one attributed paid mint qualifies you. The contract calculates equal commissions for qualifying affiliates, subject to the collection’s payout limits. Planned pools are up to 2 ETH per sold-out Growth collection and up to 1 ETH per Standard collection. Earned commissions are claimed directly from the contract, without team approval. Pool budgets are not individual earnings; unused funds remain in a separate reserve.",
   },
   {
     question: "What if a collection doesn’t sell out?",
@@ -306,16 +321,16 @@ export function LandingExperience({
       <header className="header wrap">
         <Brand />
         <nav className="desktop-nav" aria-label="Main navigation">
-          <a href="#rewards">The rewards</a>
-          <a href="#seasons">The seasons</a>
-          <a href="#collection">The art</a>
+          <a href="#rewards">Rewards</a>
+          <a href="#seasons">Collections</a>
+          <a href="#affiliates">Affiliates</a>
           <a href="#how-it-works">How it works</a>
         </nav>
         <a
           className="button button-dark header-cta"
-          href={appUrl ?? "#seasons"}
+          href="#launch-list"
         >
-          {appUrl ? "Explore Tincta" : "Explore the seasons"}
+          Join the launch list
           <Icon name="diagonal" />
         </a>
         <button
@@ -337,15 +352,15 @@ export function LandingExperience({
             onClick={() => setMenuOpen(false)}
           >
             <a href="#rewards">
-              The rewards
+              Rewards
               <Icon />
             </a>
             <a href="#seasons">
-              The seasons
+              Collections
               <Icon />
             </a>
-            <a href="#collection">
-              The art
+            <a href="#affiliates">
+              Affiliates
               <Icon />
             </a>
             <a href="#how-it-works">
@@ -353,7 +368,7 @@ export function LandingExperience({
               <Icon />
             </a>
             <a href="#questions">
-              Your questions
+              FAQ
               <Icon />
             </a>
           </nav>
@@ -364,11 +379,12 @@ export function LandingExperience({
         <section className="hero wrap" aria-labelledby="hero-title">
           <div className="hero-main">
             <div className="hero-copy">
+              <p className="eyebrow hero-kicker">LAUNCH PREVIEW</p>
               <h1 id="hero-title">
-                Real art.
-                <br />Real{" "}
+                Autonomous rewards.
+                <br />Verifiable{" "}
                 <span className="win-word">
-                  rewards
+                  onchain
                   <svg viewBox="0 0 200 20" fill="none" aria-hidden="true">
                     <path
                       d="M3 13C52 2 144 1 195 8M18 19C71 10 129 8 176 11"
@@ -381,13 +397,18 @@ export function LandingExperience({
                 .
               </h1>
               <p className="hero-description">
-                Collect original onchain art, get a chance to win ETH, and
-                earn referral rewards for growing the community.
+                Prizes and affiliate commissions are calculated, held, and paid
+                by smart contracts. Claim directly to your wallet, without team
+                approval. Verify the rules, results, and payouts on Ethereum.
+              </p>
+              <p className="hero-verification">
+                At launch, every collection will link to its deployed contract
+                and verified source code.
               </p>
               <NewsletterSignup />
               <div className="hero-actions">
                 <a className="text-link" href="#rewards">
-                  Discover the rewards
+                  Explore the rewards
                   <Icon />
                 </a>
               </div>
@@ -398,7 +419,7 @@ export function LandingExperience({
                 <div
                   className="hero-swatches"
                   role="group"
-                  aria-label="Preview season colors"
+                  aria-label="Preview collections"
                 >
                   {featuredSeasons.map((season, i) => (
                     <button
@@ -411,7 +432,7 @@ export function LandingExperience({
                       aria-label={`Preview Season ${String(season + 1).padStart(
                         2,
                         "0"
-                      )} colors`}
+                      )} collections`}
                       aria-pressed={heroSeason === i}
                       onClick={() => {
                         setHeroSeason(i);
@@ -446,7 +467,7 @@ export function LandingExperience({
             <div className="reward-metric">
               <div className="metric-top">
                 <Icon name="spark" />
-                <span>PLANNED PRIZE POOL</span>
+                <span>PLANNED PRIZE REWARDS</span>
               </div>
               <div className="metric-number">
                 {Number(plannedRewards.prizePoolEth).toLocaleString("en-US")} <span>ETH</span>
@@ -458,14 +479,14 @@ export function LandingExperience({
             <div className="reward-metric affiliate-metric">
               <div className="metric-top">
                 <Icon name="diagonal" />
-                <span>PLANNED AFFILIATE POOL</span>
+                <span>PLANNED AFFILIATE POOLS</span>
                 <span className="up-to">UP TO</span>
               </div>
               <div className="metric-number">
                 {Number(plannedRewards.affiliatePoolEth).toLocaleString("en-US")} <span>ETH</span>
               </div>
               <p>
-                Across every season. <strong>Grow the community.</strong>
+                Across every season. <strong>Contract-calculated commissions.</strong>
               </p>
             </div>
             <div className="reward-context">
@@ -476,18 +497,18 @@ export function LandingExperience({
               </div>
               <p>
                 {plannedRewards.seasonCount} seasons. {plannedRewards.collectionCount} collections.
-                <br />Rewards for the community.
+                <br />Prizes and commissions onchain.
               </p>
               <a className="text-link" href="#reward-details">
-                Meet the rewards
+                Explore prize amounts
                 <Icon name="down" />
               </a>
             </div>
           </div>
           <p className="terms-note">
             <span>Planned totals if all {plannedRewards.collectionCount} collections sell out.
-            Affiliate budgets include {plannedRewards.growthCollectionCount} Growth and {plannedRewards.standardCollectionCount} Standard collections;
-            eligibility and payout caps apply. Launch pending.</span>
+            Affiliate eligibility and payout limits apply. These are planned budgets,
+            not funded balances. Launch pending.</span>
             <a href="#questions">
               See the details
               <Icon name="diagonal" />
@@ -501,24 +522,24 @@ export function LandingExperience({
           aria-labelledby="manifesto-title"
         >
           <p className="eyebrow section-kicker">
-            <span className="section-index">01 /</span> NOT YOUR ORDINARY
-            COLLECTIBLE
+            <span className="section-index">01 /</span> CONTRACT-CONTROLLED REWARDS
           </p>
           <h2 id="manifesto-title">
-            Something to collect.
+            The contract controls
             <br />
-            <span className="muted-heading">Something to look forward to.</span>
+            <span className="muted-heading">the rewards.</span>
           </h2>
           <div className="manifesto-bottom">
             <p>
-              Tincta brings color, original art, and real ETH prizes together.
-              Pick a collection that speaks to you. Keep a piece of it. See
-              where it takes you.
+              Prize amounts and commission rules are fixed before the collection
+              launches. The contract calculates entitlements and executes claims.
+              The operator cannot withdraw funds owed as prizes or earned
+              affiliate commissions.
             </p>
             <a
               className="round-link"
               href="#collection"
-              aria-label="Discover the NFT artwork"
+              aria-label="Explore your NFT’s role in the draw"
             >
               <Icon name="down" />
             </a>
@@ -534,24 +555,23 @@ export function LandingExperience({
             <div className="section-heading" data-reveal>
               <div>
                 <p className="eyebrow">
-                  <span className="section-index">02 /</span> ONE WORLD. EVERY
-                  SHADE.
+                  <span className="section-index">02 /</span> COLLECTION TERMS ONCHAIN
                 </p>
                 <h2 id="seasons-title">
-                  Good things come
+                  Every collection.
                   <br />
-                  in <span className="serif">seasons.</span>
+                  Its own <span className="serif">rules.</span>
                 </h2>
               </div>
               <p>
-                A season is a family of colors. Each color becomes its own
-                limited NFT collection, with its own artwork, its own draw, and
-                its own prizes.
+                Every collection publishes its rules onchain at launch. Review
+                the entry price, prize amounts, and commission terms before
+                minting. Each sold-out collection has its own draw.
               </p>
             </div>
             <div className="season-explorer" data-reveal>
               <div className="season-explorer-top">
-                <span className="mono">THE COLOR CATALOG</span>
+                <span className="mono">EXPLORE THE COLLECTIONS</span>
                 <span className="catalog-tag">
                   {seasons.length} planned seasons
                   <Icon name="plus" />
@@ -561,7 +581,7 @@ export function LandingExperience({
               <div
                 className="season-swatch-stage"
                 key={catalogSeason}
-                aria-label={`Season ${selectedSeason.season}, ${selectedSeason.colors.length} collection colors`}
+                aria-label={`Season ${selectedSeason.season}, ${selectedSeason.colors.length} collections`}
               >
                 {selectedSeason.colors.map((color, i) => (
                   <div
@@ -582,9 +602,8 @@ export function LandingExperience({
                     Season {String(selectedSeason.season).padStart(2, "0")}
                   </h3>
                   <p>
-                    {selectedSeason.colors.length} colors.{" "}
-                    {selectedSeason.colors.length} collections. A fresh draw in
-                    each.
+                    {selectedSeason.colors.length} collections. A separate prize
+                    draw in each after sellout.
                   </p>
                 </div>
                 <div className="step-controls">
@@ -621,8 +640,8 @@ export function LandingExperience({
                 onClick={() => setShowCatalog(!showCatalog)}
               >
                 {showCatalog
-                  ? "Close the spectrum"
-                  : "Explore all 22 season palettes"}
+                  ? "Close season list"
+                  : "View all 22 seasons"}
                 <Icon name="plus" className={showCatalog ? "rotate" : ""} />
               </button>
               {showCatalog && (
@@ -650,11 +669,11 @@ export function LandingExperience({
             <div className="season-facts" data-reveal>
               <div>
                 <span>22</span>
-                <p>Seasons in the planned spectrum</p>
+                <p>Planned seasons</p>
               </div>
               <div>
                 <span>216</span>
-                <p>Collections to discover</p>
+                <p>Planned collections</p>
               </div>
               <div>
                 <span>
@@ -678,23 +697,22 @@ export function LandingExperience({
           <div className="wrap section-heading" data-reveal>
             <div>
               <p className="eyebrow">
-                <span className="section-index">03 /</span> ART WORTH KEEPING
+                <span className="section-index">03 /</span> YOUR ENTRY INTO THE DRAW
               </p>
               <h2 id="art-title">
-                Find your kind
+                Your NFT connects
                 <br />
-                of <span className="serif">extraordinary.</span>
+                you to the <span className="serif">draw.</span>
               </h2>
             </div>
             <div>
               <p>
-                Original geometry. Permanent numbers.
-                <br />
-                Every NFT is a little world of its own, made entirely from
-                onchain SVG.
+                Each NFT participates in its collection’s draw. The contract
+                recognizes the winning holder’s right to claim. Your permanent
+                NFT identity stays separate from the draw result.
               </p>
               <div className="gallery-controls">
-                <span className="mono">A FEW COLORS FROM THE SPECTRUM</span>
+                <span className="mono">COLLECTION PREVIEWS</span>
                 <button
                   className="circle-button"
                   aria-label="Previous artwork"
@@ -756,7 +774,7 @@ export function LandingExperience({
                   </span>
                   <span className="art-color-code">
                     <span style={{ background: art.color }} />
-                    {art.color}
+                    COLLECTION {String(art.collection).padStart(2, "0")}
                   </span>
                 </figcaption>
               </figure>
@@ -764,7 +782,7 @@ export function LandingExperience({
           </div>
           <div className="wrap art-footnote">
             <span>
-              <Icon name="check" /> Entirely SVG. Entirely onchain.
+              <Icon name="check" /> Permanent identity. Onchain results.
             </span>
             <p>
               Artwork previews. Sample numbers are illustrative; final
@@ -781,17 +799,17 @@ export function LandingExperience({
           <div className="prize-panel" data-reveal>
             <div className="prize-copy">
               <p className="eyebrow">
-                <Icon name="spark" /> MORE THAN ONE MOMENT TO WIN
+                <Icon name="spark" /> PRIZES CLAIMED DIRECTLY
               </p>
               <h2 id="prizes-title">
-                Six prizes.
+                Six winning NFTs.
                 <br />
-                Same <span className="serif">big feeling.</span>
+                <span className="serif">1 ETH each.</span>
               </h2>
               <p>
-                One collection. Six distinct winning NFTs. An equal 1 ETH prize
-                for each. When the collection sells out, a verifiable draw
-                decides the results.
+                A verifiable draw determines the winners after sellout. Each
+                winning holder claims their ETH directly from the contract.
+                Planned default: 6 ETH in prizes per sold-out collection.
               </p>
               <div className="prize-micro">
                 <span>
@@ -832,7 +850,7 @@ export function LandingExperience({
               ))}
             </div>
           </div>
-          <div className="affiliate-panel" data-reveal>
+          <div className="affiliate-panel" id="affiliates" data-reveal>
             <div className="affiliate-visual" aria-hidden="true">
               <svg viewBox="0 0 400 300" fill="none">
                 <g className="affiliate-rings">
@@ -851,21 +869,23 @@ export function LandingExperience({
                 </g>
               </svg>
               <span>
-                20<sup>%</sup>
-                <small>GROWTH AFFILIATE POOL</small>
+                <small>UP TO</small>
+                2<sup> ETH</sup>
+                <small>AFFILIATE POOL PER SOLD-OUT COLLECTION</small>
               </span>
             </div>
             <div className="affiliate-copy">
-              <p className="eyebrow">GOOD THINGS ARE BETTER SHARED</p>
+              <p className="eyebrow">COMMISSIONS CALCULATED ONCHAIN</p>
               <h2>
-                Bring your people.
+                Your referrals.
                 <br />
-                Share the <span className="serif">possibilities.</span>
+                Contract-calculated <span className="serif">commissions.</span>
               </h2>
               <p>
-                Already an eligible collector? Enroll as an affiliate. With the
-                default terms, one paid referral qualifies you to share the pool
-                equally with other qualifying affiliates.
+                Qualifying referrals are recorded onchain. The contract calculates
+                your earned commission and lets you claim it directly, without
+                team approval. Eligible holders enroll before minting opens;
+                under planned defaults, one paid referral qualifies you.
               </p>
               <div className="affiliate-detail">
                 <span>
@@ -881,9 +901,11 @@ export function LandingExperience({
                 </a>
               </div>
               <p className="affiliate-note">
-                Actual payouts depend on qualification and a shared cap: 30% of
-                the lowest qualifier’s referred mint revenue. Unused funds stay
-                in the growth reserve. Standard collections budget 10%.
+                Planned pools are up to 2 ETH for Growth collections and up to
+                1 ETH for Standard collections. Qualifying affiliates share
+                equally, subject to payout limits. Pool budgets are not individual
+                earnings. Unallocated funds remain in a separate operator-accessible
+                reserve; earned commissions remain protected.
               </p>
             </div>
           </div>
@@ -897,18 +919,17 @@ export function LandingExperience({
           <div className="section-heading" data-reveal>
             <div>
               <p className="eyebrow">
-                <span className="section-index">04 /</span> YOUR NEXT CHAPTER
+                <span className="section-index">04 /</span> FROM CONTRACT TO CLAIM
               </p>
               <h2 id="how-title">
-                A little curiosity.
+                Review. Mint.
                 <br />
-                Three simple steps.
+                Claim if you win.
               </h2>
             </div>
             <p>
-              From your first color to the final draw,
-              <br />
-              here’s how the story unfolds.
+              Review the rules before entering. Follow the draw onchain.
+              Submit your claim directly to the contract.
             </p>
           </div>
           <div className="steps" data-reveal>
@@ -917,13 +938,13 @@ export function LandingExperience({
                 01
                 <Icon name="plus" />
               </span>
-              <h3>Find your color.</h3>
+              <h3>Review the contract.</h3>
               <p>
                 Explore the season. Choose a collection and review its fixed
                 price, supply, prizes, and terms.
               </p>
               <span className="step-caption">
-                A NEW COLLECTION. A NEW POSSIBILITY.
+                FIXED TERMS. PUBLISHED ONCHAIN.
               </span>
             </article>
             <article>
@@ -931,13 +952,13 @@ export function LandingExperience({
                 02
                 <Icon name="plus" />
               </span>
-              <h3>Make it yours.</h3>
+              <h3>Mint your NFT.</h3>
               <p>
-                Mint an NFT to your wallet. Its four numbers and original SVG
-                artwork are yours from the start.
+                Mint an NFT to your wallet. Each NFT enters its collection’s
+                draw, with its permanent identity assigned by the contract.
               </p>
               <span className="step-caption">
-                YOUR ART. YOUR PERMANENT IDENTITY.
+                YOUR NFT. YOUR DRAW ENTRY.
               </span>
             </article>
             <article>
@@ -945,13 +966,13 @@ export function LandingExperience({
                 03
                 <Icon name="spark" />
               </span>
-              <h3>Let the colors unfold.</h3>
+              <h3>Claim if you win.</h3>
               <p>
                 After sellout, the verifiable draw selects the winning NFTs.
                 Hold a winner? Claim its ETH prize.
               </p>
               <span className="step-caption">
-                ONE DRAW. SIX DEFAULT PRIZES.
+                DIRECT CLAIMS. NO TEAM APPROVAL.
               </span>
             </article>
           </div>
@@ -960,10 +981,10 @@ export function LandingExperience({
               <Icon name="check" /> Verifiable Chainlink VRF draw
             </span>
             <span>
-              <Icon name="check" /> Permanent onchain artwork
+              <Icon name="check" /> Fixed collection terms
             </span>
             <span>
-              <Icon name="check" /> Holder-claimed prizes
+              <Icon name="check" /> Direct ETH claims
             </span>
           </div>
         </section>
@@ -976,17 +997,16 @@ export function LandingExperience({
         >
           <div>
             <p className="eyebrow">
-              <span className="section-index">05 /</span> A LITTLE CLARITY
+              <span className="section-index">05 /</span> INDEPENDENTLY VERIFIABLE
             </p>
             <h2 id="faq-title">
-              Good questions.
+              Inspect the code.
               <br />
-              Clear answers.
+              Verify the outcome.
             </h2>
             <p>
-              The possibilities are exciting.
-              <br />
-              The details should be simple.
+              At launch, explore verified contract code, collection terms,
+              draw results, prize claims, and commission claims on Ethereum.
             </p>
           </div>
           <div className="faq-list">
@@ -1012,17 +1032,17 @@ export function LandingExperience({
             ))}
           </div>
           <div className="wrap closing-content" data-reveal>
-            <p className="eyebrow">THE NEXT POSSIBILITY HAS YOUR NAME ON IT</p>
+            <p className="eyebrow">BE READY FOR THE FIRST COLLECTION</p>
             <h2 id="closing-title">
-              Life could use
-              <br />a little <span className="serif">color.</span>
+              Know the rules
+              <br />before you <span className="serif">enter.</span>
             </h2>
-            <a className="button button-dark" href={appUrl ?? "#seasons"}>
-              {appUrl ? "Explore Tincta" : "Find your season"}
+            <a className="button button-dark" href="#launch-list">
+              Join the launch list
               <Icon name="diagonal" />
             </a>
             <span className="closing-note">
-              22 planned seasons. One colorful beginning.
+              Get notified when the first collection opens for minting.
             </span>
           </div>
         </section>
@@ -1031,13 +1051,13 @@ export function LandingExperience({
         <div className="footer-top">
           <Brand footer />
           <p>
-            Color, collected.
+            Onchain prizes.
             <br />
-            Possibilities, open.
+            Contract-controlled commissions.
           </p>
           <nav aria-label="Footer navigation">
             <a href="#seasons">Seasons</a>
-            <a href="#collection">The art</a>
+            <a href="#affiliates">Affiliates</a>
             <a href="#questions">Questions</a>
             {appUrl && (
               <a href={new URL("/docs", appUrl).href}>

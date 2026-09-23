@@ -31,7 +31,7 @@ export function NewsletterSignup() {
       const result = await response.json();
       if (result.success !== true) throw new Error("Signup was not confirmed");
       setStatus("success");
-      setMessage("You’re on the list. Look out for Tincta launch updates.");
+      setMessage("You’re on the list. We’ll email you when minting opens.");
     } catch {
       setStatus("error");
       setMessage("We couldn’t confirm your signup. Please try again.");
@@ -39,7 +39,7 @@ export function NewsletterSignup() {
   }
 
   return (
-    <form className="newsletter" onSubmit={submit} aria-busy={status === "pending"}>
+    <form id="launch-list" className="newsletter" onSubmit={submit} aria-busy={status === "pending"}>
       <label htmlFor="launch-email">Be first to know when minting opens.</label>
       <div className="newsletter-field">
         <input
@@ -54,7 +54,7 @@ export function NewsletterSignup() {
           aria-describedby="newsletter-status"
         />
         <button className="button button-dark" type="submit" disabled={status === "pending" || status === "success"}>
-          {status === "pending" ? "Joining…" : status === "success" ? "You’re in" : "Join the list"}
+          {status === "pending" ? "Joining…" : status === "success" ? "You’re in" : "Join the launch list"}
           <svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d={status === "success" ? "m5 12 4 4L19 6" : "M4 12h15m-6-6 6 6-6 6"} />
           </svg>
