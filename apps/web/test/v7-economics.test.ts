@@ -51,7 +51,7 @@ test('fixed launch time schedules verification, retries while chain clock catche
  assert.equal(scheduledMintRecheckDelay(program,Date.parse(collection.mintDeadline!)),null);
  assert.equal(collectionProgress({...collection,phase:'minting'},now).label,'Scheduled');
  assert.equal(collectionProgress({...collection,phase:'minting'},now+3_600_000).label,'Mint open');
- assert.equal(collectionProgress(collection,now).label,'Prizes available');
+ assert.equal(collectionProgress(collection,now).label,'Prizes ready to claim');
 });
 test('history counts individual claims once and archives both awards only after both are paid',()=>{
  const partial={...collection,awards:[award(1),award(2,true)]};

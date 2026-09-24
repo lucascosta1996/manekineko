@@ -4,11 +4,11 @@ import type { DocPage } from "./model";
 // immutable terms remain authoritative, including for earlier contract versions.
 export const docPages: DocPage[] = [
   {
-    slug: "overview", title: "Welcome to Tincta", group: "Start here", minutes: 2,
-    description: "Collect color. Understand the draw. Take part on your terms.",
+    slug: "overview", title: "How rewards work", group: "Start here", minutes: 2,
+    description: "Understand prize values, protected funds, and direct contract claims.",
     sections: [
-      { id: "what-is-tincta", title: "Color with a chance to win", blocks: [
-        { type: "paragraph", text: "Tincta brings together collectible on-chain artwork and finite NFT draws. In the V10 design, each NFT arrives with four permanent numbers generated in Solidity when it is minted. After the collection sells out, one verifiable random draw assigns final scores and selects the winning NFTs. The numbers identify your ticket; they do not predict its result." },
+      { id: "what-is-tincta", title: "ETH rewards. Governed by smart contracts.", blocks: [
+        { type: "paragraph", text: "Tincta offers finite NFT draws with ETH prizes and affiliate rewards. In the current design, the smart contract holds prize funds and earned affiliate rewards, protects them from team withdrawals, and sends eligible claims directly to the chosen wallet. Winners are determined on-chain using verifiable randomness after sellout. No manual payout approval is needed." },
         { type: "paragraph", text: "The default format has six winning NFTs with equal prizes. The contract supports one to ten distinct winning NFTs, fixed in each collection’s terms. Collectors can also participate in its affiliate program, subject to enrollment and referral rules. Check the published mint price, supply, prizes and affiliate terms for each collection." },
         { type: "callout", title: "V10 rollout status", text: "V10 rollout is pending. Its contracts and application support are implemented locally; no live V10 deployment is recorded. These guides explain its new architecture alongside earlier versions. Existing V8/V9 collections keep their sealed-then-revealed artwork. Check the actual collection’s contract version before applying a guide." },
         { type: "callout", title: "A ticket is a chance, not a promised return", text: "Most tickets do not win. Holding an NFT does not automatically earn affiliate rewards, and resale value is not guaranteed. Check the network and collection terms before you mint." },
@@ -16,9 +16,9 @@ export const docPages: DocPage[] = [
       { id: "start-exploring", title: "Find your starting point", blocks: [
         { type: "links", items: [
           { label: "Your first ticket", description: "From choosing a collection to finding your NFT.", href: "/docs/quickstart" },
-          { label: "Seasons & collections", description: "How the color editions are organized.", href: "/docs/seasons" },
-          { label: "Prizes & claims", description: "Who wins, who can claim, and when.", href: "/docs/prizes" },
-          { label: "Affiliate program", description: "Eligibility, referrals and shared rewards.", href: "/docs/affiliates" },
+          { label: "Seasons & collections", description: "Find collections, prize values, and opening times.", href: "/docs/seasons" },
+          { label: "Claim your prize", description: "Who wins, who can claim, and when.", href: "/docs/prizes" },
+          { label: "Earn affiliate rewards", description: "Eligibility, referrals and shared rewards.", href: "/docs/affiliates" },
         ] },
       ] },
       { id: "read-the-right-rules", title: "Each collection keeps its own rules", blocks: [
@@ -30,21 +30,21 @@ export const docPages: DocPage[] = [
   },
   {
     slug: "quickstart", title: "Your first ticket", group: "Start here", minutes: 3,
-    description: "A short guide to collecting your first Tincta NFT.",
+    description: "Choose a prize collection, mint a ticket, and follow its result.",
     sections: [
       { id: "before-you-start", title: "Before you start", blocks: [
         { type: "list", items: ["Use an Ethereum-compatible wallet you control.", "Check the network shown by the collection. Ethereum Mainnet and Ethereum Sepolia are different networks.", "Keep enough ETH on that network for the mint price and the network transaction fee.", "Read the collection’s supply, deadline, prize terms and contract details before confirming a purchase."] },
         { type: "callout", title: "Testing on Sepolia", text: "Sepolia uses test ETH. A Sepolia NFT or prize is a testnet asset and does not become a Mainnet asset automatically." },
       ] },
       { id: "mint-a-ticket", title: "Choose, connect, mint", blocks: [
-        { type: "list", ordered: true, items: ["Open Seasons. The mint entry opens the current live season when one is available, with the active collection highlighted.", "Open the collection and connect your wallet. Check that the displayed account is the one that should receive your NFT.", "Choose your ticket quantity. If you arrived through an affiliate link, check the referral displayed before submitting.", "Review the total and confirm the mint transaction in your wallet. Wait for its on-chain confirmation.", "Open My NFTs to see your tickets. The website may need a little time to index the confirmed transaction."] },
+        { type: "list", ordered: true, items: ["Open Seasons. The mint entry opens the current live season when one is available, with the active collection highlighted.", "Open the collection and connect your wallet. Check that the displayed account is the one that should receive your NFT.", "Choose your ticket quantity. If you arrived through an affiliate link, check the referral displayed before submitting.", "Review the total and confirm the mint transaction in your wallet. Wait for its on-chain confirmation.", "Open My Tickets to see your tickets. The website may need a little time to index the confirmed transaction."] },
       ] },
       { id: "after-minting", title: "What happens next", blocks: [
         { type: "paragraph", text: "A V10 NFT has its four permanent numbers and finished artwork from mint. Its score and any prize remain pending until the post-sellout draw is finalized, and are checked separately from the image. Historical V8/V9 tickets stay sealed until finalization reveals their numbers and score." },
         { type: "paragraph", text: "A winning NFT’s current holder can claim its award. If an unsold collection reaches its deadline, the current holder can instead claim the mint-price refund under that collection’s rules." },
         { type: "links", items: [
           { label: "Browse seasons", description: "See published collections and mint availability.", href: "/seasons" },
-          { label: "View My NFTs", description: "Find your tickets and their current status.", href: "/my-nfts" },
+          { label: "View My Tickets", description: "Find your tickets and their current status.", href: "/my-nfts" },
           { label: "Understand the draw", description: "Learn how results are generated and checked.", href: "/docs/randomness" },
         ] },
       ] },
@@ -52,10 +52,10 @@ export const docPages: DocPage[] = [
   },
   {
     slug: "seasons", title: "Seasons", group: "The protocol", minutes: 3,
-    description: "A shared identity, expressed through a series of color collections.",
+    description: "Find prize collections and follow their opening schedule.",
     sections: [
-      { id: "a-family-of-collections", title: "A family of collections", blocks: [
-        { type: "paragraph", text: "A season groups up to ten collections under one name and visual identity. Each collection has its own name and color. Its NFTs carry the season name, collection name and token number, with geometric artwork that varies across the season’s editions." },
+      { id: "a-family-of-collections", title: "A series of prize collections", blocks: [
+        { type: "paragraph", text: "A season groups up to ten prize collections. Each collection has its own ticket price, supply, prize values, affiliate terms and contract. Compare the published rewards and opening times before choosing where to participate." },
         { type: "paragraph", text: "A season is an organizing layer, not a single pooled draw. Each collection has its own finite supply, mint window, prize reserve, affiliate program and result. Owning a ticket in one collection does not enter you into every collection in that season." },
       ] },
       { id: "find-the-live-collection", title: "Find the live collection", blocks: [
@@ -68,7 +68,7 @@ export const docPages: DocPage[] = [
         { type: "callout", title: "An announcement is not a draw result", text: "Sales statistics can be known at sellout while results are still pending. Only finalized on-chain results identify the winners. The launch planner’s schedule does not by itself mean automatic deployment or social posting is running." },
       ] },
       { id: "explore-more", title: "Explore more", blocks: [
-        { type: "links", items: [{ label: "Collections", description: "See the lifecycle and terms of an individual draw.", href: "/docs/collections" }, { label: "Browse seasons", description: "Find the published color editions.", href: "/seasons" }] },
+        { type: "links", items: [{ label: "Collections", description: "See the lifecycle and terms of an individual draw.", href: "/docs/collections" }, { label: "Browse seasons", description: "Compare published collections and their rewards.", href: "/seasons" }] },
       ] },
     ],
   },
@@ -77,7 +77,7 @@ export const docPages: DocPage[] = [
     description: "One collection. One set of terms. One finite draw.",
     sections: [
       { id: "what-belongs-to-a-collection", title: "What belongs to a collection", blocks: [
-        { type: "paragraph", text: "Every collection is a separate NFT contract with its own name, color, supply and price. It also defines its opening, mint deadline, prize allocation, winner count and affiliate terms. These settings are bound at deployment in the current contract design." },
+        { type: "paragraph", text: "Every collection has a separate smart contract that fixes its ticket price, supply, prize values, winner count, affiliate terms and sale deadline. These settings are bound at deployment in the current contract design." },
         { type: "paragraph", text: "The default format uses 1,000 tickets and six equal awards, but a collection’s actual configuration is what matters. The winner count can be one to ten, bounded by the supply. New seasons can use different settings. They cannot rewrite the terms of NFTs already minted under an older contract." },
       ] },
       { id: "collection-lifecycle", title: "The collection lifecycle", blocks: [
@@ -97,7 +97,7 @@ export const docPages: DocPage[] = [
       ] },
       { id: "older-collections", title: "Earlier collections remain valid", blocks: [
         { type: "paragraph", text: "History may contain earlier Manekineko-named collections, different artwork and different award counts. These are historical contract facts, not display errors. Use the collection-specific terms when checking a prize, referral payment or claim." },
-        { type: "links", items: [{ label: "Collection history", description: "Review completed collections and recorded results.", href: "/history" }, { label: "Prizes & claims", description: "Understand the current equal-prize model.", href: "/docs/prizes" }] },
+        { type: "links", items: [{ label: "Results", description: "Review completed collections and recorded results.", href: "/history" }, { label: "Claim your prize", description: "Understand the current equal-prize model.", href: "/docs/prizes" }] },
       ] },
     ],
   },
@@ -122,13 +122,13 @@ export const docPages: DocPage[] = [
         { type: "paragraph", text: "An eligible winner reward can sponsor one ticket where that feature is configured and funded. The sponsorship reserve pays the full mint price into the collection; the winning wallet still pays transaction gas. A sponsored ticket uses normal supply and is not counted as an affiliate referral." },
       ] },
       { id: "after-confirmation", title: "After confirmation", blocks: [
-        { type: "paragraph", text: "The confirmed contract transaction is the source of truth. The app indexes mint and transfer events, including transactions submitted directly through an explorer, so the visible ticket count and My NFTs list may update after confirmation rather than immediately." },
-        { type: "links", items: [{ label: "My NFTs", description: "See your tickets, artwork and status.", href: "/docs/my-nfts" }, { label: "Winner rewards", description: "Read the one-time sponsored mint rules.", href: "/docs/winner-rewards" }] },
+        { type: "paragraph", text: "The confirmed contract transaction is the source of truth. The app indexes mint and transfer events, including transactions submitted directly through an explorer, so the visible ticket count and My Tickets list may update after confirmation rather than immediately." },
+        { type: "links", items: [{ label: "My Tickets", description: "See your tickets, artwork and status.", href: "/docs/my-nfts" }, { label: "Redeem a sponsored ticket", description: "Read the one-time sponsored mint rules.", href: "/docs/winner-rewards" }] },
       ] },
     ],
   },
   {
-    slug: "randomness", title: "Numbers & randomness", group: "The protocol", minutes: 5,
+    slug: "randomness", title: "How winners are selected", group: "The protocol", minutes: 5,
     description: "Permanent ticket numbers at mint. One verifiable draw after sellout.",
     sections: [
       { id: "one-draw-after-sellout", title: "One draw after sellout", blocks: [
@@ -155,8 +155,8 @@ export const docPages: DocPage[] = [
     ],
   },
   {
-    slug: "prizes", title: "Prizes & claims", group: "Participate", minutes: 4,
-    description: "Six equal prizes by default. Independent, holder-only claims.",
+    slug: "prizes", title: "Claim your prize", group: "Participate", minutes: 4,
+    description: "Check your prize value and claim directly from the contract.",
     sections: [
       { id: "six-equal-awards", title: "Six equal awards", blocks: [
         { type: "paragraph", text: "The default format reserves a collection’s configured prize amount for six equally paid winning NFTs. The six highest scores identify the six award positions. The first-ranked ticket and the sixth-ranked ticket receive the same amount in this format. A collection can instead configure one to ten equal awards, bounded by its supply; check its actual terms." },
@@ -168,18 +168,18 @@ export const docPages: DocPage[] = [
         { type: "list", ordered: true, items: ["Connect the wallet that holds the winning NFT on the collection’s network.", "Open the collection, review its finalized award and confirm that it remains unclaimed.", "Submit the claim and pay the network fee.", "Wait for the transaction confirmation. A paid award remains a winning collectible, but has no second prize payment."] },
         { type: "paragraph", text: "Each award is independent. Another holder’s delayed claim or failed receiving address does not prevent your own valid claim. The current contract sets no prize-claim expiry." },
       ] },
-      { id: "transfers-and-reserves", title: "Transfers and reserved funds", blocks: [
+      { id: "transfers-and-reserves", title: "How reward funds are protected", blocks: [
         { type: "paragraph", text: "At sellout, ticket transfers lock until the draw is revealed. After reveal, losing tickets can transfer again. Each winning NFT stays locked until its own prize is claimed, then becomes transferable as a collectible." },
-        { type: "paragraph", text: "The contract protects unclaimed prize liabilities from ordinary operator withdrawals. Earned affiliate balances and unclaimed prizes remain separately accounted for and reserved for their recipients." },
+        { type: "paragraph", text: "The contract protects unclaimed prizes and earned affiliate rewards from team withdrawals. Reward payouts go directly from the contract to the authorized receiving address when claimed, without passing through a team wallet. Separate operating funds and unallocated reserves follow their own withdrawal rules; they are not unpaid rewards." },
       ] },
       { id: "after-a-win", title: "After a win", blocks: [
-        { type: "links", items: [{ label: "Winner rewards", description: "A qualifying winner may redeem one sponsored NFT for their wallet’s lifetime.", href: "/docs/winner-rewards" }, { label: "Collection history", description: "Review finalized results and payout status.", href: "/history" }] },
+        { type: "links", items: [{ label: "Redeem a sponsored ticket", description: "A qualifying winner may redeem one sponsored NFT for their wallet’s lifetime.", href: "/docs/winner-rewards" }, { label: "Results", description: "Review finalized results and payout status.", href: "/history" }] },
       ] },
     ],
   },
   {
-    slug: "affiliates", title: "Affiliate program", group: "Participate", minutes: 6,
-    description: "Bring collectors to a collection. Qualify for its shared referral pool.",
+    slug: "affiliates", title: "Earn affiliate rewards", group: "Participate", minutes: 6,
+    description: "Refer paid mints, check your reward in ETH, and claim after sellout.",
     sections: [
       { id: "who-can-enroll", title: "Who can enroll", blocks: [
         { type: "paragraph", text: "Each collection has a limited set of affiliate positions. In the current program, an applicant must hold an NFT from an earlier eligible official collection on the same network. It does not need to be a winning NFT. The first collection in that network’s canonical eligibility registry is the bootstrap exception and can enroll without a prior NFT." },
@@ -187,7 +187,7 @@ export const docPages: DocPage[] = [
         { type: "list", items: ["One position per wallet in each collection.", "One qualifying NFT can unlock only one position in that destination collection, even if it is transferred afterward.", "Keep ownership until enrollment confirms. Afterward, selling the NFT does not move or cancel your affiliate position or earned balance.", "The NFT’s current holder may use it again for a different future collection.", "Enrollment closes at the scheduled opening time, even if sale activation is delayed."] },
       ] },
       { id: "enroll-and-share", title: "Enroll, then share your link", blocks: [
-        { type: "list", ordered: true, items: ["Open the collection’s Affiliate program page and connect the intended account.", "Choose an eligible NFT where required and complete wallet verification and the automated abuse checks.", "Review the offered position and collection terms, then submit the enrollment transaction before the window closes.", "Once enrolled, copy that position’s collection-specific referral URL and share it with potential buyers.", "Follow your attributed tickets and qualification progress on the affiliate page."] },
+        { type: "list", ordered: true, items: ["Open the collection’s Affiliate rewards page and connect the intended account.", "Choose an eligible NFT where required and complete wallet verification and the automated abuse checks.", "Review the offered position and collection terms, then submit the enrollment transaction before the window closes.", "Once enrolled, copy that position’s collection-specific referral URL and share it with potential buyers.", "Follow your attributed tickets and qualification progress on the affiliate page."] },
         { type: "paragraph", text: "Admission uses a signed permit bound to the applicant, collection, position, terms, eligibility NFT, nonce and expiry. The contract verifies the permit and the NFT requirement. Network and human-verification checks reduce abuse; they do not prove that every wallet belongs to a different person." },
       ] },
       { id: "what-counts-as-a-referral", title: "What counts as a referral", blocks: [
@@ -200,13 +200,13 @@ export const docPages: DocPage[] = [
         { type: "table", columns: ["Step", "Calculation"], rows: [
           ["Pool", "The collection’s configured affiliate allocation from primary mint receipts."],
           ["Uncapped equal share", "The pool divided by the number of qualified affiliates."],
-          ["Common cap", "The lowest referral revenue among qualified affiliates multiplied by the configured cap rate."],
+          ["Common cap", "The collection’s ETH limit per qualifying referral multiplied by the fewest paid referrals among qualified affiliates."],
           ["Each qualified affiliate’s payout", "The smaller of the uncapped equal share and the common cap."],
         ] },
         { type: "paragraph", text: "If four affiliates qualify, each receives the same allocation. The common cap still applies, so qualification does not guarantee that the entire pool is distributed. Check the collection’s referral minimum and payout cap, then use your final claimable balance to see what you have earned." },
         { type: "paragraph", text: "The growth reserve is not an affiliate entitlement or automatically enforced future spending. After reveal, the owner can release it through a separate recorded withdrawal. Earlier collections may use proportional pools or individual referral rates instead of this qualified-equal model." },
       ] },
-      { id: "withdraw-your-allocation", title: "Withdraw your allocation", blocks: [
+      { id: "withdraw-your-allocation", title: "Claim your affiliate rewards", blocks: [
         { type: "paragraph", text: "A final affiliate balance becomes claimable at sellout. The enrolled wallet can withdraw it to a chosen receiving address without waiting for the winners’ prize claims. The withdrawal needs a network fee. Estimates before sellout can change as receipts and the set of qualifiers change." },
         { type: "paragraph", text: "No referrals means no payout. Referrals below the minimum also mean no payout. If the collection expires unsold, no affiliate share vests and the NFT refund path applies instead. Refreshing balances only rereads information; it does not claim money or submit a transaction." },
         { type: "links", items: [{ label: "Browse collections by season", description: "Open an individual collection to see its affiliate terms.", href: "/seasons" }, { label: "Common questions", description: "Understand unavailable enrollment and delayed balances.", href: "/docs/faq" }] },
@@ -214,7 +214,7 @@ export const docPages: DocPage[] = [
     ],
   },
   {
-    slug: "winner-rewards", title: "Winner rewards", group: "Participate", minutes: 3,
+    slug: "winner-rewards", title: "Redeem a sponsored ticket", group: "Participate", minutes: 3,
     description: "One sponsored future mint per winning wallet, for its lifetime.",
     sections: [
       { id: "one-time-benefit", title: "A one-time benefit", blocks: [
@@ -228,21 +228,21 @@ export const docPages: DocPage[] = [
       { id: "who-pays", title: "Who pays for the ticket", blocks: [
         { type: "paragraph", text: "The operator-sponsored reserve pays the ordinary mint price into the collection. The NFT counts toward its finite supply, and the same payment enters its prize, affiliate-pool and refund accounting. The beneficiary pays only the transaction gas for that redemption." },
         { type: "paragraph", text: "Sponsored mints carry no affiliate referral attribution. If the destination later expires unsold, the current NFT holder can claim its normal mint-price refund; the lifetime reward remains spent." },
-        { type: "links", items: [{ label: "Prizes & claims", description: "Complete your winning NFT’s prize claim first.", href: "/docs/prizes" }, { label: "My NFTs", description: "Find your tickets and wallet-specific status.", href: "/my-nfts" }] },
+        { type: "links", items: [{ label: "Claim your prize", description: "Complete your winning NFT’s prize claim first.", href: "/docs/prizes" }, { label: "My Tickets", description: "Find your tickets and wallet-specific status.", href: "/my-nfts" }] },
       ] },
     ],
   },
   {
-    slug: "my-nfts", title: "My NFTs & artwork", group: "Participate", minutes: 3,
-    description: "Find your collection, inspect a ticket, and follow it beyond Tincta.",
+    slug: "my-nfts", title: "Your tickets and prize status", group: "Participate", minutes: 3,
+    description: "Find your tickets, check draw results, and verify prize claims.",
     sections: [
       { id: "your-wallet-collection", title: "Your wallet’s collection", blocks: [
-        { type: "paragraph", text: "My NFTs brings together your indexed Tincta tickets and identifies their collection and status. Check the connected account if an expected NFT is missing. An NFT you minted and later transferred is not the same as an NFT you currently own; ownership determines current holder-only rights." },
+        { type: "paragraph", text: "My Tickets brings together your indexed Tincta tickets and identifies their collection and status. Check the connected account if an expected NFT is missing. An NFT you minted and later transferred is not the same as an NFT you currently own; ownership determines current holder-only rights." },
         { type: "paragraph", text: "New mints and transfers can take time to appear while the indexer follows confirmed chain events. Check the transaction receipt and the contract’s ownerOf value when you need the authoritative current owner." },
       ] },
       { id: "reading-the-artwork", title: "Reading the artwork", blocks: [
         { type: "table", columns: ["On a V10 ticket", "Meaning"], rows: [
-          ["Season and collection", "The edition’s identity and color family."],
+          ["Season and collection", "The collection whose contract governs this ticket and its rewards."],
           ["Token number", "That NFT’s identifier within its contract."],
           ["Four numbers", "The NFT’s permanent, unique identity within this collection, available from mint."],
           ["Combination code", "A compact encoding of those four ordered numbers."],
@@ -255,12 +255,12 @@ export const docPages: DocPage[] = [
         { type: "paragraph", text: "The NFT detail page links to supported explorers or marketplaces for its network. The contract’s tokenURI contains the on-chain metadata and SVG, so the artwork does not require a hosted image file." },
         { type: "paragraph", text: "An explorer can obtain V10’s finished numbered artwork on its first successful metadata read. There is no post-draw image change to refresh, and the permanent metadata deliberately omits score, award rank, prize and status traits. Use contract reads to check those results." },
         { type: "paragraph", text: "External services still control their own indexing, caches and SVG support, so immediate display is not guaranteed. A historical V8/V9 NFT may show an old sealed image until that service refreshes it. A missing or stale image is not evidence that ownership or a finalized result has changed." },
-        { type: "links", items: [{ label: "Open My NFTs", description: "View your tickets inside Tincta.", href: "/my-nfts" }, { label: "Verification", description: "Read metadata and ownership from the contract.", href: "/docs/verification" }] },
+        { type: "links", items: [{ label: "Open My Tickets", description: "View your tickets inside Tincta.", href: "/my-nfts" }, { label: "Verification", description: "Read metadata and ownership from the contract.", href: "/docs/verification" }] },
       ] },
     ],
   },
   {
-    slug: "refunds", title: "Deadlines & refunds", group: "Participate", minutes: 3,
+    slug: "refunds", title: "Ticket refunds", group: "Participate", minutes: 3,
     description: "What happens when a collection does not sell out.",
     sections: [
       { id: "the-mint-deadline", title: "The mint deadline", blocks: [
@@ -279,7 +279,7 @@ export const docPages: DocPage[] = [
     ],
   },
   {
-    slug: "verification", title: "Verify the protocol", group: "Reference", minutes: 5,
+    slug: "verification", title: "Verify the contract", group: "Reference", minutes: 5,
     description: "Use the contract, not a screenshot, as the source of truth.",
     sections: [
       { id: "network-and-contract", title: "Start with the network and address", blocks: [
@@ -311,9 +311,10 @@ export const docPages: DocPage[] = [
         { type: "paragraph", text: "Refreshing asks for a newer view; it does not generate a result, enroll an affiliate or withdraw funds. If a displayed value disagrees with the canonical contract state, the contract is authoritative." },
       ] },
       { id: "trust-and-availability", title: "Trust and availability", blocks: [
+        { type: "paragraph", text: "The contract enforces reward rules and sends valid claims without a team approval step. This does not mean every operation happens by itself: sale activation, randomness funding, the draw request and finalization still require transactions. The website and supporting services help execute or display those steps; they cannot rewrite a deployed collection’s fixed reward terms." },
         { type: "paragraph", text: "On-chain checks constrain claims and protect the configured reserves, but participation still involves contract risk, wallet security, Ethereum network availability and the randomness provider. Affiliate admission also depends on configured verification services and a signer. Official collection and reward registries have governance-controlled registration." },
         { type: "paragraph", text: "An interface, local test suite or source-verified contract is not proof of a completed Mainnet rollout or an audit. Use the collection’s actual deployed addresses and published release evidence rather than assuming that every feature in these guides is enabled everywhere." },
-        { type: "links", items: [{ label: "Numbers & randomness", description: "Read what the draw guarantees and what it depends on.", href: "/docs/randomness" }, { label: "Frequently asked questions", description: "Resolve common status and wallet questions.", href: "/docs/faq" }] },
+        { type: "links", items: [{ label: "How winners are selected", description: "Read what the draw guarantees and what it depends on.", href: "/docs/randomness" }, { label: "Frequently asked questions", description: "Resolve common status and wallet questions.", href: "/docs/faq" }] },
       ] },
     ],
   },
@@ -323,34 +324,36 @@ export const docPages: DocPage[] = [
     sections: [
       { id: "tickets-and-winners", title: "Tickets and winners", blocks: [
         { type: "callout", title: "Do six winners mean six wallets?", text: "No. The current default selects six distinct NFTs. A wallet holding more than one of those NFTs can claim every award it owns." },
-        { type: "callout", title: "Can I choose my numbers or improve my odds with a color?", text: "V10 generates numbers in Solidity; the mint function accepts no numbers or seed from the buyer. Upcoming combinations are predictable, so you may prefer a ticket’s appearance, but that does not predict its score or improve its chance. The later VRF draw determines winners. Color and linework give no advantage." },
+        { type: "callout", title: "Can I choose my numbers or predict a prize?", text: "V10 generates numbers in Solidity; the mint function accepts no numbers or seed from the buyer. Upcoming combinations are predictable, so you may prefer a ticket’s appearance, but that does not predict its score or improve its chance. The later VRF draw determines winners. Color and linework give no advantage." },
         { type: "callout", title: "My V10 NFT has numbers. Has the draw happened?", text: "Not necessarily. Its permanent numbers exist at mint. Final scores and prizes become available only after sellout, VRF fulfillment and draw finalization. Check the contract’s revealed state and score separately from the image." },
         { type: "callout", title: "Does every mint wait for VRF?", text: "No. V10 generates the numbered NFT during the mint transaction. There is one VRF request after the collection sells out, followed by draw finalization. Transaction confirmation and explorer indexing still take time." },
         { type: "callout", title: "Why is my V8/V9 ticket still sealed after sellout?", text: "V8/V9 keep their original sealed artwork until the randomness response and draw finalization complete. Afterward, an explorer may still hold a stale image until its cache refreshes. Compare its view with the contract’s tokenURI and revealed state. V10 has no sealed-to-revealed metadata transition." },
         { type: "callout", title: "Why does a collection show a different winner count?", text: "Six equal prizes is the default. The V10 design permits one to ten distinct winning NFTs, fixed before deployment and bounded by supply. Earlier collections retain their original award counts and terms." },
       ] },
       { id: "affiliates-and-balances", title: "Affiliates and balances", blocks: [
-        { type: "callout", title: "Does enrolling guarantee commission?", text: "No. You must meet the collection’s paid-referral minimum, and it must sell out. Qualified affiliates then receive the equal allocation allowed by the pool and common cap." },
-        { type: "callout", title: "Why is enrollment unavailable or not configured?", text: "The enrollment service or required network configuration may be unavailable, or the collection may no longer accept enrollment. This is different from an on-chain commission balance being zero. Existing earned claims follow the contract’s rules independently." },
-        { type: "callout", title: "What does Refresh balances do?", text: "It rereads the displayed enrollment, referral and commission information. It does not spend gas, submit a claim or change your account’s entitlement." },
+        { type: "callout", title: "Does enrolling guarantee a reward?", text: "No. You must meet the collection’s paid-referral minimum, and it must sell out. Qualified affiliates then receive the equal allocation allowed by the pool and common cap." },
+        { type: "callout", title: "Why is enrollment unavailable or not configured?", text: "The enrollment service or required network configuration may be unavailable, or the collection may no longer accept enrollment. This is different from an on-chain reward balance being zero. Existing earned claims follow the contract’s rules independently." },
+        { type: "callout", title: "What does Refresh balances do?", text: "It rereads the displayed enrollment, referral and reward information. It does not spend gas, submit a claim or change your account’s entitlement." },
         { type: "callout", title: "Can I enroll using an NFT from the same collection?", text: "Not under the current holder-gated program. Enrollment closes at the scheduled mint opening, and eligibility normally requires an NFT from an earlier qualifying official collection." },
       ] },
       { id: "wallets-and-artwork", title: "Wallets and artwork", blocks: [
-        { type: "callout", title: "Why is my NFT missing from My NFTs?", text: "Check the network and connected account first, then confirm the mint receipt. The indexer may still be catching up. If you transferred the NFT, you may no longer be its current holder." },
+        { type: "callout", title: "Why is my NFT missing from My Tickets?", text: "Check the network and connected account first, then confirm the mint receipt. The indexer may still be catching up. If you transferred the NFT, you may no longer be its current holder." },
         { type: "callout", title: "Why does an explorer show a placeholder or old image?", text: "External websites control their indexing, caches and SVG support. V10’s first successful metadata read contains the permanent numbers, but initial display can still lag. V8/V9 also need a cache refresh after reveal. Inspect the on-chain tokenURI to compare the artwork." },
         { type: "callout", title: "Why is a V10 winner’s score missing from its image?", text: "Scores, winning status and claims are deliberately excluded from V10 metadata so the artwork stays permanent. Read the score and award records from the contract after the draw. An unchanged image does not mean that a prize is missing." },
         { type: "callout", title: "Can the team withdraw my winning prize for me?", text: "The current contract requires the winning NFT holder to submit the claim. The owner cannot claim on your behalf or use an ordinary operator withdrawal to take a protected unclaimed prize." },
       ] },
       { id: "refunds-and-rewards", title: "Refunds and rewards", blocks: [
+        { type: "callout", title: "Who holds the reward funds?", text: "In the current design, the collection contract holds and protects unclaimed prizes and earned affiliate rewards. The team cannot withdraw those protected balances. Separate operating funds and unused reserves are governed by different rules." },
+        { type: "callout", title: "Are rewards sent automatically?", text: "You submit a claim from the eligible wallet. The contract checks your entitlement and sends ETH directly to the chosen receiving address. No manual payout approval is needed; a network fee applies." },
         { type: "callout", title: "Do I get a refund if my ticket does not win?", text: "No. The current refund path applies to collections that expire without selling out. It returns the original mint price to the current holder and burns the ticket; network fees are not refunded." },
         { type: "callout", title: "Does every win give me another free mint?", text: "No. Where rewards are enabled and funded, a qualifying wallet can redeem one sponsored future NFT for its lifetime. Further wins do not reset that limit, and redemption still requires gas." },
-        { type: "links", items: [{ label: "Verify a contract", description: "Find the authoritative values behind the app.", href: "/docs/verification" }, { label: "Glossary", description: "Look up the terms used throughout these guides.", href: "/docs/glossary" }] },
+        { type: "links", items: [{ label: "Verify a contract", description: "Find the authoritative values behind the app.", href: "/docs/verification" }, { label: "Reward glossary", description: "Look up the terms used throughout these guides.", href: "/docs/glossary" }] },
       ] },
     ],
   },
   {
-    slug: "glossary", title: "Glossary", group: "Reference", minutes: 3,
-    description: "The essential terms, in plain language.",
+    slug: "glossary", title: "Reward glossary", group: "Reference", minutes: 3,
+    description: "Understand ticket, reward, and claim terms in plain language.",
     sections: [
       { id: "collecting", title: "Collecting", blocks: [
         { type: "table", columns: ["Term", "Meaning"], rows: [

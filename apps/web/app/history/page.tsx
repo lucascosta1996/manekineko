@@ -7,8 +7,8 @@ import "./history.css";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "Collection history | Tincta",
-  description: "Follow deployed Tincta collections and explore verified winning outcomes, prize recipients, and collection statistics.",
+  title: "Results | Tincta",
+  description: "Explore winning tickets and confirmed prize and affiliate payments recorded on-chain.",
 };
 
 export default async function HistoryPage() {

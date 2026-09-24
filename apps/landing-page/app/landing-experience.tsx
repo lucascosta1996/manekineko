@@ -118,18 +118,8 @@ function ColorSculpture({ colors }: { colors: string[] }) {
       </g>
       <g className="sculpture-center" transform="translate(350 326)">
         <circle r="68" fill="#fafaf7" />
-        <g
-          fill="#1a1a1a"
-          fontFamily="Arial, Helvetica, sans-serif"
-          fontSize="8"
-          letterSpacing=".8"
-          textAnchor="middle"
-        >
-          <text y="-13">AUTONOMOUS</text>
-          <text y="1">ONCHAIN REWARDS.</text>
-        </g>
         <path
-          d="M0 15c0 8-3 11-11 11 8 0 11 3 11 11 0-8 3-11 11-11-8 0-11-3-11-11Z"
+          d="M0-22c0 16-6 22-22 22 16 0 22 6 22 22 0-16 6-22 22-22C6 0 0-6 0-22Z"
           stroke="#1a1a1a"
           strokeWidth="1.2"
         />
@@ -379,7 +369,6 @@ export function LandingExperience({
         <section className="hero wrap" aria-labelledby="hero-title">
           <div className="hero-main">
             <div className="hero-copy">
-              <p className="eyebrow hero-kicker">LAUNCH PREVIEW</p>
               <h1 id="hero-title">
                 Autonomous rewards.
                 <br />Verifiable{" "}
@@ -397,53 +386,18 @@ export function LandingExperience({
                 .
               </h1>
               <p className="hero-description">
-                Prizes and affiliate commissions are calculated, held, and paid
-                by smart contracts. Claim directly to your wallet, without team
-                approval. Verify the rules, results, and payouts on Ethereum.
+                ETH prizes and affiliate rewards, governed by smart contracts.
               </p>
-              <p className="hero-verification">
-                At launch, every collection will link to its deployed contract
-                and verified source code.
-              </p>
-              <NewsletterSignup />
               <div className="hero-actions">
-                <a className="text-link" href="#rewards">
+                <a className="button button-dark" href="#rewards">
                   Explore the rewards
-                  <Icon />
+                  <Icon name="down" />
                 </a>
               </div>
             </div>
             <div className="hero-art">
               <ColorSculpture colors={currentPalette.colors} />
               <div className="art-controls">
-                <div
-                  className="hero-swatches"
-                  role="group"
-                  aria-label="Preview collections"
-                >
-                  {featuredSeasons.map((season, i) => (
-                    <button
-                      key={season}
-                      style={
-                        {
-                          "--swatch": seasons[season].colors[4],
-                        } as CSSProperties
-                      }
-                      aria-label={`Preview Season ${String(season + 1).padStart(
-                        2,
-                        "0"
-                      )} collections`}
-                      aria-pressed={heroSeason === i}
-                      onClick={() => {
-                        setHeroSeason(i);
-                        setPaused(true);
-                      }}
-                    />
-                  ))}
-                </div>
-                <span className="mono">
-                  SEASON {String(currentPalette.season).padStart(2, "0")}
-                </span>
                 <button
                   className="motion-toggle"
                   aria-label={
@@ -463,7 +417,10 @@ export function LandingExperience({
               </div>
             </div>
           </div>
-          <div className="reward-rail" id="rewards" role="group" aria-label="Planned rewards across all seasons">
+        </section>
+
+        <section className="rewards-overview wrap" id="rewards" aria-label="Planned rewards across all seasons">
+          <div className="reward-rail">
             <div className="reward-metric">
               <div className="metric-top">
                 <Icon name="spark" />
@@ -514,6 +471,19 @@ export function LandingExperience({
               <Icon name="diagonal" />
             </a>
           </p>
+        </section>
+
+        <section
+          className="launch-section wrap"
+          id="launch-list"
+          aria-labelledby="launch-title"
+          tabIndex={-1}
+        >
+          <div className="launch-content">
+            <h2 id="launch-title">Stay in the loop.</h2>
+            <p id="launch-description">Be first to know when minting opens.</p>
+            <NewsletterSignup />
+          </div>
         </section>
 
         <section

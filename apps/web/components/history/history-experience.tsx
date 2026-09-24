@@ -83,7 +83,7 @@ function RecordDetails({ collection }: { collection: HistoryCollection }) {
       {winner && <div className="history-detail-wide"><dt>Winning holder at payout</dt><dd><Address address={winner.winningHolder} label="winning holder" /></dd></div>}
       {winner && winner.winningHolder.toLowerCase() !== winner.prizeRecipient.toLowerCase() && <div className="history-detail-wide"><dt>Prize receiving address</dt><dd><Address address={winner.prizeRecipient} label="prize recipient" /></dd></div>}
       <div><dt>Tickets minted</dt><dd>{formatCount(collection.totalMinted)} / {formatCount(collection.maxSupply)}</dd></div>
-      <div><dt>Affiliates paid</dt><dd>{amount(collection.totalAffiliatePaidWei ?? "0")}</dd></div>
+      <div><dt>Affiliate rewards paid</dt><dd>{amount(collection.totalAffiliatePaidWei ?? "0")}</dd></div>
       <div><dt>Mint price</dt><dd>{amount(collection.mintPriceWei)}</dd></div>
       <div><dt>{winner ? collection.awards ? "Total prizes paid" : "Prize paid" : "Refunds paid"}</dt><dd>{amount(winner ? paidPrizes(collection) : collection.totalRefundedWei)}</dd></div>
       <div><dt>{winner ? "Payment date (UTC)" : "Closed (UTC)"}</dt><dd><time dateTime={winner ? winner.paidAt : collection.closedAt}>{dateLabel(winner ? winner.paidAt : collection.closedAt)}</time></dd></div>
@@ -113,7 +113,7 @@ function CurrentCollections({ collections }: { collections: CollectionPublic[] }
         <dl className="history-current-facts">
           <div><dt>Tickets minted</dt><dd>{formatCount(collection.totalMinted)} <span>/ {formatCount(collection.maxSupply)}</span></dd></div>
           <div><dt>Ticket price</dt><dd>{formatWei(collection.mintPriceWei, collection.nativeCurrency.decimals)} <span>{collection.nativeCurrency.symbol}</span></dd></div>
-          <div><dt>Affiliates paid</dt><dd>{formatWei(collection.totalAffiliatePaidWei ?? "0", collection.nativeCurrency.decimals)} <span>{collection.nativeCurrency.symbol}</span></dd></div>
+          <div><dt>Affiliate rewards paid</dt><dd>{formatWei(collection.totalAffiliatePaidWei ?? "0", collection.nativeCurrency.decimals)} <span>{collection.nativeCurrency.symbol}</span></dd></div>
           <div><dt>Prize payment</dt><dd className="history-current-payment">{collection.awards?.length ? `${collection.awards.filter(award=>award.claimed).length} / ${collection.awards.length} prizes paid` : collection.prizePaid ? "Paid · outcome indexing" : "Not paid"}</dd></div>
         </dl>
         <div className="history-current-footer">
@@ -192,13 +192,13 @@ export function HistoryExperience({ collections: initialCollections, inProgress:
 
   return <div className="history-page">
     <header className="history-heading">
-      <div><p className="eyebrow">THE COLLECTION ARCHIVE</p><h1>Every color has a history.</h1><p>Explore every collection, its winning tickets, and the prizes delivered. A permanent record, open to everyone.</p></div>
+      <div><p className="eyebrow">ON-CHAIN RESULTS</p><h1>Prizes and payouts, recorded on-chain.</h1><p>Explore winning tickets and confirmed prize and affiliate payments. Verify each payout on-chain.</p></div>
       <Link href="/seasons" className="history-mint-link">Explore seasons <HistoryIcon name="arrow" /></Link>
     </header>
     <LiveDataNotice retrying={retrying} />
 
     <dl className="history-stats" aria-label="Collection statistics">
-      <div className="history-stat"><dt>Affiliates paid</dt>
+      <div className="history-stat"><dt>Affiliate rewards paid</dt>
         {stats.currencies.length ? stats.currencies.map(currency => <dd key={`${currency.chainId}-${currency.nativeCurrency.symbol}-${currency.nativeCurrency.decimals}`}>
           <span>{formatWei(currency.totalAffiliatePaidWei, currency.nativeCurrency.decimals)}</span><small>{currency.nativeCurrency.symbol}{stats.currencies.length > 1 ? ` · ${currency.networkName}` : ""}</small>
         </dd>) : <dd>0</dd>}
@@ -212,7 +212,7 @@ export function HistoryExperience({ collections: initialCollections, inProgress:
       </div>
       <div className="history-stat"><dt>Collections completed <HistoryIcon name="check" /></dt><dd>{formatCount(stats.completedCount)}</dd><p>Sold out and every prize delivered</p></div>
       <div className="history-stat"><dt>Tickets minted <HistoryIcon name="ticket" /></dt><dd>{formatCount(stats.totalTicketsMinted)}</dd><p>Across {formatCount(stats.collectionCount)} {stats.collectionCount === 1 ? "collection" : "collections"}</p></div>
-      <div className="history-stat"><dt>Unique winners <HistoryIcon name="sparkle" /></dt><dd>{formatCount(stats.uniqueWinners)}</dd><p>Distinct winning holder wallets</p></div>
+      <div className="history-stat"><dt>Winning wallets <HistoryIcon name="sparkle" /></dt><dd>{formatCount(stats.uniqueWinners)}</dd><p>Distinct winning holder wallets</p></div>
     </dl>
 
     <CurrentCollections collections={inProgress} />

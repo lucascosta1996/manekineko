@@ -185,7 +185,7 @@ export function MintExperience({
               <span>
                 {example
                   ? "AN EXAMPLE. NOT YOUR RESULT."
-                  : "COLOR, COLLECTED. ENTIRELY ON-CHAIN."}
+                  : "YOUR TICKET. GOVERNED BY SMART CONTRACTS."}
               </span>
               <TinctaWordmark className="preview-signature" />
             </div>
@@ -219,15 +219,15 @@ export function MintExperience({
 
         <div className="mint-panel">
           <div className="mint-panel-kicker">
-            <span className="eyebrow">A COLOR TO CALL YOURS</span>
+            <span className="eyebrow">MINT A TICKET. ENTER THE DRAW.</span>
             <span className="pill demo-pill">
               {isDemo ? "Demo collection" : collection.contractStatus === "deployed" ? "On-chain collection" : "Collection preview"}
             </span>
           </div>
           <h1 id="collection-title">{collection.name}</h1>
           <p className="mint-description">
-            One ticket. Four numbers. {equalPrizes ? `${winners} winning NFTs, each with an equal prize.` : ranked ? `The top ${winners} scores win.` : "One winning NFT under this collection’s original rules."}
-            <br />Collect for a chance to win. Explore referral rewards in the affiliate program.
+            Mint an NFT ticket for a chance to win. {equalPrizes ? `${winners} winning NFTs, each with an equal prize.` : ranked ? `The top ${winners} scores win.` : "One winning NFT under this collection’s original rules."}
+            <br />Prize values and reward rules are fixed by this collection’s contract.
           </p>
           {!equalPrizes && <p className="mint-version-note">This earlier collection keeps its original prize terms. The current Tincta format has six equal prizes per collection.</p>}
           {!isDemo && <LiveDataNotice retrying={retrying} />}
@@ -240,7 +240,7 @@ export function MintExperience({
               </strong>
             </div>
             <div>
-              <span>Limited collection</span>
+              <span>Total tickets</span>
               <strong>
                 {formatCount(collection.maxSupply)} <small>tickets</small>
               </strong>
@@ -253,9 +253,10 @@ export function MintExperience({
             </span>
             <div>
               <span className="prize-label">{ranked ? "Prizes at sellout" : "Prize at sellout"}</span>
-              <strong className="prize-amount">{equalPrizes ? `${winners} × ${formatWei(selloutPrize / BigInt(winners), decimals)}` : formatWei(selloutPrize, decimals)} <small>{symbol}</small></strong>
+              <strong className="prize-amount">{formatWei(selloutPrize, decimals)} <small>{symbol}</small></strong>
+              {equalPrizes && <p><strong>{winners} winning NFTs · {formatWei(selloutPrize / BigInt(winners), decimals)} {symbol} each</strong></p>}
               <p>{ranked
-                ? `After sellout and reveal, holders of the ${winners} highest-scoring NFTs can claim their prizes.`
+                ? `After sellout and the draw, winning NFT holders claim directly from the contract. Unclaimed prizes stay protected; no manual payout approval is needed.`
                 : "After sellout and reveal, the holder of the highest-scoring NFT receives the prize."}</p>
               {ranked && !equalPrizes && <p>First prize: {formatWei(selloutPrize - BigInt(collection.maxSupply)*BigInt(collection.mintPriceWei)*BigInt(collection.secondPrizeBps ?? 0)/10000n, decimals)} {symbol} · Second prize: {formatWei(BigInt(collection.maxSupply)*BigInt(collection.mintPriceWei)*BigInt(collection.secondPrizeBps ?? 0)/10000n, decimals)} {symbol}</p>}
               <p>If the collection does not sell out by the <Link href="#collection-deadline" onClick={() => { if (deadlineDetails.current) deadlineDetails.current.open = true; }}>deadline</Link>, NFT holders can claim a refund of the mint price.</p>
@@ -436,8 +437,8 @@ export function MintExperience({
       >
         <div className="section-heading">
           <div>
-            <p className="eyebrow">DESIGNED IN COLOR. VERIFIED ON-CHAIN.</p>
-            <h2 id="how-title">Four numbers. Transparent rules.</h2>
+            <p className="eyebrow">REWARDS GOVERNED BY SMART CONTRACTS.</p>
+            <h2 id="how-title">Fixed rules. Protected prizes.</h2>
           </div>
           <Link className="text-link" href={`/mint/${collection.id}/contract`}>
             Read the smart contract <span aria-hidden="true">↗</span>
@@ -446,14 +447,14 @@ export function MintExperience({
         <div className="how-grid">
           <article>
             <span className="step-label">01 / MINT</span>
-            <h3>{permanent ? "Your numbers are permanent from mint." : "Your ticket starts sealed."}</h3>
+            <h3>Mint your ticket.</h3>
             <p>
               {permanent ? "Solidity turns each token ID into a unique four-number identity. You supply no numbers or seed. Numbers and artwork stay fixed, while the draw result remains pending." : "Every ticket has a unique ID. Its four numbers stay hidden until the collection sells out, so ordinary buyers cannot inspect their result before minting."}
             </p>
           </article>
           <article>
             <span className="step-label">02 / REVEAL</span>
-            <h3>One fixed source. No rerolls.</h3>
+            <h3>Winners selected on-chain.</h3>
             <p>
               {permanent ? `After sellout, one verified Chainlink VRF result selects ${winners} distinct winning NFTs. Final scores are stored separately; your permanent numbers and artwork do not change.` : ranked ? `After sellout, one verified Chainlink VRF result selects ${winners} distinct winning tickets without replacement. The remaining unique ranks and reversible number encoding are calculated on-chain.` : v3 ? `After sellout, one Chainlink VRF request supplies randomness whose proof is verified on Ethereum. Every rank from 1 to ${formatCount(collection.maxSupply)} appears once. A reversible on-chain encoding represents each rank as four numbers from 1 to 16.` : v2 ? `After sellout, one Chainlink VRF request supplies randomness whose proof is verified on Ethereum. A fixed rotation assigns every rank from 1 to ${formatCount(collection.maxSupply)} once. Four numbers from 1 to 16 encode each rank.` : <>A block {collection.revealDelayBlocks} blocks after sellout
               supplies the reveal seed. A one-to-one shuffle turns each ID into
@@ -462,8 +463,8 @@ export function MintExperience({
             </p>
           </article>
           <article>
-            <span className="step-label">03 / VERIFY</span>
-            <h3>{ranked ? `The top ${winners} scores win.` : "The greatest result wins."}</h3>
+            <span className="step-label">03 / CLAIM</span>
+            <h3>{ranked ? "Claim directly from the contract." : "Check your prize result."}</h3>
             <p>
               {ranked ? `The top ${winners} ranks, ${formatCount(collection.maxSupply)} through ${formatCount(collection.maxSupply-winners+1)}, belong to distinct NFTs. Only the current holder of each winning ticket can claim its separate prize. A wallet may own more than one winning ticket.` : <>{v2 && `Exactly one NFT scores ${formatCount(collection.maxSupply)}. `}The contract calculates every score. The highest-scoring NFT’s holder claims its configured prize.</>}
             </p>
@@ -471,10 +472,10 @@ export function MintExperience({
         </div>
         <div className="algorithm-strip">
           <div>
-            <span className="mono-label">THE SCORE, IN THE CONTRACT</span>
-            <code>{v3 ? "scoreCombination([a, b, c, d])" : v2 ? "1 + (a − 1) × 4,096 + (b − 1) × 256 + (c − 1) × 16 + (d − 1)" : "(a × b + c × d) × 4,294,967,296 + combinationCode"}</code>
+            <span className="mono-label">{ranked ? "REWARDS HELD BY THE CONTRACT" : "REWARDS UNDER THIS COLLECTION’S RULES"}</span>
+            <code>{ranked ? "Protected funds. Direct claims." : "Fixed terms. On-chain results."}</code>
             <p>
-              {permanent ? `The contract decodes these numbers to a token ID, then reads that NFT’s final VRF-derived score. The top ${winners} scores identify the winning NFTs. Numbers alone do not reveal or predict a prize.` : ranked ? `The contract decodes the four numbers to their unique rank. The top ${winners} ranks each identify one winning NFT; a wallet can hold multiple winning tickets. The number encoding changes the artwork, not the odds.` : v3 ? "The contract decodes the four numbers using the collection’s public combination key to recover their unique rank. The encoding changes how the numbers look; it does not add randomness. This earlier collection has one highest-ranked winning NFT." : v2 ? "Every rank appears once, so the highest result has exactly one winner. Anyone can reproduce the calculation." : "The unique combination code breaks ties. Anyone can reproduce the full calculation."}
+              {ranked ? "Prize funds and earned affiliate rewards stay in the contract until claimed. The contract checks each claim and sends the reward directly to the authorized receiving address. The team cannot withdraw these protected balances." : "This earlier collection keeps its original winner-selection and payout process. Inspect its contract to verify prize values, results and payment availability."}
             </p>
           </div>
           <span className="algorithm-badge">
@@ -492,13 +493,13 @@ export function MintExperience({
       </section>
 
       <section className="details-section" aria-labelledby="details-title">
-        <h2 id="details-title">Before you mint</h2>
+        <h2 id="details-title">Understand your rewards</h2>
         <div className="faq-list">
           <details>
             <summary>{permanent ? "How do permanent numbers and draw results work?" : "How does this collection differ from V10?"}<span aria-hidden="true">+</span></summary>
             <p>{permanent ? "This V10 collection generates permanent numbers in Solidity at mint, then uses a separate VRF draw after sellout to assign scores and prizes. Its artwork stays unchanged." : "This collection follows its original contract: its numbers appear when the draw is revealed. V10 generates permanent numbers in Solidity at mint and reads later VRF scores separately."} <Link href="/docs/randomness">Read about permanent numbers and draw results</Link>.</p>
           </details>
-          <details><summary>How do affiliates earn?<span aria-hidden="true">+</span></summary><p>{collectionReferralCopy(collection)} Referral rewards are separate from the collection’s prize reserve. <Link href={`/mint/${collection.id}/affiliates`}>View eligibility, referrals and commission</Link>.</p></details>
+          <details><summary>How do I earn affiliate rewards?<span aria-hidden="true">+</span></summary><p>{collectionReferralCopy(collection)} Referral rewards are separate from the collection’s prize reserve. <Link href={`/mint/${collection.id}/affiliates`}>View eligibility and affiliate rewards</Link>.</p></details>
           <details id="collection-deadline" ref={deadlineDetails}>
             <summary>
               What if the collection does not sell out?
@@ -537,7 +538,7 @@ export function MintExperience({
               </Link>
               .{" "}
               {collection.contractStatus === "deployed"
-                ? liveContractVerified ? "The collection bytecode is checked against its recorded deployment. The contract enforces ranking, prize reserves and affiliate commissions." : "The deployed address and its blockchain snapshot are recorded. Current bytecode and collection terms are checked before any wallet mint."
+                ? liveContractVerified ? "The collection bytecode is checked against its recorded deployment. The contract enforces ranking, prize reserves and affiliate rewards." : "The deployed address and its blockchain snapshot are recorded. Current bytecode and collection terms are checked before any wallet mint."
                 : "This collection is not deployed yet, so there is no explorer-verified address to inspect."}
             </p>
           </details>

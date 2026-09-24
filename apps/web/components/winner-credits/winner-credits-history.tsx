@@ -10,7 +10,7 @@ export function WinnerCreditsHistory({ wallet }: { wallet: string }) {
   const [page, setPage] = useState(1);
   const { data, error, refresh } = useWinnerCredits(wallet, null, page);
   return <section className="winner-credits" aria-label="Lifetime winner reward">
-    <div className="winner-credits-heading"><div><p className="eyebrow">YOUR NEXT COLOR</p><h2>Your winner reward.</h2></div>{data && <strong>{data.networks.some((network) => network.configured) ? "One lifetime reward per wallet" : "Not enabled yet"}</strong>}</div>
+    <div className="winner-credits-heading"><div><p className="eyebrow">YOUR SPONSORED TICKET</p><h2>Your lifetime winner reward.</h2></div>{data && <strong>{data.networks.some((network) => network.configured) ? "One lifetime reward per wallet" : "Not enabled yet"}</strong>}</div>
     <p>Claiming any winning NFT’s prize qualifies your wallet for one sponsored ticket in a future eligible collection. This is a lifetime limit: more wins do not add more tickets. The operator covers its mint price; you pay the network fee.</p>
     {error && <p role="alert">{error} <button type="button" className="text-button" onClick={refresh}>Try again</button></p>}
     {!data && !error && <p role="status">Checking your lifetime winner reward…</p>}

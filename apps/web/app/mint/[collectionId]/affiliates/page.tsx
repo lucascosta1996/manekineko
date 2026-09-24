@@ -12,7 +12,7 @@ type Props = { params: Promise<{ collectionId: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { collectionId } = await params;
   const collection = await getCollection(collectionId);
-  return { title: collection ? `Affiliates · ${collection.name} | Tincta` : "Collection not found | Tincta", description: "Review affiliate eligibility, qualifying NFTs and referral earnings for this collection.", robots: { index: false, follow: true } };
+  return { title: collection ? `Affiliate rewards · ${collection.name} | Tincta` : "Collection not found | Tincta", description: "Check affiliate eligibility, track rewards in ETH, and claim directly from this collection’s contract.", robots: { index: false, follow: true } };
 }
 export default async function AffiliatePage({ params }: Props) {
   const { collectionId } = await params;
@@ -22,7 +22,7 @@ export default async function AffiliatePage({ params }: Props) {
     <nav className="breadcrumbs" aria-label="Breadcrumb">
       <Link href="/seasons">Seasons</Link><span aria-hidden="true">/</span>
       <Link href={`/mint/${collection.id}`}>{collection.name}</Link><span aria-hidden="true">/</span>
-      <span aria-current="page">Affiliate program</span>
+      <span aria-current="page">Affiliate rewards</span>
     </nav>
     <AffiliateExperience key={collection.id} collection={collection} />
   </SiteShell>;

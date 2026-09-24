@@ -46,9 +46,9 @@ export function SiteNavigation({ section }: { section: SiteSection }) {
     </button>
     <nav id={navigationId} aria-label="Main navigation">
       <Link href="/seasons" aria-current={section === "seasons" ? "page" : undefined} onClick={() => setOpen(false)}>Seasons</Link>
-      <Link href="/history" aria-current={section === "history" ? "page" : undefined} onClick={() => setOpen(false)}>History</Link>
-      <Link href="/my-nfts" aria-current={section === "nfts" ? "page" : undefined} onClick={() => setOpen(false)}>My NFTs</Link>
-      <Link href="/docs" aria-current={section === "docs" ? "page" : undefined} onClick={() => setOpen(false)}>Docs</Link>
+      <Link href="/history" aria-current={section === "history" ? "page" : undefined} onClick={() => setOpen(false)}>Results</Link>
+      <Link href="/my-nfts" aria-current={section === "nfts" ? "page" : undefined} onClick={() => setOpen(false)}>My Tickets</Link>
+      <Link href="/docs" aria-current={section === "docs" ? "page" : undefined} onClick={() => setOpen(false)}>How It Works</Link>
     </nav>
   </div>;
 }

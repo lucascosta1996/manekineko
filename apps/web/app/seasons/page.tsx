@@ -6,7 +6,7 @@ import { listCollections } from "../../lib/collections/repository";
 import { listAnnouncedSeasons } from "../../lib/seasons/schedule-repository";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Seasons | Tincta", description: "Earn prizes by adding color to your wallet. Explore Tincta seasons, six-prize collections, and affiliate programs." };
+export const metadata: Metadata = { title: "Seasons | Tincta", description: "Compare prize values, ticket prices, and affiliate rewards across Tincta seasons." };
 
 export default async function SeasonsPage() {
   const [collections, schedules] = await Promise.all([listCollections(), listAnnouncedSeasons()]);

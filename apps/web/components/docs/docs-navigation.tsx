@@ -38,19 +38,19 @@ function Navigation({ entries, pathname }: { entries: DocSearchEntry[]; pathname
     }
   }}>
     <button className="docs-mobile-toggle" ref={toggle} type="button" aria-expanded={open} aria-controls="docs-navigation-panel" onClick={() => setOpen(value => !value)}>
-      <span><span className="docs-mobile-label">Documentation</span>{current?.title ?? "Browse topics"}</span><span aria-hidden="true">{open ? "−" : "+"}</span>
+      <span><span className="docs-mobile-label">How It Works</span>{current?.title ?? "Browse topics"}</span><span aria-hidden="true">{open ? "−" : "+"}</span>
     </button>
     <div className="docs-navigation-panel" id="docs-navigation-panel">
-      <Link className="docs-sidebar-title" href="/docs">Documentation <span>01 / TINCTA</span></Link>
+      <Link className="docs-sidebar-title" href="/docs">How It Works <span>01 / TINCTA</span></Link>
       <div className="docs-search-field">
         <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4 4"/></svg>
-        <input type="search" ref={search} aria-label="Search documentation" placeholder="Search docs…" value={query} onChange={event => setQuery(event.target.value)} />
+        <input type="search" ref={search} aria-label="Search reward guides" placeholder="Search guides…" value={query} onChange={event => setQuery(event.target.value)} />
         {!query && <kbd title="Command or Control K">⌘ K</kbd>}
       </div>
       {query.trim() ? <div className="docs-search-results"><p className="docs-nav-label" role="status">{results.length} {results.length === 1 ? "result" : "results"}</p>
         {results.length ? results.map(entry => <Link href={docHref(entry.slug)} key={entry.slug} onClick={() => setOpen(false)}><strong>{entry.title}</strong><span>{entry.description}</span></Link>)
           : <p className="docs-no-results">No matching pages. Try “mint”, “prizes” or “affiliate”.</p>}
-      </div> : <nav aria-label="Documentation topics">{docGroups.map(group => <div className="docs-nav-group" key={group}><p className="docs-nav-label">{group}</p>{entries.filter(entry => entry.group === group).map(entry => <Link href={docHref(entry.slug)} key={entry.slug} aria-current={pathname === docHref(entry.slug) ? "page" : undefined} onClick={() => setOpen(false)}>{entry.title}</Link>)}</div>)}</nav>}
+      </div> : <nav aria-label="Reward guide topics">{docGroups.map(group => <div className="docs-nav-group" key={group}><p className="docs-nav-label">{group}</p>{entries.filter(entry => entry.group === group).map(entry => <Link href={docHref(entry.slug)} key={entry.slug} aria-current={pathname === docHref(entry.slug) ? "page" : undefined} onClick={() => setOpen(false)}>{entry.title}</Link>)}</div>)}</nav>}
       <Link className="docs-back-app" href="/seasons">Explore seasons <span aria-hidden="true">↗</span></Link>
     </div>
   </aside>;

@@ -3,9 +3,9 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Tincta | Color, collected",
+  title: "Tincta | On-chain rewards",
   description:
-    "Earn prizes by adding color to your wallet. Explore Tincta seasons, six-prize NFT collections, and affiliate programs.",
+    "Explore ETH prizes, affiliate rewards, and rules enforced by each collection’s smart contract.",
   robots: { index: false, follow: false },
 };
 

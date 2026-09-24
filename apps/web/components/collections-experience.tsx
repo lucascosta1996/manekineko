@@ -24,13 +24,14 @@ export function CollectionGrid({ collections, liveId = null, now, colors, childr
           <div className="catalog-card-title"><h3>{collection.collectionColor && <span className="collection-color-dot" style={{ backgroundColor: collection.collectionColor }} aria-hidden="true" />}{collection.name}</h3><span aria-hidden="true">↗</span></div>
           <p className="catalog-card-status"><span className="catalog-status-dot" aria-hidden="true" />{collectionAvailabilityLabel(collection, now)}<span>{collection.networkName}</span></p>
           <p className="catalog-prize-description">{collectionPrizeCopy(collection)}</p>
-          <dl><div><dt>Ticket price</dt><dd>{formatWei(collection.mintPriceWei, collection.nativeCurrency.decimals)} {collection.nativeCurrency.symbol}</dd></div>
+          <dl><div><dt>Prizes at sellout</dt><dd>{formatWei(BigInt(collection.mintPriceWei) * BigInt(collection.maxSupply) * BigInt(collection.prizeBps) / 10_000n, collection.nativeCurrency.decimals)} {collection.nativeCurrency.symbol}</dd></div>
+            <div><dt>Ticket price</dt><dd>{formatWei(collection.mintPriceWei, collection.nativeCurrency.decimals)} {collection.nativeCurrency.symbol}</dd></div>
             <div><dt>Tickets minted</dt><dd>{formatCount(collection.totalMinted)} / {formatCount(collection.maxSupply)}</dd></div></dl>
-          <span className="catalog-cta">{live ? "Mint a ticket" : "View collection"}<span aria-hidden="true">→</span></span>
+          <span className="catalog-cta">{live ? "Mint a ticket" : "View prizes"}<span aria-hidden="true">→</span></span>
         </div>
       </Link>
       <CollectionActivity collection={collection} previous={colors ? collections[index - 1] : undefined} initialNow={now} showEnrollment />
-      {collection.contractVersion !== "legacy" && <Link className="catalog-affiliate-link" href={`/mint/${collection.id}/affiliates`}>Affiliate program <span aria-hidden="true">↗</span></Link>}
+      {collection.contractVersion !== "legacy" && <Link className="catalog-affiliate-link" href={`/mint/${collection.id}/affiliates`}>Affiliate rewards <span aria-hidden="true">↗</span></Link>}
     </article>;
   })}{children}</section>;
 }

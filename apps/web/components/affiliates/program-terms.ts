@@ -1,6 +1,8 @@
-/** Basis points cross the API as integers; display percentages without rounding. */
-export function formatBasisPoints(basisPoints: number): string {
-  if (!Number.isSafeInteger(basisPoints) || basisPoints < 0 || basisPoints > 10_000) throw new Error("Invalid collection percentage.");
-  const remainder = (basisPoints % 100).toString().padStart(2, "0").replace(/0+$/, "");
-  return `${Math.floor(basisPoints / 100)}${remainder ? `.${remainder}` : ""}%`;
+import { formatWei } from "../../lib/mint/format.ts";
+
+/** Display immutable reward terms as exact ETH amounts, without floating-point rounding. */
+export function formatRewardAllocation(revenueWei: string | bigint, basisPoints: number): string {
+  const revenue = BigInt(revenueWei);
+  if (revenue < 0n || !Number.isSafeInteger(basisPoints) || basisPoints < 0 || basisPoints > 10_000) throw new Error("Invalid reward terms.");
+  return formatWei(revenue * BigInt(basisPoints) / 10_000n);
 }

@@ -27,9 +27,9 @@ export function SiteShell({ children, section = "seasons", chainId = null, class
       <footer className="mint-footer">
         <Link href="/mint" aria-label="Tincta home">
           <TinctaWordmark className="tincta-wordmark" title="" />
-          <span className="footer-tagline">Earn prizes by adding color to your wallet.</span>
+          <span className="footer-tagline">Rewards governed by smart contracts.</span>
         </Link>
-        <span>Color, collected. Entirely on-chain.</span>
+        <span>View reward rules and confirmed transactions.</span>
       </footer>
     </div>
   );

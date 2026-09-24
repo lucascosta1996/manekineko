@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { assertWallet, checkTransaction, connectWallet, invalidateWallet, parseReferralQuery, readTransaction, recoverTransaction, requestWalletAccounts, submitTransaction, transactionKey, type ContractTarget, type TransactionJournal, type WalletProvider, type WalletSession, verifyRoundTerms, walletError } from "../lib/affiliates/wallet.ts";
 
 import type { Contract } from "ethers";
-import { formatBasisPoints } from "../components/affiliates/program-terms.ts";
+import { formatRewardAllocation } from "../components/affiliates/program-terms.ts";
 import { createWalletViewScope } from "../components/affiliates/wallet-view.ts";
 
 const address = "0x1111111111111111111111111111111111111111";
@@ -359,13 +359,18 @@ test("legacy V3 keeps its verified fixed terms and rejects V4 expectations", asy
   await assert.rejects(verifyRoundTerms(readContract("affiliate-v3", [100, 100, 100]), { ...legacyTarget, commissionBps: 200 }), /terms do not match/);
 });
 
-test("program percentages display fractional basis points exactly", () => {
-  assert.equal(formatBasisPoints(0), "0%");
-  assert.equal(formatBasisPoints(1), "0.01%");
-  assert.equal(formatBasisPoints(125), "1.25%");
-  assert.equal(formatBasisPoints(10_000), "100%");
-  assert.throws(() => formatBasisPoints(1.5));
-  assert.throws(() => formatBasisPoints(10_001));
+test("reward amounts preserve exact wei allocations for ticket and sellout values", () => {
+  const price = "10000000000000000";
+  assert.equal(formatRewardAllocation(price, 0), "0");
+  assert.equal(formatRewardAllocation(price, 1), "0.000001");
+  assert.equal(formatRewardAllocation(price, 125), "0.000125");
+  assert.equal(formatRewardAllocation(price, 10_000), "0.01");
+  assert.equal(formatRewardAllocation(BigInt(price) * 1000n, 6000), "6");
+  assert.equal(formatRewardAllocation(BigInt(price) * 1000n, 2000), "2");
+  assert.equal(formatRewardAllocation(10_001n, 1), "0.000000000000000001");
+  assert.equal(formatRewardAllocation("9007199254740993000000000000000000", 125), "112589990684262.4125");
+  for (const rate of [-1, 1.5, 10_001, NaN]) assert.throws(() => formatRewardAllocation(price, rate));
+  assert.throws(() => formatRewardAllocation(-1n, 100));
 });
 
 

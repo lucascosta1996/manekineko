@@ -11,7 +11,7 @@ export function AnnouncedActivity({ season, collection }: { season: AnnouncedSea
   return <div className="collection-activity">
     {activity.target ? <ProtocolCountdown target={activity.target} label={activity.label} now={now} /> : <span className="activity-label">{activity.label}</span>}
     <p className="activity-detail">{activity.detail}</p>
-    {collection.contractAddress && collection.status === "enrollment" && <Link className="activity-link" href={`/mint/${collection.id}/affiliates`}>View affiliate program ↗</Link>}
+    {collection.contractAddress && collection.status === "enrollment" && <Link className="activity-link" href={`/mint/${collection.id}/affiliates`}>View affiliate rewards ↗</Link>}
   </div>;
 }
 export function AnnouncedSeasonCard({ season }: { season: AnnouncedSeason }) {
@@ -22,7 +22,7 @@ export function AnnouncedSeasonCard({ season }: { season: AnnouncedSeason }) {
     <div className="season-card-heading"><h3><Link href={href}>{season.seasonName}</Link></h3><span aria-hidden="true">↗</span></div>
     <p>{season.colors.length} collections · Season announced</p>
     {collection && <AnnouncedActivity season={season} collection={collection} />}
-    <Link className="season-card-foot" href={href}><span>Explore the season schedule</span><span aria-hidden="true">→</span></Link>
+    <Link className="season-card-foot" href={href}><span>View upcoming collections</span><span aria-hidden="true">→</span></Link>
   </article>;
 }
 export function AnnouncedCollectionCard({ season, collection }: { season: AnnouncedSeason; collection: AnnouncedCollection }) {

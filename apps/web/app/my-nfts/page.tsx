@@ -6,8 +6,8 @@ import "./nfts.css";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "My NFTs | Tincta",
-  description: "Explore your Tincta tickets, on-chain artwork, number combinations, and collection results.",
+  title: "My Tickets | Tincta",
+  description: "Follow your Tincta tickets, draw results, and available prize claims.",
 };
 
 export default async function MyNftsPage({ searchParams }: { searchParams: Promise<{ wallet?: string | string[] }> }) {

@@ -71,7 +71,7 @@ export function AffiliateWindow({ program, initialNow, canLink = false }: { prog
     <div className="activity-counter"><span>{closed ? "Affiliate enrollment closed" : program.availableSlots === 0 ? "Affiliate positions filled" : available ? "Affiliate enrollment open" : "Affiliate enrollment unavailable"}</span><strong>{closed ? `${program.enrolledSlots} / ${program.maxSlots}` : `${program.availableSlots} / ${program.maxSlots}`}</strong></div>
     <p>{closed ? "Enrolled positions" : "Positions remaining"}</p>
     {available && program.saleStartAt && <ProtocolCountdown target={program.saleStartAt} label="Enrollment closes in" now={now} expiredLabel="Enrollment closed" />}
-    {canLink && <Link className="activity-link" href={`/mint/${program.collectionId}/affiliates`}>{available ? "Explore affiliate enrollment" : "View affiliate program"}<span aria-hidden="true">↗</span></Link>}
+    {canLink && <Link className="activity-link" href={`/mint/${program.collectionId}/affiliates`}>{available ? "Join the affiliate program" : "View affiliate rewards"}<span aria-hidden="true">↗</span></Link>}
   </div>;
 }
 

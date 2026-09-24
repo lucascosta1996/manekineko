@@ -41,9 +41,10 @@ function SeasonCard({ season, now, announcement }: { season: SeasonPublic; now: 
     </Link>
     <div className="season-card-heading"><h3><Link href={seasonHref(season)}>{season.name}</Link></h3><span aria-hidden="true">↗</span></div>
     <p>{season.collections.length} published {season.collections.length === 1 ? "collection" : "collections"} · Up to 10 in a season</p>
+    <p className="catalog-prize-description">{cover.name} · {collectionPrizeCopy(cover)}</p>
     <CollectionActivity key={cover.id} collection={cover} previous={previous} initialNow={now} showEnrollment />
     {announcement && next && !live && <AnnouncedActivity season={announcement} collection={next} />}
-    <Link className="season-card-foot" href={seasonHref(season)}><span>{live ? `Now minting · ${live.name}` : "Explore collections and results"}</span><span aria-hidden="true">→</span></Link>
+    <Link className="season-card-foot" href={seasonHref(season)}><span>{live ? `Now minting · ${live.name}` : "View prizes and results"}</span><span aria-hidden="true">→</span></Link>
   </article>;
 }
 
@@ -56,9 +57,9 @@ function UpcomingSeasonCard({ palette }: { palette: SeasonPalette }) {
       <SeasonColorBar colors={palette.colors} />
     </div>
     <div className="season-card-heading"><h3>{label}</h3></div>
-    <p>{palette.colors.length} colors · Names to be revealed</p>
+    <p>{palette.colors.length} upcoming collections · Reward details to follow</p>
     <div className="collection-activity"><span className="activity-label">Season schedule to be announced</span><p className="activity-detail">Launch countdowns and affiliate availability appear once the next collection is confirmed.</p></div>
-    <div className="season-card-foot"><span>A glimpse of what comes next.</span><span className="season-coming-label">Coming soon</span></div>
+    <div className="season-card-foot"><span>The next opportunities to win.</span><span className="season-coming-label">Coming soon</span></div>
   </article>;
 }
 
@@ -73,7 +74,7 @@ function UpcomingCollectionCard({ ordinal, color, colors, previous }: { ordinal:
     </div>
     <div className="catalog-card-body">
       <div className="catalog-card-title"><h3><span className="collection-color-dot" style={{ backgroundColor: color }} aria-hidden="true" />{label}</h3></div>
-      <p>A new color is coming. Name and launch details to be revealed.</p>
+      <p>A new collection is coming. Prize and opening details will appear when confirmed.</p>
     </div>
     <div className="collection-activity"><span className="activity-label">{activity.label}</span><p className="activity-detail">{activity.detail}</p></div>
   </article>;
@@ -86,11 +87,11 @@ export function SeasonsExperience({ initialCollections, initialNow, initialSched
   const earlier = collections.filter(c => !c.seasonId);
   const upcoming = upcomingSeasonPalettes(seasons, seasons.length ? 2 : 3).filter(palette => !announced.some(item => item.seasonNumber === palette.ordinal));
   return <>
-    <div className="catalog-heading seasons-heading"><div><p className="eyebrow">TINCTA / COLOR, COLLECTED</p><h1>Earn prizes by<br />adding color to<br />your wallet.</h1></div>
+    <div className="catalog-heading seasons-heading"><div><p className="eyebrow">TINCTA / ON-CHAIN REWARDS</p><h1>Explore your<br />next reward.</h1></div>
       <div className="catalog-intro"><SeasonSpectrum />
-        <p>Six winning tickets. Six equal prizes.<br />Collect an edition for a chance to win, or earn referral rewards through its affiliate program.</p><span className="catalog-intro-caption">A NEW SEASON. A NEW PALETTE.</span></div></div>
-    <div className="season-format"><p><strong>Permanent numbers. A later draw.</strong> V10 gives each NFT four numbers generated in Solidity at mint. One VRF draw after sellout determines final scores and winners, with six equal prizes by default. The numbers and artwork stay fixed.</p><p>V10 rollout is pending. Published collections keep their original numbers, reveal rules and affiliate terms. Qualifying affiliates share equally under the collection’s published payout cap. <Link href="/docs/randomness">Explore numbers and the draw →</Link></p></div>
-    <div className="catalog-section-heading"><h2>Seasons <span>{String(seasons.length + announced.length).padStart(2, "0")}</span></h2><span>One season. A family of colors.</span></div>
+        <p>Compare prize values and ticket prices.<br />Mint a ticket for a chance to win, or qualify for affiliate rewards.</p><span className="catalog-intro-caption">FIXED RULES. PROTECTED REWARDS.</span></div></div>
+    <div className="season-format"><p><strong>ETH rewards. Governed by smart contracts.</strong> In the current design, the contract holds prize funds and earned affiliate rewards, protects them from team withdrawals, and pays eligible claims directly to the chosen wallet. No manual payout approval.</p><p>V10 rollout is pending. Published collections keep their original draw, prize and affiliate rules. Reward values and claim availability follow each collection’s contract. <Link href="/docs/prizes">How reward funds are protected →</Link></p></div>
+    <div className="catalog-section-heading"><h2>Seasons <span>{String(seasons.length + announced.length).padStart(2, "0")}</span></h2><span>Explore prizes and affiliate rewards.</span></div>
     <LiveDataNotice retrying={retrying || schedules.retrying} />
     <section className="seasons-grid" aria-label="Seasons">
       {seasons.map(season => <SeasonCard key={`${season.chainId}:${season.id}`} season={season} now={now} announcement={schedules.data.find(item => item.chainId === season.chainId && item.seasonId === season.id)} />)}
@@ -109,7 +110,7 @@ export function SeasonExperience({ initialCollections, initialNow, seasonId, cha
   const season = seasons.find(s => s.chainId === chainId && s.id === seasonId);
   if (!season && announcement) return <>
     <nav className="breadcrumbs" aria-label="Breadcrumb"><Link href="/seasons">Seasons</Link><span aria-hidden="true">/</span><span aria-current="page">{announcement.seasonName}</span></nav>
-    <header className="season-heading"><div><p className="eyebrow">{chainId === 1 ? "ETHEREUM" : "SEPOLIA"} / ANNOUNCED SEASON</p><h1>{announcement.seasonName}</h1><p>The season has been announced. Follow the fixed launch schedule as collections are prepared.</p></div></header>
+    <header className="season-heading"><div><p className="eyebrow">{chainId === 1 ? "ETHEREUM" : "SEPOLIA"} / ANNOUNCED SEASON</p><h1>{announcement.seasonName}</h1><p>Explore the upcoming collections. Prize values and affiliate rewards appear once their terms are confirmed.</p></div></header>
     <LiveDataNotice retrying={retrying || schedules.retrying} />
     <section className="catalog-grid" aria-label="Announced collections">{announcement.collections.map(collection => <AnnouncedCollectionCard key={collection.id} season={announcement} collection={collection} />)}</section>
   </>;
@@ -120,9 +121,9 @@ export function SeasonExperience({ initialCollections, initialNow, seasonId, cha
   const upcoming = upcomingCollectionColors(season).filter(item => !scheduled.some(collection => collection.number === item.ordinal));
   return <>
     <nav className="breadcrumbs" aria-label="Breadcrumb"><Link href="/seasons">Seasons</Link><span aria-hidden="true">/</span><span aria-current="page">{season.name}</span></nav>
-    <header className="season-heading"><div><p className="eyebrow">{season.networkName.toUpperCase()} / TINCTA SEASON</p><h1>{season.name}</h1><p>A palette of limited editions. Explore each collection’s artwork, prizes and affiliate program.</p></div><div className="season-heading-count"><strong>{season.collections.length.toString().padStart(2, "0")}</strong><span>published collections</span></div></header>
+    <header className="season-heading"><div><p className="eyebrow">{season.networkName.toUpperCase()} / TINCTA SEASON</p><h1>{season.name}</h1><p>Explore each collection’s prize pool, ticket price and affiliate rewards.</p></div><div className="season-heading-count"><strong>{season.collections.length.toString().padStart(2, "0")}</strong><span>published collections</span></div></header>
     {live ? <section className="season-live-summary" aria-label="Current live collection"><div><p className="eyebrow">MINTING NOW</p><h2>{live.name}</h2><p>{collectionPrizeCopy(live)}</p><p>{collectionReferralCopy(live)}</p></div><Link className="primary-button" href={`/mint/${live.id}`}>Mint a ticket <span aria-hidden="true">↗</span></Link></section>
-      : <div className="season-closed-note"><strong>No collection is minting right now.</strong><p>Browse published editions and preview the colors to come. Launch details appear after deployment; scheduled collections show their opening time on the collection page.</p></div>}
+      : <div className="season-closed-note"><strong>No collection is minting right now.</strong><p>Review past rewards and upcoming collections. Opening times appear when confirmed; minting requires contract activation.</p></div>}
     <div className="catalog-section-heading"><h2>Collections <span>{season.collections.length}</span></h2><Link className="text-link" href="/seasons">All seasons →</Link></div>
     {announcement && (announcement.status === "paused" || announcement.status === "failed") && announcement.collections[0] && <AnnouncedActivity season={announcement} collection={announcement.collections[0]} />}
     <LiveDataNotice retrying={retrying || schedules.retrying} /><CollectionGrid collections={season.collections} liveId={live?.id} now={now} colors={colors}>

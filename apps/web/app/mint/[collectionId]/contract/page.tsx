@@ -9,7 +9,7 @@ import eligibilityV2Source from "@manekineko/contract-abi/affiliate-eligibility-
 import v6Source from "@manekineko/contract-abi/round-v6-source";
 import eligibilitySource from "@manekineko/contract-abi/affiliate-eligibility-source";
 import v5Source from "@manekineko/contract-abi/round-v5-source";
-import { formatBasisPoints } from "../../../../components/affiliates/program-terms";
+import { formatRewardAllocation } from "../../../../components/affiliates/program-terms";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import legacySource from "@manekineko/contract-abi/round-source";
@@ -60,8 +60,9 @@ export default async function ContractPage({
         <span aria-current="page">Contract</span>
       </nav>
       <div className="source-heading">
-        <p className="eyebrow">PUBLIC RULES. REPRODUCIBLE RESULTS.</p>
-        <h1>It’s all in the contract.</h1>
+        <p className="eyebrow">REWARDS GOVERNED BY SMART CONTRACTS.</p>
+        <h1>The rules behind your rewards.</h1>
+        <p>{v7 ? "The contract protects unclaimed prizes and earned affiliate rewards. Eligible wallets claim directly to their chosen receiving address, without manual payout approval." : "This collection’s original contract determines its prizes, referral rewards and payment process. Review the version-specific rules below."}</p>
         <div className="source-deployment">
           <span className="source-version">{version} · {collection.networkName}</span>
           <p>{permanent ? "This collection uses V10: permanent Solidity-generated numbers from mint, a separate post-sellout VRF draw, equal prizes and 20 cumulative primary mints per recipient wallet." : version === "V9"
@@ -87,7 +88,7 @@ export default async function ContractPage({
         </Link>
       </div>
       <div className="source-guide">
-        <h2>Follow the calculation</h2>
+        <h2>How winners and payouts are determined</h2>
         {v2 ? <ol>
           <li><code>requestRandomness()</code> submits the collection’s single request after sellout.</li>
           <li>The configured Chainlink coordinator verifies the VRF proof before <code>rawFulfillRandomWords()</code> stores the word.</li>
@@ -135,17 +136,17 @@ export default async function ContractPage({
       </div>}
       {program && <>
         <div className="source-guide" id="affiliate-rules">
-          <h2>Affiliate rules, recorded on-chain</h2>
+          <h2>Affiliate rewards, enforced on-chain</h2>
           <p>
             Enrollment requires an expiring authorization from the automated admission service.
             The contract enforces position limits and registered beneficiaries. Each successful
             referred mint is attributed to its selected affiliate under this collection’s
             immutable payout rules, while preserving the configured winner’s prize.
-            Commissions become claimable at sellout; an unsold expiry voids pending commissions
+            Earned rewards become claimable at sellout; an unsold expiry voids pending rewards
             so holders can receive full mint-price refunds.
           </p>
-          {v7 && <p>Only affiliates with at least {program.minAffiliateReferrals} paid referrals qualify. Qualifying affiliates split equally, capped at {formatBasisPoints(program.affiliatePayoutCapBps ?? 0)} of the lowest qualifying affiliate’s referred revenue. Unfilled and unqualified positions receive nothing. Unallocated funds stay in a separate growth reserve.</p>}
-          {(program.contractVersion === "affiliate-v5" || program.contractVersion === "affiliate-v6") && <p>The collection reserves {formatBasisPoints(program.affiliatePoolBps ?? 0)} of all primary mint revenue for affiliates. At sellout, the contract allocates that pool proportionally to recorded referral sales. Unused positions earn zero; an unsold collection preserves full refunds. Enrollment signatures bind the exact position, pool terms, wallet and collection.</p>}
+          {v7 && <p>Only affiliates with at least {program.minAffiliateReferrals} paid referrals qualify. The affiliate reward budget at sellout is up to {formatRewardAllocation(BigInt(program.mintPriceWei) * BigInt(program.maxSupply), program.affiliatePoolBps ?? 0)} ETH. Qualified affiliates earn equal rewards. The shared payout limit is {formatRewardAllocation(program.mintPriceWei, program.affiliatePayoutCapBps ?? 0)} ETH multiplied by the fewest paid referrals among qualified affiliates. Unfilled and unqualified positions receive nothing. The full budget is not guaranteed to be distributed; unallocated funds stay in a separate growth reserve.</p>}
+          {(program.contractVersion === "affiliate-v5" || program.contractVersion === "affiliate-v6") && <p>The affiliate reward budget at sellout is up to {formatRewardAllocation(BigInt(program.mintPriceWei) * BigInt(program.maxSupply), program.affiliatePoolBps ?? 0)} ETH. At sellout, the contract allocates that pool proportionally to recorded referral sales. Unused positions earn zero; an unsold collection preserves full refunds. Enrollment signatures bind the exact position, pool terms, wallet and collection.</p>}
           {(program.contractVersion === "affiliate-v6" || v7) ? <>
             <p>After the first official collection on this network, enrollment also requires an NFT from any earlier completed official collection. {v7?"Ranked-prize sources qualify after sellout and reveal with all prizes protected; older sources follow their original completed and paid rules;":"Completed means sold out, revealed and paid its winner;"} the NFT itself does not have to be the winning ticket. Current-collection NFTs cannot qualify because enrollment closes before minting begins.</p>
             <p>The shared eligibility contract checks the applicant’s current ownership and permits each NFT to unlock only one position per collection. Each wallet can enroll once. A transfer afterward cannot unlock a second position in that collection or move the enrolled wallet’s position and earnings. The NFT’s current holder may use it to qualify in a different future collection.</p>
@@ -162,7 +163,7 @@ export default async function ContractPage({
             the original contract shown above; a live affiliate program requires a new deployment
             of <code>{affiliateSource.contractName}</code>.
           </p>}
-          <Link href={`/mint/${collection.id}/affiliates`} className="text-link">View this collection’s affiliate program →</Link>
+          <Link href={`/mint/${collection.id}/affiliates`} className="text-link">View this collection’s affiliate rewards →</Link>
         </div>
         {program.mode === "demo" && <div className="source-code">
           <div><span>{affiliateSource.contractName}.sol</span><span>Solidity {affiliateSource.compiler}</span></div>

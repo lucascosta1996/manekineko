@@ -39,8 +39,8 @@ export function NewsletterSignup() {
   }
 
   return (
-    <form id="launch-list" className="newsletter" onSubmit={submit} aria-busy={status === "pending"}>
-      <label htmlFor="launch-email">Be first to know when minting opens.</label>
+    <form className="newsletter" onSubmit={submit} aria-label="Launch notifications" aria-describedby="launch-description" aria-busy={status === "pending"}>
+      <label className="visually-hidden" htmlFor="launch-email">Email address</label>
       <div className="newsletter-field">
         <input
           id="launch-email"
