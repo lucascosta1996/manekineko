@@ -36,7 +36,11 @@ test("persists signed intent before broadcast and crash resume reconciles its ex
 });
 test("failed durable write prevents broadcasting even if caller retries the same in-memory instance", async () => {
   const f = fixture(), pipeline = f.make(); f.saveFails();
-  await assert.rejects(pipeline.send("deploy", { to: target }), /save failed/);
+  await assert.rejects(pipeline.send("deploy", { to: target }), (error: Error) => {
+    assert.match(error.message, /save failed/);
+    assert.equal((error.cause as Error).message, "private backend failure");
+    return true;
+  });
   await assert.rejects(pipeline.send("deploy", { to: target }), /Reload/);
   assert.equal(f.events.includes("broadcast"), false);
 });
@@ -45,6 +49,18 @@ test("fee and aggregate spend caps fail before signing or broadcasting", async (
     const f = fixture(settings); await assert.rejects(f.make().send("deploy", { to: target }), /ceiling|spending cap/);
     assert.equal(f.journal.transactions.length, 0); assert.deepEqual(f.events, []);
   }
+});
+test("confirmation save failures preserve the cause and forbid further sends on that instance", async () => {
+  const f = fixture(), pipeline = f.make();
+  await assert.rejects(pipeline.send("mint", { to: target }), ChainPendingError);
+  f.confirm(); f.saveFails();
+  await assert.rejects(pipeline.send("mint", { to: target }), (error: Error) => {
+    assert.match(error.message, /save failed/);
+    assert.equal((error.cause as Error).message, "private backend failure");
+    return true;
+  });
+  await assert.rejects(pipeline.send("mint", { to: target }), /Reload/);
+  assert.equal(f.events.filter(event => event === "broadcast").length, 1);
 });
 test("a changed canonical receipt and outside nonce consumption block new writes", async () => {
   const f = fixture(); await assert.rejects(f.make().send("first", { to: target }), ChainPendingError); f.confirm();

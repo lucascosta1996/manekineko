@@ -1,4 +1,5 @@
 "use client";
+import { Icon } from "@manekineko/ui/icons";
 
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
@@ -40,9 +41,7 @@ export function SiteNavigation({ section }: { section: SiteSection }) {
       aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} aria-controls={navigationId}
       onClick={() => setOpen(value => !value)}>
       <span>{open ? "Close" : "Menu"}</span>
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-        {open ? <path d="m5 5 10 10M5 15 15 5" /> : <path d="M3 6h14M3 10h14M3 14h14" />}
-      </svg>
+      <Icon name={open ? "close" : "menu"} />
     </button>
     <nav id={navigationId} aria-label="Main navigation">
       <Link href="/seasons" aria-current={section === "seasons" ? "page" : undefined} onClick={() => setOpen(false)}>Seasons</Link>

@@ -63,7 +63,12 @@ export async function openRunStore(pool: Pool, runId: string, chainId: 1 | 11155
     }
     async function replacePendingAction(key: string, payload: Record<string, any>) {
       await guard();
-      const replaced = await query(`UPDATE manekineko_season_runtime_actions SET payload=$3::jsonb,result='{}'::jsonb,status='pending',last_error=NULL,updated_at=now()
+      // Keep the exact old payload/media attempt with its state. Only documented
+      // known-unsent refreshes reach here; confirmed and ambiguous writes are immutable.
+      const replaced = await query(`UPDATE manekineko_season_runtime_actions SET payload=$3::jsonb,
+        result=jsonb_build_object('observation',result->'observation','payloadHistory',
+          coalesce(result->'payloadHistory','[]'::jsonb) || jsonb_build_array(jsonb_build_object('payload',payload,'result',result-'payloadHistory','status',status,'lastError',last_error,'replacedAt',now()))),
+        status='pending',last_error=NULL,updated_at=now()
         WHERE run_id=$1 AND action_key=$2 AND status IN ('pending','failed') AND payload->>'accountId'=$4 RETURNING *`, [runId, key, JSON.stringify(payload), payload.accountId]);
       ensure(replaced.rowCount === 1, "post_refresh_requires_known_unsent_action");
       return replaced.rows[0] as Action;

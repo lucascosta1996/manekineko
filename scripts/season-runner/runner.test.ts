@@ -8,6 +8,7 @@ import { ChainPendingError, type ChainJournal } from "./chain-transactions.ts";
 import type { ChainDeployment, ChainSnapshot } from "./chain.ts";
 import type { RunStore } from "./store.ts";
 import { AIRY_RECOVERY as A, createAiryRecoveryPlan, recoveryDigest, recoveryPayload } from "./airy-recovery-plan.ts";
+import { XApiError } from "./social.ts";
 
 const hash = `0x${"ab".repeat(32)}`, factory = `0x${"66".repeat(20)}`, round = `0x${"77".repeat(20)}`;
 function fixture() {
@@ -44,6 +45,48 @@ function fixture() {
   } as unknown as Partial<RunnerDependencies>;
   return { artifact, wallet, now, snapshot, deployment, journal, state, events, published, store, options, chain, dependencies };
 }
+
+test("a verified draw queues and attempts primary results before bot claims, even when optional delivery fails", async () => {
+  for (const fail of [false, true]) {
+    const f = fixture(); f.artifact.steps = [f.artifact.steps[0]]; f.state.firstThreadComplete = true;
+    f.options.wallets = Array.from({ length: 50 }, () => new Wallet(Wallet.createRandom().privateKey));
+    const id = f.artifact.steps[0].id;
+    f.store.action = (async key => key === `${id}:winners-revealed:root` ? undefined : { status: "confirmed", result: { confirmedAt: iso(f.now - 10000) } }) as unknown as RunStore["action"];
+    f.dependencies.deliverMessage = (async (_store, _credentials, _account, key, message, options) => {
+      if (key === `${id}:winners-revealed`) {
+        assert.match(message.post, /claim unpaid prizes/);
+        assert.equal(options?.observation?.unpaidPrizes, 6);
+        f.events.push(options?.enqueueOnly ? "enqueue-results" : "deliver-results");
+        if (options?.enqueueOnly) return null;
+        if (fail) throw new XApiError("X request rejected", 403);
+      }
+      if (key === "season:season-complete" && fail) throw new XApiError("X request rejected", 403);
+      return "123";
+    }) as RunnerDependencies["deliverMessage"];
+    const runner = await createSeasonRunner(f.store, {} as Pool, f.options, f.dependencies);
+    await runner.tick();
+    assert(f.events.indexOf("enqueue-results") < f.events.indexOf("deliver-results"));
+    assert(f.events.indexOf("deliver-results") < f.events.indexOf("rehearsal"));
+    assert.equal(f.events.filter(event => event === "deliver-results").length, 1);
+    assert.equal(f.state.completed, true, "Social failure does not turn a terminal season into an upcoming one");
+    assert(f.events.includes("complete"));
+  }
+});
+
+test("rapid claims before the next observation enqueue paid results and an independent all-paid summary", async () => {
+  const f = fixture(); f.artifact.steps = [f.artifact.steps[0]]; f.state.firstThreadComplete = true;
+  f.snapshot.prizePaid = true; f.snapshot.prizePaidAmount = "6000000000000000000";
+  f.snapshot.awards.forEach(award => { award.claimed = true; award.paidAt = String(f.now - 10); });
+  const id = f.artifact.steps[0].id;
+  f.store.action = (async key => /:(winners-revealed|prizes-paid):root$/.test(key) ? undefined : { status: "confirmed", result: { confirmedAt: iso(f.now - 10000) } }) as unknown as RunStore["action"];
+  const enqueued: string[] = [];
+  f.dependencies.deliverMessage = (async (_s, _c, _a, key, message, options) => {
+    if (options?.enqueueOnly) { enqueued.push(key); assert.equal(options.observation?.unpaidPrizes, 0); assert.match(message.post, /All prizes have been paid/); assert.doesNotMatch(message.post, /claim link|claim unpaid/); }
+    return "123";
+  }) as RunnerDependencies["deliverMessage"];
+  const runner = await createSeasonRunner(f.store, {} as Pool, f.options, f.dependencies); await runner.tick();
+  assert.deepEqual(enqueued, [`${id}:winners-revealed`, `${id}:prizes-paid`]);
+});
 
 test("canonical confirmed receipts are rechecked on restart before any public post", async () => {
   const f = fixture(); f.journal.transactions.push({ action: "old", state: "confirmed", rawTransaction: "not-read-by-mock", hash, nonce: 1 });

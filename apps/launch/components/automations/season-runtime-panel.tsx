@@ -1,6 +1,9 @@
 "use client";
+import { Icon } from "@manekineko/ui/icons";
 
-import { useCallback, useEffect, useState } from "react";
+import { CompactSelect } from "@manekineko/ui/select";
+
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { AutomationPlan } from "../../lib/launch-automation";
 import type { RuntimeSnapshot } from "../../lib/season-runtime";
 import type { SeasonSocialMessage } from "@manekineko/contract-abi/season-social";
@@ -20,17 +23,20 @@ export function SeasonRuntimePanel({ automation, allowedChainId, dirty }: { auto
   const [loadError, setLoadError] = useState("");
   const [acceptedBinding, setAcceptedBinding] = useState("");
   const [accepted, setAccepted] = useState(false), [previews, setPreviews] = useState<Preview[]>([]), [previewKey, setPreviewKey] = useState("");
+  const generation = useRef(0);
   const path = `/api/launch/automations/${automation.id}/runtime`;
   const restricted = allowedChainId !== null && allowedChainId !== automation.plan.chainId;
   const preview = previews.find(item => item.key === previewKey) ?? previews[0];
   const load = useCallback(async () => {
+    const requestId = ++generation.current;
     try {
       const next = await request<RuntimeSnapshot>(path);
+      if (requestId !== generation.current || (next.run && next.run.chainId !== automation.plan.chainId)) return;
       setSnapshot(next); setLoadError("");
-    } catch (cause) { setLoadError(cause instanceof Error ? cause.message : "Unable to load the season."); }
-    finally { setLoading(false); }
-  }, [path]);
-  useEffect(() => { void load(); const timer = setInterval(() => void load(), 10000); return () => clearInterval(timer); }, [load]);
+    } catch (cause) { if (requestId === generation.current) setLoadError(cause instanceof Error ? cause.message : "Unable to load the season."); }
+    finally { if (requestId === generation.current) setLoading(false); }
+  }, [path, automation.plan.chainId]);
+  useEffect(() => { void load(); const timer = setInterval(() => void load(), 10000); return () => { generation.current++; clearInterval(timer); }; }, [load]);
   useEffect(() => {
     let active = true;
     void request<{ previews: Preview[] }>(`${path}/previews`).then(value => { if (active) setPreviews(value.previews); }).catch(cause => { if (active) setError(cause instanceof Error ? cause.message : "Previews unavailable."); });
@@ -51,7 +57,7 @@ export function SeasonRuntimePanel({ automation, allowedChainId, dirty }: { auto
   const blocked = loading || pending || restricted;
   const canRun = !blocked && !dirty && automation.status === "prepared" && !!snapshot?.profile?.enabled && !!snapshot?.encryptionConfigured && automation.plan.social?.enabled === true;
   return <section className="season-runtime" aria-labelledby="season-runtime-title">
-    <div className="season-runtime-heading"><div><span className="launch-eyebrow">SEASON EXECUTION / V9 + V10</span><h2 id="season-runtime-title">Ready when you are.</h2><p>Review the images and this network’s Twitter / X configuration, then start the prepared season.</p></div><span className="launch-status">{loading ? "Loading" : run?.status ?? "Not started"}</span></div>
+    <div className="season-runtime-heading"><div><span className="launch-eyebrow">SEASON EXECUTION / V9 + V10</span><h2 id="season-runtime-title">Worker and delivery.</h2><p>The prepared artifact records intended terms. Current chain lifecycle appears above; worker and X delivery status are separate.</p></div><span className="launch-status">{loading ? "Loading" : run?.status ?? "Not started"}</span></div>
     {error && <div className="launch-alert launch-alert-error" role="alert">{error}</div>}
     {loadError && <div className="launch-alert launch-alert-error" role="alert">{loadError}</div>}
     {notice && <div className="launch-alert launch-alert-success" role="status">{notice}</div>}
@@ -67,10 +73,10 @@ export function SeasonRuntimePanel({ automation, allowedChainId, dirty }: { auto
         {active && <button type="button" className="launch-button launch-button-secondary" disabled={blocked} onClick={() => void control("pause")}>{run.status === "completed" ? "Pause claim monitoring" : "Pause season"}</button>}
       </div>
     </div>
-    <div className="season-runtime-preview"><div><span className="launch-eyebrow">POSTS & IMAGES</span><h3>Every event, in the season’s colors.</h3><p>Preview examples use saved names, colors and terms. Dates, winners and totals shown here are illustrative; the worker replaces them with confirmed event data.</p><select aria-label="Social event preview" value={preview?.key ?? ""} onChange={event => setPreviewKey(event.target.value)}>{previews.map(item => <option key={item.key} value={item.key}>{item.collectionLabel} · {item.message.header}</option>)}</select></div>
-      {preview && <div className="season-runtime-preview-grid"><div><img src={preview.imageUrl} alt={`Preview example: ${preview.message.alt}`} width={1600} height={900}/><span className="season-runtime-note">PREVIEW EXAMPLE · 1600 × 900</span></div><div><pre>{preview.message.post}</pre><details><summary>Thread replies ({preview.message.replies.length})</summary>{preview.message.replies.map((reply, index) => <pre key={index}>{reply}</pre>)}</details></div></div>}
+    <div className="season-runtime-preview"><div><span className="launch-eyebrow">POSTS & IMAGES</span><h3>Every event, in the season’s colors.</h3><p>Preview examples use saved names, colors and terms. Dates, winners and totals shown here are illustrative; the worker replaces them with confirmed event data.</p><CompactSelect aria-label="Social event preview" value={preview?.key ?? ""} onChange={event => setPreviewKey(event.target.value)}>{previews.map(item => <option key={item.key} value={item.key}>{item.collectionLabel} · {item.message.header}</option>)}</CompactSelect></div>
+      {preview && <div className="season-runtime-preview-grid"><div><img src={preview.imageUrl} alt={`Preview example: ${preview.message.alt}`} width={1600} height={900}/><span className="season-runtime-note">PREVIEW EXAMPLE · 1600 × 900</span></div><div><pre>{preview.message.post}</pre><details><summary>Thread replies ({preview.message.replies.length})<Icon name="chevron" className="ui-disclosure-icon" /></summary>{preview.message.replies.map((reply, index) => <pre key={index}>{reply}</pre>)}</details></div></div>}
       {!preview && !loading && <p className="season-runtime-note">Complete and save the collection terms to generate event previews.</p>}
     </div>
-    {run && <div className="season-runtime-audit"><div><h3>Activity</h3>{snapshot?.events.length ? <ol>{snapshot.events.map(event => <li key={event.id}><time>{date(event.createdAt)}</time><p>{event.message}</p></li>)}</ol> : <p>No worker activity yet.</p>}</div><div><h3>Transactions & posts</h3>{snapshot?.actions.length ? <ol>{snapshot.actions.map(action => <li key={action.id}><strong>{action.kind.replaceAll("-", " ").replaceAll("_", " ")}</strong><span>{action.status}</span>{action.postId && <a href={`https://x.com/i/status/${action.postId}`} target="_blank" rel="noreferrer">View post ↗</a>}{action.txHash && <a href={`https://${automation.plan.chainId === "11155111" ? "sepolia." : ""}etherscan.io/tx/${action.txHash}`} target="_blank" rel="noreferrer">Transaction ↗</a>}{action.lastError && <p>{action.lastError}</p>}</li>)}</ol> : <p>The durable outbox appears here when the worker starts.</p>}</div></div>}
+    {run && <div className="season-runtime-audit"><div><h3>Activity</h3>{snapshot?.events.length ? <ol>{snapshot.events.map(event => <li key={event.id}><time>{date(event.createdAt)}</time><p>{event.message}</p></li>)}</ol> : <p>No worker activity yet.</p>}</div><div><h3>Transactions & posts</h3>{snapshot?.actions.length ? <ol>{snapshot.actions.map(action => <li key={action.id}><strong>{action.kind.replaceAll("-", " ").replaceAll("_", " ")}</strong><span>{action.status}</span>{action.postId && <a href={`https://x.com/i/status/${action.postId}`} target="_blank" rel="noreferrer">View post <Icon name="diagonal" /></a>}{action.txHash && <a href={`https://${automation.plan.chainId === "11155111" ? "sepolia." : ""}etherscan.io/tx/${action.txHash}`} target="_blank" rel="noreferrer">Transaction <Icon name="diagonal" /></a>}{action.delivery?.observedAt && <p>Observed {date(action.delivery.observedAt)}{action.delivery.blockNumber !== null ? ` · block ${action.delivery.blockNumber}` : ""}{action.delivery.unpaidPrizes !== null ? ` · ${action.delivery.unpaidPrizes} unpaid prizes at observation` : ""}</p>}{action.delivery?.latencyMs != null && <p>Observation to delivery: {Math.round(action.delivery.latencyMs / 1000)} seconds.</p>}{action.delivery?.attempts != null && <p>Delivery attempts: {action.delivery.attempts}.</p>}{action.delivery?.nextAction && <p>Next action: {action.delivery.nextAction.replaceAll("_", " ")}{action.delivery.nextAttemptAt ? ` · retry after ${date(action.delivery.nextAttemptAt)}` : ""}.</p>}{action.lastError && <p>{action.lastError}</p>}</li>)}</ol> : <p>The durable outbox appears here when the worker starts.</p>}</div></div>}
   </section>;
 }

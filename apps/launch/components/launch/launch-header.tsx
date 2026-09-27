@@ -1,125 +1,196 @@
 "use client";
-
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { LaunchBrand } from "./brand";
-
+import { launchDestination } from "../../lib/launch-navigation";
+import type { LaunchChainId } from "../../lib/chain-policy";
+import { Icon, type IconName } from "@manekineko/ui/icons";
+import { CompactSelect } from "@manekineko/ui/select";
+import * as Dialog from "@manekineko/ui/dialog";
+const pages: { path: string; label: string; active: string; icon: IconName }[] =
+  [
+    {
+      path: "/dashboard",
+      label: "Dashboard",
+      active: "dashboard",
+      icon: "dashboard",
+    },
+    { path: "/seasons", label: "Seasons", active: "seasons", icon: "layers" },
+    {
+      path: "/launch",
+      label: "Collections",
+      active: "configurations",
+      icon: "ticket",
+    },
+    {
+      path: "/activity",
+      label: "Activity",
+      active: "activity",
+      icon: "activity",
+    },
+    {
+      path: "/earnings",
+      label: "Creator earnings",
+      active: "earnings",
+      icon: "wallet",
+    },
+    {
+      path: "/settings",
+      label: "Network settings",
+      active: "settings",
+      icon: "settings",
+    },
+  ];
 export function LaunchHeader({
   username,
   active,
   onLogout,
   pending = false,
+  chainId,
+  onNetworkChange,
+  beforeNavigate,
 }: {
   username: string;
-  active: "configurations" | "seasons" | "earnings" | "active" | "upcoming";
+  active:
+    | "configurations"
+    | "seasons"
+    | "earnings"
+    | "active"
+    | "upcoming"
+    | "dashboard"
+    | "activity"
+    | "settings";
   onLogout: () => void;
   pending?: boolean;
+  chainId: LaunchChainId;
+  onNetworkChange: (chainId: LaunchChainId) => void;
+  beforeNavigate?: () => boolean;
 }) {
   const [open, setOpen] = useState(false);
-  const menuId = useId();
-  const navigation = useRef<HTMLDivElement>(null);
-  const toggle = useRef<HTMLButtonElement>(null);
-
   useEffect(() => {
-    const desktop = window.matchMedia("(min-width: 761px)");
-    const closeOnDesktop = () => {
-      if (desktop.matches) setOpen(false);
+    const media = window.matchMedia("(min-width: 961px)");
+    const close = () => {
+      if (media.matches) setOpen(false);
     };
-    desktop.addEventListener("change", closeOnDesktop);
-    return () => desktop.removeEventListener("change", closeOnDesktop);
+    media.addEventListener("change", close);
+    return () => media.removeEventListener("change", close);
   }, []);
-
-  useEffect(() => {
-    if (!open) return;
-    const closeOutside = (event: PointerEvent) => {
-      if (
-        event.target instanceof Node &&
-        !navigation.current?.contains(event.target)
-      )
-        setOpen(false);
-    };
-    document.addEventListener("pointerdown", closeOutside);
-    return () => document.removeEventListener("pointerdown", closeOutside);
-  }, [open]);
-
-  return (
-    <header className="launch-header launch-header-with-nav">
-      <a href="/seasons" aria-label="Tincta launch workspace">
-        <LaunchBrand />
-      </a>
-      <span className="launch-workspace-label">Launch</span>
-      <div
-        className="launch-navigation"
-        data-open={open}
-        ref={navigation}
-        onBlur={(event) => {
-          if (!event.currentTarget.contains(event.relatedTarget))
-            setOpen(false);
+  const nav = () => (
+    <>
+      <a
+        className="dashboard-brand"
+        href={launchDestination("/dashboard", chainId)}
+        onClick={(event) => {
+          if (beforeNavigate && !beforeNavigate()) event.preventDefault();
         }}
-        onKeyDown={(event) => {
-          if (event.key === "Escape" && open) {
-            event.preventDefault();
-            setOpen(false);
-            toggle.current?.focus();
-          }
-        }}
+        aria-label="Tincta dashboard"
       >
-        <button
-          type="button"
-          className="launch-mobile-menu-toggle"
-          ref={toggle}
-          aria-label={open ? "Close menu" : "Open menu"}
-          aria-expanded={open}
-          aria-controls={menuId}
-          onClick={() => setOpen((value) => !value)}
-        >
-          <span>{open ? "Close" : "Menu"}</span>
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            aria-hidden="true"
+        <LaunchBrand />
+        <span>Launch</span>
+      </a>
+      <nav className="dashboard-nav" aria-label="Launch workspace">
+        {pages.map((page) => (
+          <a
+            key={page.path}
+            href={launchDestination(page.path, chainId)}
+            aria-current={active === page.active ? "page" : undefined}
+            onClick={(event) => {
+              if (beforeNavigate && !beforeNavigate()) {
+                event.preventDefault();
+                return;
+              }
+              setOpen(false);
+            }}
           >
-            {open ? (
-              <path d="m5 5 10 10M5 15 15 5" />
-            ) : (
-              <path d="M3 6h14M3 10h14M3 14h14" />
-            )}
-          </svg>
-        </button>
-        <div className="launch-navigation-content" id={menuId}>
-          <nav className="launch-primary-nav" aria-label="Launch workspace">
-            <a
-              href="/seasons"
-              aria-current={active === "seasons" ? "page" : undefined}
-              onClick={() => setOpen(false)}
-            >
-              Seasons
-            </a>
-            <a
-              href="/launch"
-              aria-current={active === "configurations" ? "page" : undefined}
-              onClick={() => setOpen(false)}
-            >
-              Collections
-            </a>
-            <a href="/active-collection" aria-current={active === "active" ? "page" : undefined}>Active collection</a>
-            <a href="/upcoming-collection" aria-current={active === "upcoming" ? "page" : undefined}>Upcoming collection</a>
-            <a href="/earnings" aria-current={active === "earnings" ? "page" : undefined} onClick={() => setOpen(false)}>Creator earnings</a>
-          </nav>
-          <div className="launch-account">
-            <span className="launch-account-avatar" aria-hidden="true">
-              {username.charAt(0).toUpperCase()}
-            </span>
-            <span>{username}</span>
-            <button type="button" onClick={onLogout} disabled={pending}>
-              Sign out
-            </button>
-          </div>
+            <Icon name={page.icon} />
+            {page.label}
+          </a>
+        ))}
+        <div className="dashboard-nav-secondary">
+          <span>Collection views</span>
+          <a
+            href={launchDestination("/active-collection", chainId)}
+            aria-current={active === "active" ? "page" : undefined}
+            onClick={(event) => {
+              if (beforeNavigate && !beforeNavigate()) event.preventDefault();
+              else setOpen(false);
+            }}
+          >
+            Deployed collections
+          </a>
+          <a
+            href={launchDestination("/upcoming-collection", chainId)}
+            aria-current={active === "upcoming" ? "page" : undefined}
+            onClick={(event) => {
+              if (beforeNavigate && !beforeNavigate()) event.preventDefault();
+              else setOpen(false);
+            }}
+          >
+            Upcoming collections
+          </a>
         </div>
+      </nav>
+      <div className="dashboard-account">
+        <span title={username}>{username}</span>
+        <button type="button" onClick={onLogout} disabled={pending}>
+          <Icon name="logout" />
+          Sign out
+        </button>
       </div>
-    </header>
+    </>
+  );
+  return (
+    <>
+      <aside className="dashboard-sidebar">{nav()}</aside>
+      <header className="dashboard-topbar">
+        <a className="launch-skip" href="#launch-main">
+          Skip to workspace
+        </a>
+        <Dialog.Root open={open} onOpenChange={setOpen}>
+          <Dialog.Trigger
+            className="dashboard-menu"
+            aria-label="Open navigation"
+          >
+            <Icon name="menu" />
+          </Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Overlay className="ui-dialog-overlay" />
+            <Dialog.Content className="dashboard-drawer">
+              <Dialog.Title className="dashboard-sr-only">
+                Launch navigation
+              </Dialog.Title>
+              <Dialog.Description className="dashboard-sr-only">
+                Choose a workspace page. The selected network is retained.
+              </Dialog.Description>
+              <Dialog.Close
+                className="ui-dialog-close"
+                aria-label="Close navigation"
+              >
+                <Icon name="close" />
+              </Dialog.Close>
+              {nav()}
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+        <span className="dashboard-page-label">
+          {pages.find((page) => page.active === active)?.label ??
+            (active === "active"
+              ? "Deployed collections"
+              : "Upcoming collections")}
+        </span>
+        <div className="dashboard-network">
+          <CompactSelect
+            aria-label="Workspace network"
+            value={chainId}
+            disabled={pending}
+            onChange={(event) =>
+              onNetworkChange(event.target.value as LaunchChainId)
+            }
+          >
+            <option value="1">Ethereum Mainnet</option>
+            <option value="11155111">Sepolia testnet</option>
+          </CompactSelect>
+        </div>
+      </header>
+    </>
   );
 }

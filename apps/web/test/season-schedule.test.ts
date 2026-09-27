@@ -63,7 +63,7 @@ test("stale observations preserve scheduled intent without claiming readiness; p
   value.status = "paused";
   assert.equal(activity(value).label, "Season automation paused"); assert.equal(activity(value).target, null);
   value.status = "completed";
-  assert.equal(activity(value).label, "Season complete");
+  assert.equal(activity(value).label, "Worker finished");
 });
 test("unannounced next start remains unknown, while confirmed outcomes take precedence over old schedules", () => {
   const value = fixture(), c = value.collections[0]; c.enrollmentOpensAt = null; c.saleStartAt = null; c.mintDeadline = null;

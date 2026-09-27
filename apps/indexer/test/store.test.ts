@@ -25,6 +25,7 @@ test('PostgreSQL leases and canonicality failures cannot leave partial cursors, 
       for (const name of (await readdir(migrations)).filter(name => /^0(0[1-9]|1[0-9])_/.test(name)).sort()) {
         await client.query(await readFile(new URL(name, migrations), 'utf8'));
       }
+      await client.query(await readFile(new URL('029_collection_observation_time.sql', migrations), 'utf8'));
     } finally { client.release(); }
     const hash = (n: number) => `0x${n.toString(16).padStart(64, '0')}`;
     const c: RegisteredCollection = {contractVersion:"affiliate-v5",algorithmVersion:"unique-rank-v2",id:randomUUID(),seriesId:randomUUID(),chainId:11155111,roundId:'1',name:'Store test',symbol:'STORE',maxSupply:20,
@@ -52,6 +53,7 @@ test('PostgreSQL leases and canonicality failures cannot leave partial cursors, 
     assert.equal((await pool.query('SELECT block_number FROM manekineko_indexer_checkpoints')).rows[0].block_number,null);
     await store.commit({...batch,beforeCommit:async()=>{}});
     assert.equal((await pool.query('SELECT total_minted FROM manekineko_collection_state')).rows[0].total_minted,3);
+    assert.equal((await pool.query('SELECT observed_block_at FROM manekineko_collection_state')).rows[0].observed_block_at.toISOString(), new Date(batch.block.timestamp * 1000).toISOString());
     assert.equal((await pool.query('SELECT block_number FROM manekineko_indexer_checkpoints')).rows[0].block_number,'20');
     await assert.rejects(store.commit({...batch,beforeCommit:async()=>{}}),/lease_expired/,'A stale cursor cannot replay a different batch.');
     await pool.query("UPDATE manekineko_indexer_checkpoints SET lease_expires_at=clock_timestamp()-interval '1 second'");

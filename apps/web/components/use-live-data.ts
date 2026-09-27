@@ -28,6 +28,7 @@ export function useLiveData<T>(endpoint: string | null, initialData: T, decode: 
     window.addEventListener("online", visibility);
     window.addEventListener("offline", visibility);
     window.addEventListener("focus", focus);
+    window.addEventListener("tincta:prize-confirmed", focus);
     poller.start();
     return () => {
       poller.stop();
@@ -35,6 +36,7 @@ export function useLiveData<T>(endpoint: string | null, initialData: T, decode: 
       window.removeEventListener("online", visibility);
       window.removeEventListener("offline", visibility);
       window.removeEventListener("focus", focus);
+      window.removeEventListener("tincta:prize-confirmed", focus);
     };
   }, [endpoint, decode]);
 

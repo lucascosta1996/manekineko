@@ -1,4 +1,5 @@
 "use client";
+import { Icon } from "@manekineko/ui/icons";
 import Link from "next/link";
 import { announcedCollectionActivity, type AnnouncedCollection, type AnnouncedSeason } from "../lib/seasons/schedule";
 import { ProtocolCountdown, useProtocolClock } from "./collection-activity";
@@ -17,7 +18,7 @@ export function AnnouncedActivity({ season, collection }: { season: AnnouncedSea
       : <p>Scheduled mint: <time dateTime={collection.saleStartAt}>{new Date(collection.saleStartAt).toUTCString()}</time>.</p>)}
     {collection.enrollmentOpensAt && <p>Enrollment: <time dateTime={collection.enrollmentOpensAt}>{new Date(collection.enrollmentOpensAt).toUTCString()}</time> until the scheduled mint opening.</p>}
     <small>Last update: {new Date(collection.observedAt ?? season.updatedAt).toUTCString()}</small>
-    {collection.contractAddress && collection.status === "enrollment" && <Link className="activity-link" href={`/mint/${collection.id}/affiliates`}>View affiliate rewards ↗</Link>}
+    {collection.contractAddress && collection.status === "enrollment" && <Link className="activity-link" href={`/mint/${collection.id}/affiliates`}>View affiliate rewards <Icon name="diagonal" /></Link>}
   </div>;
 }
 export function AnnouncedSeasonCard({ season }: { season: AnnouncedSeason }) {
@@ -25,10 +26,10 @@ export function AnnouncedSeasonCard({ season }: { season: AnnouncedSeason }) {
   const href = `/seasons/${season.chainId}/${season.seasonId}`;
   return <article className="season-card season-card-upcoming">
     <Link className="season-cover season-cover-link" href={href}><div className="season-cover-label"><span>{season.chainId === 1 ? "ETHEREUM" : "SEPOLIA"}</span><span>ANNOUNCED</span></div><SeasonColorStack colors={season.colors} /><SeasonColorBar colors={season.colors} /></Link>
-    <div className="season-card-heading"><h3><Link href={href}>{season.seasonName}</Link></h3><span aria-hidden="true">↗</span></div>
-    <p>{season.colors.length} collections · Season announced</p>
+    <div className="season-card-heading"><h3><Link href={href}>{season.seasonName}</Link></h3><span aria-hidden="true"><Icon name="diagonal" /></span></div>
+    <p>{season.collections.length} collections · Season announced</p>
     {collection && <AnnouncedActivity season={season} collection={collection} />}
-    <Link className="season-card-foot" href={href}><span>View upcoming collections</span><span aria-hidden="true">→</span></Link>
+    <Link className="season-card-foot" href={href}><span>View schedule and results</span><span aria-hidden="true"><Icon name="arrow" /></span></Link>
   </article>;
 }
 export function AnnouncedCollectionCard({ season, collection }: { season: AnnouncedSeason; collection: AnnouncedCollection }) {

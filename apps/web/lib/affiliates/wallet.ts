@@ -14,7 +14,7 @@ export interface WalletProvider extends Eip1193Provider {
   on?: (event: string, listener: (...args: unknown[]) => void) => void;
   removeListener?: (event: string, listener: (...args: unknown[]) => void) => void;
 }
-export interface WalletSession { address: string; chainId: number; provider: BrowserProvider; injected: WalletProvider; signer: JsonRpcSigner }
+export interface WalletSession { address: string; chainId: number; providerName?: string; provider: BrowserProvider; injected: WalletProvider; signer: JsonRpcSigner }
 export interface ContractTarget { chainId: number; contractAddress: string; winnerCount?: number; secondPrizeBps?: number; minAffiliateReferrals?: number; affiliatePayoutCapBps?: number; contractVersion?: "affiliate-v3" | "affiliate-v4" | "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10"; mintPriceWei?: string; maxSupply?: number; maxAffiliateSlots?: number; runtimeCodeHash?: string; prizeBps?: number; affiliatePoolBps?: number | null; affiliateRatesBps?: readonly number[]; affiliateId?: number; commissionBps?: number }
 export interface TransactionJournal { action: "enroll" | "claim" | "mint" | "prize"; wallet: string; chainId: number; contractAddress: string; hash: string | null; startedAt: string; data: string; valueWei: string; nonce: number }
 
@@ -23,6 +23,16 @@ const selectedWalletAccounts = new WeakMap<WalletSession, readonly string[]>();
 
 export function invalidateWallet(session: WalletSession): void {
   invalidatedWallets.add(session);
+}
+
+/** Revoked/expired connections stay invalid even if a provider later reports old accounts. */
+export function observeWalletSession(session: WalletSession, onInvalidated: () => void): () => void {
+  let active = true;
+  const events = ["accountsChanged", "chainChanged", "disconnect"];
+  const stop = () => { active = false; for (const event of events) session.injected.removeListener?.(event, changed); };
+  const changed = () => { if (!active) return; invalidateWallet(session); stop(); onInvalidated(); };
+  for (const event of events) session.injected.on?.(event, changed);
+  return stop;
 }
 
 export function injectedWallet(): WalletProvider {
@@ -58,7 +68,7 @@ export async function requestWalletAccounts(injected: WalletProvider, options: {
   return accounts;
 }
 
-export async function connectWallet(chainId: number, options: { injected?: WalletProvider; address?: string; selectAccount?: boolean } = {}): Promise<WalletSession> {
+export async function connectWallet(chainId: number, options: { injected?: WalletProvider; address?: string; selectAccount?: boolean; providerName?: string } = {}): Promise<WalletSession> {
   if (chainId !== 1 && chainId !== 11155111) throw new Error("This collection is not configured for a supported Ethereum network.");
   const injected = options.injected ?? injectedWallet();
   const selectedAddress = options.address === undefined ? undefined : getAddress(options.address);
@@ -74,7 +84,7 @@ export async function connectWallet(chainId: number, options: { injected?: Walle
   if (!accounts.includes(address)) throw new Error("This account is no longer connected to this site. Authorize it in your wallet, then select it again.");
   const provider = new BrowserProvider(injected, "any");
   try {
-    const session = { address, chainId, provider, injected, signer: await provider.getSigner(address) };
+    const session = { address, chainId, providerName: options.providerName, provider, injected, signer: await provider.getSigner(address) };
     if (selectedAddress !== undefined) selectedWalletAccounts.set(session, accounts);
     await assertWallet(session);
     return session;
@@ -201,19 +211,20 @@ export async function submitTransaction(session: WalletSession, target: Contract
   }
 }
 
-export async function checkTransaction(session: WalletSession, target: ContractTarget, record: TransactionJournal): Promise<"pending" | "confirmed" | "reverted" | "unknown"> {
+export async function checkTransaction(session: WalletSession, target: ContractTarget, record: TransactionJournal, onReceipt?: (receipt: TransactionReceipt) => void): Promise<"pending" | "confirmed" | "reverted" | "unknown"> {
   await assertWallet(session);
   if (session.address.toLowerCase() !== record.wallet.toLowerCase()) throw new Error("Connect the wallet that submitted this transaction.");
   if (!record.hash) return "unknown";
   const receipt = await session.provider.getTransactionReceipt(record.hash);
   if (!receipt) return "pending";
+  onReceipt?.(receipt);
   sessionStorage.removeItem(transactionKey(target, record.action));
   return receipt.status === 1 ? "confirmed" : "reverted";
 }
 
 
 /** A recovery hash must identify this exact wallet intent, including its nonce. */
-export async function recoverTransaction(session: WalletSession, target: ContractTarget, record: TransactionJournal, hash: string, onJournal: (record: TransactionJournal) => void): Promise<"pending" | "confirmed" | "reverted"> {
+export async function recoverTransaction(session: WalletSession, target: ContractTarget, record: TransactionJournal, hash: string, onJournal: (record: TransactionJournal) => void, onReceipt?: (receipt: TransactionReceipt) => void): Promise<"pending" | "confirmed" | "reverted"> {
   if (!/^0x[0-9a-f]{64}$/i.test(hash)) throw new Error("Enter the full transaction hash from your wallet activity.");
   await assertWallet(session);
   if (session.address.toLowerCase() !== record.wallet.toLowerCase() || record.chainId !== target.chainId || record.contractAddress.toLowerCase() !== target.contractAddress.toLowerCase()) throw new Error("Connect the wallet and network used for the original transaction.");
@@ -223,7 +234,7 @@ export async function recoverTransaction(session: WalletSession, target: Contrac
   const recovered = { ...record, hash: tx.hash };
   sessionStorage.setItem(transactionKey(target, record.action), JSON.stringify(recovered));
   onJournal(recovered);
-  const status = await checkTransaction(session, target, recovered);
+  const status = await checkTransaction(session, target, recovered, onReceipt);
   if (status === "unknown") throw new Error("The transaction could not be checked.");
   return status;
 }
@@ -234,6 +245,10 @@ export function walletError(error: unknown): string {
   if (code === "ACTION_REJECTED" || code === 4001) return "The wallet request was declined. Nothing else will be sent automatically.";
   if (code === -32002) return "A wallet request is already waiting. Open your wallet and complete or cancel it before trying again.";
   if (code === 4100) return "This site no longer has permission to use that account. Connect your wallet and authorize the account again.";
+  if (code === 4900) return "Your wallet session is disconnected or expired. Connect again before continuing.";
+  if (code === 4901) return "Your wallet is not connected to this collection's network. Choose the correct network and reconnect.";
+  if (code === "CALL_EXCEPTION") return "The contract could not confirm this action. Its current state may have changed, or verification is unavailable. Refresh the collection before continuing.";
+  if (code === "NETWORK_ERROR" || code === "TIMEOUT") return "Wallet verification is temporarily unavailable. Check the network and any pending transaction before trying again.";
   if (code === "INSUFFICIENT_FUNDS") return "Your wallet needs enough ETH for the payment and network fee.";
   if (typeof detail?.message === "string" && detail.message.trim() && detail.message.length <= 300) return detail.message;
   return "The request could not be completed. Check your wallet activity before trying again.";

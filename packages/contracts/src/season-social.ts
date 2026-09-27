@@ -1,6 +1,6 @@
 /** Shared, side-effect-free V9/V10 social content. Never infer chain facts here:
  * the runner supplies confirmed snapshots; the Launch console marks previews. */
-export const SEASON_SOCIAL_EVENTS = ["upcoming-season", "affiliate-opening-soon", "affiliate-enrollment-open", "collection-live", "collection-sold-out", "winners-revealed", "refunds-available", "season-complete"] as const;
+export const SEASON_SOCIAL_EVENTS = ["upcoming-season", "affiliate-opening-soon", "affiliate-enrollment-open", "collection-live", "collection-sold-out", "winners-revealed", "prizes-paid", "refunds-available", "season-complete"] as const;
 export type SeasonSocialEvent = typeof SEASON_SOCIAL_EVENTS[number];
 export type SeasonSocialIdentity = { id: string; number: number; name: string; colors: string[] };
 export type SeasonSocialCollection = { id: string; number: number; name: string; color: string; supply: number; mintPriceEth: string; winnerCount: number; prizePerWinnerEth: string };
@@ -176,19 +176,23 @@ export function buildSeasonSocialMessage(input: SeasonSocialInput): SeasonSocial
       reply("commissions", `Qualified affiliates: check your earned balance and claim:\n${url("commissions")}`);
       reply("results", `${input.drawVerified ? "View the verified draw." : "Winning NFTs are announced after the draw is verified."} Prize claims are separate from sellout.\n${url("collection")}`);
       break;
+    case "prizes-paid":
     case "winners-revealed": {
       if (input.drawVerified !== true || !input.winners || input.winners.length !== c!.winnerCount) throw new Error("Every verified winner is required");
+      const allPaid = input.winners.every(winner => winner.claimed);
+      if (input.event === "prizes-paid" && !allPaid) throw new Error("Every prize must be paid for a payment summary");
       const seenRanks = new Set<number>(), seenTokens = new Set<string>();
-      header = "VERIFIED DRAW"; headline = ["Winners", "revealed."];
+      header = allPaid ? "ALL PRIZES PAID" : "VERIFIED DRAW"; headline = allPaid ? ["All prizes", "paid."] : ["Winners", "revealed."];
       detail = `${c!.winnerCount} WINNING NFTs · ${c!.prizePerWinnerEth} ETH EACH`;
-      footer = "Results and prize claims in the thread.";
-      post = `${title}\n\nThe draw is verified: ${c!.winnerCount} winning NFTs, ${c!.prizePerWinnerEth} ETH each.\n${input.winners.every(winner => winner.claimed) ? "All prizes have been claimed." : "Winning NFT holders can claim unpaid prizes."}\n\nResults and claim link in the thread.`;
-      reply("results", `View the verified results and prize claim status:\n${url("prizeClaim")}`);
+      footer = allPaid ? "Results and payment history in the thread." : "Results and prize claims in the thread.";
+      post = `${title}\n\nThe draw is verified: ${c!.winnerCount} winning NFTs, ${c!.prizePerWinnerEth} ETH each.\n${allPaid ? "All prizes have been paid." : "Winning NFT holders can claim unpaid prizes."}\n\n${allPaid ? "Results and payment history" : "Results and claim link"} in the thread.`;
+      reply("results", `View the verified results and ${allPaid ? "payment history" : "prize claim status"}:\n${url("prizeClaim")}`);
       for (const winner of [...input.winners].sort((a, b) => a.rank - b.rank)) {
         integer(winner.rank, "award rank", 1); decimalInteger(winner.tokenId, "token ID"); decimalInteger(winner.holderBlock, "holder block");
         if (winner.rank > c!.winnerCount || seenRanks.has(winner.rank) || seenTokens.has(winner.tokenId) || typeof winner.claimed !== "boolean" || decimal(winner.awardEth, "award") !== c!.prizePerWinnerEth) throw new Error("Inconsistent winning award");
         seenRanks.add(winner.rank); seenTokens.add(winner.tokenId);
-        reply(`winner:${winner.rank}`, `Award #${winner.rank} · NFT #${winner.tokenId} · ${winner.awardEth} ETH\nHolder at block ${winner.holderBlock}: ${wallet(winner.holderWallet)}\n\nVerified NFT:\n${socialPublicUrl(winner.nftUrl)}`);
+        wallet(winner.holderWallet); socialPublicUrl(winner.nftUrl);
+        if (input.event !== "prizes-paid") reply(`winner:${winner.rank}`, `Award #${winner.rank} · NFT #${winner.tokenId} · ${winner.awardEth} ETH\nHolder at block ${winner.holderBlock}: ${winner.holderWallet}\n\nVerified NFT:\n${winner.nftUrl}`);
       }
       for (const payment of input.payments ?? []) {
         integer(payment.rank, "award rank", 1); integer(payment.logIndex, "claim log index"); decimalInteger(payment.tokenId, "token ID");
@@ -222,7 +226,7 @@ export function buildSeasonSocialMessage(input: SeasonSocialInput): SeasonSocial
     }
   }
   if (new Set(replyKeys).size !== replyKeys.length) throw new Error("Duplicate social reply identity");
-  const alt = `${input.chainId === 11155111 ? "Color study" : "Tincta"}. ${network}. Season ${serial}: ${season.name}.${isSeason ? "" : ` Collection ${pad(c!.number)}: ${c!.name}.`} ${headline.join(" ")}${detail ? ` ${detail}.` : ""}${metrics.length ? ` ${metrics.map(metric => `${metric.label}: ${metric.value}`).join("; ")}.` : ""} ${season.colors.length} palette bands and the season's geometric linework.`;
+  const alt = `${input.chainId === 11155111 ? "Sepolia collections" : "Tincta"}. ${network}. Season ${serial}: ${season.name}.${isSeason ? "" : ` Collection ${pad(c!.number)}: ${c!.name}.`} ${headline.join(" ")}${detail ? ` ${detail}.` : ""}${metrics.length ? ` ${metrics.map(metric => `${metric.label}: ${metric.value}`).join("; ")}.` : ""} ${season.colors.length} palette bands and the season's geometric linework.`;
   if ([...alt].length > 1000) throw new Error("Image alt text is too long");
   const cutoff = input.event === "affiliate-opening-soon" ? input.enrollmentOpensAt : input.event === "affiliate-enrollment-open" ? input.saleStartsAt : input.event === "collection-live" ? input.deadline : undefined;
   const countdownEvent = input.event === "affiliate-opening-soon" || input.event === "affiliate-enrollment-open";

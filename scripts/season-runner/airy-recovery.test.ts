@@ -54,9 +54,17 @@ test("recovery rejects failed predecessor, partial supply, changed identity and 
     (f: ReturnType<typeof fixture>) => { f.artifact.steps[1].id = A.firstId; },
     (f: ReturnType<typeof fixture>) => { f.state.journal!.collections[A.nextId] = {} as never; },
     (f: ReturnType<typeof fixture>) => { f.state.completed = true; },
-    (f: ReturnType<typeof fixture>) => { f.startAt = "2035-01-01T12:30:00Z"; },
+    (f: ReturnType<typeof fixture>) => { f.startAt = "2035-01-01T12:14:00Z"; },
     (f: ReturnType<typeof fixture>) => { f.startAt = "2035-01-10T12:30:00Z"; },
   ]) { const f = fixture(); mutate(f); assert.throws(() => createAiryRecoveryPlan(f)); }
+});
+test("one-hour recovery keeps full enrollment plus fifteen minutes of preparation, including at execution", () => {
+  const f = fixture(); f.startAt = "2035-01-01T13:00:00Z";
+  const plan = createAiryRecoveryPlan(f);
+  assert.equal(Date.parse(plan.replacement.saleStartAt) - Date.parse(plan.replacement.enrollmentAt), Number(f.artifact.steps[1].payload.operations.enrollmentWindowSeconds) * 1000);
+  assert.doesNotThrow(() => validateRecoveryPlan(f, f.actionsHash, f.snapshot, plan, f.now));
+  const tooLate = Date.parse(plan.replacement.enrollmentAt) / 1000 - 899;
+  assert.throws(() => validateRecoveryPlan(f, f.actionsHash, f.snapshot, plan, tooLate));
 });
 test("plan validation rejects state changes, new posts, revisions, expired plans and tampered original clocks", () => {
   for (const mutate of [
@@ -87,6 +95,7 @@ test("apply locks and commits once, preserves posts/journals, and duplicate exec
     f.row.state = { encrypted: encryptRuntimeSecret(JSON.stringify(f.state), `run-state:${A.runId}`) };
     const store = { ...f, query: async (sql: string) => {
       calls.push(sql);
+      if (/FROM manekineko_(season_runtime_profiles|launch_automations).*FOR (UPDATE|SHARE)/.test(sql)) throw new Error("restricted worker cannot lock read-only tables");
       if (sql.startsWith("SELECT * FROM manekineko_season_runtime_runs")) return { rows: [f.row] };
       if (sql.startsWith("SELECT enabled")) return { rows: [{ enabled: true, revision: 1 }] };
       if (sql.startsWith("SELECT revision,status")) return { rows: [{ status: "prepared", revision: 1, content_hash: f.preparedHash, prepared_artifact: f.artifact }] };
@@ -96,7 +105,7 @@ test("apply locks and commits once, preserves posts/journals, and duplicate exec
     assert.equal((await applyRecoveryPlan(store, f.snapshot, f.plan, recoveryDigest(f.plan), f.now)).status, "queued");
     assert.deepEqual(saved!.journal, original.journal); assert.equal(saved!.binding, original.binding);
     assert.deepEqual(f.artifact.steps[1].payload.contract.mintDurationSeconds, "2592000");
-    assert(calls[1].includes("FOR UPDATE")); assert.equal(calls.at(-1), "COMMIT");
+    assert(calls[1].includes("pg_advisory_xact_lock")); assert(calls[2].includes("FOR UPDATE")); assert.equal(calls.at(-1), "COMMIT");
     assert.equal((await applyRecoveryPlan(store, f.snapshot, f.plan, recoveryDigest(f.plan), f.now + 1000)).status, "already-applied");
     assert.equal(calls.filter(sql => sql.startsWith("UPDATE")).length, 1);
     assert.equal(calls.filter(sql => sql === "recovery_schedule_approved").length, 1);

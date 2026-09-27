@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { requestWalletAccounts, walletError } from "../../lib/affiliates/wallet";
 import { discoverWalletProviders, type WalletOption } from "../../lib/affiliates/wallet-discovery";
+import { connectWalletConnect, manageWalletConnect, walletConnectConfigured } from "../../lib/affiliates/walletconnect";
 import { connectNftWallet, type NftWalletConnection } from "../../lib/nfts/wallet-view";
 
 export type { NftWalletConnection } from "../../lib/nfts/wallet-view";
@@ -43,6 +44,20 @@ export function NftWalletPicker({ onConnected, onCancel }: {
     }
   }
 
+  async function mobileWallet() {
+    if (inFlight.current) return;
+    inFlight.current = true; setBusy(true); setError("");
+    const controller = new AbortController(); pending.current = controller;
+    try {
+      const provider = await connectWalletConnect(undefined, controller.signal);
+      if (!mounted.current || controller.signal.aborted) return;
+      setSelected({ id: "walletconnect", name: "WalletConnect", provider });
+      const next = await requestWalletAccounts(provider);
+      if (mounted.current && !controller.signal.aborted) setAccounts(next);
+    } catch (cause) { if (mounted.current) setError(walletError(cause)); }
+    finally { pending.current = null; inFlight.current = false; if (mounted.current) setBusy(false); }
+  }
+
   async function chooseAccount(address: string) {
     if (!selected || inFlight.current) return;
     const request = ++revision.current;
@@ -74,6 +89,7 @@ export function NftWalletPicker({ onConnected, onCancel }: {
     {!selected ? <>
       <p>Connect the wallet you used to mint your NFTs. Viewing your collection never requests a signature or a payment.</p>
       <div className="nft-wallet-options">{wallets.map((option) => <button type="button" className="secondary-button" key={option.id} disabled={busy} onClick={() => void loadAccounts(option)}>{option.name}</button>)}</div>
+      {walletConnectConfigured() && <button type="button" className="secondary-button" disabled={busy} onClick={()=>void mobileWallet()}>WalletConnect · mobile wallet</button>}
       {wallets.length === 0 && <p>No Ethereum wallet was found. Open this page in the browser where your wallet is installed, or look up your public wallet address below.</p>}
     </> : <>
       <p>Choose the address whose NFTs you want to see. These are the accounts your wallet has shared with this site.</p>
@@ -82,6 +98,7 @@ export function NftWalletPicker({ onConnected, onCancel }: {
       <div className="nft-wallet-picker-actions">
         <button type="button" className="text-button" disabled={busy} onClick={() => void loadAccounts(selected)}>Refresh accounts</button>
         <button type="button" className="text-button" disabled={busy} onClick={() => void loadAccounts(selected, true)}>Authorize another account</button>
+        {selected.id === "walletconnect" && <button type="button" className="text-button" disabled={busy} onClick={()=>void manageWalletConnect().catch(cause=>setError(walletError(cause)))}>Manage mobile wallet connection</button>}
         <button type="button" className="text-button" disabled={busy} onClick={() => { setSelected(null); setAccounts([]); setError(""); }}>Change wallet</button>
       </div>
       <p>If an address is missing, choose Authorize another account and approve its access in your wallet. No network change is needed to view your NFTs.</p>

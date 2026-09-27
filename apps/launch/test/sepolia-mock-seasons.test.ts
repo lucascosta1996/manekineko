@@ -56,7 +56,7 @@ test("Sepolia preview posts, alt text and images omit hardcoded production brand
   const source = payloadFromAutomationForm(defaultAutomationForm([randomUUID()], "1", `0x${"12".repeat(32)}`));
   const mock = mockSepoliaSeason(source);
   const previews = seasonRuntimePreviews({ id: randomUUID(), revision: 1, plan: mock } as AutomationPlan);
-  assert.equal(previews.length, 8);
+  assert.equal(previews.length, 9);
   for (const preview of previews) {
     assert.doesNotMatch(JSON.stringify(preview.message), /tincta|manekineko/i);
     assert.doesNotMatch(renderSeasonSocialSvg(preview.message), /tincta|manekineko/i);

@@ -27,6 +27,8 @@ test('V6 additive migration preserves V5 exports and indexes versioned scrambled
     pool=new pg.Pool({connectionString,max:3,options:`-c search_path=${schema},public`});const db=pool;
     const migrations=new URL('../../../database/migrations/',import.meta.url);
     for(const name of (await readdir(migrations)).filter(n=>/^0(0[1-9]|1[0-5])_/.test(n)).sort())await db.query(await readFile(new URL(name,migrations),'utf8'));
+    await db.query(await readFile(new URL('029_collection_observation_time.sql',migrations),'utf8'));
+    await db.query(await readFile(new URL('027_sepolia_mock_seasons.sql',migrations),'utf8'));
     const actor={userId:randomUUID()};
     await db.query('INSERT INTO manekineko_launch_users(id,username,password_hash) VALUES($1,$2,$3)',[actor.userId,'operator',`scrypt$131072$8$1$${'A'.repeat(22)}$${'A'.repeat(86)}`]);
     const payload=launchFixture();payload.contract.affiliatePoolBps='1000';payload.contract.affiliateRatesBps=[];

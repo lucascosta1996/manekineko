@@ -1,22 +1,28 @@
 "use client";
+import { Icon } from "@manekineko/ui/icons";
 
 import Link from "next/link";
-import { lifecycleStage, observationFresh, enrollmentTiming } from "@manekineko/contract-abi/lifecycle";
+import { lifecycleStage, enrollmentTiming } from "@manekineko/contract-abi/lifecycle";
 import { useEffect, useState } from "react";
 import type { CollectionPublic } from "../lib/collections/model";
 import type { AffiliateProgram } from "../lib/affiliates/types";
 import { enrollmentWindowClosed } from "../lib/affiliates/enrollment-window";
 import { collectionActivity, collectionHasClosed, countdownParts } from "../lib/seasons/activity";
 import { createDataPoller } from "../lib/live-data/poller";
+import { serverClockNow, synchronizeClock } from "../lib/live-data/clock";
+import { collectionObservationFresh, collectionChainNow } from "../lib/seasons/model";
 
 export function useProtocolClock(initialNow?: number) {
   const [now, setNow] = useState<number | null>(initialNow ?? null);
   useEffect(() => {
-    const tick = () => { if (!document.hidden) setNow(Date.now()); };
-    tick();
+    const tick = () => { if (!document.hidden) setNow(serverClockNow()); };
+    const refresh = () => { if (!document.hidden) void synchronizeClock().then(tick).catch(() => setNow(null)); };
+    refresh();
     const interval = setInterval(tick, 1000);
-    document.addEventListener("visibilitychange", tick);
-    return () => { clearInterval(interval); document.removeEventListener("visibilitychange", tick); };
+    const refreshInterval = setInterval(refresh, 60_000);
+    document.addEventListener("visibilitychange", refresh);
+    window.addEventListener("online", refresh);
+    return () => { clearInterval(interval); clearInterval(refreshInterval); document.removeEventListener("visibilitychange", refresh); window.removeEventListener("online", refresh); };
   }, []);
   return now;
 }
@@ -50,7 +56,7 @@ function useEnrollmentProgram(collection: CollectionPublic, enabled: boolean) {
           || program.availableSlots !== program.maxSlots - program.enrolledSlots || typeof program.readiness?.canEnroll !== "boolean") throw new Error("Enrollment mismatch");
         return program;
       },
-      onData: program => setState({ id: collection.id, program, receivedAt: Date.now(), unavailable: false }),
+      onData: program => setState({ id: collection.id, program, receivedAt: performance.now(), unavailable: false }),
       onError: () => setState({ id: collection.id, program: null, receivedAt: 0, unavailable: true }),
     });
     const visibility = () => { if (active()) poller.refresh(); else { poller.pause(); setState({ id: collection.id, program: null, receivedAt: 0, unavailable: true }); } };
@@ -74,7 +80,7 @@ export function AffiliateWindow({ program, initialNow, canLink = false }: { prog
     <p>{closed ? "Enrolled positions" : "Positions remaining"}</p>
     {!closed && timing.target && <ProtocolCountdown target={timing.target} label={timing.label} now={now} expiredLabel="Checking enrollment" />}
     {!closed && program.saleStartAt && <ProtocolCountdown target={program.saleStartAt} label="Mint scheduled in" now={now} />}
-    {canLink && <Link className="activity-link" href={`/mint/${program.collectionId}/affiliates`}>{available ? "Join the affiliate program" : "View affiliate rewards"}<span aria-hidden="true">↗</span></Link>}
+    {canLink && <Link className="activity-link" href={`/mint/${program.collectionId}/affiliates`}>{available ? "Join the affiliate program" : "View affiliate rewards"}<span aria-hidden="true"><Icon name="diagonal" /></span></Link>}
   </div>;
 }
 
@@ -84,19 +90,22 @@ export function CollectionActivity({ collection, previous, initialNow, showEnrol
   const checkEnrollment = showEnrollment && pending && (!previous || collectionHasClosed(previous)) && collection.contractVersion !== "legacy" && collection.mode === "live";
   const enrollment = useEnrollmentProgram(collection, checkEnrollment);
   if (now === null || collection.mode !== "live") return null;
-  const activity = collectionActivity(collection, now, previous);
+  const fresh = collectionObservationFresh(collection, now);
+  const chainNow = collectionChainNow(collection, now);
+  const activity = collectionActivity(collection, chainNow ?? now, previous);
   const refunded = collection.phase === "refundable";
   const awards = collection.awards ?? [];
   const showAwards = awards.length > 0 && ["awaiting_prize", "complete"].includes(collection.phase ?? "");
   const count = refunded ? (collection.refundedCount ?? 0) : showAwards ? awards.filter(a => a.claimed).length : collection.totalMinted;
   const total = refunded ? collection.totalMinted : showAwards ? awards.length : collection.maxSupply;
-  const freshProgram = enrollment.program && now - enrollment.receivedAt < 45000 ? enrollment.program : null;
+  const freshProgram = enrollment.program && performance.now() - enrollment.receivedAt < 45000 ? enrollment.program : null;
   return <div className="collection-activity">
-    <span className="lifecycle-badge" data-live={lifecycleStage(collection.phase).live && observationFresh(collection.updatedAt, now) && activity.label === "Mint open"} data-busy={lifecycleStage(collection.phase).busy && observationFresh(collection.updatedAt, now)} role="status">{collection.phase === "minting" && !observationFresh(collection.updatedAt, now) ? "Mint status awaiting fresh confirmation" : activity.label}</span>
-    {activity.target && <ProtocolCountdown target={activity.target} label={activity.countdownLabel} now={now} />}
+    <span className="lifecycle-badge" data-live={lifecycleStage(collection.phase).live && fresh && chainNow !== null && activity.label === "Mint open"} data-busy={lifecycleStage(collection.phase).busy && fresh} role="status">{!fresh ? "Observation delayed · last known state" : activity.label}</span>
+    {fresh && chainNow !== null && activity.target && <ProtocolCountdown target={activity.target} label={activity.countdownLabel} now={chainNow} />}
     <p className="activity-detail">{activity.detail}</p>
     <div className="activity-counter"><span>{refunded ? "Tickets refunded" : showAwards ? "Prizes claimed" : "Tickets minted"}</span><strong>{count.toLocaleString("en-US")} / {total.toLocaleString("en-US")}</strong></div>
     <progress value={count} max={Math.max(1, total)} aria-label={refunded ? "Refund progress" : showAwards ? "Prize claim progress" : "Mint progress"} />
+    <small>{fresh ? "Observed" : "Last observed"} {new Date(collection.updatedAt).toUTCString()}{collection.observation ? ` · block ${collection.observation.blockNumber}` : ""}. {!collection.observation?.chainTimestamp && "Verified chain clock unavailable."}</small>
     {checkEnrollment && (freshProgram ? <AffiliateWindow program={freshProgram} initialNow={now} canLink /> : <p className="activity-detail">{enrollment.unavailable || enrollment.program ? "Affiliate availability is temporarily unavailable. Checking again…" : "Checking affiliate positions…"}</p>)}
   </div>;
 }

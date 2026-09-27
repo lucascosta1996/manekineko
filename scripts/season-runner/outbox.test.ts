@@ -24,7 +24,9 @@ function memoryStore() {
     },
     replacePendingAction: async (key: string, payload: Record<string, any>) => {
       const item = actions.get(key)!;
-      assert(["pending", "failed"].includes(item.status)); item.payload = payload; item.status = "pending"; item.result = {}; return item;
+      assert(["pending", "failed"].includes(item.status));
+      const previous = structuredClone({ payload: item.payload, result: item.result, status: item.status });
+      item.payload = payload; item.status = "pending"; item.result = { observation: item.result.observation, payloadHistory: [...(item.result.payloadHistory ?? []), previous] }; return item;
     },
     guard: async () => ({ profile_revision: 1, status: "running" }), event: async () => {},
   };
@@ -47,6 +49,37 @@ test("ambiguous writes remain uncertain and never send again on resume", async (
   assert.equal(store.actions.get("root")!.status, "uncertain");
   await assert.rejects(deliverPost(store, credentials, account.id, "root", { text: "Changed text" }, { fetch }), /reconciliation/);
   assert.equal(writes, 1); assert.equal(store.actions.get("root")!.payload.text, "One announcement");
+});
+
+test("draw intent is durable without any media/public writes, and delayed all-paid copy retains earlier observation", async () => {
+  const store = memoryStore(); let posts = 0;
+  const observation = { observedAt: new Date(baseTime).toISOString(), blockNumber: 12, blockHash: `0x${"ab".repeat(32)}`, unpaidPrizes: 2 };
+  const input = { event: "winners-revealed" as const, drawVerified: true, chainId: 11155111 as const,
+    season: { id: `0x${"1".repeat(64)}`, number: 1, name: "Test Season", colors: ["#123456"] },
+    collection: { id: "collection", number: 1, name: "Test Collection", color: "#123456", supply: 1000, mintPriceEth: "0.01", winnerCount: 2, prizePerWinnerEth: "1" },
+    now: new Date(baseTime).toISOString(), urls: { prizeClaim: "https://tincta.xyz/mint/collection" },
+    winners: [1, 2].map(rank => ({ rank, tokenId: String(rank), awardEth: "1", holderWallet: `0x${"1".repeat(40)}`, holderBlock: "12", nftUrl: `https://tincta.xyz/nfts/collection/${rank}`, claimed: false })) };
+  const queued = buildSeasonSocialMessage(input);
+  await deliverMessage(store, credentials, account.id, "draw", queued, { enqueueOnly: true, observation, fetch: async () => { throw new Error("must not send"); } });
+  assert.equal(store.actions.get("draw:root")!.status, "pending");
+  assert.equal(store.actions.size, 1);
+  const fresh = buildSeasonSocialMessage({ ...input, now: new Date(baseTime + 9000).toISOString(), winners: input.winners.map(winner => ({ ...winner, claimed: true })) });
+  const fetch: typeof globalThis.fetch = async (url, request) => {
+    if (String(url).endsWith("/users/me")) return response({ data: account });
+    if (String(url).endsWith("/media/upload")) return response({ data: { id: "222", expires_after_secs: 86400 } });
+    if (String(url).endsWith("/media/metadata")) return response({ data: { id: "222" } });
+    if (posts++ === 0) { assert.match(JSON.parse(String(request?.body)).text, /All prizes have been paid/); assert.doesNotMatch(JSON.parse(String(request?.body)).text, /claim unpaid|claim link/); }
+    return response({ data: { id: String(333 + posts) } }, 201);
+  };
+  await deliverMessage(store, credentials, account.id, "draw", fresh, { fetch, observation: { ...observation, unpaidPrizes: 0 }, now: () => baseTime + 9000 });
+  const result = store.actions.get("draw:root")!.result;
+  assert.deepEqual(result.observation, observation);
+  assert.equal(result.observationToDeliveryMs, 9000);
+  assert.equal(result.payloadHistory.length, 1);
+  assert.match(result.payloadHistory[0].payload.text, /claim unpaid prizes/);
+  const writes = posts;
+  await deliverMessage(store, credentials, account.id, "draw", fresh, { fetch });
+  assert.equal(posts, writes);
 });
 test("a crash after X accepts but before persistence never becomes a duplicate", async () => {
   const store = memoryStore(); store.failConfirmed = true; let writes = 0;
@@ -124,5 +157,5 @@ test("supplemental 403 preserves safe diagnostics and confirmed root, and never 
   const reply=store.actions.get(`event:${image.replyKeys[0]}`)!;
   assert.equal(reply.status,"failed");assert.deepEqual(reply.result.diagnostics,{status:403,codes:[453],problem:"client-forbidden"});
   assert(!JSON.stringify(reply).includes("secret material"));assert(!JSON.stringify(reply).includes("token-secret"));
-  await assert.rejects(deliverMessage(store,credentials,account.id,"event",image,{fetch}),/HTTP 403/);
+  await assert.rejects(deliverMessage(store,credentials,account.id,"event",image,{fetch}),/x_retry_after_pending/);
 });

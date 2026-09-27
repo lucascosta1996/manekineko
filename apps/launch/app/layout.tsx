@@ -4,6 +4,9 @@ import "./launch.css";
 import "./automations.css";
 import "./earnings.css";
 
+import "@manekineko/ui/styles.css";
+import "./compact.css";
+
 export const metadata: Metadata = {
   title: "Tincta | Launch workspace",
   description:
@@ -16,7 +19,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>{children}<footer className="dashboard-footer">Tincta · Private operator workspace</footer></body>
     </html>
   );
 }

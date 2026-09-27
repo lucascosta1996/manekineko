@@ -8,7 +8,7 @@ import { createTransactionPipeline } from "./chain-transactions.ts";
 import { decryptRuntimeSecret } from "../../apps/launch/lib/season-runtime-crypto.ts";
 import { automationArtifactHash } from "../../apps/launch/lib/launch-automation-artifact.ts";
 import type { SeasonState } from "./runner.ts";
-import { AIRY_RECOVERY as A, assertAiryArtifact, assertAppliedRecovery, assertRecoveryPredecessor, createAiryRecoveryPlan, recoveryDigest, recoveryPayload, type AiryRecoveryPlan } from "./airy-recovery-plan.ts";
+import { AIRY_RECOVERY as A, RECOVERY_PREPARATION_SECONDS, assertAiryArtifact, assertAppliedRecovery, assertRecoveryPredecessor, createAiryRecoveryPlan, recoveryDigest, recoveryPayload, type AiryRecoveryPlan } from "./airy-recovery-plan.ts";
 
 export function recoveryArguments(args: string[]) {
   const result: { envFiles: string[]; execute?: boolean; help?: boolean; startAt?: string; output?: string; plan?: string; expectedHash?: string } = { envFiles: [] };
@@ -51,7 +51,7 @@ export function validateRecoveryPlan(store: Pick<RunStore, "artifact" | "row" | 
   paused(store.row, now);
   const created = Date.parse(plan.createdAt) / 1000;
   ensure(Number.isSafeInteger(created) && created <= now && now < Date.parse(plan.expiresAt) / 1000, "recovery_plan_expired_or_future");
-  ensure(Date.parse(plan.replacement.enrollmentAt) / 1000 >= now + 1800, "recovery_enrollment_lead_time_expired");
+  ensure(Date.parse(plan.replacement.enrollmentAt) / 1000 >= now + RECOVERY_PREPARATION_SECONDS, "recovery_enrollment_lead_time_expired");
   ensure(snapshot.blockNumber >= plan.evidence.block, "recovery_chain_head_behind_plan");
   const expected = createAiryRecoveryPlan({ artifact: store.artifact, state: store.state, preparedHash: store.row.prepared_hash,
     actionsHash, profileRevision: store.row.profile_revision, runRevision: store.row.revision,
@@ -64,6 +64,8 @@ export async function applyRecoveryPlan(store: RunStore, snapshot: ChainSnapshot
   ensure(recoveryDigest(plan) === expectedHash, "recovery_plan_hash_mismatch");
   await store.query("BEGIN");
   try {
+    // Match Launch's profile/start lock without requiring permission to modify credentials.
+    await store.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", ["season-profile:11155111"]);
     const row = (await store.query("SELECT * FROM manekineko_season_runtime_runs WHERE id=$1 FOR UPDATE", [A.runId])).rows[0];
     ensure(row?.state?.encrypted, "recovery_run_state_missing");
     const state: SeasonState = JSON.parse(decryptRuntimeSecret(row.state.encrypted, `run-state:${A.runId}`));
@@ -72,9 +74,10 @@ export async function applyRecoveryPlan(store: RunStore, snapshot: ChainSnapshot
       assertAppliedRecovery(store.artifact, state, row.prepared_hash);
       await store.query("COMMIT"); return { status: "already-applied", hash: expectedHash };
     }
-    const profile = (await store.query("SELECT enabled,revision FROM manekineko_season_runtime_profiles WHERE chain_id='11155111' FOR UPDATE")).rows[0];
+    const profile = (await store.query("SELECT enabled,revision FROM manekineko_season_runtime_profiles WHERE chain_id='11155111'")).rows[0];
     ensure(profile?.enabled && profile.revision === row.profile_revision, "profile_changed_pause_and_resume");
-    const saved = (await store.query("SELECT revision,status,prepared_artifact,content_hash FROM manekineko_launch_automations WHERE id=$1 FOR SHARE", [A.automationId])).rows[0];
+    // Prepared rows are immutable under the database trigger, including deletion.
+    const saved = (await store.query("SELECT revision,status,prepared_artifact,content_hash FROM manekineko_launch_automations WHERE id=$1", [A.automationId])).rows[0];
     ensure(saved?.status === "prepared" && saved.revision === row.automation_revision && saved.content_hash === row.prepared_hash && automationArtifactHash(saved.prepared_artifact) === row.prepared_hash, "prepared_artifact_changed");
     const actions = await actionEvidence(store);
     validateRecoveryPlan({ ...store, row, state }, recoveryDigest(actions), snapshot, plan, now);
@@ -109,7 +112,7 @@ export async function recoverAiryGarden(args: string[]) {
       ensure(store.row.id === A.runId && store.row.automation_id === A.automationId, "recovery_requires_exact_airy_sepolia_run");
       assertAppliedRecovery(store.artifact, state, store.row.prepared_hash);
       ensure(!options.execute || state.airyRecovery.hash === options.expectedHash, "recovery_already_applied_with_different_plan");
-      return { status: "already-applied", hash: state.airyRecovery.hash, runId: A.runId, runStatus: store.row.status, desiredState: store.row.desired_state, changed: false };
+      return { status: "already-applied", hash: state.airyRecovery.hash, runId: A.runId, runStatus: store.row.status, desiredState: store.row.desired_state, schedule: state.airyRecovery.plan.replacement, changed: false };
     }
     paused(store.row, now); assertAiryArtifact(store.row.id, store.artifact, state);
     const profile = (await store.query("SELECT enabled,revision FROM manekineko_season_runtime_profiles WHERE chain_id='11155111'")).rows[0];

@@ -1,4 +1,5 @@
 "use client";
+import { Icon } from "@manekineko/ui/icons";
 import Link from "next/link";
 import { SiteShell } from "../../components/site-shell";
 export default function MintError({ reset }: { reset: () => void }) {
@@ -12,7 +13,7 @@ export default function MintError({ reset }: { reset: () => void }) {
           moment.
         </p>
         <button className="primary-button" onClick={reset}>
-          Try again <span aria-hidden="true">↻</span>
+          Try again <span aria-hidden="true"><Icon name="refresh" /></span>
         </button>
         <Link className="text-link" href="/seasons">
           Back to seasons

@@ -1,11 +1,12 @@
 "use client";
+import { Icon } from "@manekineko/ui/icons";
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { LaunchBrand } from "./brand";
 
 export function LaunchLogin({
-  destination = "/seasons",
+  destination = "/dashboard",
 }: {
   destination?: ReturnType<typeof import("../../lib/launch-navigation").safeLaunchDestination>;
 }) {
@@ -82,23 +83,7 @@ export function LaunchLogin({
         </section>
         <section className="launch-login-card">
           <span className="launch-lock" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <rect
-                x="5"
-                y="10"
-                width="14"
-                height="11"
-                rx="2"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              />
-              <path
-                d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-            </svg>
+            <Icon name="shield" />
           </span>
           <h2>Welcome back.</h2>
           <p>Sign in to your launch workspace.</p>
@@ -138,7 +123,7 @@ export function LaunchLogin({
               disabled={pending}
             >
               {pending ? "Signing in…" : "Sign in"}
-              <span aria-hidden="true">↗</span>
+              <span aria-hidden="true"><Icon name="diagonal" /></span>
             </button>
           </form>
           <p className="launch-login-help">

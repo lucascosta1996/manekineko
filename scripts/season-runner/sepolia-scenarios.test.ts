@@ -8,6 +8,11 @@ test("refund manifest pins exact target, duration, network, spending and termina
  for(const patch of [{chainId:1},{mintTarget:4},{durationSeconds:3600},{expectedOutcome:"sellout"},{maxTotalSpendWei:"0"},{privateKey:"secret"}])assert.throws(()=>parseSepoliaScenario({...manifest,...patch}));
  assert.throws(()=>parseArguments(["--sepolia-scenario","private.json"],1),/sepolia_only/);
 });
+test("manual sellout requires distinct public roles and the capacity-preserving twenty-ticket manual allocations", () => {
+ const manual={kind:"manual-affiliate-sellout",chainId:11155111,collectionId:manifest.collectionId,affiliateWallet:`0x${"1".repeat(40)}`,buyerWallet:`0x${"2".repeat(40)}`,manualMintsPerWallet:20,expectedOutcome:"manual-prize-and-commission-claimed",maxTotalSpendWei:manifest.maxTotalSpendWei,maxFeePerGasWei:manifest.maxFeePerGasWei};
+ assert.deepEqual(parseSepoliaScenario(manual),manual);
+ for(const patch of [{buyerWallet:manual.affiliateWallet},{manualMintsPerWallet:1},{affiliateId:1},{chainId:1},{privateKey:"forbidden"}])assert.throws(()=>parseSepoliaScenario({...manual,...patch}));
+});
 test("restart planning purchases one each for three controlled recipients and stops at three",()=>{
  for(let minted=0;minted<3;minted++)assert.equal(refundMintQuantity(BigInt(minted),0n,minted),1n);
  assert.equal(refundMintQuantity(2n,1n,0),0n);

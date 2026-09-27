@@ -13,6 +13,7 @@ export const AIRY_RECOVERY = {
   round: "0xaeCf42388f3Df8A92279d68065920745B73Ad728",
 } as const;
 export const recoveryDigest = (value: unknown) => createHash("sha256").update(canonicalLaunchJson(value)).digest("hex");
+export const RECOVERY_PREPARATION_SECONDS = 900;
 const iso = (seconds: number) => new Date(seconds * 1000).toISOString().replace(".000Z", "Z");
 export type AiryRecoveryPlan = {
   version: 1; kind: "airy-garden-continuation"; chainId: 11155111; runId: string; automationId: string;
@@ -40,7 +41,7 @@ export function createAiryRecoveryPlan(input: {
   assertAiryArtifact(AIRY_RECOVERY.runId, input.artifact, input.state); assertRecoveryPredecessor(input.snapshot);
   ensure(!input.state.airyRecovery && !input.state.collections?.[AIRY_RECOVERY.nextId]?.deployment && !input.state.journal?.collections[AIRY_RECOVERY.nextId], "recovery_next_collection_already_started");
   const start = Date.parse(input.startAt) / 1000, enrollment = Number(input.artifact.steps[1].payload.operations.enrollmentWindowSeconds);
-  ensure(Number.isSafeInteger(start) && iso(start) === input.startAt && start >= input.now + enrollment + 3600 && start <= input.now + 7 * 86400, "recovery_opening_requires_full_enrollment_plus_one_hour_within_seven_days");
+  ensure(Number.isSafeInteger(start) && iso(start) === input.startAt && start >= input.now + enrollment + RECOVERY_PREPARATION_SECONDS && start <= input.now + 7 * 86400, "recovery_opening_requires_full_enrollment_plus_fifteen_minutes_within_seven_days");
   const soldOut = Number(input.snapshot.soldOutAt), originalStart = soldOut + Number(input.artifact.timing!.nextLaunchDelaySeconds);
   ensure(originalStart < input.now, "recovery_only_for_missed_opening");
   const plan: AiryRecoveryPlan = {

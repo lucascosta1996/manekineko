@@ -22,6 +22,12 @@ function uint256(value: string, field: string): bigint {
 export function validateCollection(
   collection: CollectionPublic
 ): CollectionPublic {
+  if (collection.observation !== undefined) {
+    const o = collection.observation;
+    ensure(o && /^\d+$/.test(o.blockNumber) && /^0x[0-9a-f]{64}$/i.test(o.blockHash), "observation block");
+    ensure(Number.isFinite(Date.parse(o.observedAt)) && Number.isFinite(Date.parse(o.servedAt))
+      && (o.chainTimestamp === null || Number.isFinite(Date.parse(o.chainTimestamp))), "observation time");
+  }
   if ([collection.seasonId, collection.seasonName, collection.collectionColor, collection.textColor].some(value => value != null)) {
     ensure(["affiliate-v6","affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(collection.contractVersion), "season contract version");
     normalizeSeasonAppearance(collection);

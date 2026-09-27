@@ -36,13 +36,21 @@ test("execution rejects historical contracts, disabled social and stale first op
   assert.throws(() => assertRuntimeArtifact(disabled), /Enable X/);
   assert.throws(() => assertRuntimeArtifact(runtimeArtifact(), new Date("2036-01-01")), /already past/);
 });
-test("saved season provides all eight event types and distinct collection previews", () => {
+test("saved season provides all event types and distinct collection previews", () => {
   const plan = runtimePlan(), previews = seasonRuntimePreviews(plan);
-  assert.equal(previews.length, 14);
-  assert.equal(new Set(previews.map(item => item.message.event)).size, 8);
-  assert.equal(new Set(previews.map(item => item.key)).size, 14);
+  assert.equal(previews.length, 16);
+  assert.equal(new Set(previews.map(item => item.message.event)).size, 9);
+  assert.equal(new Set(previews.map(item => item.key)).size, 16);
   assert(previews.every(item => item.message.post.startsWith("[Sepolia test]")));
   assert(previews.every(item => item.imageUrl.includes("revision=2")));
   const incomplete = runtimePlan(); incomplete.plan.steps[0].payload.contract.winnerCount = "0";
   assert.doesNotThrow(() => seasonRuntimePreviews(incomplete));
+});
+
+
+test("delivery diagnostics expose only bounded public observations and known retry actions", async () => {
+  const { runtimeDelivery } = await import("../lib/season-runtime.ts");
+  const delivery = runtimeDelivery({ observedAt:"2026-09-27T12:00:00Z",blockNumber:"123",blockHash:`0x${"ab".repeat(32)}`,unpaidPrizes:4,latencyMs:9000,attempts:2,nextAttemptAt:Date.parse("2026-09-27T12:10:00Z"),nextAction:"reconcile_exact_post",payloadHistory:["PRIVATE"],credentials:"PRIVATE" });
+  assert.equal(delivery?.blockNumber,123);assert.equal(delivery?.nextAction,"reconcile_exact_post");assert.equal(delivery?.latencyMs,9000);assert.equal(JSON.stringify(delivery).includes("PRIVATE"),false);
+  assert.equal(runtimeDelivery({nextAction:"PRIVATE",attempts:-1,nextAttemptAt:Infinity})?.nextAction,null);
 });

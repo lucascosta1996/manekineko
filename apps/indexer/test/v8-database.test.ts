@@ -16,6 +16,7 @@ test('V8 six equal awards settle independently and preserve refund and reorganiz
   await admin.query(`CREATE SCHEMA ${schema}`);pool=new pg.Pool({connectionString,options:`-c search_path=${schema},public`});
   const folder=new URL('../../../database/migrations/',import.meta.url);
   for(const name of (await readdir(folder)).filter(n=>/^0(0[1-9]|1[0-9]|2[01])_/.test(n)).sort())await pool.query(await readFile(new URL(name,folder),'utf8'));
+  await pool.query(await readFile(new URL('029_collection_observation_time.sql',folder),'utf8'));
   const c:RegisteredCollection={id:randomUUID(),seriesId:randomUUID(),chainId:1,roundId:'1',name:'V8',symbol:'V8',maxSupply:1000,mintPrice:'10000000000000000',prizeBps:6000,winnerCount:6,affiliatePoolBps:2000,minAffiliateReferrals:100,affiliatePayoutCapBps:3000,saleStartAt:1800350000,address:wallet,factory,deploymentTransaction:hash(1),deploymentBlock:10,deployedAt:new Date(1800349900*1000).toISOString(),mintDeadline:1800436400,maxAffiliateSlots:10,enrollmentSigner:wallet,contractVersion:'affiliate-v8',algorithmVersion:'unique-rank-v5'};
   await pool.query('INSERT INTO manekineko_series(id,name) VALUES($1,$2)',[c.seriesId,'Test']);
   await pool.query(`INSERT INTO manekineko_collections(id,series_id,chain_id,round_id,slug,name,symbol,max_supply,mint_price_wei,mint_duration_seconds,reveal_delay_blocks,algorithm_version,randomness_provider,contract_version,prize_bps,affiliate_pool_bps,winner_count,min_affiliate_referrals,affiliate_payout_cap_bps,sale_start_at)

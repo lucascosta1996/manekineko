@@ -1,18 +1,20 @@
-import { Interface, getAddress } from "ethers";
+import { Interface, getAddress, keccak256 } from "ethers";
 import type { LaunchChainId } from "./chain-policy.ts";
 
 export type EarningsCollection = {
   id: string; name: string; seasonName: string | null; chainId: LaunchChainId;
-  address: string; version: string; roundId: string;
+  address: string; version: string; roundId: string; deploymentBlock?: string;
 };
 export type EarningsBalance = {
-  owner: string; ownerIsContract: boolean; withdrawableWei: string;
+  owner: string; ownerIsContract: boolean; runtimeHash: string; withdrawableWei: string;
+  withdrawals: { ordinaryWithdrawnWei: string | null; historyError: string | null };
   growthReserveWei: string; growthAvailableWei: string; mintRevenueWei: string;
   accounting?: { balanceWei: string; unpaidPrizesWei: string; unpaidAffiliatesWei: string; refundLiabilityWei: string; lockedWei: string; growthWithdrawnWei: string; operatorAvailableWei: string };
 };
 export type EarningsRow = EarningsCollection & { balance: EarningsBalance | null; error: string | null };
 export type EarningsReport = {
-  chainId: LaunchChainId; blockNumber: number | null; blockTime: string | null;
+  chainId: LaunchChainId; blockNumber: number | null; blockHash: string | null; blockTime: string | null;
+  status: "empty" | "available" | "partial" | "unavailable";
   checkedAt: string; rows: EarningsRow[]; error: string | null;
   totals: { withdrawableWei: string; growthAvailableWei: string; availableCollections: number; verifiedCollections: number };
 };
@@ -26,6 +28,7 @@ export const earningsInterface = new Interface([
   "function totalAffiliateAccrued() view returns(uint256)", "function totalAffiliateClaimed() view returns(uint256)",
   "function totalRefunded() view returns(uint256)", "function refundsAvailable() view returns(bool)",
   "function growthReserveWithdrawn() view returns(uint256)",
+  "event Withdrawn(address indexed recipient,uint256 amount)",
 ]);
 const supported = new Set(["affiliate-v3", "affiliate-v4", "affiliate-v5", "affiliate-v6", "affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10"]);
 const hasGrowth = new Set(["affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10"]);
@@ -46,11 +49,12 @@ export function summarizeEarnings(rows: EarningsRow[]): EarningsReport["totals"]
 
 /** All reads use a canonical block hash. No signer, transaction method or stored wallet material. */
 export async function readCreatorEarnings(collections: EarningsCollection[], chainId: LaunchChainId, rpc: EarningsRpc | null, now = Date.now()): Promise<EarningsReport> {
-  const report: EarningsReport = { chainId, blockNumber: null, blockTime: null, checkedAt: new Date(now).toISOString(), rows: [], error: null, totals: summarizeEarnings([]) };
+  const report: EarningsReport = { chainId, blockNumber: null, blockHash: null, blockTime: null, status: "empty", checkedAt: new Date(now).toISOString(), rows: [], error: null, totals: summarizeEarnings([]) };
   if (collections.some(c => c.chainId !== chainId)) throw new Error("Collection network mismatch");
   if (!collections.length) return report;
   const failed = (message: string) => {
     report.error = message;
+    report.status = "unavailable";
     report.rows = collections.map(c => ({ ...c, balance: null, error: message }));
     report.totals = summarizeEarnings(report.rows);
     return report;
@@ -87,7 +91,8 @@ export async function readCreatorEarnings(collections: EarningsCollection[], cha
             hasGrowth.has(collection.version) ? call("growthReserveBalance") : Promise.resolve(0n),
           ]);
           if (version !== collection.version || String(roundId) !== collection.roundId) throw new Error("Identity mismatch");
-          const code = await rpc.send("eth_getCode", [owner, tag]);
+          const [code, runtime] = await Promise.all([rpc.send("eth_getCode", [owner, tag]), rpc.send("eth_getCode", [address, tag])]);
+          if (typeof runtime !== "string" || !/^0x(?:[\da-f]{2})+$/i.test(runtime)) throw new Error("Missing contract runtime");
           if (typeof code !== "string" || !/^0x(?:[\da-f]{2})*$/i.test(code)) throw new Error("Invalid owner code");
           let accounting: EarningsBalance["accounting"];
           if (hasGrowth.has(collection.version)) {
@@ -100,7 +105,25 @@ export async function readCreatorEarnings(collections: EarningsCollection[], cha
             if ([locked, unpaidPrizes, unpaidAffiliates, refundLiability].some(v => v < 0n)) throw new Error("Unreconciled liabilities");
             accounting = {balanceWei:String(balance),unpaidPrizesWei:String(unpaidPrizes),unpaidAffiliatesWei:String(unpaidAffiliates),refundLiabilityWei:String(refundLiability),lockedWei:String(locked),growthWithdrawnWei:String(withdrawn),operatorAvailableWei:String(BigInt(amount)+(revealed?BigInt(growth):0n))};
           }
-          rows[index] = { ...collection, error: null, balance: { accounting, owner: getAddress(owner), ownerIsContract: code !== "0x", withdrawableWei: String(amount), growthReserveWei: String(growth), growthAvailableWei: revealed ? String(growth) : "0", mintRevenueWei: String(revenue) } };
+          let ordinaryWithdrawnWei: string | null = null;
+          let historyError: string | null = "Withdrawal history is unavailable. Current available funds are verified independently.";
+          if (collection.deploymentBlock && /^\d+$/.test(collection.deploymentBlock)) {
+            try {
+              const first = Number(collection.deploymentBlock), span = 10_000;
+              if (!Number.isSafeInteger(first) || first < 0 || first > blockNumber || blockNumber - first >= span * 20 || Date.now() > deadline) throw Error();
+              let withdrawn = 0n;
+              for (let from = first; from <= blockNumber; from += span) {
+                const logs = await rpc.send("eth_getLogs", [{ address, fromBlock: `0x${from.toString(16)}`, toBlock: `0x${Math.min(from + span - 1, blockNumber).toString(16)}`, topics: [earningsInterface.getEvent("Withdrawn")!.topicHash] }]);
+                if (!Array.isArray(logs) || logs.length > 10_000 || Date.now() > deadline) throw Error();
+                for (const log of logs) {
+                  if (log.removed || getAddress(log.address) !== address) throw Error();
+                  withdrawn += BigInt(earningsInterface.parseLog(log)!.args.amount);
+                }
+              }
+              ordinaryWithdrawnWei = String(withdrawn); historyError = null;
+            } catch { /* History failure must not hide independently verified current balances. */ }
+          }
+          rows[index] = { ...collection, error: null, balance: { accounting, runtimeHash: keccak256(runtime), withdrawals: { ordinaryWithdrawnWei, historyError }, owner: getAddress(owner), ownerIsContract: code !== "0x", withdrawableWei: String(amount), growthReserveWei: String(growth), growthAvailableWei: revealed ? String(growth) : "0", mintRevenueWei: String(revenue) } };
         } catch { rows[index] = { ...collection, balance: null, error: unavailable }; }
       }
     }));
@@ -109,8 +132,10 @@ export async function readCreatorEarnings(collections: EarningsCollection[], cha
     if (canonical?.hash !== block.hash) throw new Error("Reorganized block");
     report.rows = rows;
     report.blockNumber = blockNumber;
+    report.blockHash = block.hash;
     report.blockTime = new Date(timestamp).toISOString();
     report.totals = summarizeEarnings(rows);
+    report.status = report.totals.verifiedCollections === rows.length ? "available" : report.totals.verifiedCollections ? "partial" : "unavailable";
     return report;
   } catch { return failed("Could not verify a recent canonical block on this network. Refresh to retry."); }
 }

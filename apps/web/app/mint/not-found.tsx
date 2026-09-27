@@ -1,3 +1,4 @@
+import { Icon } from "@manekineko/ui/icons";
 import { configuredChainId } from "../../lib/chain-policy";
 import Link from "next/link";
 import { SiteShell } from "../../components/site-shell";
@@ -12,7 +13,7 @@ export default function NotFound() {
           collections to find your next ticket.
         </p>
         <Link className="primary-button" href="/seasons">
-          Explore seasons <span aria-hidden="true">↗</span>
+          Explore seasons <span aria-hidden="true"><Icon name="diagonal" /></span>
         </Link>
       </div>
     </SiteShell>

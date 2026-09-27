@@ -32,8 +32,8 @@ export function seasonRuntimePreviews(saved: AutomationPlan, publicBaseUrl?: str
           ...(!seasonEvent ? { collection: { id: step.id, number: index + 1, name: terms.name, color: colors[index], supply, mintPriceEth: formatEther(mintPrice), winnerCount: winners, prizePerWinnerEth: formatEther(prize) } } : {}),
           now: iso(sampleNow), enrollmentOpensAt: iso(enrollment), saleStartsAt: iso(start), deadline: iso(deadline),
           urls: { season: `${base}/seasons/${plan.chainId}/${plan.seasonId}`, collection: collectionUrl, affiliate: `${collectionUrl}/affiliates`, docs: `${base}/docs`, refund: collectionUrl, commissions: `${collectionUrl}/affiliates`, prizeClaim: collectionUrl },
-          drawVerified: event === "winners-revealed",
-          ...(event === "winners-revealed" ? { winners: Array.from({ length: winners }, (_, rank) => ({ rank: rank + 1, tokenId: String(rank + 1), awardEth: formatEther(prize), holderWallet: `0x${String(rank + 1).padStart(40, "0")}`, holderBlock: "0", nftUrl: `${base}/nfts/${step.id}/${rank + 1}`, claimed: false })) } : {}),
+          drawVerified: event === "winners-revealed" || event === "prizes-paid",
+          ...(["winners-revealed", "prizes-paid"].includes(event) ? { winners: Array.from({ length: winners }, (_, rank) => ({ rank: rank + 1, tokenId: String(rank + 1), awardEth: formatEther(prize), holderWallet: `0x${String(rank + 1).padStart(40, "0")}`, holderBlock: "0", nftUrl: `${base}/nfts/${step.id}/${rank + 1}`, claimed: event === "prizes-paid" })) } : {}),
           ...(event === "season-complete" ? { stats: { collectionsSoldOut: plan.steps.length, nftsMinted: plan.steps.reduce((sum, item) => sum + Number(item.payload.contract.maxSupply), 0), prizesClaimedEth: "0", affiliateClaimedEth: "0", snapshotBlock: "0" } } : {}),
         };
         const key = `${event}:${seasonEvent ? "season" : step.id}`;

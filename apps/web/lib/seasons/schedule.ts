@@ -63,7 +63,7 @@ export function announcedSeasonsResponse(input: unknown): AnnouncedSeason[] {
 }
 export function announcedCollectionActivity(season: AnnouncedSeason, collection: AnnouncedCollection, now: number) {
   if (season.status === "paused" || season.status === "failed") return { label: "Season automation paused", target: null, detail: "New launch events are paused. Existing on-chain mint and claim terms remain in effect." };
-  if (season.status === "completed") return { label: "Season complete", target: null, detail: "Explore collection results and any remaining claims." };
+  if (season.status === "completed") return { label: "Worker finished", target: null, detail: "Explore each collection’s verified results and remaining claims. Worker completion is separate from prize payment." };
   if (!observationFresh(collection.observedAt ?? season.updatedAt, now)) return {
     label: collection.saleStartAt && Date.parse(collection.saleStartAt) > now ? "Mint scheduled in" : "Checking season status",
     target: collection.saleStartAt && Date.parse(collection.saleStartAt) > now ? collection.saleStartAt : null,

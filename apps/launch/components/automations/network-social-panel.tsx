@@ -1,4 +1,5 @@
 "use client";
+import { Icon } from "@manekineko/ui/icons";
 
 import { useEffect, useState } from "react";
 import type { RuntimeChainId, RuntimeCredentials, RuntimeProfile } from "../../lib/season-runtime";
@@ -14,17 +15,24 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
 }
 
 /** Network settings remain available even when the network has no saved season. */
-export function NetworkSocialPanel({ chainId, allowedChainId, onSaved }: { chainId: RuntimeChainId; allowedChainId: RuntimeChainId | null; onSaved: () => void }) {
+export function NetworkSocialPanel({ chainId, allowedChainId, onSaved, onDirtyChange, leaveApproved, onPendingChange }: { chainId: RuntimeChainId; allowedChainId: RuntimeChainId | null; onSaved: () => void; onDirtyChange?: (dirty: boolean) => void; leaveApproved?: { current: boolean }; onPendingChange?: (pending: boolean) => void }) {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [loading, setLoading] = useState(true), [pending, setPending] = useState(false);
   const [error, setError] = useState(""), [notice, setNotice] = useState("");
   const [handle, setHandle] = useState(""), [accountId, setAccountId] = useState(""), [baseUrl, setBaseUrl] = useState("");
   const [enabled, setEnabled] = useState(false), [credentials, setCredentials] = useState<RuntimeCredentials>(emptyCredentials);
+  const [baseline, setBaseline] = useState("");
+  const current = JSON.stringify({handle, accountId, baseUrl, enabled, credentials});
+  const dirty = baseline !== "" && current !== baseline;
+  useEffect(() => { onDirtyChange?.(dirty); }, [dirty, onDirtyChange]);
+  useEffect(() => { onPendingChange?.(pending); }, [pending, onPendingChange]);
+  useEffect(() => { if (!dirty) return; const warn = (event: BeforeUnloadEvent) => { if (!leaveApproved?.current) event.preventDefault(); }; window.addEventListener("beforeunload", warn); return () => window.removeEventListener("beforeunload", warn); }, [dirty, leaveApproved]);
   const path = `/api/launch/runtime/profiles/${chainId}`;
   const testnet = chainId === "11155111";
   const restricted = allowedChainId !== null && chainId !== allowedChainId;
   const blocked = loading || pending || restricted || !settings;
   function populate(next: Settings) {
+    setBaseline(JSON.stringify({handle: next.profile?.handle ?? "", accountId: next.profile?.expectedAccountId ?? "", baseUrl: next.profile?.publicBaseUrl ?? "", enabled: next.profile?.enabled ?? false, credentials: emptyCredentials}));
     setSettings(next); setHandle(next.profile?.handle ?? ""); setAccountId(next.profile?.expectedAccountId ?? "");
     setBaseUrl(next.profile?.publicBaseUrl ?? ""); setEnabled(next.profile?.enabled ?? false); setCredentials(emptyCredentials);
   }
@@ -34,6 +42,7 @@ export function NetworkSocialPanel({ chainId, allowedChainId, onSaved }: { chain
     return () => { active = false; };
   }, [path]);
   async function reload() {
+    if (dirty && !window.confirm("Discard unsaved network settings and reload?")) return;
     setLoading(true); setError(""); setNotice("");
     try { populate(await request<Settings>(path)); } catch (cause) { setError(cause instanceof Error ? cause.message : "Unable to reload settings."); }
     finally { setLoading(false); }
@@ -53,7 +62,7 @@ export function NetworkSocialPanel({ chainId, allowedChainId, onSaved }: { chain
     {error && <div className="launch-alert launch-alert-error" role="alert">{error}</div>}
     {notice && <div className="launch-alert launch-alert-success" role="status">{notice}</div>}
     {restricted && <p className="launch-context-note">Open this network’s execution environment to save its credentials.</p>}
-    <details><summary>{settings?.profile ? `@${settings.profile.handle} · Edit account settings` : "Configure account"}</summary>
+    <details><summary>{settings?.profile ? `@${settings.profile.handle} · Edit account settings` : "Configure account"}<Icon name="chevron" className="ui-disclosure-icon" /></summary>
       <div className="season-runtime-account"><p>Credentials are encrypted and never returned to the browser. Leave all four secret fields empty to keep saved credentials. Pause this network’s worker before changing settings.</p>
         <div className="launch-fields">
           <label className="launch-field"><span>Account handle</span><input value={handle} onChange={event => setHandle(event.target.value)} autoComplete="off" placeholder={testnet ? "@your_test_account" : "@tincta"} disabled={blocked}/></label>

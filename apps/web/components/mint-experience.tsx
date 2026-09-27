@@ -1,4 +1,5 @@
 "use client";
+import { Icon } from "@manekineko/ui/icons";
 
 import { collectionReferralCopy } from "../lib/collections/copy";
 import { DrawProgress } from "./draw-progress";
@@ -183,7 +184,7 @@ export function MintExperience({
               />
             </div>
             <div className="preview-stage-bottom">
-              <span>{permanent ? "Illustrative artwork" : example ? "Example artwork" : "Collection artwork"}</span>
+              <span>{permanent ? "Artwork preview" : example ? "Example artwork" : "Collection artwork"}</span>
               <TinctaWordmark className="preview-signature" />
             </div>
           </div>
@@ -207,7 +208,7 @@ export function MintExperience({
               Example after reveal
             </button>
           </div>}
-          <p className="preview-caption">
+          <p className="preview-caption artwork-caption">
             {permanent ? "Illustrative artwork. View your minted ticket for its actual numbers." : example
               ? "Sample numbers explain the artwork. Your ticket’s numbers cannot be known before reveal."
               : "Illustrative sealed SVG preview. The contract stores NFT images and metadata entirely on-chain."}
@@ -247,7 +248,7 @@ export function MintExperience({
           }
           {!afterSellout && <div className="prize-note">
             <span className="prize-symbol" aria-hidden="true">
-              ✳
+              <Icon name="spark" />
             </span>
             <div>
               <span className="prize-label">{ranked ? "Prizes at sellout" : "Prize at sellout"}</span>
@@ -283,7 +284,7 @@ export function MintExperience({
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   disabled={quantity <= 1 || pending || maxQuantity === 0}
                 >
-                  −
+                  <Icon name="minus" />
                 </button>
                 <input
                   id="ticket-quantity"
@@ -311,7 +312,7 @@ export function MintExperience({
                   }
                   disabled={quantity >= maxQuantity || pending}
                 >
-                  +
+                  <Icon name="plus" />
                 </button>
               </div>
             </div>
@@ -351,11 +352,11 @@ export function MintExperience({
               {pending ? (
                 <span className="button-spinner" aria-hidden="true" />
               ) : (
-                <span aria-hidden="true">↗</span>
+                <span aria-hidden="true"><Icon name="diagonal" /></span>
               )}
             </button>
             <p className="transaction-note" id="demo-mint-note">
-              <span aria-hidden="true">◇</span>{" "}
+              <span aria-hidden="true"><Icon name="diamond" /></span>{" "}
               {isDemo
                 ? "No wallet. No payment. Just a preview."
                 : progress.detail}
@@ -374,7 +375,7 @@ export function MintExperience({
           {isDemo && demo.minted > 0 && (
             <div className="demo-receipt">
               <span className="receipt-check" aria-hidden="true">
-                ✓
+                <Icon name="check" />
               </span>
               <div>
                 <strong>
@@ -422,7 +423,7 @@ export function MintExperience({
               href={`/mint/${collection.id}/contract`}
               aria-label="Read the collection smart contract"
             >
-              ↗
+              <Icon name="diagonal" />
             </Link>
           </div>
         </div>
@@ -439,7 +440,7 @@ export function MintExperience({
             <h2 id="how-title">Fixed rules. Protected prizes.</h2>
           </div>
           <Link className="text-link" href={`/mint/${collection.id}/contract`}>
-            Read the smart contract <span aria-hidden="true">↗</span>
+            Read the smart contract <span aria-hidden="true"><Icon name="diagonal" /></span>
           </Link>
         </div>
         <div className="how-grid">
@@ -494,15 +495,15 @@ export function MintExperience({
         <h2 id="details-title">Understand your rewards</h2>
         <div className="faq-list">
           <details>
-            <summary>{permanent ? "How do permanent numbers and draw results work?" : "How does this collection differ from V10?"}<span aria-hidden="true">+</span></summary>
+            <summary>{permanent ? "How do permanent numbers and draw results work?" : "How does this collection differ from V10?"}<Icon name="chevron" className="ui-disclosure-icon" /></summary>
             <p>{permanent ? "This V10 collection generates permanent numbers in Solidity at mint, then uses a separate VRF draw after sellout to assign scores and prizes. Its artwork stays unchanged." : "This collection follows its original contract: its numbers appear when the draw is revealed. V10 generates permanent numbers in Solidity at mint and reads later VRF scores separately."} <Link href="/docs/randomness">Read about permanent numbers and draw results</Link>.</p>
           </details>
-          <details><summary>How do I earn affiliate rewards?<span aria-hidden="true">+</span></summary><p>{collectionReferralCopy(collection)} Referral rewards are separate from the collection’s prize reserve. <Link href={`/mint/${collection.id}/affiliates`}>View eligibility and affiliate rewards</Link>.</p></details>
+          <details><summary>How do I earn affiliate rewards?<Icon name="chevron" className="ui-disclosure-icon" /></summary><p>{collectionReferralCopy(collection)} Referral rewards are separate from the collection’s prize reserve. <Link href={`/mint/${collection.id}/affiliates`}>View eligibility and affiliate rewards</Link>.</p></details>
           <details id="collection-deadline" ref={deadlineDetails}>
             <summary>
               What if the collection does not sell out?
-              <span aria-hidden="true">+</span>
-            </summary>
+
+            <Icon name="chevron" className="ui-disclosure-icon" /></summary>
             <p>
               Minting closes after the configured sale period of{" "}
               {formatDuration(collection.mintDurationSeconds)}.
@@ -524,8 +525,8 @@ export function MintExperience({
           </details>
           <details>
             <summary>
-              Can I verify the numbers myself?<span aria-hidden="true">+</span>
-            </summary>
+              Can I verify the numbers myself?
+            <Icon name="chevron" className="ui-disclosure-icon" /></summary>
             <p>
               {permanent ? <>Yes. Use <code>tokenIdForCombination()</code> to verify the permanent identity. After draw finalization, <code>scoreCombination()</code> returns the NFT’s separately assigned score. Inspect both in the </> : v3 ? <>Yes. Inspect the fulfilled VRF request and the collection’s public <code>combinationKey()</code>. The <code>scoreCombination()</code> function decodes the four numbers back to their assigned rank. Both are in the </> : v2 ? <>Yes. Inspect the fulfilled VRF request, then reproduce the accepted offset, rank and four numbers with <code>finalizeDraw</code> and the <code>UniqueRank</code> library in the </> : <>Yes. After reveal, the public seed and token ID reproduce the
               four-round shuffle, combination, and score. Read{" "}
@@ -542,8 +543,8 @@ export function MintExperience({
           </details>
           <details>
             <summary>
-              Is this a real NFT mint?<span aria-hidden="true">+</span>
-            </summary>
+              Is this a real NFT mint?
+            <Icon name="chevron" className="ui-disclosure-icon" /></summary>
             <p>
               {isDemo
                 ? "This is a functional demo using the collection’s server-provided settings. Your sample tickets stay in this browser tab, separated by collection. No wallet is connected, no money moves, and no blockchain transaction is sent. Real minting will require a deployed contract."

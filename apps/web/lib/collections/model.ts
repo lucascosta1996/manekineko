@@ -59,6 +59,8 @@ export interface CollectionPublic {
     | null;
   prizePaid: boolean;
   updatedAt: string;
+  /** Canonical snapshot identity/time; absent while observation migration is pending. */
+  observation?: { blockNumber: string; blockHash: string; chainTimestamp: string | null; observedAt: string; servedAt: string };
 }
 
 export const DEFAULT_COLLECTION_ID = "8fa5f8c0-6ef4-47f6-9af3-60b8101c9321";

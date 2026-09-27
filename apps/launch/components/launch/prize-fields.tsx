@@ -1,4 +1,7 @@
 "use client";
+import { Icon } from "@manekineko/ui/icons";
+
+import { CompactSelect } from "@manekineko/ui/select";
 
 import { collectionEconomics, equalPrizeEconomics, qualifiedAffiliateExample, type LaunchForm } from "./form-values";
 
@@ -9,10 +12,10 @@ export function PrizeFields({ form, disabled, onChange }: { form: LaunchForm; di
   const economy = collectionEconomics(form), prizes = equalPrizeEconomics(form), example = qualifiedAffiliateExample(form);
   const presetPrizes = form.prizePercent === "60" && form.winnerCount === "6";
   const percent = (label: string, key: "prizePercent" | "affiliatePoolPercent" | "affiliatePayoutCapPercent", hint: string) => <label className="launch-field"><span>{label}</span><div className="launch-input-unit"><input inputMode="decimal" value={form[key] ?? ""} onChange={event => edit(key, event.target.value)} disabled={disabled}/><span>%</span></div><small>{hint}</small></label>;
-  return <details className="launch-advanced" open>
-    <summary>Prize & affiliate allocations <span>Equal prizes · qualified referrals</span></summary>
+  return <details className="launch-advanced">
+    <summary>Prize & affiliate allocations <span>Equal prizes · qualified referrals</span><Icon name="chevron" className="ui-disclosure-icon" /></summary>
     <div className="launch-fields">
-      <label className="launch-field launch-field-wide"><span>Allocation preset</span><select value={presetPrizes && form.affiliatePoolPercent === "20" ? "growth" : presetPrizes && form.affiliatePoolPercent === "10" ? "standard" : "custom"} disabled={disabled} onChange={event => { if (event.target.value !== "custom") onChange({ ...form, prizePercent: "60", winnerCount: "6", affiliatePoolPercent: event.target.value === "growth" ? "20" : "10" }); }}><option value="growth">Growth · 6 equal prizes · 60% prizes / 20% affiliates / 20% operator</option><option value="standard">Standard · 6 equal prizes · 60% prizes / 10% affiliates / 30% operator</option><option value="custom">Custom allocations</option></select><small>Sets the prize allocation, winner count and affiliate pool. Ticket price, supply and referral requirements remain independently editable.</small></label>
+      <label className="launch-field launch-field-wide"><span>Allocation preset</span><CompactSelect value={presetPrizes && form.affiliatePoolPercent === "20" ? "growth" : presetPrizes && form.affiliatePoolPercent === "10" ? "standard" : "custom"} disabled={disabled} onChange={event => { if (event.target.value !== "custom") onChange({ ...form, prizePercent: "60", winnerCount: "6", affiliatePoolPercent: event.target.value === "growth" ? "20" : "10" }); }}><option value="growth">Growth · 6 equal prizes · 60% prizes / 20% affiliates / 20% operator</option><option value="standard">Standard · 6 equal prizes · 60% prizes / 10% affiliates / 30% operator</option><option value="custom">Custom allocations</option></CompactSelect><small>Sets the prize allocation, winner count and affiliate pool. Ticket price, supply and referral requirements remain independently editable.</small></label>
       {percent("Total prize allocation", "prizePercent", "Divided equally among the winning NFTs. The percentage supports two decimal places and must divide exactly by the winner count.")}
       <label className="launch-field"><span>Winning NFTs</span><input inputMode="numeric" value={form.winnerCount ?? ""} onChange={event => edit("winnerCount", event.target.value)} disabled={disabled}/><small>1–10, within the ticket supply. The highest-scoring NFTs receive equal prizes; the standard collection has six winners.</small></label>
       {percent("Affiliate pool", "affiliatePoolPercent", "Share of mint revenue reserved for affiliates. Together with the prize allocation, this cannot exceed 100%.")}

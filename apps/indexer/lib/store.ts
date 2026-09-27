@@ -146,9 +146,9 @@ export class PostgresIndexerStore implements IndexerStore {
           closing = date(refunds.closed_at); status = 'refunded';
         }
         const columns = ['collection_id','phase','total_minted','total_mint_revenue_wei','settled_count','refunded_count','total_refunded_wei','winning_token_id','highest_score',
-          'randomness_state','randomness_request_id','randomness_word','prize_paid','prize_recipient','prize_paid_wei','prize_transaction_hash','block_number','block_hash','award_count','sold_out_at','revealed_at','all_prizes_paid'];
+          'randomness_state','randomness_request_id','randomness_word','prize_paid','prize_recipient','prize_paid_wei','prize_transaction_hash','block_number','block_hash','award_count','sold_out_at','revealed_at','all_prizes_paid','observed_block_at'];
         const values = [c.id,s.phase,s.totalMinted,s.totalMintRevenueWei,s.settledCount,s.refundedCount,s.totalRefundedWei,s.winningTokenId,s.highestScore,
-          s.randomnessState,s.randomnessRequestId,s.randomnessWord,s.prizePaid,s.prizeRecipient,s.prizePaidWei,prizeTransaction,block.number,block.hash,awardCount(c),s.soldOutAt ? new Date(s.soldOutAt * 1000).toISOString() : null,revealedAt,s.prizePaid];
+          s.randomnessState,s.randomnessRequestId,s.randomnessWord,s.prizePaid,s.prizeRecipient,s.prizePaidWei,prizeTransaction,block.number,block.hash,awardCount(c),s.soldOutAt ? new Date(s.soldOutAt * 1000).toISOString() : null,revealedAt,s.prizePaid,new Date(block.timestamp * 1000).toISOString()];
         await client.query(`INSERT INTO manekineko_collection_state(${columns.join(',')}) VALUES(${values.map((_, i) => `$${i + 1}`).join(',')})
           ON CONFLICT(collection_id) DO UPDATE SET ${columns.slice(1).map(name => `${name}=EXCLUDED.${name}`).join(',')},synced_at=now()`, values);
         // Rebuild the terminal projection together with the source snapshot, so an orphan winner never remains visible.

@@ -1,4 +1,7 @@
 "use client";
+import { PublicFooter } from "@manekineko/ui/footer";
+import type { PublicLinks } from "@manekineko/ui/links";
+import { Icon } from "@manekineko/ui/icons";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { LiveCollection } from "../components/live-collection";
@@ -8,55 +11,6 @@ import { TinctaWordmark } from "../components/tincta-logo";
 import type { PlannedRewards } from "../lib/planned-rewards";
 
 type Season = { season: number; colors: string[] };
-type IconName =
-  | "arrow"
-  | "diagonal"
-  | "down"
-  | "plus"
-  | "pause"
-  | "play"
-  | "check"
-  | "spark"
-  | "ethereum";
-
-function Icon({
-  name = "arrow",
-  className = "",
-}: {
-  name?: IconName;
-  className?: string;
-}) {
-  return (
-    <svg
-      className={`icon ${className}`}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      {name === "arrow" && <path d="M4 12h15m-6-6 6 6-6 6" />}
-      {name === "diagonal" && <path d="M5 19 19 5M5 5h14v14" />}
-      {name === "down" && <path d="M12 4v15m-6-6 6 6 6-6" />}
-      {name === "plus" && <path d="M5 12h14M12 5v14" />}
-      {name === "pause" && <path d="M9 5v14M15 5v14" />}
-      {name === "play" && <path d="m8 5 11 7-11 7Z" />}
-      {name === "check" && <path d="m5 12 4 4L19 6" />}
-      {name === "spark" && (
-        <path d="M12 2c0 7-3 10-10 10 7 0 10 3 10 10 0-7 3-10 10-10-7 0-10-3-10-10Z" />
-      )}
-      {name === "ethereum" && (
-        <>
-          <path d="m12 2-6 10 6 4 6-4-6-10Zm-6 12 6 8 6-8-6 4-6-4Z" />
-          <path d="M12 2v14m-6-4 6-3 6 3" />
-        </>
-      )}
-    </svg>
-  );
-}
-
 function Brand({ footer = false }: { footer?: boolean }) {
   return (
     <a
@@ -186,10 +140,12 @@ const faqs = (plannedRewards: PlannedRewards) => [
 
 export function LandingExperience({
   appUrl,
+  footerLinks,
   seasons,
   plannedRewards,
 }: {
   appUrl: string | null;
+  footerLinks: PublicLinks;
   seasons: Season[];
   plannedRewards: PlannedRewards;
 }) {
@@ -332,8 +288,7 @@ export function LandingExperience({
           aria-controls="mobile-nav"
           onClick={() => setMenuOpen(!menuOpen)}
         >
-          <span />
-          <span />
+          <Icon name={menuOpen ? "close" : "menu"} />
         </button>
         {menuOpen && (
           <nav
@@ -1019,29 +974,8 @@ export function LandingExperience({
           </div>
         </section>
       </main>
+      <PublicFooter brand={<TinctaWordmark title="Tincta" className="ui-footer-wordmark" />} links={footerLinks} />
       <footer className="footer wrap">
-        <div className="footer-top">
-          <Brand footer />
-          <p>
-            Onchain prizes.
-            <br />
-            Contract-controlled commissions.
-          </p>
-          <nav aria-label="Footer navigation">
-            <a href="#seasons">Seasons</a>
-            <a href="#affiliates">Affiliates</a>
-            <a href="#questions">Questions</a>
-            {appUrl && (
-              <a href={new URL("/docs", appUrl).href}>
-                Documentation
-                <Icon name="diagonal" />
-              </a>
-            )}
-          </nav>
-          <a className="back-top" href="#top" aria-label="Back to top">
-            <Icon name="down" />
-          </a>
-        </div>
         <div className="footer-bottom">
           <span>© {new Date().getFullYear()} Tincta</span>
           <p>

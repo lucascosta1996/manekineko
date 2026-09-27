@@ -1,4 +1,5 @@
 "use client";
+import { Icon } from "@manekineko/ui/icons";
 
 import { useId } from "react";
 import { contrastTextColor, DEFAULT_COLLECTION_COLOR, normalizeCollectionColor } from "@manekineko/contract-abi/season-appearance";
@@ -60,7 +61,7 @@ export function SeasonAppearanceFields({ form, disabled, onChange, inheritedSeas
       <span className="launch-eyebrow">ON-CHAIN IDENTITY</span>
       {inheritedSeason ? <div className="season-inherited-name"><small>Part of this season</small><strong>{form.seasonName || "Name your season above"}</strong><p>The season name appears on every NFT in this group.</p></div> : <>
         <label className="launch-field"><span>Season name</span><input value={form.seasonName ?? ""} onChange={event => onChange({ ...form, seasonName: event.target.value })} disabled={disabled} maxLength={64} placeholder="Crimson & Blood Orange" /><small>The shared name shown on every NFT in this season. Each collection keeps its own creative name and color.</small></label>
-        <details className="season-identity-details"><summary>Season identity</summary><label className="launch-field"><span>Season ID</span><input value={form.seasonId ?? ""} onChange={event => onChange({ ...form, seasonId: event.target.value })} disabled={disabled} className="launch-address-input" spellCheck={false} maxLength={66} /><small>Keep the same ID for collections in one season. A season supports up to 10 collections. Use Seasons to manage the complete group.</small></label></details>
+        <details className="season-identity-details"><summary>Season identity<Icon name="chevron" className="ui-disclosure-icon" /></summary><label className="launch-field"><span>Season ID</span><input value={form.seasonId ?? ""} onChange={event => onChange({ ...form, seasonId: event.target.value })} disabled={disabled} className="launch-address-input" spellCheck={false} maxLength={66} /><small>Keep the same ID for collections in one season. A season supports up to 10 collections. Use Seasons to manage the complete group.</small></label></details>
       </>}
       <label className="launch-field" htmlFor={`${id}-hex`}><span>Collection color</span></label>
       <div className="season-color-input"><input type="color" aria-label="Choose collection color" value={color.background} onChange={event => onChange({ ...form, collectionColor: event.target.value.toUpperCase() })} disabled={disabled} /><input id={`${id}-hex`} aria-describedby={`${id}-color-hint`} value={form.collectionColor ?? ""} onChange={event => onChange({ ...form, collectionColor: event.target.value })} disabled={disabled} placeholder="#RRGGBB" maxLength={7} spellCheck={false} aria-invalid={!color.valid} /></div>

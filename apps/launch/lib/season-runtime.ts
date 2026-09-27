@@ -8,7 +8,7 @@ export type RuntimeCredentials = { apiKey: string; apiKeySecret: string; accessT
 export type RuntimeProfile = { chainId: RuntimeChainId; revision: number; enabled: boolean; handle: string; expectedAccountId: string; publicBaseUrl: string; credentialsConfigured: boolean; updatedAt: string };
 export type RuntimeRun = { id: string; automationId: string; automationRevision: number; preparedHash: string; chainId: RuntimeChainId; profileRevision: number; status: RuntimeStatus; desiredState: "running" | "paused"; revision: number; lastError: string | null; heartbeatAt: string | null; createdAt: string; updatedAt: string };
 export type RuntimeEvent = { id: string; event: string; message: string; createdAt: string };
-export type RuntimeAction = { id: string; actionKey: string; kind: string; status: string; txHash: string | null; postId: string | null; lastError: string | null; createdAt: string; updatedAt: string };
+export type RuntimeAction = { delivery?: RuntimeDelivery | null; id: string; actionKey: string; kind: string; status: string; txHash: string | null; postId: string | null; lastError: string | null; createdAt: string; updatedAt: string };
 export type RuntimeSnapshot = { run: RuntimeRun | null; profile: RuntimeProfile | null; events: RuntimeEvent[]; actions: RuntimeAction[]; encryptionConfigured: boolean };
 
 export function runtimeRevision(value: unknown, allowZero = false): number {
@@ -41,4 +41,25 @@ export function assertRuntimeArtifact(artifact: AutomationArtifact, now = new Da
   if (!["affiliate-v9", "affiliate-v10"].includes(artifact.contractVersion) || !artifact.seasonId || !artifact.timing || !artifact.steps.length || artifact.steps.some(step => launchContractVersion(step.payload) !== artifact.contractVersion || step.payload.contract.maxMintsPerWallet !== "20" || step.payload.contract.chainId !== artifact.chainId)) throw new AutomationError("runtime_version", "Season execution requires a prepared V9 or V10 season with consistent network and timing.", 422);
   if (checkStart && (!artifact.startAt || Date.parse(artifact.startAt) <= now.getTime())) throw new AutomationError("runtime_start", "The prepared first mint opening is already past. Prepare a fresh season with enough deployment and enrollment time.", 422);
   if (artifact.social?.enabled !== true) throw new AutomationError("runtime_social", "Enable X announcements in the season before preparing it for execution.", 422);
+}
+
+export type RuntimeDelivery = {
+  observedAt: string | null; blockNumber: number | null; blockHash: string | null; unpaidPrizes: number | null;
+  latencyMs: number | null; attempts: number | null; nextAttemptAt: string | null; nextAction: string | null;
+};
+/** Only sanctioned diagnostics cross the operator API; never return payloads, credentials or journal history. */
+export function runtimeDelivery(value: unknown): RuntimeDelivery | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const input = value as Record<string, unknown>;
+  const integer = (candidate: unknown) => Number.isSafeInteger(candidate) && (candidate as number) >= 0 ? candidate as number : null;
+  const date = (candidate: unknown) => typeof candidate === "string" && /^\d{4}-\d\d-\d\dT/.test(candidate) && Number.isFinite(Date.parse(candidate)) ? new Date(candidate).toISOString() : null;
+  const retry = integer(input.nextAttemptAt);
+  const allowed = ["reconcile_exact_post", "review_account_permissions_and_recorded_provider_codes", "retry_after_fresh_state_check", "review_media_delivery_then_retry"];
+  return {
+    observedAt: date(input.observedAt), blockNumber: integer(typeof input.blockNumber === "string" && /^\d+$/.test(input.blockNumber) ? Number(input.blockNumber) : input.blockNumber),
+    blockHash: typeof input.blockHash === "string" && /^0x[0-9a-f]{64}$/i.test(input.blockHash) ? input.blockHash : null,
+    unpaidPrizes: integer(input.unpaidPrizes), latencyMs: integer(input.latencyMs), attempts: integer(input.attempts),
+    nextAttemptAt: retry !== null && retry <= 8_640_000_000_000_000 ? new Date(retry).toISOString() : null,
+    nextAction: typeof input.nextAction === "string" && allowed.includes(input.nextAction) ? input.nextAction : null,
+  };
 }

@@ -1,4 +1,5 @@
 "use client";
+import { Icon } from "@manekineko/ui/icons";
 
 /** A fixed protocol rule; the editable value identifies its canonical network registry. */
 export function AffiliateEligibilityFields({ address, disabled, inherited = false, onAddress, version, mintCap }: {
@@ -10,7 +11,7 @@ export function AffiliateEligibilityFields({ address, disabled, inherited = fals
   onAddress: (value: string) => void;
 }) {
   return <details className="launch-advanced">
-    <summary>Affiliate eligibility <span>NFT holders · verified enrollment</span></summary>
+    <summary>Affiliate eligibility <span>NFT holders · verified enrollment</span><Icon name="chevron" className="ui-disclosure-icon" /></summary>
     <p>The first official collection on a network allows open enrollment. Every later collection requires an NFT from an earlier completed official collection. A new factory does not restart open enrollment.</p>
     <p>{["unique-rank-v4", "unique-rank-v5", "unique-rank-v6"].includes(version ?? "") ? "Completed means sold out with a verified draw and protected prizes. Earlier versions keep their original settlement requirements." : "This historical version requires the earlier collection to have sold out, revealed and paid its winner."} Any NFT from that collection can qualify. The current collection’s NFTs cannot qualify because affiliate enrollment closes before minting opens.</p>
     <p>Eligibility is checked on-chain at enrollment: one position per wallet and one use of each qualifying NFT per collection. Transferring that NFT afterward does not transfer the affiliate position or earnings. The NFT can qualify its holder for another future collection.</p>

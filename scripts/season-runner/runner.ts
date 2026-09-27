@@ -10,7 +10,7 @@ import { createV9ChainAdapter, createV10ChainAdapter, type V9ChainOptions, type 
 import { ChainPendingError, createTransactionPipeline, transactionSpend, type ChainJournal } from "./chain-transactions.ts";
 import type { SepoliaScenario } from "./sepolia-scenarios.ts";
 import type { runSepoliaRehearsalStep, SepoliaRehearsalState } from "./sepolia-wallets.ts";
-import { verifyXAccount } from "./social.ts";
+import { verifyXAccount, XApiError } from "./social.ts";
 import { deliverMessage, MediaPending } from "./outbox.ts";
 import { ensure, RunnerStop, type RunStore } from "./store.ts";
 import { indexSeasonFactory, registerVerifiedCollection } from "./registration.ts";
@@ -68,6 +68,7 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
     ensure(options.wallets && options.scenario.chainId === 11155111 && options.scenario.maxTotalSpendWei === options.maxTotalSpendWei && options.scenario.maxFeePerGasWei === options.maxFeePerGasWei, "scenario_spending_policy_mismatch");
     ensure(artifact.steps.length === 1 && artifact.steps[0].id === options.scenario.collectionId, "scenario_requires_one_bound_collection");
     ensure((options.scenario.kind === "refund-3-30m") === (first.contract.sepoliaRehearsal === "refund-3-30m"), "scenario_terms_mismatch");
+    if (options.scenario.kind === "manual-affiliate-sellout") ensure(policy.permanent && first.contract.mintDurationSeconds === "86400" && !options.recycleSepoliaFunds, "manual_rehearsal_requires_unrecycled_24_hour_v10");
   }
   ensure(!artifact.steps.some(step => step.payload.contract.sepoliaRehearsal) || options.scenario?.kind === "refund-3-30m", "refund_scenario_manifest_required");
   if (options.wallets) ensure(options.wallets.length === 50 && new Set(options.wallets.map(wallet => wallet.address)).size === 50, "rehearsal_requires_50_unique_wallets");
@@ -134,7 +135,7 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
     }
     return result;
   }
-  async function message(event: SeasonSocialEvent, now: number, id?: string, snapshot?: ChainSnapshot) {
+  async function message(event: SeasonSocialEvent, now: number, id?: string, snapshot?: ChainSnapshot, enqueueOnly = false) {
     let summaryEvidence: { blockNumber: number; blockHash: string } | undefined;
     const index = id ? artifact.steps.findIndex(step => step.id === id) : -1, step = index >= 0 ? artifact.steps[index] : undefined, prepared = id ? state.collections![id] : undefined;
     const terms = step?.payload.contract, path = id ? `${base}/mint/${id}` : undefined;
@@ -144,9 +145,9 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
     }, ...(terms ? { collection: { id: id!, number: index + 1, name: terms.name, color: terms.collectionColor!, supply: Number(terms.maxSupply), mintPriceEth: formatEther(terms.mintPriceWei), winnerCount: Number(terms.winnerCount),
       prizePerWinnerEth: formatEther(BigInt(terms.maxSupply) * BigInt(terms.mintPriceWei) * BigInt(terms.prizeBps) / 10000n / BigInt(terms.winnerCount!)) } } : {}),
       enrollmentOpensAt: prepared?.enrollmentAt, saleStartsAt: prepared && iso(prepared.payload.contract.saleStartAt!), deadline: snapshot ? iso(snapshot.mintDeadline) : undefined, drawVerified: snapshot?.revealed };
-    if (event === "winners-revealed" && snapshot && id) {
+    if ((event === "winners-revealed" || event === "prizes-paid") && snapshot && id) {
       input.winners = snapshot.awards.map(award => ({ rank: award.rank, tokenId: award.tokenId, awardEth: formatEther(award.amountWei), holderWallet: award.holder, holderBlock: String(snapshot.blockNumber), nftUrl: `${base}/nfts/${id}/${award.tokenId}`, claimed: award.claimed }));
-      input.payments = await payments(id, snapshot);
+      if (event === "winners-revealed" && !enqueueOnly) input.payments = await payments(id, snapshot);
     }
     if (event === "season-complete") {
       const snapshots = Object.values(state.collections!).flatMap(item => item.snapshot ? [item.snapshot] : []);
@@ -163,7 +164,9 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
       socialMessage.post = assertSocialText(`[Sepolia test]\nSatin Echo · rescheduled\n\nOriginal mint: ${socialDateText(original.saleStartAt)}\nNew mint: ${socialDateText(replacement.saleStartAt)}\nEnrollment: ${socialDateText(replacement.enrollmentAt)}\n\nGuide in the thread.`);
     }
     return dependencies.deliverMessage(store, credentials, profile.expectedAccountId, `${id ?? "season"}:${event}`, socialMessage, {
-      supplementalReplies: event === "winners-revealed" || event === "season-complete",
+      enqueueOnly,
+      ...(snapshot && (event === "winners-revealed" || event === "prizes-paid") ? { observation: { observedAt: new Date(dependencies.now()).toISOString(), blockNumber: snapshot.blockNumber, blockHash: snapshot.blockHash, unpaidPrizes: snapshot.awards.filter(award => !award.claimed).length } } : {}),
+      supplementalReplies: event === "winners-revealed" || event === "prizes-paid" || event === "season-complete",
       beforePost: async () => {
         await store.guard();
         const head = await chain.provider.getBlock("latest"); ensure(head?.hash && Math.abs(dependencies.now() / 1000 - head.timestamp) < 180, "rpc_head_stale");
@@ -176,8 +179,8 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
           if (event === "collection-live" && !(current.saleActivated && !current.soldOut && !current.refundsAvailable && head.timestamp < Number(current.mintDeadline))) throw new MediaPending("mint_announcement_changed_refresh_required");
           if (event === "collection-sold-out") ensure(current.soldOut, "sellout_not_confirmed");
           if (event === "collection-sold-out" && current.revealed !== snapshot.revealed) throw new MediaPending("draw_state_changed_refresh_required");
-          if (event === "winners-revealed") ensure(current.revealed, "draw_not_confirmed");
-          if (event === "winners-revealed" && current.awards.some(award => award.claimed !== snapshot.awards.find(saved => saved.rank === award.rank)?.claimed)) throw new MediaPending("prize_claims_changed_refresh_required");
+          if (event === "winners-revealed" || event === "prizes-paid") ensure(current.revealed, "draw_not_confirmed");
+          if ((event === "winners-revealed" || event === "prizes-paid") && current.awards.some(award => award.claimed !== snapshot.awards.find(saved => saved.rank === award.rank)?.claimed)) throw new MediaPending("prize_claims_changed_refresh_required");
           if (event === "refunds-available") ensure(current.refundsAvailable, "refunds_not_confirmed");
         }
         if (event === "season-complete") {
@@ -188,6 +191,15 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
       },
       beforeReply: async () => { if (snapshot) ensure((await chain.provider.getBlock(snapshot.blockNumber))?.hash === snapshot.blockHash, "social_snapshot_reorganized"); },
     });
+  }
+  // Failure of optional social maintenance cannot undo chain/public progress.
+  // Successor activation still independently requires its confirmed results root.
+  async function maintainMessage(event: SeasonSocialEvent, now: number, id?: string, snapshot?: ChainSnapshot) {
+    try { return await message(event, now, id, snapshot); }
+    catch (error) {
+      if (!(error instanceof XApiError || error instanceof MediaPending || error instanceof RunnerStop && error.code === "x_delivery_requires_reconciliation")) throw error;
+      return null; // The durable outbox stores exact attempts and the next action.
+    }
   }
   async function project() {
     if (!state.announcedAt) return;
@@ -371,6 +383,19 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
     const observations = Object.values(state.collections!).flatMap(item => item.snapshot ? [item.snapshot.timestamp] : []);
     if (observations.length) state.observedAt = new Date(dependencies.now()).toISOString();
     await save(); await project();
+    // Queue every verified result before any bot claim and before supplemental
+    // sellout threads. The first evidence survives fast claims and process restarts.
+    const primaryResultAttempts = new Set<string>();
+    for (const [id, item] of Object.entries(state.collections!)) {
+      if (!item.snapshot?.revealed) continue;
+      if (!await rootConfirmed("winners-revealed", id)) await message("winners-revealed", now, id, item.snapshot, true);
+      if (item.snapshot.prizePaid && !await rootConfirmed("prizes-paid", id)) await message("prizes-paid", now, id, item.snapshot, true);
+    }
+    for (const [id, item] of Object.entries(state.collections!)) {
+      if (!item.snapshot?.revealed) continue;
+      if (!await rootConfirmed("winners-revealed", id)) { primaryResultAttempts.add(`${id}:winners-revealed`); await maintainMessage("winners-revealed", now, id, item.snapshot); }
+      if (item.snapshot.prizePaid && !await rootConfirmed("prizes-paid", id)) { primaryResultAttempts.add(`${id}:prizes-paid`); await maintainMessage("prizes-paid", now, id, item.snapshot); }
+    }
     // Reconcile one owned terminal claim before social delivery or a missed next schedule can stop this tick.
     // The urgent-opening checkpoints above still protect future activation prerequisites.
     let terminalClaimProcessed = false;
@@ -422,19 +447,23 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
       else ensure(now < enrollment, "collection_announcement_not_confirmed_before_enrollment");
       const snapshot = item.snapshot ?? await chain.snapshot(item.deployment.round); item.snapshot = snapshot;
       state.observedAt = new Date(dependencies.now()).toISOString();
+      if (options.scenario?.kind === "manual-affiliate-sellout" && !snapshot.saleActivated && !snapshot.refundsAvailable) await rehearsal(item);
       await enroll(index, item, snapshot, now);
       await activate(index, item, snapshot);
       if (snapshot.saleActivated && await openingCheckpoint()) return { mode: "running", runId: store.row.id, priority: "fixed-opening" };
       if (snapshot.saleActivated && !snapshot.soldOut && !snapshot.refundsAvailable && now < Number(snapshot.mintDeadline)) await message("collection-live", now, step.id, snapshot);
       if (snapshot.soldOut) await message("collection-sold-out", now, step.id, snapshot);
       if (snapshot.saleActivated && await openingCheckpoint()) return { mode: "running", runId: store.row.id, priority: "fixed-opening" };
-      if (snapshot.revealed) await message("winners-revealed", now, step.id, snapshot);
+      // Primary results were attempted before automated claims. Reconcile remaining
+      // supplemental/payment replies only after the fixed-opening checkpoint.
+      if (snapshot.revealed && !primaryResultAttempts.has(`${step.id}:winners-revealed`)) await maintainMessage("winners-revealed", now, step.id, snapshot);
+      if (snapshot.prizePaid && !primaryResultAttempts.has(`${step.id}:prizes-paid`)) await maintainMessage("prizes-paid", now, step.id, snapshot);
       if (snapshot.refundsAvailable) {
         await message("refunds-available", now, step.id, snapshot);
         // Unsold collections terminate the factory sequence, but owned refunds
         // and public status continue while the worker remains running.
         if (!snapshot.cancelled) { await store.guard(); await chain.advance(step.id, item.deployment.round); }
-        state.completed = true; await message("season-complete", now); await save(); await store.complete(); await project();
+        state.completed = true; await save(); await store.complete(); await project(); await maintainMessage("season-complete", now);
         if (!terminalClaimProcessed && options.wallets && state.rehearsal) await rehearsal(item);
         return { mode: "completed", outcome: "unsold", claimsMonitored: true };
       }
@@ -442,7 +471,7 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
       if (options.wallets && state.rehearsal && snapshot.saleActivated && !state.rehearsalDone?.includes(item.deployment.round)) rehearsalQueue.push(item);
       await save(); await project();
       if (!snapshot.readyForNextRound) break;
-      if (index === artifact.steps.length - 1) { await message("season-complete", now); state.completed = true; await save(); await store.complete(); await project(); }
+      if (index === artifact.steps.length - 1) { state.completed = true; await save(); await store.complete(); await project(); await maintainMessage("season-complete", now); }
     }
     await project();
     await chain.verifyExplorer?.();

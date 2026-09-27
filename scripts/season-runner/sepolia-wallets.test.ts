@@ -55,6 +55,78 @@ function rehearsalFixture(funded: boolean, primary = 0n, remaining = 1000n, vers
   } as unknown as Provider;
   return { state, writes, wallets, operator, iface, options: { chainId: 11155111, provider, operator, wallets, execute: true, state, saveState: async () => {}, maxFeePerGasWei: "100", maxTotalSpendWei: String(10n ** 21n), confirmations: 2 } };
 }
+
+function manualFixture() {
+  const f = rehearsalFixture(true, 0n, 1000n, "affiliate-v10", "unique-rank-v6"), round = `0x${"12".repeat(20)}`;
+  const iface = new Interface([...f.iface.fragments,
+    "function saleStartAt() view returns(uint256)", "function affiliateIdOf(address) view returns(uint256)", "function affiliateWallet(uint256) view returns(address)",
+    "function affiliateAccrued(uint256) view returns(uint256)", "function affiliateEqualShare() view returns(uint256)", "function affiliateQualifiedCount() view returns(uint256)", "function affiliatePoolAmount() view returns(uint256)", "function affiliateClaimed(uint256) view returns(uint256)",
+    "function awardCount() view returns(uint256)", "function prizeClaimed(uint256) view returns(bool)", "function winningTokenIds(uint256) view returns(uint256)", "function ownerOf(uint256) view returns(address)",
+    "function mintWithAffiliate(address,uint256,uint256) payable", "function claimPrizeForRank(uint256,address)",
+    "event AffiliateReferralRecorded(uint256 indexed id,address indexed payer,address indexed recipient,uint256 firstTokenId,uint256 quantity)",
+  ]);
+  const control = { enrolled: false, manualMints: false, revealed: false, paid: false, commissionPaid: false, transferred: false, wrongReferral: false };
+  const provider = f.options.provider as any, original = provider.call;
+  provider.call = async (request: { data: string }) => {
+    const call = iface.parseTransaction(request)!;
+    const values: Record<string, unknown> = { saleStartAt: 0n, mintDeadline: 86400n, affiliateIdOf: control.enrolled ? 1n : 0n, affiliateWallet: f.wallets[0].address,
+      affiliateAccrued: 1000n, affiliateEqualShare: 1000n, affiliateQualifiedCount: 1n, affiliatePoolAmount: 2000n, affiliateClaimed: control.commissionPaid ? 1000n : 0n,
+      awardCount: 1n, prizeClaimed: control.paid, winningTokenIds: 42n, ownerOf: f.wallets[control.transferred ? 3 : 2].address,
+      revealed: control.revealed, totalMinted: control.revealed ? 1000n : control.manualMints ? 40n : 0n,
+      mintedPerWallet: control.revealed ? 20n : control.manualMints && call.args.length > 0 && [f.wallets[0].address, f.wallets[1].address].includes(call.args[0]) ? 20n : 0n };
+    return call.name in values ? iface.encodeFunctionResult(call.name, [values[call.name]]) : original(request);
+  };
+  provider.provider = provider;
+  provider.getLogs = async () => {
+    const log = iface.encodeEventLog(iface.getEvent("AffiliateReferralRecorded")!, [1n, f.wallets[1].address, f.wallets[1].address, 1n, control.wrongReferral ? 1n : 20n]);
+    return [{ ...log, address: round, blockNumber: 100, blockHash: `0x${"ab".repeat(32)}`, transactionHash: `0x${"cd".repeat(32)}`, transactionIndex: 0, index: 1, removed: false }];
+  };
+  const scenario = { kind: "manual-affiliate-sellout" as const, chainId: 11155111 as const, collectionId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", affiliateWallet: f.wallets[0].address, buyerWallet: f.wallets[1].address, manualMintsPerWallet: 20 as const, expectedOutcome: "manual-prize-and-commission-claimed" as const, maxFeePerGasWei: f.options.maxFeePerGasWei, maxTotalSpendWei: f.options.maxTotalSpendWei };
+  return { ...f, control, iface, round, options: { ...f.options, scenario } };
+}
+
+test("manual roles persist before purchases, wait for actual enrollment and buyer referral, and bots never sign with either role", async () => {
+  const f = manualFixture();
+  assert.equal((await runSepoliaRehearsalStep(f.options, f.round)).action, "manual-checkpoint");
+  assert.equal(f.state.manual![f.round].checkpoint, "awaiting-enrollment"); assert.equal(f.writes.length, 0);
+  const resumed = structuredClone(f.state); f.options.state = resumed;
+  f.control.enrolled = true;
+  assert.equal((await runSepoliaRehearsalStep(f.options, f.round)).action, "manual-checkpoint");
+  assert.equal(resumed.manual![f.round].checkpoint, "awaiting-manual-mints");
+  f.control.manualMints = true;
+  await assert.rejects(runSepoliaRehearsalStep(f.options, f.round), ChainPendingError);
+  const tx = Transaction.from(f.writes[0]), call = f.iface.parseTransaction(tx)!;
+  assert.equal(tx.from, f.wallets[2].address); assert.equal(call.name, "mintWithAffiliate"); assert.equal(call.args[2], 1n);
+  assert.equal(resumed.manual![f.round].referralReceipts?.[0].quantity, "20");
+  assert.equal(resumed.journals[f.wallets[0].address], undefined); assert.equal(resumed.journals[f.wallets[1].address], undefined);
+});
+
+test("manual post-draw winner reservation survives restart, holds unpaid rights and waits for both explicit claims", async () => {
+  const f = manualFixture(); await runSepoliaRehearsalStep(f.options, f.round);
+  Object.assign(f.control, { enrolled: true, manualMints: true, revealed: true });
+  const result = await runSepoliaRehearsalStep(f.options, f.round);
+  assert.equal(result.action, "manual-checkpoint"); assert.equal(f.writes.length, 0);
+  const saved = f.state.manual![f.round]; assert.equal(saved.winner?.address, f.wallets[2].address); assert.equal(saved.winner?.tokenId, "42");
+  f.options.state = structuredClone(f.state);
+  await runSepoliaRehearsalStep(f.options, f.round); assert.equal(f.writes.length, 0);
+  f.control.transferred = true; await assert.rejects(runSepoliaRehearsalStep(f.options, f.round), /manual_winning_ticket_owner_changed/);
+  f.control.paid = true;
+  assert.equal((await runSepoliaRehearsalStep(f.options, f.round)).action, "manual-checkpoint");
+  f.control.commissionPaid = true;
+  assert.equal((await runSepoliaRehearsalStep(f.options, f.round)).action, "settled");
+  assert.equal(f.options.state.manual![f.round].checkpoint, "complete"); assert.equal(f.writes.length, 0);
+});
+
+test("manual rehearsal fails closed for wrong referral, attaching after purchases, changed roles or recycling", async () => {
+  const f = manualFixture();
+  await assert.rejects(runSepoliaRehearsalStep({ ...f.options, recycleOperatorFunds: true }, f.round), /unrecycled/);
+  f.control.manualMints = true;
+  await assert.rejects(runSepoliaRehearsalStep(f.options, f.round), /precede_purchases/);
+  f.control.manualMints = false; await runSepoliaRehearsalStep(f.options, f.round);
+  await assert.rejects(runSepoliaRehearsalStep({ ...f.options, scenario: undefined }, f.round), /original_scenario/);
+  Object.assign(f.control, { enrolled: true, manualMints: true, wrongReferral: true });
+  await assert.rejects(runSepoliaRehearsalStep(f.options, f.round), /verified_affiliate_link/); assert.equal(f.writes.length, 0);
+});
 test("first mint funds only the required shortfall from existing operator ETH and journals the transfer", async () => {
   const f = rehearsalFixture(false);
   await assert.rejects(runSepoliaRehearsalStep(f.options, `0x${"12".repeat(20)}`), ChainPendingError);
@@ -62,6 +134,22 @@ test("first mint funds only the required shortfall from existing operator ETH an
   const signed = Transaction.from(f.writes[0]); assert.equal(signed.from, f.operator.address); assert.equal(signed.to, f.wallets[0].address);
   assert.equal(signed.value, 20n * 10_000n + 2_500_000n * 100n);
   assert.equal(f.state.journals[f.operator.address].transactions[0].state, "submitted");
+});
+test("explicit prize settlement signs as the winning holder and pays only the actual operator", async () => {
+  for (const mode of ["valid", "unrevealed", "wrong-owner"] as const) {
+    const f = rehearsalFixture(true, 20n, 0n, "affiliate-v10", "unique-rank-v6");
+    const iface = new Interface([...f.iface.fragments, "function owner() view returns(address)", "function awardCount() view returns(uint256)", "function prizeClaimed(uint256) view returns(bool)", "function winningTokenIds(uint256) view returns(uint256)", "function ownerOf(uint256) view returns(address)", "function claimPrizeForRank(uint256,address)"]);
+    const provider = f.options.provider as any, original = provider.call;
+    provider.call = async (request: { data: string }) => {
+      const call = iface.parseTransaction(request)!;
+      const values: Record<string, unknown> = { revealed: mode !== "unrevealed", owner: mode === "wrong-owner" ? f.wallets[1].address : f.operator.address, awardCount: 1n, prizeClaimed: false, winningTokenIds: 208n, ownerOf: f.wallets[0].address };
+      return call.name in values ? iface.encodeFunctionResult(call.name, [values[call.name]]) : original(request);
+    };
+    await assert.rejects(runSepoliaRehearsalStep({ ...f.options, settlePrizesToOperator: true }, `0x${"12".repeat(20)}`), mode === "valid" ? ChainPendingError : /prize_settlement_requires_revealed_owned_round/);
+    if (mode !== "valid") { assert.equal(f.writes.length, 0); continue; }
+    const tx = Transaction.from(f.writes[0]), call = iface.parseTransaction(tx)!;
+    assert.equal(tx.from, f.wallets[0].address); assert.equal(tx.value, 0n); assert.equal(call.name, "claimPrizeForRank"); assert.equal(call.args[0], 1n); assert.equal(call.args[1], f.operator.address);
+  }
 });
 test("mint step uses existing balances, respects prior primary mints and remaining collection supply", async () => {
   for (const [primary, remaining, expected] of [[0n, 1000n, 20n], [19n, 900n, 1n], [0n, 7n, 7n]]) {

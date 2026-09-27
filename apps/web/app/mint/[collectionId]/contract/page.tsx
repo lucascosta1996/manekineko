@@ -1,3 +1,4 @@
+import { Icon } from "@manekineko/ui/icons";
 import v10Source from "@manekineko/contract-abi/round-v10-source";
 import eligibilityV5Source from "@manekineko/contract-abi/affiliate-eligibility-v5-source";
 import v9Source from "@manekineko/contract-abi/round-v9-source";
@@ -70,7 +71,7 @@ export default async function ContractPage({
             : `This collection uses its original ${version} rules. The source and results below belong to this version; later architecture changes do not upgrade it.`}</p>
           {explorerUrl && <>
             <code className="source-address">{collection.contractAddress}</code>
-            <a className="text-link" href={explorerUrl} target="_blank" rel="noopener noreferrer">View contract on Etherscan ↗</a>
+            <a className="text-link" href={explorerUrl} target="_blank" rel="noopener noreferrer">View contract on Etherscan <Icon name="diagonal" /></a>
           </>}
         </div>
         <p>
@@ -82,9 +83,9 @@ export default async function ContractPage({
           This source preview is not an explorer verification or an independent
           security audit.
         </p>
-        <p>V10 introduces permanent numbers at mint and separate VRF-derived scores after sellout. <Link href="/docs/verification">Read the version-aware verification guide →</Link></p>
+        <p>V10 introduces permanent numbers at mint and separate VRF-derived scores after sellout. <Link href="/docs/verification">Read the version-aware verification guide <Icon name="arrow" /></Link></p>
         <Link className="text-link" href={`/mint/${collection.id}`}>
-          ← Back to mint
+          <Icon name="back" /> Back to mint
         </Link>
       </div>
       <div className="source-guide">
@@ -163,7 +164,7 @@ export default async function ContractPage({
             the original contract shown above; a live affiliate program requires a new deployment
             of <code>{affiliateSource.contractName}</code>.
           </p>}
-          <Link href={`/mint/${collection.id}/affiliates`} className="text-link">View this collection’s affiliate rewards →</Link>
+          <Link href={`/mint/${collection.id}/affiliates`} className="text-link">View this collection’s affiliate rewards <Icon name="arrow" /></Link>
         </div>
         {program.mode === "demo" && <div className="source-code">
           <div><span>{affiliateSource.contractName}.sol</span><span>Solidity {affiliateSource.compiler}</span></div>

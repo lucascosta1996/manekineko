@@ -1,4 +1,19 @@
 import { redirect } from "next/navigation";
+import { configuredLaunchChain } from "../../lib/chain-policy";
+import { launchDestination, launchNetwork } from "../../lib/launch-navigation";
 
-/** Saved automation APIs and manifests remain compatible; seasons is the public workspace. */
-export default function AutomationsPage() { redirect("/seasons"); }
+/** Preserve network and supported season context for saved legacy links. */
+export default async function AutomationsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ chainId?: string; automationId?: string }>;
+}) {
+  const query = await searchParams;
+  redirect(
+    launchDestination(
+      "/seasons",
+      launchNetwork(query.chainId, configuredLaunchChain() ?? "1"),
+      query.automationId
+    )
+  );
+}

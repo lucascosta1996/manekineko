@@ -1,6 +1,28 @@
 import { sha256, toUtf8Bytes } from "ethers";
 import { collectionProgress } from "../collections/presentation.ts";
 import type { CollectionPublic } from "../collections/model.ts";
+import { observationFresh, collectionLifecycle, seasonLifecycle } from "@manekineko/contract-abi/lifecycle";
+import type { AnnouncedSeason } from "./schedule.ts";
+
+export function collectionObservationFresh(collection: CollectionPublic, now: number): boolean {
+  return observationFresh(collection.observation?.observedAt ?? collection.updatedAt, now)
+    && (!collection.observation?.chainTimestamp || observationFresh(collection.observation.chainTimestamp, now));
+}
+export function collectionChainNow(collection: CollectionPublic, now: number): number | null {
+  if (!collection.observation?.chainTimestamp || !collectionObservationFresh(collection, now)) return null;
+  return Date.parse(collection.observation.chainTimestamp) + Math.max(0, now - Date.parse(collection.observation.observedAt));
+}
+export function collectionLifecycleInput(collection: CollectionPublic, now: number) {
+  return { id: collection.id, phase: collection.phase, deployment: collection.contractStatus, now,
+    observedAt: collectionObservationFresh(collection, now) ? collection.updatedAt : null,
+    winnerCount: collection.winnerCount, awards: collection.awards, allPrizesPaid: collection.allPrizesPaid ?? collection.prizePaid };
+}
+export function publicCollectionLifecycle(collection: CollectionPublic, now: number) {
+  return collectionLifecycle(collectionLifecycleInput(collection, now));
+}
+export function publicSeasonLifecycle(collections: CollectionPublic[], now: number, announcement?: AnnouncedSeason) {
+  return seasonLifecycle(collections.map(c => collectionLifecycleInput(c, now)), announcement?.collections.map(c => c.id));
+}
 
 export interface SeasonPublic {
   id: string;
@@ -26,10 +48,11 @@ export function collectionSeasonHref(collection: CollectionPublic): string | nul
 /** A minting snapshot alone is not enough: scheduled, expired and sold-out sales are not live. */
 export function isCollectionLive(collection: CollectionPublic, now: number): boolean {
   if (collection.mode !== "live" || collection.contractStatus !== "deployed" || !collection.contractAddress
-    || collection.phase !== "minting" || collection.totalMinted >= collection.maxSupply || !collection.mintDeadline) return false;
+    || collection.phase !== "minting" || collection.totalMinted >= collection.maxSupply || !collection.mintDeadline || !collectionObservationFresh(collection, now)) return false;
   const deadline = Date.parse(collection.mintDeadline);
   const start = collection.saleStartAt ? Date.parse(collection.saleStartAt) : 0;
-  return Number.isFinite(start) && Number.isFinite(deadline) && start <= now && now < deadline;
+  const chainNow = collectionChainNow(collection, now) ?? now;
+  return Number.isFinite(start) && Number.isFinite(deadline) && start <= chainNow && chainNow < deadline;
 }
 
 export function collectionAvailabilityLabel(collection: CollectionPublic, now: number): string {

@@ -1,0 +1,23 @@
+{
+  "name": "@manekineko/ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./icons": "./src/icons.tsx",
+    "./select": "./src/select.tsx",
+    "./dialog": "./src/dialog.tsx",
+    "./footer": "./src/footer.tsx",
+    "./links": "./src/links.ts",
+    "./styles.css": "./src/styles.css"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "dependencies": {
+    "@radix-ui/react-dialog": "1.1.23",
+    "@radix-ui/react-select": "2.3.7",
+    "lucide-react": "1.48.0"
+  }
+}

@@ -16,6 +16,7 @@ import { createV9ChainAdapter, createV10ChainAdapter } from "./chain.ts";
 import { retryVerification } from "./explorer-verification.ts";
 import type { SeasonState } from "./runner.ts";
 import { seasonVersionPolicy } from "./version.ts";
+import { dependencyErrorCode, safeErrorDiagnostic } from "./dependency-error.ts";
 
 function help(chainId: 1 | 11155111) {
   const command = `npm run season:run:${chainId === 1 ? "mainnet" : "sepolia"} --`;
@@ -39,6 +40,8 @@ export function safeError(error: unknown) {
   if (error instanceof RunnerStop) return error.code;
   if (error instanceof AmbiguousDelivery) return "x_delivery_requires_reconciliation";
   if (error instanceof XApiError) return `x_request_rejected${error.status ? `_http_${error.status}` : ""}`;
+  const dependencyCode = dependencyErrorCode(error);
+  if (dependencyCode) return dependencyCode;
   // Raw dependency errors may contain an RPC URL or SQL parameters. Never print them.
   if (error instanceof Error && /^[a-z][a-z0-9_]{1,150}$/.test(error.message)) return error.message;
   return "dependency_or_chain_validation_failed_review_configuration_and_activity";
@@ -88,7 +91,7 @@ async function main(args: ReturnType<typeof parseArguments>, report: (value: unk
         const state = store.state as SeasonState;
         ensure(state.journal && state.collections, "verification_deployment_journal_required");
         const adapter = await (store.artifact.contractVersion === "affiliate-v10" ? createV10ChainAdapter : createV9ChainAdapter)({ ...config, ...registryPins(chainId,process.env,seasonVersionPolicy(store.artifact.contractVersion).contractVersion), chainId, execute,
-          owner: store.artifact.steps[0].payload.contract.initialOwner, journal: state.journal, saveJournal: async journal => { state.journal=journal; await store.save(state); } });
+          owner: store.artifact.steps[0].payload.contract.initialOwner, journal: state.journal, saveJournal: async journal => { state.journal=journal; if (state.rehearsal) state.rehearsal.journals[getAddress(journal.from)]=journal; await store.save(state); } });
         try {
           for (const item of Object.values(state.collections)) if(item.deployment) await adapter.queueExistingVerification(item.deployment);
           if(args["retry-verification"]) {
@@ -137,7 +140,13 @@ async function main(args: ReturnType<typeof parseArguments>, report: (value: unk
             xRetryNotBefore = Date.now() + Math.max(1, error.retryAfterSeconds ?? 60) * 1000;
             result = { mode: "waiting_for_x_rate_limit", retryAt: new Date(xRetryNotBefore).toISOString() };
           }
-          else { const code = safeError(error); if (execute) await store.pause(code); report({ mode: "paused", reason: code, runId: store.row.id }); process.exitCode = 1; break; }
+          else {
+            const code = safeError(error), diagnostic = safeErrorDiagnostic(error);
+            // Flush original evidence before a failing database pause can mask it.
+            report({ mode: "worker_error", reason: code, diagnostic, runId: store.row.id });
+            if (execute) await store.pause(code);
+            report({ mode: "paused", reason: code, diagnostic, runId: store.row.id }); process.exitCode = 1; break;
+          }
         }
         const serialized = JSON.stringify(result); if (serialized !== previousReport) { report(result); previousReport = serialized; }
         if (args.once || !execute) break;
@@ -164,7 +173,7 @@ export async function runWorkerCli(chainId: 1 | 11155111, prepareRehearsal?: Pre
     }
     await main(args, report, prepareRehearsal);
   } catch (error) {
-    const result = { mode: "stopped", reason: safeError(error) };
+    const result = { mode: "stopped", reason: safeError(error), diagnostic: safeErrorDiagnostic(error) };
     try { log?.write(result); } catch { /* The stdout fallback still reports a safe failure code. */ }
     stdoutReport(result); process.exitCode = 1;
   } finally {

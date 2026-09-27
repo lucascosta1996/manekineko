@@ -4,7 +4,7 @@ import { AutomationError, type AutomationArtifact } from "./launch-automation.ts
 import { automationArtifactHash } from "./launch-automation-artifact.ts";
 import { configuredLaunchChain, requireLaunchChain, requireSeasonPlanningChain } from "./chain-policy.ts";
 import { encryptRuntimeSecret, decryptRuntimeSecret, runtimeEncryptionConfigured } from "./season-runtime-crypto.ts";
-import { assertRuntimeArtifact, runtimeId, runtimeProfileInput, runtimeRevision, type RuntimeCredentials, type RuntimeProfile, type RuntimeRun, type RuntimeSnapshot, type RuntimeChainId } from "./season-runtime.ts";
+import { assertRuntimeArtifact, runtimeDelivery, runtimeId, runtimeProfileInput, runtimeRevision, type RuntimeCredentials, type RuntimeProfile, type RuntimeRun, type RuntimeSnapshot, type RuntimeChainId } from "./season-runtime.ts";
 import type { LaunchActor } from "./launch-config-store.ts";
 
 type Query = Pick<Pool, "query">;
@@ -85,9 +85,9 @@ export async function getSeasonRuntime(db: Query, automationId: string, env: Rec
   if (!runRow) return { profile, run: null, events: [], actions: [], encryptionConfigured: runtimeEncryptionConfigured(env) };
   const [events, actions] = await Promise.all([
     db.query<{ id: string; event: string; message: string; created_at: Date }>("SELECT id,event,message,created_at FROM manekineko_season_runtime_events WHERE run_id=$1 ORDER BY id DESC LIMIT 50", [runRow.id]),
-    db.query<{ id: string; action_key: string; kind: string; status: string; tx_hash: string | null; post_id: string | null; last_error: string | null; created_at: Date; updated_at: Date }>("SELECT id,action_key,kind,status,tx_hash,CASE WHEN result->>'postId' ~ '^[0-9]{1,30}$' THEN result->>'postId' ELSE NULL END AS post_id,last_error,created_at,updated_at FROM manekineko_season_runtime_actions WHERE run_id=$1 ORDER BY created_at DESC LIMIT 100", [runRow.id]),
+    db.query<{ id: string; action_key: string; kind: string; status: string; tx_hash: string | null; post_id: string | null; last_error: string | null; created_at: Date; updated_at: Date; delivery: unknown }>("SELECT id,action_key,kind,status,tx_hash,CASE WHEN result->>'postId' ~ '^[0-9]{1,30}$' THEN result->>'postId' ELSE NULL END AS post_id,last_error,created_at,updated_at,jsonb_build_object('observedAt',result->'observation'->'observedAt','blockNumber',result->'observation'->'blockNumber','blockHash',result->'observation'->'blockHash','unpaidPrizes',result->'observation'->'unpaidPrizes','latencyMs',result->'observationToDeliveryMs','attempts',result->'attempts','nextAttemptAt',result->'nextAttemptAt','nextAction',result->'nextAction') AS delivery FROM manekineko_season_runtime_actions WHERE run_id=$1 ORDER BY created_at DESC LIMIT 100", [runRow.id]),
   ]);
-  return { profile, run: runtimeRun(runRow), encryptionConfigured: runtimeEncryptionConfigured(env), events: events.rows.map(row => ({ id: row.id, event: row.event, message: row.message, createdAt: row.created_at.toISOString() })), actions: actions.rows.map(row => ({ id: row.id, actionKey: row.action_key, kind: row.kind, status: row.status, txHash: row.tx_hash, postId: row.post_id, lastError: row.last_error, createdAt: row.created_at.toISOString(), updatedAt: row.updated_at.toISOString() })) };
+  return { profile, run: runtimeRun(runRow), encryptionConfigured: runtimeEncryptionConfigured(env), events: events.rows.map(row => ({ id: row.id, event: row.event, message: row.message, createdAt: row.created_at.toISOString() })), actions: actions.rows.map(row => ({ delivery: runtimeDelivery(row.delivery), id: row.id, actionKey: row.action_key, kind: row.kind, status: row.status, txHash: row.tx_hash, postId: row.post_id, lastError: row.last_error, createdAt: row.created_at.toISOString(), updatedAt: row.updated_at.toISOString() })) };
 }
 export async function requestSeasonStart(db: Pool, actor: LaunchActor, automationId: string, input: Record<string, unknown>): Promise<RuntimeRun> {
   return withRuntimeTransaction(db, client => requestSeasonStartInTransaction(client, actor, automationId, input));

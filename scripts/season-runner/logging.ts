@@ -1,6 +1,7 @@
 import { constants, openSync, closeSync, fstatSync, fsyncSync, mkdirSync, readSync, realpathSync, writeSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
 import { randomUUID } from "node:crypto";
+import { publicErrorDiagnostic } from "./dependency-error.ts";
 
 type LogContext = { chainId: 1 | 11155111; runId?: string };
 function canonicalPath(path: string): string {
@@ -47,6 +48,7 @@ export function publicLogReport(value: unknown): Record<string, unknown> {
     const item = report[field];
     if (typeof item === "boolean" || typeof item === "number" && Number.isFinite(item) || typeof item === "string" && item.length <= 512) result[field] = item;
   }
+  if (report.diagnostic) result.diagnostic = publicErrorDiagnostic(report.diagnostic);
   for (const field of ["eligibility", "credits"]) {
     const pin = report[field] as { address?: unknown; codeHash?: unknown } | undefined;
     if (pin && typeof pin.address === "string" && /^0x[0-9a-f]{40}$/i.test(pin.address)

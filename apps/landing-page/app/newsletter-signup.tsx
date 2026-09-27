@@ -1,4 +1,5 @@
 "use client";
+import { Icon } from "@manekineko/ui/icons";
 
 import { useState, type FormEvent } from "react";
 
@@ -55,9 +56,7 @@ export function NewsletterSignup() {
         />
         <button className="button button-dark" type="submit" disabled={status === "pending" || status === "success"}>
           {status === "pending" ? "Joining…" : status === "success" ? "You’re in" : "Join the launch list"}
-          <svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d={status === "success" ? "m5 12 4 4L19 6" : "M4 12h15m-6-6 6 6-6 6"} />
-          </svg>
+          <Icon name="arrow" />
         </button>
       </div>
       <div className="newsletter-trap" aria-hidden="true" inert>

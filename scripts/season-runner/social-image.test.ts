@@ -17,15 +17,17 @@ const fixture: SeasonSocialInput = {
   payments: [{ rank: 1, tokenId: "1", awardEth: "1", claimantWallet: `0x${"1".repeat(40)}`, recipientWallet: `0x${"2".repeat(40)}`, transactionHash: `0x${"4".repeat(64)}`, logIndex: 2 }],
 };
 function forEvent(event: SeasonSocialInput["event"]): SeasonSocialInput {
-  return { ...structuredClone(fixture), event, now: event === "affiliate-opening-soon" ? "2026-09-21T11:00:00Z" : event === "affiliate-enrollment-open" ? "2026-09-21T12:00:00Z" : event === "refunds-available" ? "2026-09-23T13:00:00Z" : "2026-09-21T13:00:00Z" };
+  return { ...structuredClone(fixture), event, ...(event === "prizes-paid" ? { winners: fixture.winners!.map(winner => ({ ...winner, claimed: true })) } : {}), now: event === "affiliate-opening-soon" ? "2026-09-21T11:00:00Z" : event === "affiliate-enrollment-open" ? "2026-09-21T12:00:00Z" : event === "refunds-available" ? "2026-09-23T13:00:00Z" : "2026-09-21T13:00:00Z" };
 }
-test("all eight events render real frozen terms without sample placeholders", async () => {
+test("all supported events render real frozen terms without sample placeholders", async () => {
   for (const event of SEASON_SOCIAL_EVENTS) {
     const message = buildSeasonSocialMessage(forEvent(event));
     const image = await renderSeasonSocialImage(message);
     const metadata = await sharp(image.png).metadata();
     assert.equal(metadata.width, 1600); assert.equal(metadata.height, 900);
     assert.match(image.svg, /SEPOLIA TEST · TEST ETH/);
+    assert.doesNotMatch(image.svg, /Color study/);
+    assert.doesNotMatch(message.alt, /Color study/);
     assert.doesNotMatch(image.svg, /SAMPLE DATA|DESIGN PREVIEW|example\.invalid|\{\{/);
     assert.ok(image.svg.indexOf('fill="#B7410E"') < image.svg.indexOf('fill="#F2A65A"'));
     assert.ok(message.replies.every(reply => socialTextWeight(reply) <= 280));
@@ -58,7 +60,7 @@ test("copy separates sellout, verified winners and confirmed claim receipts", ()
   assert.equal(winners.replyKeys.filter(key => key.startsWith("payment:")).length, 1);
   assert.match(winners.replies.at(-1)!, /sepolia\.etherscan\.io\/tx/);
   assert.match(winners.post, /claim unpaid prizes/);
-  assert.match(buildSeasonSocialMessage({ ...forEvent("winners-revealed"), winners: fixture.winners!.map(w => ({ ...w, claimed: true })) }).post, /All prizes have been claimed/);
+  assert.match(buildSeasonSocialMessage({ ...forEvent("winners-revealed"), winners: fixture.winners!.map(w => ({ ...w, claimed: true })) }).post, /All prizes have been paid/);
 });
 test("missing values, premature and stale events, duplicates, invalid links fail closed", () => {
   assert.throws(() => buildSeasonSocialMessage({ ...forEvent("affiliate-opening-soon"), now: fixture.saleStartsAt! }), /stale/);

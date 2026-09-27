@@ -25,7 +25,7 @@ export function readIndexerConfig(env: Record<string, string | undefined> = proc
     maxBatches: integer(env.INDEXER_MAX_BATCHES, 8, 1, 100),
     maxCollections: integer(env.INDEXER_MAX_COLLECTIONS, 10, 1, 100),
     timeBudgetMs: integer(env.INDEXER_TIME_BUDGET_MS, 45000, 1000, 240000),
-    reconcileSeconds: integer(env.INDEXER_RECONCILE_SECONDS, 900, 60, 86400),
+    reconcileSeconds: integer(env.INDEXER_RECONCILE_SECONDS, 120, 60, 86400),
     leaseSeconds: 300,
   };
 }

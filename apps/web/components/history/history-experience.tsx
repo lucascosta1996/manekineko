@@ -1,4 +1,7 @@
 "use client";
+import { Icon } from "@manekineko/ui/icons";
+
+import { CompactSelect } from "@manekineko/ui/select";
 
 import { RankedAwards } from "../prizes/ranked-awards";
 import Link from "next/link";
@@ -118,7 +121,7 @@ function CurrentCollections({ collections }: { collections: CollectionPublic[] }
         </dl>
         <div className="history-current-footer">
           <div><p>Snapshot recorded <time dateTime={collection.updatedAt}>{new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }).format(new Date(collection.updatedAt))} UTC</time></p>
-            {collection.contractAddress && <a href={`${collection.explorerUrl.replace(/\/$/, "")}/address/${collection.contractAddress}`} target="_blank" rel="noreferrer">View contract <code>{shortAddress(collection.contractAddress)}</code> ↗</a>}
+            {collection.contractAddress && <a href={`${collection.explorerUrl.replace(/\/$/, "")}/address/${collection.contractAddress}`} target="_blank" rel="noreferrer">View contract <code>{shortAddress(collection.contractAddress)}</code> <Icon name="diagonal" /></a>}
           </div>
           <Link className="history-feature-link" href={`/mint/${collection.id}`}>Explore collection <HistoryIcon name="arrow" /></Link>
         </div>
@@ -234,7 +237,7 @@ export function HistoryExperience({ collections: initialCollections, inProgress:
         </div>
         <div className="history-tool-inputs">
           <label className="history-search"><span className="history-sr-only">Search collections, tickets, or wallets</span><HistoryIcon name="search" /><input type="search" placeholder="Collection, ticket, or wallet" value={query} onChange={(event) => { setQuery(event.target.value); setPage(1); }} /></label>
-          <label className="history-sort"><span className="history-sr-only">Sort past collections</span><select value={sort} onChange={(event) => { setSort(event.target.value as HistorySort); setPage(1); }}><option value="newest">Newest first</option><option value="oldest">Oldest first</option>{canComparePrizes && <option value="prize">Largest prize</option>}</select><HistoryIcon name="chevron" /></label>
+          <label className="history-sort"><span className="history-sr-only">Sort past collections</span><CompactSelect value={sort} onChange={(event) => { setSort(event.target.value as HistorySort); setPage(1); }}><option value="newest">Newest first</option><option value="oldest">Oldest first</option>{canComparePrizes && <option value="prize">Largest prize</option>}</CompactSelect><HistoryIcon name="chevron" /></label>
         </div>
       </div>
       <div className="history-list">

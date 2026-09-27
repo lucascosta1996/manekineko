@@ -68,7 +68,17 @@ test("persistent run store preserves locks, encrypted recovery, outbox metadata 
     assert.equal(pending.status, "pending");
     const duplicate = await store.putAction("opening:root", "x-post", { accountId: "999", text: "Unreviewed change" });
     assert.equal(duplicate.id, pending.id); assert.equal(duplicate.payload.text, "Original");
-    assert.equal((await store.replacePendingAction("opening:root", { accountId: "123", text: "Fresh countdown" })).payload.text, "Fresh countdown");
+    const observation = { observedAt: "2030-01-01T11:00:00Z", blockNumber: 88, blockHash: `0x${"ab".repeat(32)}`, unpaidPrizes: 6 };
+    await store.updateAction("opening:root", "failed", { observation, mediaId: "old-media", diagnostics: { status: 403 } }, "x_request_rejected");
+    const refreshed = await store.replacePendingAction("opening:root", { accountId: "123", text: "Fresh countdown" });
+    assert.equal(refreshed.payload.text, "Fresh countdown");
+    assert.deepEqual(refreshed.result.observation, observation);
+    assert.equal(refreshed.result.mediaId, undefined);
+    assert.equal(refreshed.result.payloadHistory.length, 1);
+    assert.equal(refreshed.result.payloadHistory[0].payload.text, "Original");
+    assert.equal(refreshed.result.payloadHistory[0].result.mediaId, "old-media");
+    assert.equal(refreshed.result.payloadHistory[0].lastError, "x_request_rejected");
+    assert.equal(refreshed.result.payloadHistory[0].status, "failed");
     await assert.rejects(() => store!.replacePendingAction("opening:root", { accountId: "999", text: "Wrong account" }), /post_refresh_requires_known_unsent_action/);
     await store.updateAction("opening:root", "sending", { mediaId: "555" });
     await assert.rejects(() => store!.replacePendingAction("opening:root", { accountId: "123", text: "Ambiguous replacement" }), /post_refresh_requires_known_unsent_action/);

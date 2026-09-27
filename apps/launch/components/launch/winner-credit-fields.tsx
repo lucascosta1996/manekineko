@@ -1,4 +1,5 @@
 "use client";
+import { Icon } from "@manekineko/ui/icons";
 
 import { DEFAULT_SPONSORED_MINT_BUDGET_ETH, winnerCreditBudget, type LaunchForm } from "./form-values";
 
@@ -13,8 +14,8 @@ export function WinnerCreditFields({ form, disabled, onRegistry, onBudget, onCon
   if (!form.algorithmVersion) return null;
   const configured = form.winnerCreditsAddress !== undefined;
   const budget = winnerCreditBudget(form);
-  return <details className="launch-advanced" open>
-    <summary>Winner credit <span>One per wallet, for life</span></summary>
+  return <details className="launch-advanced">
+    <summary>Winner credit <span>One per wallet, for life</span><Icon name="chevron" className="ui-disclosure-icon" /></summary>
     <p>A wallet holding a winning NFT when its prize is claimed can receive one non-transferable credit for an NFT in a later participating collection. Winning again or holding several winning NFTs does not create another lifetime credit.</p>
     <p>The operator sponsors the full mint price, preserving the prize and affiliate allocations. The winner pays network gas.</p>
     {!configured ? <div className="launch-context-note"><p>This saved configuration has no winner credit funding plan.</p>{!disabled && <button type="button" className="launch-button launch-button-secondary" onClick={onConfigure}>Set up winner credit funding</button>}</div> : <>

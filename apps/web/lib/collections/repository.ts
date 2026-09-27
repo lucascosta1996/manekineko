@@ -25,6 +25,8 @@ type DatabaseCollection = Omit<
   mintDeadline: Date | null;
   updatedAt: Date;
   snapshotBlock: string | null;
+  snapshotHash: string | null;
+  snapshotAt: string | null;
 };
 
 const COLLECTION_QUERY = `
@@ -58,7 +60,8 @@ const COLLECTION_QUERY = `
     COALESCE(s.total_mint_revenue_wei, 0)::text AS "totalMintRevenueWei",
     s.phase, COALESCE(s.prize_paid, false) AS "prizePaid",
     s.block_number::text AS "snapshotBlock",
-    GREATEST(c.updated_at, d.updated_at, s.updated_at) AS "updatedAt"
+    s.block_hash AS "snapshotHash", to_jsonb(s)->>'observed_block_at' AS "snapshotAt",
+    COALESCE(s.synced_at, d.updated_at, c.updated_at) AS "updatedAt"
   FROM manekineko_collections c
   JOIN manekineko_networks n ON n.chain_id = c.chain_id
   LEFT JOIN manekineko_deployments d ON d.collection_id = c.id
@@ -74,7 +77,7 @@ function publicCollection(row: DatabaseCollection): CollectionPublic {
   const {
     currencySymbol,
     currencyDecimals,
-    snapshotBlock: _snapshotBlock,
+    snapshotBlock, snapshotHash, snapshotAt,
     ...record
   } = row;
   return validateCollection({
@@ -88,6 +91,8 @@ function publicCollection(row: DatabaseCollection): CollectionPublic {
     scoreFormula: scoreFormulaFor(row.algorithmVersion),
     mintDeadline: row.mintDeadline?.toISOString() ?? null,
     updatedAt: row.updatedAt.toISOString(),
+    ...(snapshotBlock && snapshotHash ? { observation: { blockNumber: snapshotBlock, blockHash: snapshotHash,
+      chainTimestamp: snapshotAt ? new Date(snapshotAt).toISOString() : null, observedAt: row.updatedAt.toISOString(), servedAt: new Date().toISOString() } } : {}),
   });
 }
 

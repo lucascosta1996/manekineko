@@ -41,7 +41,7 @@ export function createTransactionPipeline(options: {
   const { provider, signer, execute, journal, save, confirmations } = options;
   let persistenceFailed = false;
   async function persist() {
-    try { await save(); } catch { persistenceFailed = true; throw new DeploymentError("Durable transaction journal save failed; reload the stored run before any retry."); }
+    try { await save(); } catch (cause) { persistenceFailed = true; throw new DeploymentError("Durable transaction journal save failed; reload the stored run before any retry.", { cause }); }
   }
   const ceiling = BigInt(journal.maxFeePerGasWei), budget = BigInt(journal.maxTotalSpendWei);
   if (![1, 11155111].includes(journal.chainId) || journal.version !== 1 || ceiling <= 0n || budget <= 0n || !Number.isInteger(confirmations) || confirmations < 2)

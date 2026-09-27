@@ -1,4 +1,5 @@
 "use client";
+import { Icon } from "@manekineko/ui/icons";
 
 import { useEffect, useRef, useState } from "react";
 import type { NftItem } from "../../lib/nfts/model";
@@ -55,7 +56,7 @@ export function NftArt({ item, data, error, retry }: { item: NftItem; data: NftA
   const portrait = (item.contractVersion === "affiliate-v8" || item.contractVersion === "affiliate-v9" || item.contractVersion === "affiliate-v10");
   if (data?.image) return <img src={data.image} width="640" height={portrait ? "800" : "640"} alt={`Ticket #${item.tokenId}${data.numbers ? ` · ${data.numbers.join(", ")}${data.score ? ` · score ${data.score}` : item.phase === "refundable" ? " · no draw" : " · draw pending"}` : item.phase === "refundable" ? " · refundable on-chain artwork" : " · sealed on-chain artwork"}`} decoding="async" />;
   return <div className="nft-art-placeholder" style={{ aspectRatio: portrait ? "4 / 5" : "1" }}>
-    <span className="nft-art-symbol" aria-hidden="true">◇</span>
+    <span className="nft-art-symbol" aria-hidden="true"><Icon name="diamond" /></span>
     <span>{item.currentOwner === null || data?.status === "burned" ? "This ticket was burned" : error ? "Artwork unavailable" : "Loading on-chain artwork"}</span>
     {error && item.currentOwner !== null && <button type="button" className="text-button" onClick={retry}>Try again</button>}
   </div>;

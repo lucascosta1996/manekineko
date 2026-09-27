@@ -24,7 +24,10 @@ export async function advanceVerification(job: VerificationJob, options: { apiKe
   if (job.guid) { params.set("action","checkverifystatus"); params.set("guid",job.guid); }
   else for (const [k,v] of Object.entries({action:"verifysourcecode",contractaddress:job.address,sourceCode,codeformat:"solidity-standard-json-input",contractname:job.contractName,compilerversion:job.compiler,constructorArguments:job.constructorArguments})) params.set(k,v);
   try {
-    const response=await (options.fetcher??fetch)("https://api.etherscan.io/v2/api",{method:"POST",body:params,signal:AbortSignal.timeout(8000),redirect:"error"});
+    // V2 routes the network from the URL, even for form-encoded POST requests.
+    const endpoint = new URL("https://api.etherscan.io/v2/api");
+    for (const key of ["chainid", "module", "action", "apikey"]) endpoint.searchParams.set(key, params.get(key)!);
+    const response=await (options.fetcher??fetch)(endpoint.toString(),{method:"POST",body:params,signal:AbortSignal.timeout(8000),redirect:"error"});
     if (!response.ok) { await response.body?.cancel(); job.reason=`explorer_http_${response.status}`; }
     else {
       const data=await response.json() as {status?:string;result?:unknown};
