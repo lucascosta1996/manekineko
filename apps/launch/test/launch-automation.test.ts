@@ -7,7 +7,7 @@ import { AUTOMATION_NOW, automationFixture, previousObservation } from "./launch
 
 function validate(plan: unknown) { return validateAutomationPayload(plan, AUTOMATION_NOW); }
 function context(plan: AutomationPayload, step = 0): AutomationRuntimeContext { return { stepId: plan.steps[step].id, blockTimestamp: (AUTOMATION_NOW.getTime() / 1000).toString(), ...(step ? { previous: previousObservation() } : {}) }; }
-function fixed(plan: AutomationPayload, index = 0, at = "2030-01-08T00:00:00Z") { plan.steps[index].deadline = { mode: "fixed", at }; return plan; }
+function fixed(plan: AutomationPayload, index = 0, at = "2030-01-02T00:00:00Z") { plan.steps[index].deadline = { mode: "fixed", at }; return plan; }
 function artifact(plan = automationFixture()): AutomationArtifact { return { schemaVersion: 1, kind: "launch-automation", contractVersion: "affiliate-v4", ...requireValidAutomationPayload(plan, AUTOMATION_NOW) }; }
 
 test("collections keep independent supply, economics and round authorities within one factory series", () => {
@@ -45,8 +45,8 @@ for (const [label, change] of [
   ["a fixed date that expired", (p: AutomationPayload) => { fixed(p, 0, "2029-12-31T00:00:00Z"); }],
   ["a fixed date inside the minimum chain duration", (p: AutomationPayload) => { fixed(p, 0, "2030-01-01T00:59:59Z"); }],
   ["a fixed date more than a year away", (p: AutomationPayload) => { fixed(p, 0, "2031-01-02T00:00:00Z"); }],
-  ["a fixed date that leaves no enrollment window", (p: AutomationPayload) => { fixed(p, 0, "2030-01-02T00:00:00Z"); }],
-  ["a later fixed date earlier than the possible sequence", (p: AutomationPayload) => { fixed(p, 1, "2030-01-02T02:00:00Z"); }],
+  ["a fixed date that leaves no enrollment window", (p: AutomationPayload) => { fixed(p, 0, "2030-01-01T01:00:00Z"); }],
+  ["a later fixed date earlier than the possible sequence", (p: AutomationPayload) => { fixed(p, 1, "2030-01-01T02:30:00Z"); }],
 ] as const) test(`preparation rejects ${label}`, () => { const plan = automationFixture(); change(plan); assert.equal(validate(plan).valid, false); });
 
 test("a past earliest start remains eligible; future starts bound fixed deadlines", () => {

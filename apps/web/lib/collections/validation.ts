@@ -226,5 +226,6 @@ export function validateCollection(
   } else {
     ensure(!["pending_activation", "awaiting_request", "awaiting_randomness", "awaiting_finalization"].includes(collection.phase ?? ""), "algorithm phase");
   }
+  if (collection.drawEvents !== undefined) ensure(Array.isArray(collection.drawEvents) && collection.drawEvents.length <= 3 && collection.drawEvents.every(e => ["RandomnessRequested", "RandomnessReceived", "WinnerDetermined"].includes(e.name) && /^0x[0-9a-f]{64}$/i.test(e.transactionHash) && Number.isFinite(Date.parse(e.at))), "drawEvents");
   return collection;
 }

@@ -1,4 +1,6 @@
 import { runWorkerCli } from "./worker-cli.ts";
+import { readPrivateFile } from "./config.ts";
+import { parseSepoliaScenario } from "./sepolia-scenarios.ts";
 import { ensure } from "./store.ts";
 
 await runWorkerCli(11155111, async args => {
@@ -8,5 +10,6 @@ await runWorkerCli(11155111, async args => {
   const wallets = await ensureSepoliaWallets({ chainId: 11155111,
     path: String(args["wallet-vault"] ?? ".private/season-runner/sepolia-wallets.enc"),
     masterKey: Buffer.from(master, "base64").toString("hex"), create: args.execute === true });
-  return { options: { wallets, donors: donorWallets(), recycleSepoliaFunds: args["recycle-sepolia-funds"] === true }, step: runSepoliaRehearsalStep };
+  const scenario = args["sepolia-scenario"] ? parseSepoliaScenario(JSON.parse((await readPrivateFile(String(args["sepolia-scenario"])))!)) : undefined;
+  return { options: { scenario, wallets, donors: donorWallets(), recycleSepoliaFunds: args["recycle-sepolia-funds"] === true }, step: runSepoliaRehearsalStep };
 });

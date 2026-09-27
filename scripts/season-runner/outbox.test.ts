@@ -111,3 +111,18 @@ test("rate rejection respects persisted Retry-After before another attempt", asy
   await assert.rejects(deliverPost(store, credentials, account.id, "root", { text: "Rate limited" }, { fetch, now: () => now }), MediaPending);
   assert.equal(writes, 1);
 });
+
+test("supplemental 403 preserves safe diagnostics and confirmed root, and never blindly retries", async()=>{
+  const store=memoryStore(), image=message(baseTime);
+  await store.putAction("event:root","x-post",{accountId:account.id,text:image.post,image,replyToId:null});
+  await store.updateAction("event:root","confirmed",{postId:"333"});
+  let writes=0;
+  const fetch:typeof globalThis.fetch=async url=>String(url).endsWith("/users/me")?response({data:account}):(writes++,response({errors:[{code:453,message:"secret material"}],type:"https://api.x.com/2/problems/client-forbidden",detail:"token-secret"},403));
+  assert.equal(await deliverMessage(store,credentials,account.id,"event",image,{fetch,supplementalReplies:true}),"333");
+  await deliverMessage(store,credentials,account.id,"event",image,{fetch,supplementalReplies:true});
+  assert.equal(writes,1);
+  const reply=store.actions.get(`event:${image.replyKeys[0]}`)!;
+  assert.equal(reply.status,"failed");assert.deepEqual(reply.result.diagnostics,{status:403,codes:[453],problem:"client-forbidden"});
+  assert(!JSON.stringify(reply).includes("secret material"));assert(!JSON.stringify(reply).includes("token-secret"));
+  await assert.rejects(deliverMessage(store,credentials,account.id,"event",image,{fetch}),/HTTP 403/);
+});

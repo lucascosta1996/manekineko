@@ -222,6 +222,8 @@ export async function grantStagingPrivileges(client, config) {
   await client.query(`GRANT UPDATE(consumed_at) ON public.manekineko_affiliate_challenges TO ${web}`);
   await client.query(`GRANT SELECT,INSERT,UPDATE,DELETE ON public.manekineko_affiliate_rate_limits TO ${web}`);
   await client.query(`GRANT SELECT ON public.manekineko_launch_users TO ${launch}`);
+  // Read-only discovery and observed lifecycle state for the private operations dashboard.
+  await client.query(`GRANT SELECT ON public.manekineko_collections,public.manekineko_deployments,public.manekineko_collection_state TO ${launch}`);
   // PostgreSQL row locks need UPDATE on at least one column, even without a write.
   await client.query(`GRANT UPDATE(updated_at) ON public.manekineko_launch_users TO ${launch}`);
   await client.query(`GRANT SELECT,INSERT,UPDATE,DELETE ON public.manekineko_launch_sessions,public.manekineko_launch_login_limits TO ${launch}`);

@@ -1,9 +1,10 @@
+import { observationFresh } from "@manekineko/contract-abi/lifecycle";
 /** Public announcements only. Never deserialize a private launch plan here. */
 export type AnnouncedCollection = {
   id: string; number: number; name: string | null; color: string;
   status: "scheduled" | "preparing" | "enrollment" | "minting" | "sold_out" | "revealed" | "refundable";
   enrollmentOpensAt: string | null; saleStartAt: string | null; mintDeadline: string | null;
-  contractAddress: string | null;
+  contractAddress: string | null; observedAt?: string | null; originalSaleStartAt?: string | null;
 };
 export type AnnouncedSeason = {
   version: 1; runId: string; chainId: 1 | 11155111; seasonId: string; seasonName: string;
@@ -42,7 +43,7 @@ export function parseAnnouncedSeason(input: unknown): AnnouncedSeason {
     if (!id.test(String(item.id)) || !Number.isInteger(item.number) || Number(item.number) < 1 || Number(item.number) > colors.length || !["scheduled","preparing","enrollment","minting","sold_out","revealed","refundable"].includes(String(item.status))) throw new Error("Invalid collection identity.");
     if (item.contractAddress !== null && (typeof item.contractAddress !== "string" || !/^0x[0-9a-f]{40}$/i.test(item.contractAddress) || /^0x0{40}$/i.test(item.contractAddress))) throw new Error("Invalid collection address.");
     const result: AnnouncedCollection = { id: String(item.id), number: Number(item.number), name: item.name === null ? null : name(item.name), color: color(item.color),
-      status: item.status as AnnouncedCollection["status"], enrollmentOpensAt: date(item.enrollmentOpensAt), saleStartAt: date(item.saleStartAt), mintDeadline: date(item.mintDeadline), contractAddress: item.contractAddress as string | null };
+      originalSaleStartAt: item.originalSaleStartAt == null ? null : date(item.originalSaleStartAt), observedAt: item.observedAt == null ? null : date(item.observedAt), status: item.status as AnnouncedCollection["status"], enrollmentOpensAt: date(item.enrollmentOpensAt), saleStartAt: date(item.saleStartAt), mintDeadline: date(item.mintDeadline), contractAddress: item.contractAddress as string | null };
     if (result.color !== colors[result.number - 1]) throw new Error("Announced palette mismatch.");
     if (result.enrollmentOpensAt && result.saleStartAt && Date.parse(result.enrollmentOpensAt) >= Date.parse(result.saleStartAt)
       || result.saleStartAt && result.mintDeadline && Date.parse(result.saleStartAt) >= Date.parse(result.mintDeadline)) throw new Error("Invalid announced schedule order.");
@@ -63,7 +64,11 @@ export function announcedSeasonsResponse(input: unknown): AnnouncedSeason[] {
 export function announcedCollectionActivity(season: AnnouncedSeason, collection: AnnouncedCollection, now: number) {
   if (season.status === "paused" || season.status === "failed") return { label: "Season automation paused", target: null, detail: "New launch events are paused. Existing on-chain mint and claim terms remain in effect." };
   if (season.status === "completed") return { label: "Season complete", target: null, detail: "Explore collection results and any remaining claims." };
-  if (!Number.isFinite(now) || now - Date.parse(season.updatedAt) > 180_000 || Date.parse(season.updatedAt) > now + 60_000) return { label: "Checking season status", target: null, detail: "Waiting for a fresh update before showing the next launch countdown." };
+  if (!observationFresh(collection.observedAt ?? season.updatedAt, now)) return {
+    label: collection.saleStartAt && Date.parse(collection.saleStartAt) > now ? "Mint scheduled in" : "Checking season status",
+    target: collection.saleStartAt && Date.parse(collection.saleStartAt) > now ? collection.saleStartAt : null,
+    detail: "The announced schedule remains visible. Readiness is unconfirmed until a fresh observation; reaching zero does not open minting.",
+  };
   if (["refundable","sold_out","revealed"].includes(collection.status)) return { label: collection.status === "refundable" ? "Refunds available" : collection.status === "sold_out" ? "Sold out · draw pending" : "Draw verified", target: null, detail: "View the collection for current blockchain state and available actions." };
   if (collection.mintDeadline && Date.parse(collection.mintDeadline) <= now) return { label: "Mint deadline reached", target: null, detail: "Minting has closed. Waiting for the confirmed final outcome and available claims." };
   if (collection.enrollmentOpensAt && now < Date.parse(collection.enrollmentOpensAt)) return { label: "Affiliate enrollment scheduled in", target: collection.enrollmentOpensAt, detail: "Enrollment opens after deployment and admission readiness are confirmed." };

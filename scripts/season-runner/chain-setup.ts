@@ -1,7 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { Contract, ContractFactory, JsonRpcProvider, Wallet, ZeroAddress, ZeroHash, getAddress, getCreateAddress, keccak256 } from "ethers";
+import { Contract, ContractFactory, Wallet, ZeroAddress, ZeroHash, getAddress, getCreateAddress, keccak256 } from "ethers";
+import { createWorkerRpcProvider } from "./rpc-provider.ts";
 import { matchesRuntime } from "../../apps/contracts/scripts/runtime-match.ts";
 import { DeploymentError } from "../../apps/contracts/scripts/deployment-journal.ts";
 import { createTransactionPipeline, type ChainJournal } from "./chain-transactions.ts";
@@ -27,7 +28,7 @@ export async function setupVersionedRegistries(options: V9RegistrySetupOptions, 
   check([1, 11155111].includes(options.chainId), "Only Mainnet and Sepolia registry setup is supported.");
   check(options.previousCredits || (options.freshNetwork === true && !(options.historicalSources?.length)), "Existing deployments require the prior winner-credit registry and reviewed completed historical imports.");
   check(!options.previousCredits || (options.historicalSources?.length ?? 0) > 0, "Migrating credits requires completed historical eligibility source imports.");
-  const owner = getAddress(options.owner), provider = new JsonRpcProvider(options.rpcUrl);
+  const owner = getAddress(options.owner), provider = createWorkerRpcProvider(options.rpcUrl);
   const signer = options.privateKey ? new Wallet(options.privateKey, provider) : undefined;
   const confirmations = options.confirmations ?? (options.chainId === 1 ? 12 : 2);
   try {
@@ -68,7 +69,7 @@ export async function setupVersionedRegistries(options: V9RegistrySetupOptions, 
         check(matchesRuntime(code, artifact), "Prior registry lineage differs from the reviewed build.");
         const ledger = new Contract(prior, artifact.abi, provider);
         check(await ledger.totalSponsorBalance(at) === 0n && same(await ledger.legacyMerkleRoot(at), root), "Retire all predecessor sponsorship and preserve the historical winner root.");
-        if (policy.permanent) await verifyRetiredRegistryTargets(provider, prior, artifact.abi, { number: block.number, hash: block.hash, timestamp: block.timestamp });
+        if (policy.permanent) await verifyRetiredRegistryTargets(provider, prior, artifact.abi, { number: block.number, hash: block.hash, timestamp: block.timestamp }, readArtifact);
         upperVersion = registryNumber;
         prior = registryNumber === 2 ? ZeroAddress : getAddress(await ledger.previousRegistry(at));
       }
@@ -110,6 +111,9 @@ export async function setupVersionedRegistries(options: V9RegistrySetupOptions, 
     }
     const adapter = await createVersionedChainAdapter({ ...options, journal, eligibility: pins[0], credits: pins[1] }, version);
     try { await adapter.preflight(); await adapter.ensureHistoricalSources(); } finally { adapter.destroy(); }
+    // A restart may observe the last registration in storage and skip its send
+    // path; persist its confirmed receipt and gas before reporting setup ready.
+    await pipeline.confirmAll();
     return { mode: "ready" as const, chainId: options.chainId, contractVersion: version, owner, eligibility: pins[0], credits: pins[1], previousCredits: previous, legacyMerkleRoot: root };
   } finally { provider.destroy(); }
 }

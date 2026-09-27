@@ -60,6 +60,15 @@ test("mock catalog persists atomically, preserves edits and sources, and isolate
     assert.deepEqual(await createSepoliaMockSeasons(pool, actor), { createdSeasons: 0, createdCollections: 0, existingSeasons: 2 });
     assert.deepEqual(await getLaunchAutomation(pool, mock.id), edited);
     await assert.rejects(() => pool!.query("UPDATE manekineko_launch_automations SET mock_source_revision=99 WHERE id=$1", [mock.id]), /immutable/);
+    // Replacement drafts keep the catalog position but never copy immutable source provenance.
+    const replacement = await createLaunchAutomation(pool, actor, { plan: { ...edited.plan, steps: edited.plan.steps.slice(0, 1) } });
+    assert.equal(replacement.seasonOrder, 1);
+    assert.equal((await getLaunchAutomation(pool, replacement.id)).seasonOrder, 1);
+    const ordered = (await listLaunchAutomations(pool, null, "11155111")).automations;
+    assert.deepEqual(ordered.map(item => item.id), [replacement.id, mock.id, mocks[1].id]);
+    assert.equal(ordered[0].collectionCount, 1);
+    const provenance = (await pool.query("SELECT mock_source_id,mock_catalog_order FROM manekineko_launch_automations WHERE id=$1", [replacement.id])).rows[0];
+    assert.deepEqual(provenance, { mock_source_id: null, mock_catalog_order: null });
     await pool.query("UPDATE manekineko_launch_users SET disabled_at=now() WHERE id=$1", [actor.userId]);
     await assert.rejects(() => createSepoliaMockSeasons(pool!, actor), /active operator/);
   } finally {

@@ -15,6 +15,7 @@ type Row = {
   content_hash: string | null; created_at: Date; updated_at: Date; prepared_at: Date | null;
   created_by: string; updated_by: string; prepared_by: string | null; prepared_artifact: AutomationArtifact | null;
   mock_catalog_order?: number | null;
+  display_season_order?: number | null;
 };
 
 function automationId(value: string): string {
@@ -35,14 +36,23 @@ async function mutateAutomation(db: AutomationDatabase, sql: string, values: unk
 
 function automation(row: Row): AutomationPlan {
   return {
-    id: row.id, seasonOrder: row.mock_catalog_order ?? catalogSeasonOrder(row.plan.seasonId), plan: row.plan, status: row.status, revision: row.revision, contentHash: row.content_hash,
+    id: row.id, seasonOrder: row.display_season_order ?? row.mock_catalog_order ?? catalogSeasonOrder(row.plan.seasonId), plan: row.plan, status: row.status, revision: row.revision, contentHash: row.content_hash,
     createdAt: row.created_at.toISOString(), updatedAt: row.updated_at.toISOString(), preparedAt: row.prepared_at?.toISOString() ?? null,
     createdBy: row.created_by, updatedBy: row.updated_by, preparedBy: row.prepared_by,
   };
 }
 
+/** A replacement draft retains its season's catalog position without editing frozen provenance. */
+function sharedMockOrder(alias: string): string {
+  return `COALESCE(${alias}.mock_catalog_order,(SELECT min(peer.mock_catalog_order)
+    FROM manekineko_launch_automations peer
+    WHERE peer.plan->>'chainId'=${alias}.plan->>'chainId'
+      AND peer.plan->>'seasonId'=${alias}.plan->>'seasonId'))`;
+}
+
 async function findRow(db: AutomationDatabase, id: string): Promise<Row> {
-  const result = await db.query<Row>("SELECT * FROM manekineko_launch_automations WHERE id=$1", [automationId(id)]);
+  const result = await db.query<Row>(`SELECT saved.*, ${sharedMockOrder("saved")} AS display_season_order
+    FROM manekineko_launch_automations saved WHERE saved.id=$1`, [automationId(id)]);
   if (!result.rows[0]) throw new AutomationError("not_found", "Launch automation not found.", 404);
   requireSeasonPlanningChain(result.rows[0].plan.chainId);
   for (const step of result.rows[0].plan.steps) requireSeasonPlanningChain(step.payload.contract.chainId);
@@ -82,8 +92,8 @@ export async function listLaunchAutomations(db: AutomationDatabase, rawCursor?: 
   if (chainId !== null) requireSeasonPlanningChain(chainId);
   const cursor = parseCursor(rawCursor);
   const result = await db.query<SummaryRow>(`WITH ordered_seasons AS (
-    SELECT *,COALESCE(mock_catalog_order,($4::jsonb->>lower(plan->>'seasonId'))::integer,${UNLISTED_SEASON_ORDER}) AS season_order
-    FROM manekineko_launch_automations
+    SELECT saved.*,COALESCE(${sharedMockOrder("saved")},($4::jsonb->>lower(plan->>'seasonId'))::integer,${UNLISTED_SEASON_ORDER}) AS season_order
+    FROM manekineko_launch_automations saved
     WHERE ($3::text IS NULL OR plan->>'chainId' = $3)
   ) SELECT id,plan->>'name' AS name,plan->>'chainId' AS chain_id,season_order,
     jsonb_array_length(plan->'steps') AS collection_count,status,revision,content_hash,created_at,updated_at,prepared_at,
@@ -111,28 +121,28 @@ export async function getLaunchAutomation(db: AutomationDatabase, id: string): P
 }
 
 export async function createLaunchAutomation(db: AutomationDatabase, actor: LaunchActor, input: { plan: unknown }): Promise<AutomationPlan> {
-  const plan = parseAutomationDraft(input.plan);
+  const plan = parseAutomationDraft(input.plan, {editable:true});
   const result = await mutateAutomation(db, `INSERT INTO manekineko_launch_automations(id,plan,created_by,updated_by)
     VALUES($1,$2::jsonb,$3,$3) RETURNING *`, [randomUUID(), JSON.stringify(plan), actor.userId]);
-  return automation(result.rows[0]);
+  return getLaunchAutomation(db, result.rows[0].id);
 }
 
 export async function updateLaunchAutomation(db: AutomationDatabase, actor: LaunchActor, id: string, input: { plan: unknown; revision: unknown }): Promise<AutomationPlan> {
-  const revision = parseLaunchRevision(input.revision), plan = parseAutomationDraft(input.plan);
+  const revision = parseLaunchRevision(input.revision), plan = parseAutomationDraft(input.plan, {editable:true});
   const result = await mutateAutomation(db, `UPDATE manekineko_launch_automations SET plan=$2::jsonb,revision=revision+1,updated_by=$3
     WHERE id=$1 AND revision=$4 AND status='draft' RETURNING *`, [automationId(id), JSON.stringify(plan), actor.userId, revision]);
   if (!result.rows[0]) {
     assertEditable(await findRow(db, id), revision);
     throw new AutomationError("revision_conflict", "This automation changed. Reload it before continuing.", 409);
   }
-  return automation(result.rows[0]);
+  return getLaunchAutomation(db, result.rows[0].id);
 }
 
 /** Validation refers to the saved revision, never to an unsaved browser copy. */
 export async function validateLaunchAutomation(db: AutomationDatabase, id: string, rawRevision: unknown, now = new Date()): Promise<AutomationValidation> {
   const revision = parseLaunchRevision(rawRevision), row = await findRow(db, id);
   assertRevision(row, revision);
-  return validateAutomationPayload(row.plan, now, { requireWinnerCredits: row.status === "draft", requireAffiliateEligibility: row.status === "draft", requireSeasonAppearance: row.status === "draft" });
+  return validateAutomationPayload(row.plan, now, { preserveHistoricalDuration: row.status !== "draft", requireWinnerCredits: row.status === "draft", requireAffiliateEligibility: row.status === "draft", requireSeasonAppearance: row.status === "draft" });
 }
 
 /** Preparation freezes instructions only. A future worker must recheck chain state and schedules before execution. */
@@ -151,7 +161,7 @@ export async function prepareLaunchAutomation(db: AutomationDatabase, actor: Lau
     assertEditable(await findRow(db, id), revision);
     throw new AutomationError("revision_conflict", "This automation changed. Reload it before continuing.", 409);
   }
-  return automation(result.rows[0]);
+  return getLaunchAutomation(db, result.rows[0].id);
 }
 
 export async function exportLaunchAutomation(db: AutomationDatabase, id: string): Promise<{ artifact: AutomationArtifact & { contentHash: string }; filename: string }> {

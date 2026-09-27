@@ -25,13 +25,13 @@ test("seasons migration preserves history and enforces named ten-collection grou
     const pool = db;
     const root = new URL("../../../database/migrations/", import.meta.url);
     for (const name of (await readdir(root)).filter(name => /^\d+.*\.sql$/.test(name) && name < "018").sort()) await pool.query(await readFile(new URL(name, root), "utf8"));
+    await pool.query(await readFile(new URL("027_sepolia_mock_seasons.sql", root), "utf8"));
     const actor = { userId: randomUUID() };
     await pool.query("INSERT INTO manekineko_launch_users(id,username,password_hash) VALUES($1,'season-operator',$2)", [actor.userId, `scrypt$131072$8$1$${"A".repeat(22)}$${"A".repeat(86)}`]);
     const legacy = await createLaunchAutomation(pool, actor, { plan: automationFixture() });
     await prepareLaunchAutomation(pool, actor, legacy.id, 1, AUTOMATION_NOW);
     const oldExport = await exportLaunchAutomation(pool, legacy.id);
     await pool.query(await readFile(new URL("018_collection_seasons.sql", root), "utf8"));
-    await pool.query(await readFile(new URL("027_sepolia_mock_seasons.sql", root), "utf8"));
 
     await t.test("migration keeps previously prepared plans and hashes unchanged", async () => {
       assert.deepEqual(await exportLaunchAutomation(pool, legacy.id), oldExport);

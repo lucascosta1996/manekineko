@@ -1,3 +1,4 @@
+import { assertEditableMintDuration } from "@manekineko/contract-abi/mint-duration";
 import { getAddress, ZeroAddress } from "ethers";
 import { parseV5Config } from "@manekineko/contract-abi/v5-config";
 import { parseV10Config } from "@manekineko/contract-abi/v10-config";
@@ -11,7 +12,7 @@ import { LaunchConfigurationError, type LaunchPayload } from "./launch-config.ts
 import { requireLaunchChain, requireSeasonPlanningChain } from "./chain-policy.ts";
 
 const CONTRACT_STRINGS = ["chainId", "name", "symbol", "maxSupply", "mintPriceWei", "mintDurationSeconds", "initialOwner", "requestConfirmations", "callbackGasLimit", "randomnessFundingWei", "maxAffiliateSlots", "enrollmentSigner", "prizeBps"] as const;
-const OPTIONAL_CONTRACT_STRINGS = ["vrfCoordinator", "keyHash", "affiliatePoolBps", "algorithmVersion", "seasonId", "seasonName", "collectionColor", "textColor", "maxMintsPerWallet", "winnerCount", "secondPrizeBps", "minAffiliateReferrals", "affiliatePayoutCapBps", "saleStartAt"] as const;
+const OPTIONAL_CONTRACT_STRINGS = ["sepoliaRehearsal","vrfCoordinator", "keyHash", "affiliatePoolBps", "algorithmVersion", "seasonId", "seasonName", "collectionColor", "textColor", "maxMintsPerWallet", "winnerCount", "secondPrizeBps", "minAffiliateReferrals", "affiliatePayoutCapBps", "saleStartAt"] as const;
 const APPEARANCE_FIELDS = ["seasonId", "seasonName", "collectionColor", "textColor"] as const;
 const OPERATION_STRINGS = ["factoryAddress", "deployerAddress", "factoryOwnerAddress", "enrollmentWindowSeconds", "notes"] as const;
 const OPTIONAL_OPERATION_STRINGS = ["winnerCreditsAddress", "winnerCreditSponsorshipWei", "affiliateEligibilityAddress"] as const;
@@ -31,9 +32,13 @@ function boundedString(raw: Record<string, unknown>, key: string, maximum = 512)
 }
 
 /** Drafts may be incomplete, but cannot smuggle unbounded objects or secret-bearing extra fields. */
-export function parseLaunchDraft(input: unknown, options: { seasonPlanning?: boolean } = {}): LaunchPayload {
+export function parseLaunchDraft(input: unknown, options: { seasonPlanning?: boolean; editable?: boolean } = {}): LaunchPayload {
   const raw = object(input, ["contract", "operations"], "payload");
   const contract = object(raw.contract, [...CONTRACT_STRINGS, ...OPTIONAL_CONTRACT_STRINGS, "affiliateRatesBps", "activateSale"], "contract");
+  if (options.editable && typeof contract.mintDurationSeconds === "string" && contract.mintDurationSeconds) {
+    try { assertEditableMintDuration(contract as unknown as Parameters<typeof assertEditableMintDuration>[0]); }
+    catch (error) { throw new LaunchConfigurationError("invalid_duration", error instanceof Error ? error.message : "Invalid mint duration.", 422); }
+  }
   const operations = object(raw.operations, ["factoryMode", ...OPERATION_STRINGS, ...OPTIONAL_OPERATION_STRINGS], "operations");
   const copiedContract: Record<string, unknown> = {};
   for (const key of CONTRACT_STRINGS) copiedContract[key] = boundedString(contract, key);
@@ -82,13 +87,14 @@ export function parseLaunchId(value: string): string {
 }
 
 /** Uses the same contract parser as the deployment CLI; this does not contact an RPC or deploy. */
-export type LaunchValidationOptions = { requireWinnerCredits?: boolean; requireAffiliateEligibility?: boolean; requireSeasonAppearance?: boolean; resolveSeasonStartAt?: boolean };
+export type LaunchValidationOptions = { preserveHistoricalDuration?: boolean; requireWinnerCredits?: boolean; requireAffiliateEligibility?: boolean; requireSeasonAppearance?: boolean; resolveSeasonStartAt?: boolean };
 
 export function validateLaunchPayload(input: unknown, options: LaunchValidationOptions = {}): { valid: boolean; issues: string[]; payload: LaunchPayload | null } {
   let payload: LaunchPayload;
   try { payload = parseLaunchDraft(input); }
   catch (error) { return { valid: false, issues: [error instanceof Error ? error.message : "Invalid launch configuration."], payload: null }; }
   const issues: string[] = [];
+  if (!options.preserveHistoricalDuration) try { assertEditableMintDuration(payload.contract); } catch (error) { issues.push((error as Error).message); }
   if (!["1", "11155111"].includes(payload.contract.chainId)) issues.push("Choose Ethereum Mainnet or Sepolia.");
   let parsed: ReturnType<typeof parseV4Config> | ReturnType<typeof parseV5Config> | undefined;
   const isV10 = payload.contract.algorithmVersion === "unique-rank-v6";

@@ -22,12 +22,13 @@ test("V7 timing migrations preserve prepared history and persist immutable revis
     const root = new URL("../../../database/migrations/", import.meta.url);
     const names = (await readdir(root)).filter(n => /^\d+.*\.sql$/.test(n)).sort();
     for (const name of names.filter(n => n < "019")) await db.query(await readFile(new URL(name, root), "utf8"));
+    await db.query(await readFile(new URL("027_sepolia_mock_seasons.sql", root), "utf8"));
     const actor = { userId: randomUUID() };
     await db.query("INSERT INTO manekineko_launch_users(id,username,password_hash) VALUES($1,'timing-operator',$2)", [actor.userId, `scrypt$131072$8$1$${"A".repeat(22)}$${"A".repeat(86)}`]);
     const legacy = await createLaunchAutomation(db, actor, { plan: automationFixture() });
     await prepareLaunchAutomation(db, actor, legacy.id, 1, AUTOMATION_NOW);
     const before = await exportLaunchAutomation(db, legacy.id);
-    for (const name of names.filter(n => n >= "019")) {
+    for (const name of names.filter(n => n >= "019" && !n.startsWith("027"))) {
       try { await db.query(await readFile(new URL(name, root), "utf8")); }
       catch (error) { const issue = error as { message: string; position?: string; internalQuery?: string }; throw new Error(`${name}: ${issue.message}, position ${issue.position}, SQL ${issue.internalQuery ?? ""}`); }
     }

@@ -5,9 +5,10 @@ import type { LaunchPayload } from "../../apps/launch/lib/launch-config.ts";
 import { getRuntimeWorkerProfile } from "../../apps/launch/lib/season-runtime-store.ts";
 import { resolveTimedAutomationStep, seasonActivationDecision } from "../../apps/launch/lib/season-timeline.ts";
 import { catalogSeasonOrder } from "../../apps/launch/lib/season-catalog-order.ts";
-import { buildSeasonSocialMessage, socialPublicUrl, type SeasonSocialEvent, type SeasonSocialInput, type SocialPayment } from "../../packages/contracts/src/season-social.ts";
+import { assertSocialText, buildSeasonSocialMessage, socialDateText, socialPublicUrl, type SeasonSocialEvent, type SeasonSocialInput, type SocialPayment } from "../../packages/contracts/src/season-social.ts";
 import { createV9ChainAdapter, createV10ChainAdapter, type V9ChainOptions, type ChainDeployment, type ChainSnapshot } from "./chain.ts";
 import { ChainPendingError, createTransactionPipeline, transactionSpend, type ChainJournal } from "./chain-transactions.ts";
+import type { SepoliaScenario } from "./sepolia-scenarios.ts";
 import type { runSepoliaRehearsalStep, SepoliaRehearsalState } from "./sepolia-wallets.ts";
 import { verifyXAccount } from "./social.ts";
 import { deliverMessage, MediaPending } from "./outbox.ts";
@@ -15,12 +16,14 @@ import { ensure, RunnerStop, type RunStore } from "./store.ts";
 import { indexSeasonFactory, registerVerifiedCollection } from "./registration.ts";
 
 import { seasonVersionPolicy, type SeasonContractVersion } from "./version.ts";
+import { AIRY_RECOVERY, assertAppliedRecovery, assertRecoveryPredecessor, type AppliedAiryRecovery } from "./airy-recovery-plan.ts";
 
 export const iso = (seconds: number | string) => new Date(Number(seconds) * 1000).toISOString().replace(".000Z", "Z");
+const X_IDENTITY_POLL_REFRESH_MS = 5 * 60 * 1000;
 type PreparedCollection = { payload: LaunchPayload; enrollmentAt: string; announcementAt: string; deployment?: ChainDeployment; readinessAt?: string; snapshot?: ChainSnapshot; enrollmentChecked?: boolean };
 export type SeasonState = { version?: 1; binding?: string; journal?: ChainJournal; factory?: { factory: string; factoryCodeHash: string }; collections?: Record<string, PreparedCollection>;
-  announcedAt?: string; firstThreadComplete?: boolean; observedAt?: string; completed?: boolean; rehearsal?: SepoliaRehearsalState; walletAddresses?: string[]; rehearsalCursor?: number; rehearsalDone?: string[] };
-export type RunnerOptions = Omit<V9ChainOptions, "journal" | "saveJournal" | "sponsorshipFundingWei"> & { databaseUrl: string; wallets?: Wallet[]; donors?: Wallet[]; recycleSepoliaFunds?: boolean; contractVersion?: SeasonContractVersion };
+  announcedAt?: string; firstThreadComplete?: boolean; observedAt?: string; completed?: boolean; rehearsal?: SepoliaRehearsalState; walletAddresses?: string[]; rehearsalCursor?: number; rehearsalDone?: string[]; airyRecovery?: AppliedAiryRecovery };
+export type RunnerOptions = Omit<V9ChainOptions, "journal" | "saveJournal" | "sponsorshipFundingWei"> & { databaseUrl: string; scenario?: SepoliaScenario; wallets?: Wallet[]; donors?: Wallet[]; recycleSepoliaFunds?: boolean; contractVersion?: SeasonContractVersion };
 const defaultDependencies = { getRuntimeWorkerProfile, createV9ChainAdapter, createV10ChainAdapter, verifyXAccount, deliverMessage, indexSeasonFactory, registerVerifiedCollection,
   createTransactionPipeline, runSepoliaRehearsalStep: undefined as typeof runSepoliaRehearsalStep | undefined,
   resolveTimedAutomationStep, seasonActivationDecision, fetch: globalThis.fetch, now: Date.now };
@@ -31,6 +34,7 @@ export function scheduleBinding(options: RunnerOptions, accountId: string, publi
     maxFeePerGasWei: options.maxFeePerGasWei, maxTotalSpendWei: options.maxTotalSpendWei, confirmations: options.confirmations ?? (options.chainId === 1 ? 12 : 2),
     historicalSources: options.historicalSources ?? [],
     ...(options.contractVersion === "affiliate-v10" ? { contractVersion: options.contractVersion } : {}),
+    ...(options.scenario ? { scenario: options.scenario } : {}),
     wallets: options.wallets?.map(wallet => wallet.address) ?? [], donors: options.donors?.map(wallet => wallet.address) ?? [], recycleSepoliaFunds: options.recycleSepoliaFunds === true });
 }
 export function socialIdentity(artifact: RunStore["artifact"], mockOrder?: number | null) {
@@ -40,8 +44,14 @@ export function socialIdentity(artifact: RunStore["artifact"], mockOrder?: numbe
 
 export async function createSeasonRunner(store: RunStore, pool: Pool, options: RunnerOptions, overrides: Partial<RunnerDependencies> = {}) {
   // Reject test configuration and resumed test state before any service access.
-  ensure(options.chainId === 11155111 || (options.wallets === undefined && options.donors === undefined && !options.recycleSepoliaFunds), "test_minting_is_sepolia_only");
+  ensure(options.chainId === 11155111 || (options.wallets === undefined && options.donors === undefined && options.scenario === undefined && !options.recycleSepoliaFunds), "test_minting_is_sepolia_only");
   ensure(options.chainId === 11155111 || ["rehearsal", "walletAddresses", "rehearsalCursor", "rehearsalDone"].every(key => !(key in store.state)), "rehearsal_state_is_sepolia_only");
+  ensure(options.chainId === 11155111 || store.artifact.steps.every(step => step.payload.contract.sepoliaRehearsal === undefined), "test_scenario_is_sepolia_only");
+  ensure(!store.state.airyRecovery || options.chainId === 11155111, "recovery_is_sepolia_only");
+  if (store.state.airyRecovery) {
+    ensure(store.row.id === AIRY_RECOVERY.runId && store.row.automation_id === AIRY_RECOVERY.automationId, "recovery_requires_exact_airy_sepolia_run");
+    assertAppliedRecovery(store.artifact, store.state, store.row.prepared_hash);
+  }
   const dependencies = { ...defaultDependencies, ...overrides };
   ensure(!options.wallets || dependencies.runSepoliaRehearsalStep, "sepolia_rehearsal_adapter_required");
   const { profile, credentials } = await dependencies.getRuntimeWorkerProfile(store.db, String(options.chainId) as "1" | "11155111");
@@ -54,6 +64,12 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
   const owner = getAddress(options.owner), binding = scheduleBinding(options, profile.expectedAccountId, profile.publicBaseUrl);
   ensure(!state.binding || state.binding === binding, "immutable_runtime_configuration_changed");
   ensure(artifact.chainId === String(options.chainId) && artifact.steps.length > 0 && artifact.steps.every(step => step.payload.contract.chainId === String(options.chainId)), "prepared_network_mismatch");
+  if (options.scenario) {
+    ensure(options.wallets && options.scenario.chainId === 11155111 && options.scenario.maxTotalSpendWei === options.maxTotalSpendWei && options.scenario.maxFeePerGasWei === options.maxFeePerGasWei, "scenario_spending_policy_mismatch");
+    ensure(artifact.steps.length === 1 && artifact.steps[0].id === options.scenario.collectionId, "scenario_requires_one_bound_collection");
+    ensure((options.scenario.kind === "refund-3-30m") === (first.contract.sepoliaRehearsal === "refund-3-30m"), "scenario_terms_mismatch");
+  }
+  ensure(!artifact.steps.some(step => step.payload.contract.sepoliaRehearsal) || options.scenario?.kind === "refund-3-30m", "refund_scenario_manifest_required");
   if (options.wallets) ensure(options.wallets.length === 50 && new Set(options.wallets.map(wallet => wallet.address)).size === 50, "rehearsal_requires_50_unique_wallets");
   for (const step of artifact.steps) {
     ensure(step.payload.contract.algorithmVersion === policy.algorithmVersion && step.payload.contract.maxMintsPerWallet === "20", "prepared_version_mismatch");
@@ -61,7 +77,7 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
     ensure([step.payload.contract.initialOwner, op.deployerAddress, op.factoryOwnerAddress].every(address => getAddress(address) === owner), "autonomous_owner_mismatch");
     ensure(getAddress(op.affiliateEligibilityAddress!) === getAddress(options.eligibility.address) && getAddress(op.winnerCreditsAddress!) === getAddress(options.credits.address), "prepared_registry_pins_mismatch");
     ensure(op.winnerCreditSponsorshipWei === first.operations.winnerCreditSponsorshipWei, "season_sponsorship_policy_mismatch");
-    if (options.wallets) ensure(step.payload.contract.maxSupply === "1000", "rehearsal_requires_1000_ticket_collections");
+    if (options.wallets) ensure(options.scenario?.kind === "refund-3-30m" ? Number(step.payload.contract.maxSupply) > 3 && Number(step.payload.contract.maxSupply) <= 1000 : step.payload.contract.maxSupply === "1000", "rehearsal_requires_1000_ticket_collections");
     if (artifact.steps.length > 1) ensure(Number(artifact.timing!.nextAnnouncementDelaySeconds) + Number(op.enrollmentWindowSeconds) < Number(artifact.timing!.nextLaunchDelaySeconds), "next_announcement_must_precede_enrollment_window");
   }
   state.version = 1; state.binding = binding; state.collections ??= {};
@@ -91,6 +107,20 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
   if (state.rehearsal) state.rehearsal.journals[owner] = chain.journal;
   const season = socialIdentity(artifact, store.seasonOrder), base = profile.publicBaseUrl;
   let reconciledHistory = false;
+  let identityVerifiedAt: number | undefined, identityClockAt: number | undefined;
+  async function verifyPollingIdentity() {
+    const now = dependencies.now();
+    const refresh = identityVerifiedAt === undefined || now - identityVerifiedAt >= X_IDENTITY_POLL_REFRESH_MS
+      || identityClockAt !== undefined && now < identityClockAt;
+    identityClockAt = now;
+    if (!refresh) return;
+    // Bound to this instance's loaded credentials and profile revision. A failed
+    // renewal never falls back to the prior success. Store guards still run each
+    // tick, and social.ts independently verifies identity before public writes.
+    identityVerifiedAt = undefined;
+    await dependencies.verifyXAccount(credentials, { expectedAccountId: profile.expectedAccountId });
+    identityVerifiedAt = identityClockAt = dependencies.now();
+  }
   const rootConfirmed = async (event: SeasonSocialEvent, id = "season") => (await store.action(`${id}:${event}:root`))?.status === "confirmed";
   async function payments(id: string, snapshot: ChainSnapshot): Promise<SocialPayment[]> {
     const rows = (await store.query(`SELECT transaction_hash,log_index,block_number,block_hash,arguments FROM manekineko_chain_events
@@ -127,7 +157,13 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
       input.stats = { collectionsSoldOut: snapshots.filter(item => item.soldOut).length, nftsMinted: snapshots.reduce((total, item) => total + Number(item.totalMinted), 0),
         prizesClaimedEth: formatEther(snapshots.reduce((total, item) => total + BigInt(item.prizePaidAmount), 0n)), affiliateClaimedEth: formatEther(snapshots.reduce((total, item) => total + BigInt(item.totalAffiliateClaimed), 0n)), snapshotBlock: String(snapshots[0].blockNumber) };
     }
-    return dependencies.deliverMessage(store, credentials, profile.expectedAccountId, `${id ?? "season"}:${event}`, buildSeasonSocialMessage(input), {
+    const socialMessage = buildSeasonSocialMessage(input);
+    if (event === "affiliate-opening-soon" && id === state.airyRecovery?.plan.collectionId) {
+      const { original, replacement } = state.airyRecovery.plan;
+      socialMessage.post = assertSocialText(`[Sepolia test]\nSatin Echo · rescheduled\n\nOriginal mint: ${socialDateText(original.saleStartAt)}\nNew mint: ${socialDateText(replacement.saleStartAt)}\nEnrollment: ${socialDateText(replacement.enrollmentAt)}\n\nGuide in the thread.`);
+    }
+    return dependencies.deliverMessage(store, credentials, profile.expectedAccountId, `${id ?? "season"}:${event}`, socialMessage, {
+      supplementalReplies: event === "winners-revealed" || event === "season-complete",
       beforePost: async () => {
         await store.guard();
         const head = await chain.provider.getBlock("latest"); ensure(head?.hash && Math.abs(dependencies.now() / 1000 - head.timestamp) < 180, "rpc_head_stale");
@@ -165,13 +201,110 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
         const snap = item.snapshot;
         return [{ id: step.id, number: index + 1, name: announcedCollections.has(step.id) ? step.payload.contract.name : null, color: season.colors[index], status: snap?.refundsAvailable ? "refundable" : snap?.revealed ? "revealed" : snap?.soldOut ? "sold_out" : snap?.saleActivated ? "minting" : item.enrollmentChecked ? "enrollment" : item.deployment ? "preparing" : "scheduled",
           enrollmentOpensAt: item.enrollmentAt, saleStartAt: iso(item.payload.contract.saleStartAt!), mintDeadline: iso(Number(item.payload.contract.saleStartAt) + Number(item.payload.contract.mintDurationSeconds)), contractAddress: item.deployment?.round ?? null,
-          snapshotBlock: snap?.blockNumber ?? null, snapshotHash: snap?.blockHash ?? null, observedAt: snap ? iso(snap.timestamp) : null }];
+          ...(state.airyRecovery?.plan.collectionId === step.id ? { originalSaleStartAt: state.airyRecovery.plan.original.saleStartAt } : {}),
+          verification: item.deployment ? chain.journal.verifications?.[item.deployment.round.toLowerCase()]?.state ?? "unknown" : "pending", snapshotBlock: snap?.blockNumber ?? null, snapshotHash: snap?.blockHash ?? null, observedAt: snap ? iso(snap.timestamp) : null }];
       }) });
+  }
+  async function enroll(index: number, item: PreparedCollection, snapshot: ChainSnapshot, now: number) {
+    const step = artifact.steps[index], previous = index > 0 ? state.collections![artifact.steps[index - 1].id] : undefined;
+    const saleStart = Number(item.payload.contract.saleStartAt), enrollment = Date.parse(item.enrollmentAt) / 1000;
+    if (now >= enrollment && now < saleStart && !snapshot.saleActivated) {
+      await store.guard();
+      await store.query("UPDATE manekineko_affiliate_programs SET enrollment_enabled=true WHERE collection_id=$1 AND contract_version=$2", [step.id, policy.contractVersion]);
+      const response = await dependencies.fetch(`${base}/api/collections/${step.id}/affiliates`, { redirect: "error", signal: AbortSignal.timeout(15000) });
+      ensure(response.ok, "public_affiliate_api_unavailable");
+      const { program } = await response.json();
+      ensure(program?.chainId === options.chainId && program.contractVersion === policy.contractVersion && program.contractAddress?.toLowerCase() === item.deployment.round.toLowerCase()
+        && program.source === "ethereum" && (program.readiness?.canEnroll || (program.enrollmentStatus === "full" && !program.readiness?.reason)), "public_affiliate_enrollment_not_ready");
+      item.enrollmentChecked = true;
+      if (program.enrollmentStatus === "open") await message("affiliate-enrollment-open", now, step.id, snapshot);
+      else ensure(await rootConfirmed("affiliate-enrollment-open", step.id), "affiliate_slots_filled_before_open_announcement");
+      const announcements = await rootConfirmed("affiliate-enrollment-open", step.id) && (!previous || await rootConfirmed("winners-revealed", artifact.steps[index - 1].id));
+      if (announcements && !item.readinessAt) {
+        const readyHead = await chain.provider.getBlock("latest");
+        ensure(readyHead?.hash && Math.abs(dependencies.now() / 1000 - readyHead.timestamp) < 180, "rpc_head_stale");
+        ensure(readyHead.timestamp <= saleStart, "readiness_completed_after_fixed_launch");
+        item.readinessAt = iso(readyHead.timestamp); await save();
+      }
+    }
+  }
+  async function activate(index: number, item: PreparedCollection, snapshot: ChainSnapshot) {
+    const step = artifact.steps[index], previous = index > 0 ? state.collections![artifact.steps[index - 1].id] : undefined;
+    const saleStart = Number(item.payload.contract.saleStartAt);
+    const activationHead = !snapshot.saleActivated ? await chain.provider.getBlock("latest") : null;
+    if (!snapshot.saleActivated && activationHead && activationHead.timestamp >= saleStart && !snapshot.refundsAvailable) {
+      ensure(Math.abs(dependencies.now() / 1000 - activationHead.timestamp) < 180, "rpc_head_stale");
+      const activation = dependencies.seasonActivationDecision({ now: iso(activationHead.timestamp), launchAt: iso(saleStart), deployedAndFunded: !!item.deployment, previousDrawVerified: !previous || previous.snapshot?.revealed === true,
+        prizesReserved: !previous || previous.snapshot?.readyForNextRound === true, socialEnabled: true, winnersAnnouncementConfirmed: !previous || await rootConfirmed("winners-revealed", artifact.steps[index - 1].id),
+        nextLaunchAnnouncementConfirmed: await rootConfirmed("affiliate-enrollment-open", step.id), readinessConfirmedAt: item.readinessAt ?? null });
+      ensure(activation.status === "ready", "fixed_activation_window_missed_or_not_ready");
+      await store.guard(); await chain.advance(step.id, item.deployment.round);
+    }
+  }
+  // A prepared opening has a fixed deadline. During its last two minutes, only
+  // its prerequisites and immediate predecessor may run ahead of activation.
+  async function urgentOpening(head: { number: number; timestamp: number }): Promise<boolean> {
+    const index = artifact.steps.findIndex(step => {
+      const item = state.collections![step.id];
+      return item && !item.snapshot?.saleActivated && !item.snapshot?.refundsAvailable
+        && Number(item.payload.contract.saleStartAt) - head.timestamp <= 120;
+    });
+    if (index < 0) return false;
+    const step = artifact.steps[index], item = state.collections![step.id];
+    const previous = index > 0 ? state.collections![artifact.steps[index - 1].id] : undefined;
+    ensure(item.deployment && (index === 0 || previous?.deployment), "opening_deployment_missing");
+    const evidenceBlock = head.number - (options.confirmations ?? (options.chainId === 1 ? 12 : 2)) + 1;
+    ensure(evidenceBlock >= 0, "confirmed_block_unavailable");
+    const relevant = previous ? [previous, item] : [item];
+    await Promise.all(relevant.map(async current => {
+      const deployment = current.deployment!;
+      ensure(getAddress(deployment.factory) === getAddress(state.factory!.factory), "opening_factory_mismatch");
+      const [created, snapshot] = await Promise.all([
+        chain.provider.getBlock(deployment.deploymentBlock), chain.snapshot(deployment.round, evidenceBlock),
+      ]);
+      ensure(created?.hash === deployment.deploymentBlockHash, "deployment_receipt_reorganized");
+      ensure(snapshot.blockNumber === evidenceBlock && snapshot.chainId === options.chainId && getAddress(snapshot.round) === getAddress(deployment.round), "opening_snapshot_mismatch");
+      ensure(snapshot.saleStartAt === current.payload.contract.saleStartAt && snapshot.maxSupply === current.payload.contract.maxSupply
+        && snapshot.mintPrice === current.payload.contract.mintPriceWei, "opening_terms_mismatch");
+      current.snapshot = snapshot;
+    }));
+    const evidence = await chain.provider.getBlock(evidenceBlock);
+    ensure(evidence?.hash && relevant.every(current => current.snapshot!.blockHash === evidence.hash), "opening_evidence_reorganized");
+    state.observedAt = new Date(dependencies.now()).toISOString();
+    const snapshot = item.snapshot!;
+    // A prior broadcast may just have become confirmed. Resume routine lifecycle
+    // work on the next tick, without trying to activate it a second time.
+    if (!snapshot.saleActivated && !snapshot.refundsAvailable) {
+      const enrollment = Date.parse(item.enrollmentAt) / 1000, announcement = Date.parse(item.announcementAt) / 1000;
+      if (head.timestamp >= announcement && head.timestamp < enrollment) await message("affiliate-opening-soon", head.timestamp, step.id);
+      const collectionAnnounced = head.timestamp >= announcement && await rootConfirmed("affiliate-opening-soon", step.id);
+      if (collectionAnnounced) {
+        await store.guard();
+        const created = await chain.provider.getBlock(item.deployment.deploymentBlock);
+        ensure(created?.hash === item.deployment.deploymentBlockHash, "deployment_receipt_reorganized");
+        await dependencies.registerVerifiedCollection(pool, step.id, item.deployment, item.payload, options.chainId, created.timestamp);
+      } else ensure(head.timestamp < enrollment, "collection_announcement_not_confirmed_before_enrollment");
+      if (head.timestamp < Number(item.payload.contract.saleStartAt)) {
+        // The quiet window must not suppress a still-required winner or enrollment
+        // announcement. Existing outbox confirmation and beforePost checks apply.
+        if (previous?.snapshot?.revealed && !await rootConfirmed("winners-revealed", artifact.steps[index - 1].id))
+          await message("winners-revealed", head.timestamp, artifact.steps[index - 1].id, previous.snapshot);
+        await enroll(index, item, snapshot, head.timestamp);
+      }
+      await activate(index, item, snapshot);
+    }
+    await save(); await project();
+    return true;
+  }
+  async function openingCheckpoint() {
+    const head = await chain.provider.getBlock("latest");
+    ensure(head?.hash && Math.abs(dependencies.now() / 1000 - head.timestamp) < 180, "rpc_head_stale");
+    return urgentOpening(head);
   }
   async function tick() {
     const preflight = await chain.preflight();
-    await dependencies.verifyXAccount(credentials, { expectedAccountId: profile.expectedAccountId });
-    if (!options.execute) return { mode: "preflight", chainId: options.chainId, runId: store.row.id, account: profile.handle, collections: artifact.steps.length, walletCount: options.wallets?.length ?? 0, owner, balanceWei: preflight.balanceWei };
+    await verifyPollingIdentity();
+    if (!options.execute) return { mode: "preflight", chainId: options.chainId, runId: store.row.id, account: profile.handle, collections: artifact.steps.length, walletCount: options.wallets?.length ?? 0, scenario: options.scenario ?? null, owner, balanceWei: preflight.balanceWei };
     await store.guard();
     // Replay signed intents before examining state transitions that may already
     // have happened on chain while the process was down.
@@ -218,6 +351,7 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
       finally { await recordFirstRoot(); } // The root itself starts Web counters, even when a later thread reply is uncertain.
     }
     if (!state.factory) { await store.guard(); state.factory = await chain.ensureFactory(`season:${store.row.id}`, first.operations.factoryMode === "existing" ? first.operations.factoryAddress : undefined); await save(); }
+    if (await openingCheckpoint()) return { mode: "running", runId: store.row.id, priority: "fixed-opening" };
     // Keep historical collection claims current while the next collection runs.
     const indexed = await dependencies.indexSeasonFactory(pool, chain.provider, { databaseUrl: options.databaseUrl, rpcUrl: options.rpcUrl, chainId: options.chainId, contractVersion: policy.contractVersion, ...state.factory, confirmations: options.confirmations ?? (options.chainId === 1 ? 12 : 2) });
     ensure(indexed.ok, "season_indexer_failed");
@@ -225,16 +359,43 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
     // Pin all evidence after those operations, never to the earlier preflight report.
     const evidenceHead = await chain.provider.getBlock("latest");
     ensure(evidenceHead?.hash && Math.abs(dependencies.now() / 1000 - evidenceHead.timestamp) < 180, "rpc_head_stale");
+    // An indexer batch may have crossed into the preparation window.
+    if (await urgentOpening(evidenceHead)) return { mode: "running", runId: store.row.id, priority: "fixed-opening" };
     const evidenceBlock = evidenceHead.number - (options.confirmations ?? (options.chainId === 1 ? 12 : 2)) + 1;
     ensure(evidenceBlock >= 0, "confirmed_block_unavailable");
     now = evidenceHead.timestamp;
     await Promise.all(Object.values(state.collections!).map(async item => { if (item.deployment) item.snapshot = await chain.snapshot(item.deployment.round, evidenceBlock); }));
+    // A normal tick can itself cross into the quiet window while reading old
+    // collections. Yield at bounded work boundaries before doing more of it.
+    if (await openingCheckpoint()) return { mode: "running", runId: store.row.id, priority: "fixed-opening" };
     const observations = Object.values(state.collections!).flatMap(item => item.snapshot ? [item.snapshot.timestamp] : []);
     if (observations.length) state.observedAt = new Date(dependencies.now()).toISOString();
+    await save(); await project();
+    // Reconcile one owned terminal claim before social delivery or a missed next schedule can stop this tick.
+    // The urgent-opening checkpoints above still protect future activation prerequisites.
+    let terminalClaimProcessed = false;
+    const futurePreparation = artifact.steps.some((step, index) => {
+      if (state.collections![step.id]?.deployment) return false;
+      const previous = index > 0 ? state.collections![artifact.steps[index - 1].id]?.snapshot : null;
+      const opening = state.collections![step.id]?.payload.contract.saleStartAt ?? (previous?.soldOutAt ? Number(previous.soldOutAt) + Number(artifact.timing!.nextLaunchDelaySeconds) : null);
+      return opening === null || Number(opening) > now;
+    });
+    const terminal = Object.values(state.collections!).filter(item => item.deployment && item.snapshot?.revealed && !state.rehearsalDone?.includes(item.deployment.round));
+    if (!futurePreparation && options.wallets && state.rehearsal && terminal.length) {
+      const item = terminal[(state.rehearsalCursor ?? 0) % terminal.length];
+      state.rehearsalCursor = (state.rehearsalCursor ?? 0) + 1;
+      await rehearsal(item); terminalClaimProcessed = true;
+    }
     const rehearsalQueue: PreparedCollection[] = [];
     for (let index = 0; index < artifact.steps.length; index++) {
+      if (index > 0 && await openingCheckpoint()) return { mode: "running", runId: store.row.id, priority: "fixed-opening" };
       const step = artifact.steps[index], previous = index > 0 ? state.collections![artifact.steps[index - 1].id] : undefined;
       let item = state.collections![step.id];
+      if (item && !item.deployment && step.id === state.airyRecovery?.plan.collectionId) {
+        const evidence = state.airyRecovery.plan.evidence;
+        ensure((await chain.provider.getBlock(evidence.block))?.hash === evidence.hash, "recovery_evidence_reorganized");
+        assertRecoveryPredecessor(await chain.snapshot(AIRY_RECOVERY.round));
+      }
       if (!item) {
         const snap = previous?.snapshot;
         const decision = dependencies.resolveTimedAutomationStep(artifact, { stepId: step.id, blockTimestamp: String(now), ...(snap ? { previous: {
@@ -248,7 +409,7 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
         item = { payload: decision.payload, enrollmentAt: iso(Number(decision.payload.contract.saleStartAt) - Number(decision.payload.operations.enrollmentWindowSeconds)), announcementAt: iso(Number(snap!.soldOutAt) + Number(artifact.timing!.nextAnnouncementDelaySeconds)) };
         state.collections![step.id] = item; await save();
       }
-      const saleStart = Number(item.payload.contract.saleStartAt), enrollment = Date.parse(item.enrollmentAt) / 1000;
+      const enrollment = Date.parse(item.enrollmentAt) / 1000;
       if (now >= Date.parse(item.announcementAt) / 1000 && now < enrollment) await message("affiliate-opening-soon", now, step.id);
       if (!item.deployment) {
         ensure(now < enrollment || Boolean(chain.journal.collections[step.id]), "collection_deployment_window_missed");
@@ -261,36 +422,12 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
       else ensure(now < enrollment, "collection_announcement_not_confirmed_before_enrollment");
       const snapshot = item.snapshot ?? await chain.snapshot(item.deployment.round); item.snapshot = snapshot;
       state.observedAt = new Date(dependencies.now()).toISOString();
-      if (now >= enrollment && now < saleStart && !snapshot.saleActivated) {
-        await store.guard();
-        await store.query("UPDATE manekineko_affiliate_programs SET enrollment_enabled=true WHERE collection_id=$1 AND contract_version=$2", [step.id, policy.contractVersion]);
-        const response = await dependencies.fetch(`${base}/api/collections/${step.id}/affiliates`, { redirect: "error", signal: AbortSignal.timeout(15000) });
-        ensure(response.ok, "public_affiliate_api_unavailable");
-        const { program } = await response.json();
-        ensure(program?.chainId === options.chainId && program.contractVersion === policy.contractVersion && program.contractAddress?.toLowerCase() === item.deployment.round.toLowerCase()
-          && program.source === "ethereum" && (program.readiness?.canEnroll || (program.enrollmentStatus === "full" && !program.readiness?.reason)), "public_affiliate_enrollment_not_ready");
-        item.enrollmentChecked = true;
-        if (program.enrollmentStatus === "open") await message("affiliate-enrollment-open", now, step.id, snapshot);
-        else ensure(await rootConfirmed("affiliate-enrollment-open", step.id), "affiliate_slots_filled_before_open_announcement");
-        const announcements = await rootConfirmed("affiliate-enrollment-open", step.id) && (!previous || await rootConfirmed("winners-revealed", artifact.steps[index - 1].id));
-        if (announcements && !item.readinessAt) {
-          const readyHead = await chain.provider.getBlock("latest");
-          ensure(readyHead?.hash && Math.abs(dependencies.now() / 1000 - readyHead.timestamp) < 180, "rpc_head_stale");
-          ensure(readyHead.timestamp <= saleStart, "readiness_completed_after_fixed_launch");
-          item.readinessAt = iso(readyHead.timestamp); await save();
-        }
-      }
-      const activationHead = !snapshot.saleActivated ? await chain.provider.getBlock("latest") : null;
-      if (!snapshot.saleActivated && activationHead && activationHead.timestamp >= saleStart && !snapshot.refundsAvailable) {
-        ensure(Math.abs(dependencies.now() / 1000 - activationHead.timestamp) < 180, "rpc_head_stale");
-        const activation = dependencies.seasonActivationDecision({ now: iso(activationHead.timestamp), launchAt: iso(saleStart), deployedAndFunded: !!item.deployment, previousDrawVerified: !previous || previous.snapshot?.revealed === true,
-          prizesReserved: !previous || previous.snapshot?.readyForNextRound === true, socialEnabled: true, winnersAnnouncementConfirmed: !previous || await rootConfirmed("winners-revealed", artifact.steps[index - 1].id),
-          nextLaunchAnnouncementConfirmed: await rootConfirmed("affiliate-enrollment-open", step.id), readinessConfirmedAt: item.readinessAt ?? null });
-        ensure(activation.status === "ready", "fixed_activation_window_missed_or_not_ready");
-        await store.guard(); await chain.advance(step.id, item.deployment.round);
-      }
+      await enroll(index, item, snapshot, now);
+      await activate(index, item, snapshot);
+      if (snapshot.saleActivated && await openingCheckpoint()) return { mode: "running", runId: store.row.id, priority: "fixed-opening" };
       if (snapshot.saleActivated && !snapshot.soldOut && !snapshot.refundsAvailable && now < Number(snapshot.mintDeadline)) await message("collection-live", now, step.id, snapshot);
       if (snapshot.soldOut) await message("collection-sold-out", now, step.id, snapshot);
+      if (snapshot.saleActivated && await openingCheckpoint()) return { mode: "running", runId: store.row.id, priority: "fixed-opening" };
       if (snapshot.revealed) await message("winners-revealed", now, step.id, snapshot);
       if (snapshot.refundsAvailable) {
         await message("refunds-available", now, step.id, snapshot);
@@ -298,7 +435,7 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
         // and public status continue while the worker remains running.
         if (!snapshot.cancelled) { await store.guard(); await chain.advance(step.id, item.deployment.round); }
         state.completed = true; await message("season-complete", now); await save(); await store.complete(); await project();
-        if (options.wallets && state.rehearsal) await rehearsal(item);
+        if (!terminalClaimProcessed && options.wallets && state.rehearsal) await rehearsal(item);
         return { mode: "completed", outcome: "unsold", claimsMonitored: true };
       }
       if (snapshot.saleActivated && (!snapshot.randomnessRequested && snapshot.soldOut || snapshot.randomnessReceived && !snapshot.revealed)) { await store.guard(); await chain.advance(step.id, item.deployment.round); }
@@ -307,10 +444,12 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
       if (!snapshot.readyForNextRound) break;
       if (index === artifact.steps.length - 1) { await message("season-complete", now); state.completed = true; await save(); await store.complete(); await project(); }
     }
-    await save(); await project();
+    await project();
+    await chain.verifyExplorer?.();
     // Optional old prize/refund/treasury actions never run ahead of due next-collection preparation or activation.
     // Rotate fairly so a live mint and earlier owned claims both progress without an old round starving the new one.
-    if (rehearsalQueue.length) {
+    if (rehearsalQueue.length && !terminalClaimProcessed) {
+      if (await openingCheckpoint()) return { mode: "running", runId: store.row.id, priority: "fixed-opening" };
       const item = rehearsalQueue[(state.rehearsalCursor ?? 0) % rehearsalQueue.length];
       state.rehearsalCursor = (state.rehearsalCursor ?? 0) + 1;
       await rehearsal(item);
@@ -322,7 +461,7 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
     await store.guard();
     const result = await dependencies.runSepoliaRehearsalStep({ chainId: options.chainId, provider: chain.provider, operator: new Wallet(options.privateKey!), wallets: options.wallets!, donors: options.donors,
       execute: true, state: state.rehearsal!, saveState: async value => { state.rehearsal = value; await save(); }, maxFeePerGasWei: options.maxFeePerGasWei, maxTotalSpendWei: options.maxTotalSpendWei,
-      confirmations: options.confirmations, recycleOperatorFunds: options.recycleSepoliaFunds }, item.deployment!.round);
+      confirmations: options.confirmations, scenario: options.scenario, recycleOperatorFunds: options.recycleSepoliaFunds }, item.deployment!.round);
     if (["settled", "refunded"].includes(result.action)) { state.rehearsalDone ??= []; if (!state.rehearsalDone.includes(item.deployment!.round)) state.rehearsalDone.push(item.deployment!.round); }
     await save();
   }

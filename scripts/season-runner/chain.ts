@@ -1,7 +1,10 @@
+import { createHash } from "node:crypto";
+import { advanceVerification, verificationJob } from "./explorer-verification.ts";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
-import { Contract, ContractFactory, JsonRpcProvider, Wallet, ZeroAddress, ZeroHash, concat, getAddress, getBytes, getCreateAddress, hexlify, id, keccak256 } from "ethers";
+import { Contract, ContractFactory, Wallet, ZeroAddress, ZeroHash, concat, getAddress, getBytes, getCreateAddress, hexlify, id, keccak256 } from "ethers";
+import { createWorkerRpcProvider } from "./rpc-provider.ts";
 import type { InterfaceAbi } from "ethers";
 import { seasonVersionPolicy, supportedHistoricalSource, type SeasonContractVersion } from "./version.ts";
 import { AbiCoder } from "ethers";
@@ -53,7 +56,7 @@ export async function createVersionedChainAdapter(options: V9ChainOptions, versi
   check(Number.isInteger(confirmations) && confirmations >= 2 && confirmations <= 256, "Confirmations must be from 2 to 256.");
   const owner = getAddress(options.owner);
   check(owner !== ZeroAddress, "A nonzero operator owner is required.");
-  const provider = new JsonRpcProvider(options.rpcUrl);
+  const provider = createWorkerRpcProvider(options.rpcUrl);
   const signer = options.privateKey ? new Wallet(options.privateKey, provider) : undefined;
   check(!options.execute || (signer && signer.address === owner), "Execute requires a local key matching the reviewed owner.");
   for (const pin of [options.eligibility, options.credits]) check(getAddress(pin.address) !== ZeroAddress && /^0x[0-9a-f]{64}$/i.test(pin.codeHash), "Canonical registry address and runtime hash pins are required.");
@@ -85,6 +88,45 @@ export async function createVersionedChainAdapter(options: V9ChainOptions, versi
   const eligibility = contract("Eligibility", options.eligibility.address), credits = contract("Credits", options.credits.address);
   const verifyCreditLineage = policy.permanent ? createV10CreditLineageVerifier(provider, options.credits.address, loadArtifact) : undefined;
 
+  async function queueVerification(name: string, address: string, args: unknown[]) {
+    const artifact = artifacts[name];
+    const build = JSON.parse(await readFile(join(artifactRoot,"build-info",`${artifact.buildInfoId}.json`),"utf8"));
+    const builder = new ContractFactory(artifact.abi,artifact.bytecode);
+    const input = verificationJob({address:getAddress(address),chainId:options.chainId,contractName:`contracts/${artifact.contractName}.sol:${artifact.contractName}`,compiler:`v${build.solcLongVersion}`,sourceCode:JSON.stringify(build.input),constructorArguments:builder.interface.encodeDeploy(args).slice(2)});
+    journal.verifications ??= {};
+    const prior = journal.verifications[address.toLowerCase()];
+    check(!prior || prior.fingerprint===input.fingerprint,"Explorer verification build changed; review exact deployment artifacts.");
+    if (!prior) {
+      // Keep a digest-bound local build reference instead of duplicating compiler sources in every encrypted tick.
+      input.buildInfoId=artifact.buildInfoId; input.sourceHash=createHash("sha256").update(input.sourceCode).digest("hex"); input.sourceCode="";
+      journal.verifications[address.toLowerCase()]=input;if(options.execute)await save();
+    }
+  }
+  async function queueExistingVerification(deployment: ChainDeployment) {
+    // Read and verify the existing deployment. This path never sends a transaction.
+    const verified = await verifyFactory(deployment.factory);
+    const block = await confirmedBlock();
+    const codeHash = await verifyRuntime("Round", deployment.round, block.number);
+    check(same(codeHash, deployment.roundCodeHash) && same(verified.renderer, deployment.renderer), "Verification deployment identity mismatch.");
+    const round = contract("Round", deployment.round);
+    for (const [field, value] of Object.entries(deployment.config)) {
+      const actual = await round[field === "initialOwner" ? "owner" : field]({blockTag:block.number});
+      check(["name","symbol","seasonName"].includes(field) ? actual === value : same(actual,value), "Verification constructor does not match deployed terms.");
+    }
+    const createdFactory = journal.transactions.find(tx => tx.action.endsWith(":deploy-factory") && getCreateAddress({from:journal.from,nonce:tx.nonce}) === getAddress(deployment.factory));
+    if(createdFactory) await queueVerification("Factory",deployment.factory,[journal.from]);
+    await queueVerification("Renderer",verified.renderer,[]);
+    await queueVerification("RoundDeployer",verified.deployer,[]);
+    await queueVerification("Round",deployment.round,[deployment.config,verified.renderer]);
+  }
+  async function verifyExplorer() {
+    if (!options.execute) return;
+    const job=Object.values(journal.verifications??{}).find(j=>j.state==="pending" && j.nextAttemptAt<=Date.now());
+    if (job) await advanceVerification(job,{apiKey:process.env.ETHERSCAN_API_KEY,now:Date.now(),save,loadSource:async()=>{
+      check(/^[a-zA-Z0-9_-]+$/.test(job.buildInfoId??""),"Invalid build reference.");
+      return JSON.stringify(JSON.parse(await readFile(join(artifactRoot,"build-info",`${job.buildInfoId}.json`),"utf8")).input);
+    }});
+  }
   async function confirmedBlock() {
     check((await provider.getNetwork()).chainId === BigInt(options.chainId), "RPC network differs from the selected profile.");
     const head = await provider.getBlock("latest");
@@ -187,6 +229,9 @@ export async function createVersionedChainAdapter(options: V9ChainOptions, versi
     const verified = await verifyFactory(address);
     await approveFactory(`${key}:eligibility:approve`, eligibility, address, verified.factoryCodeHash);
     await approveFactory(`${key}:credits:approve`, credits, address, verified.factoryCodeHash);
+    if (!existingFactory) await queueVerification("Factory",address,[owner]);
+    await queueVerification("Renderer",verified.renderer,[]);
+    await queueVerification("RoundDeployer",verified.deployer,[]);
     return { factory: getAddress(address), factoryCodeHash: verified.factoryCodeHash, renderer: verified.renderer, deployer: verified.deployer };
   }
   async function deployCollection(key: string, payload: unknown, factoryAddress: string): Promise<ChainDeployment> {
@@ -234,6 +279,7 @@ export async function createVersionedChainAdapter(options: V9ChainOptions, versi
     const coordinator = new Contract(config.vrfCoordinator, ["function getSubscription(uint256) view returns(uint96 balance,uint96 nativeBalance,uint64 reqCount,address owner,address[] consumers)"], provider);
     const subscription = await coordinator.getSubscription(subscriptionId, { blockTag: (await confirmedBlock()).number });
     check(subscription.nativeBalance > 0n && same(subscription.owner, roundAddress) && subscription.consumers.length === 1 && same(subscription.consumers[0], roundAddress), "Round VRF subscription is not funded and exclusively bound.");
+    await queueVerification("Round",roundAddress,[config,verified.renderer]);
     return { factory: getAddress(factoryAddress), round: roundAddress, roundId: prepared.roundId, subscriptionId, deploymentBlock: receipt.blockNumber, deploymentBlockHash: receipt.blockHash, deploymentTransactionHash: receipt.hash, factoryCodeHash: verified.factoryCodeHash, roundCodeHash, renderer: verified.renderer, deployer: verified.deployer, config: prepared.config };
   }
   async function snapshot(roundAddress: string, blockNumber?: number): Promise<ChainSnapshot> {
@@ -282,5 +328,5 @@ export async function createVersionedChainAdapter(options: V9ChainOptions, versi
     }
     return { action, snapshot: action ? await snapshot(roundAddress) : state };
   }
-  return { journal, provider, preflight, ensureFactory, deployCollection, snapshot, advance, ensureHistoricalSources, destroy: () => provider.destroy() };
+  return { journal, provider, preflight, verifyExplorer, queueExistingVerification, ensureFactory, deployCollection, snapshot, advance, ensureHistoricalSources, destroy: () => provider.destroy() };
 }

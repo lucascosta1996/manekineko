@@ -6,7 +6,7 @@ import { ensure, RunnerStop, type RunStore } from "./store.ts";
 type OutboxStore = Pick<RunStore, "action" | "putAction" | "updateAction" | "replacePendingAction" | "guard" | "event">;
 export class MediaPending extends Error {}
 export class SocialContentExpired extends MediaPending { constructor() { super("social_content_expired_refresh_required"); this.name = "SocialContentExpired"; } }
-type DeliveryOptions = { beforePost?: () => Promise<void>; beforeReply?: () => Promise<void>; now?: () => number; fetch?: typeof globalThis.fetch };
+type DeliveryOptions = { supplementalReplies?: boolean; beforePost?: () => Promise<void>; beforeReply?: () => Promise<void>; now?: () => number; fetch?: typeof globalThis.fetch };
 /** X has no documented create-post idempotency key. A crash after sending is
  * an unresolved delivery, even when the request may have succeeded remotely. */
 export async function deliverPost(store: OutboxStore, credentials: XCredentials, accountId: string, key: string, input: { text: string; replyToId?: string; image?: SeasonSocialMessage }, delivery: DeliveryOptions = {}) {
@@ -57,6 +57,7 @@ export async function deliverPost(store: OutboxStore, credentials: XCredentials,
   let post: { id: string };
   try { post = await createXPost(credentials, { text: payload.text, ...(result.mediaId ? { mediaId: result.mediaId } : {}), ...(payload.replyToId ? { replyToId: payload.replyToId } : {}) }, { ...options, beforePost: async () => { await store.guard(); await delivery.beforePost?.(); fresh(payload.image); if (result.mediaExpiresAt && now() >= result.mediaExpiresAt) throw new MediaPending("media_expired_before_post"); } }); }
   catch (error) {
+    if (error instanceof XApiError) result.diagnostics = { status: error.status ?? null, ...(error.diagnostics ?? { codes: [], problem: null }) };
     if (error instanceof XApiError && error.retryAfterSeconds !== undefined) result.nextAttemptAt = now() + error.retryAfterSeconds * 1000;
     await store.updateAction(key, error instanceof AmbiguousDelivery ? "uncertain" : "failed", result, error instanceof AmbiguousDelivery ? "x_delivery_requires_reconciliation" : "x_request_rejected");
     throw error;
@@ -70,6 +71,18 @@ export async function deliverPost(store: OutboxStore, credentials: XCredentials,
 }
 export async function deliverMessage(store: OutboxStore, credentials: XCredentials, accountId: string, key: string, message: SeasonSocialMessage, options: DeliveryOptions = {}) {
   const postId = await deliverPost(store, credentials, accountId, `${key}:root`, { text: message.post, image: message }, options);
-  for (let i = 0; i < message.replies.length; i++) await deliverPost(store, credentials, accountId, `${key}:${message.replyKeys[i]}`, { text: message.replies[i], replyToId: postId }, { ...options, beforePost: options.beforeReply });
+  for (let i = 0; i < message.replies.length; i++) {
+    const replyKey = `${key}:${message.replyKeys[i]}`;
+    const existing = options.supplementalReplies ? await store.action(replyKey) : null;
+    // A rejected or ambiguous supplemental reply requires explicit reconciliation.
+    // Roots and required announcement threads retain their original gates.
+    if (existing && ["failed", "uncertain", "sending"].includes(existing.status)) continue;
+    try { await deliverPost(store, credentials, accountId, replyKey, { text: message.replies[i], replyToId: postId }, { ...options, beforePost: options.beforeReply }); }
+    catch (error) {
+      if (!options.supplementalReplies || !(error instanceof XApiError || error instanceof MediaPending || error instanceof RunnerStop && error.code === "x_delivery_requires_reconciliation")) throw error;
+      await store.event("supplemental_reply_needs_review", `Review ${replyKey}; confirmed roots and canonical claims remain valid.`);
+      break; // Avoid a burst of similar rejected replies in the same tick.
+    }
+  }
   return postId;
 }

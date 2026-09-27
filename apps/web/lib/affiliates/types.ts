@@ -26,6 +26,8 @@ export interface AffiliateAccount {
 }
 export interface AffiliateProgram {
   minAffiliateReferrals?: number; affiliatePayoutCapBps?: number; winnerCount?: number; secondPrizeBps?: number;
+  enrollmentOpensAt?: string | null;
+  availabilityCode?: string;
   qualifiedSlots?: number; equalShareWei?: string; unallocatedPoolWei?: string; saleStartAt?: string;
   collectionId: string;
   collectionName: string;
@@ -44,7 +46,7 @@ export interface AffiliateProgram {
   affiliateRatesBps: number[];
   enrollmentOffer: { affiliateId: number; commissionBps: number } | null;
   enrollmentEligibility?: AffiliateEnrollmentEligibility;
-  enrollmentStatus: "open" | "closed" | "full" | "unavailable";
+  enrollmentStatus: "open" | "closed" | "full" | "unavailable" | "scheduled";
   readiness: { canEnroll: boolean; canMint: boolean; canClaim: boolean; reason: string | null };
   saleActivated: boolean;
   soldOut: boolean;

@@ -1,6 +1,7 @@
 "use client";
 
 import { collectionReferralCopy } from "../lib/collections/copy";
+import { DrawProgress } from "./draw-progress";
 import { RankedAwards } from "./prizes/ranked-awards";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -97,6 +98,7 @@ export function MintExperience({
   const winners = equalPrizes ? collection.winnerCount! : 2;
   const v3 = collection.algorithmVersion === "unique-rank-v3" || ranked;
   const progress = collectionProgress(collection);
+  const afterSellout = !isDemo && collection.totalMinted >= collection.maxSupply && collection.phase !== "refundable";
   const exampleNumbers = previewExample(collection.algorithmVersion, collection.maxSupply).numbers;
 
   function mint() {
@@ -160,7 +162,6 @@ export function MintExperience({
 
   return (
     <>
-      <RankedAwards collection={collection} claim />
       <section className="mint-hero" aria-labelledby="collection-title">
         <div className="preview-column">
           <div className={`preview-stage${["unique-rank-v5", "unique-rank-v6"].includes(collection.algorithmVersion) ? " is-portrait" : ""}`}>
@@ -182,11 +183,7 @@ export function MintExperience({
               />
             </div>
             <div className="preview-stage-bottom">
-              <span>
-                {example
-                  ? "AN EXAMPLE. NOT YOUR RESULT."
-                  : "YOUR TICKET. GOVERNED BY SMART CONTRACTS."}
-              </span>
+              <span>{permanent ? "Illustrative artwork" : example ? "Example artwork" : "Collection artwork"}</span>
               <TinctaWordmark className="preview-signature" />
             </div>
           </div>
@@ -211,7 +208,7 @@ export function MintExperience({
             </button>
           </div>}
           <p className="preview-caption">
-            {permanent ? "Illustrative permanent artwork with sample numbers. Solidity assigns your NFT’s actual numbers at mint; VRF determines its result after sellout." : example
+            {permanent ? "Illustrative artwork. View your minted ticket for its actual numbers." : example
               ? "Sample numbers explain the artwork. Your ticket’s numbers cannot be known before reveal."
               : "Illustrative sealed SVG preview. The contract stores NFT images and metadata entirely on-chain."}
           </p>
@@ -219,19 +216,19 @@ export function MintExperience({
 
         <div className="mint-panel">
           <div className="mint-panel-kicker">
-            <span className="eyebrow">MINT A TICKET. ENTER THE DRAW.</span>
+            <span className="eyebrow">{afterSellout ? "COLLECTION RESULTS" : "MINT A TICKET. ENTER THE DRAW."}</span>
             <span className="pill demo-pill">
               {isDemo ? "Demo collection" : collection.contractStatus === "deployed" ? "On-chain collection" : "Collection preview"}
             </span>
           </div>
           <h1 id="collection-title">{collection.name}</h1>
           <p className="mint-description">
-            Mint an NFT ticket for a chance to win. {equalPrizes ? `${winners} winning NFTs, each with an equal prize.` : ranked ? `The top ${winners} scores win.` : "One winning NFT under this collection’s original rules."}
+            {afterSellout ? "All tickets have been minted." : "Mint an NFT ticket for a chance to win."} {equalPrizes ? `${winners} winning NFTs, each with an equal prize.` : ranked ? `The top ${winners} scores win.` : "One winning NFT under this collection’s original rules."}
             <br />Prize values and reward rules are fixed by this collection’s contract.
           </p>
           {!equalPrizes && <p className="mint-version-note">This earlier collection keeps its original prize terms. The current Tincta format has six equal prizes per collection.</p>}
           {!isDemo && <LiveDataNotice retrying={retrying} />}
-          <div className="mint-summary">
+          {!afterSellout && <div className="mint-summary">
             <div>
               <span>Ticket price</span>
               <strong>
@@ -247,7 +244,8 @@ export function MintExperience({
             </div>
           </div>
 
-          <div className="prize-note">
+          }
+          {!afterSellout && <div className="prize-note">
             <span className="prize-symbol" aria-hidden="true">
               ✳
             </span>
@@ -262,10 +260,10 @@ export function MintExperience({
               <p>If the collection does not sell out by the <Link href="#collection-deadline" onClick={() => { if (deadlineDetails.current) deadlineDetails.current.open = true; }}>deadline</Link>, NFT holders can claim a refund of the mint price.</p>
               {isDemo && <p>Demo prizes are illustrative and unfunded.</p>}
             </div>
-          </div>
-
-          {!isDemo && <CollectionActivity collection={collection} />}
-          <AffiliateMintPanel collection={collection} referralQuery={referralQuery} onReferralBlocked={setReferralBlocked} onLiveContractVerified={setLiveContractVerified}>
+          </div>}
+          {afterSellout && <p className="results-prize-summary">{formatWei(selloutPrize, decimals)} {symbol} total prizes · {winners} winning NFTs{equalPrizes ? ` · ${formatWei(selloutPrize / BigInt(winners), decimals)} ${symbol} each` : ""}.</p>}
+          {!isDemo && !afterSellout && <CollectionActivity collection={collection} />}
+          {afterSellout ? <><DrawProgress collection={collection} /><RankedAwards collection={collection} claim /></> : <AffiliateMintPanel collection={collection} referralQuery={referralQuery} onReferralBlocked={setReferralBlocked} onLiveContractVerified={setLiveContractVerified}>
           <form
             className="mint-form"
             onSubmit={(event) => {
@@ -371,7 +369,7 @@ export function MintExperience({
               {message && <p>{message}</p>}
             </div>
           </form>
-          </AffiliateMintPanel>
+          </AffiliateMintPanel>}
 
           {isDemo && demo.minted > 0 && (
             <div className="demo-receipt">

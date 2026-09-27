@@ -27,7 +27,7 @@ function instant(value: bigint): string { return new Date(Number(value) * 1000).
 function nonnegativeInteger(value: unknown): value is string { return typeof value === "string" && /^(0|[1-9]\d{0,15})$/.test(value); }
 
 /** Allows incomplete contract drafts while rejecting unknown fields, oversized plans and ambiguous date formats. */
-export function parseAutomationDraft(input: unknown): AutomationPayload {
+export function parseAutomationDraft(input: unknown, options: {editable?:boolean} = {}): AutomationPayload {
   try {
     const raw = parseLaunchRequest(input, ["name", "seasonId", "chainId", "startAt", "intervalSeconds", "failurePolicy", "steps", "timing", "social"]);
     const name = parseLaunchLabel(raw.name);
@@ -46,7 +46,7 @@ export function parseAutomationDraft(input: unknown): AutomationPayload {
       const deadline = parseLaunchRequest(step.deadline, ["mode", "at"]);
       if (deadline.mode !== "duration" && deadline.mode !== "fixed") throw new AutomationError("invalid_automation", `Collection ${index + 1}: choose a duration or fixed deadline.`);
       if (deadline.mode === "duration" && deadline.at !== null) throw new AutomationError("invalid_automation", `Collection ${index + 1}: a duration deadline must not also contain a date.`);
-      return { id: step.id.toLowerCase(), label: parseLaunchLabel(step.label), payload: parseLaunchDraft(step.payload, { seasonPlanning: true }), deadline: { mode: deadline.mode, at: iso(deadline.at, `Collection ${index + 1} deadline`) } };
+      return { id: step.id.toLowerCase(), label: parseLaunchLabel(step.label), payload: parseLaunchDraft(step.payload, { seasonPlanning: true, editable: options.editable }), deadline: { mode: deadline.mode, at: iso(deadline.at, `Collection ${index + 1} deadline`) } };
     });
     const plan = { name, ...(raw.timing === undefined ? {} : { timing: parseSeasonTiming(raw.timing) }), ...(raw.social === undefined ? {} : { social: parseSeasonSocial(raw.social) }), ...(raw.seasonId === undefined ? {} : { seasonId: (raw.seasonId as string).toLowerCase() }), chainId: raw.chainId, startAt: iso(raw.startAt, "Earliest start"), intervalSeconds: raw.intervalSeconds, failurePolicy: "pause", steps } as AutomationPayload;
     if (plan.steps.some(step => step.payload.contract.chainId !== plan.chainId)) throw new AutomationError("invalid_automation", "Every collection must use its season’s network.");
@@ -93,7 +93,7 @@ export function validateAutomationPayload(input: unknown, now = new Date(), opti
       if (!step.deadline.at) issues.push(`${prefix}set a fixed deadline.`);
       else {
         const duration = seconds(step.deadline.at) - earliest;
-        if (duration < MIN_DURATION || duration > MAX_DURATION) issues.push(`${prefix}the fixed deadline must leave between 1 hour and 365 days from its earliest possible deployment.`);
+        if (duration < MIN_DURATION || duration > (options.preserveHistoricalDuration ? MAX_DURATION : 86400n)) issues.push(`${prefix}the fixed deadline must leave between 1 hour and 24 hours from its earliest possible opening.`);
         else effective.contract.mintDurationSeconds = duration.toString();
         if (!nonnegativeInteger(step.payload.contract.mintDurationSeconds) || BigInt(step.payload.contract.mintDurationSeconds) < MIN_DURATION || BigInt(step.payload.contract.mintDurationSeconds) > MAX_DURATION) issues.push(`${prefix}the saved duration must remain between 1 hour and 365 days; the fixed date overrides it at execution.`);
       }
@@ -176,7 +176,7 @@ export function resolveAutomationStep(input: AutomationPayload, context: Automat
     result.contract.mintDurationSeconds = (seconds(step.deadline.at) - now).toString();
   }
   if (now < earliest) return { status: "wait", reason: "The earliest start or interval has not been reached.", earliestAt: instant(earliest) };
-  const validation = validateLaunchPayload(result, { requireSeasonAppearance: true });
+  const validation = validateLaunchPayload(result, { requireSeasonAppearance: true, preserveHistoricalDuration: true });
   if (!validation.valid || !validation.payload) return { status: "pause", reason: validation.issues.join(" ") };
   return { status: "ready_for_preflight", stepId: step.id, payload: validation.payload, mintDeadline: (now + BigInt(validation.payload.contract.mintDurationSeconds)).toString(), earliestAt: earliest ? instant(earliest) : null };
 }

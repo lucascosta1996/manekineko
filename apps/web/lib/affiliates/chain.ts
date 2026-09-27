@@ -38,19 +38,25 @@ export interface ChainSnapshot {
   verifyContractSignature(wallet: string, digest: string, signature: string): Promise<boolean>;
   walletCode(wallet: string): Promise<string>;
   assertCanonical(): Promise<void>;
+  paymentLog?: (transactionHash: string, logIndex: number) => Promise<{address:string;topics:string[];data:string;blockHash:string;blockNumber:string}>;
 }
 export function enrollmentWallet(): Wallet {
   try { return new Wallet(process.env.AFFILIATE_ENROLLMENT_PRIVATE_KEY ?? ""); }
   catch { throw new AffiliateError("enrollment_unavailable", "Affiliate enrollment is not configured yet.", 503); }
 }
+/** Server-only diagnostic flags: never include environment values, keys or signatures. */
+export function enrollmentDiagnostics(signer: string) {
+  let origin = false, signerMatches = false;
+  try { configuredOrigin(); origin = true; } catch {}
+  try { signerMatches = enrollmentWallet().address.toLowerCase() === signer.toLowerCase(); } catch {}
+  return { origin, signerMatches,
+    botSecret: !!process.env.TURNSTILE_SECRET_KEY && !/^[123]x0{10}/.test(process.env.TURNSTILE_SECRET_KEY ?? ""),
+    botSite: !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+    ipHash: (process.env.AFFILIATE_IP_HASH_SECRET?.length ?? 0) >= 32,
+    trustedProxy: process.env.AFFILIATE_TRUSTED_PROXY === "vercel" && process.env.VERCEL === "1" };
+}
 export function enrollmentConfigured(signer: string): boolean {
-  try {
-    configuredOrigin();
-    return enrollmentWallet().address.toLowerCase() === signer.toLowerCase() && !!process.env.TURNSTILE_SECRET_KEY
-      && !/^[123]x0{10}/.test(process.env.TURNSTILE_SECRET_KEY ?? "")
-      && !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (process.env.AFFILIATE_IP_HASH_SECRET?.length ?? 0) >= 32
-      && process.env.AFFILIATE_TRUSTED_PROXY === "vercel" && process.env.VERCEL === "1";
-  } catch { return false; }
+  return Object.values(enrollmentDiagnostics(signer)).every(Boolean);
 }
 export async function trustedSnapshot(record: ProgramRecord): Promise<ChainSnapshot> {
   if (!chainEnabled(record.chainId)) throw new AffiliateError("network_disabled", "This collection is not available on this network.", 503);
@@ -115,7 +121,17 @@ export async function trustedSnapshot(record: ProgramRecord): Promise<ChainSnaps
   if(nextId<0||nextId>record.maxSlots||(nextId!==0&&String(await call("affiliateWallet",[nextId])).toLowerCase()!=="0x0000000000000000000000000000000000000000")) throw new AffiliateError("offer_unavailable","The next affiliate position could not be verified.",503);
   return { record, equalPool, totalReferredMints:v5?Number(value.totalReferredMints):0, nextAvailableAffiliateId:nextId, blockNumber:BigInt(block.number).toString(),blockHash:block.hash,blockTimestamp:Number(BigInt(block.timestamp)),codeHash:keccak256(roundCode),affiliateCount:Number(value.affiliateCount),saleActivated:value.saleActivated,soldOut:value.soldOut,refundable:value.refundsAvailable,prizePaid:value.prizePaid,
     mintDeadline:value.mintDeadline,totalMinted:Number(value.totalMinted),totalAccrued:value.totalAffiliateAccrued,totalClaimed:value.totalAffiliateClaimed,enrollmentSigner:normalizedWallet(value.enrollmentSigner),call,
-    assertCanonical, readContract, walletCode:wallet=>rpc("eth_getCode",[wallet,blockTag]),
+    assertCanonical, readContract,
+    paymentLog: async (transactionHash, logIndex) => {
+      if(!/^0x[0-9a-f]{64}$/i.test(transactionHash)||!Number.isSafeInteger(logIndex)||logIndex<0)throw new Error("Invalid payment receipt");
+      const receipt=await rpc("eth_getTransactionReceipt",[transactionHash]);
+      if(!receipt || receipt.status!=="0x1" || receipt.transactionHash.toLowerCase()!==transactionHash.toLowerCase() || BigInt(receipt.blockNumber)>BigInt(block.number))throw new Error("Payment receipt unavailable");
+      const canonical=await rpc("eth_getBlockByNumber",[receipt.blockNumber,false]);
+      if(canonical?.hash!==receipt.blockHash)throw new Error("Payment receipt reorganized");
+      const log=receipt.logs.find((entry:{logIndex:string})=>Number(BigInt(entry.logIndex))===logIndex);
+      if(!log||log.removed||log.address.toLowerCase()!==record.contractAddress!.toLowerCase()||log.blockHash!==receipt.blockHash)throw new Error("Payment log mismatch");
+      return log;
+    }, walletCode:wallet=>rpc("eth_getCode",[wallet,blockTag]),
     verifyContractSignature:async(wallet,digest,signature)=>{ try { return (await callAt(wallet,SIGNATURE,"isValidSignature",[digest,signature])).toLowerCase() === "0x1626ba7e"; } catch { return false; } },
   };
 }

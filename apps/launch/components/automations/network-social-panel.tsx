@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import type { RuntimeChainId, RuntimeCredentials, RuntimeProfile } from "../../lib/season-runtime";
 
 const emptyCredentials: RuntimeCredentials = { apiKey: "", apiKeySecret: "", accessToken: "", accessTokenSecret: "" };
-const fields = [["apiKey", "API key"], ["apiKeySecret", "API key secret"], ["accessToken", "Access token"], ["accessTokenSecret", "Access token secret"]] as const;
+const fields = [["apiKey", "Consumer Key"], ["apiKeySecret", "Consumer Secret"], ["accessToken", "Access Token"], ["accessTokenSecret", "Access Token Secret"]] as const;
 type Settings = { profile: RuntimeProfile | null; encryptionConfigured: boolean };
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
   const response = await fetch(url, { ...options, cache: "no-store", headers: { "Content-Type": "application/json" } });

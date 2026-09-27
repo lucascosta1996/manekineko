@@ -1,3 +1,4 @@
+@import "@manekineko/contract-abi/lifecycle.css";
 :root {
   --background: #ffffff;
   --ink: #111111;
@@ -1690,3 +1691,9 @@ select:focus-visible, textarea:focus-visible { outline:2px solid var(--ink); out
   .mint-header .site-navigation nav a[aria-current="page"] { font-weight: 600; }
   .mint-header .site-navigation nav a[aria-current="page"]::after { display: none; }
 }
+
+.draw-progress{padding:1.4rem 0}.draw-progress ol{display:grid;gap:.65rem;padding-left:1.2rem}.draw-progress code{overflow-wrap:anywhere}.draw-progress small{display:block;line-height:1.6}
+
+.prize-hub{padding:4rem 0}.prize-hub h1{font-size:clamp(2.3rem,5vw,4rem);letter-spacing:-.04em}.prize-hub h2{margin-top:2.5rem}.prize-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:1rem}.prize-card{border:1px solid #deded5;border-radius:16px;padding:1.5rem}.prize-card h3{font-size:2rem;margin:.6rem 0}.prize-card code,.prize-hub>p code{overflow-wrap:anywhere}.prize-card p{line-height:1.6}.prize-card small{font-size:.75rem}.prize-hub nav{display:flex;gap:1rem;margin-top:2rem}
+
+.prize-hub>p{max-width:64ch;line-height:1.7;margin:1rem 0;color:var(--muted)}.prize-hub>.primary-button{margin-top:.5rem}.results-prize-summary{font-size:1.1rem;padding:1.25rem 0;margin-top:1.4rem;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.draw-progress>p{line-height:1.7;margin:1rem 0}.draw-progress ol{list-style:none;padding:0;margin:1.5rem 0}.draw-progress .primary-button{margin:.5rem 0}

@@ -55,14 +55,14 @@ export async function getLaunchConfiguration(db: LaunchDatabase, id: string): Pr
 }
 
 export async function createLaunchConfiguration(db: LaunchDatabase, actor: LaunchActor, input: { label: unknown; payload: unknown }): Promise<LaunchConfiguration> {
-  const label = parseLaunchLabel(input.label), payload = parseLaunchDraft(input.payload);
+  const label = parseLaunchLabel(input.label), payload = parseLaunchDraft(input.payload, {editable:true});
   const result = await mutateLaunchConfiguration(db, `INSERT INTO manekineko_launch_configurations(id,label,payload,created_by,updated_by)
     VALUES($1,$2,$3::jsonb,$4,$4) RETURNING *`, [randomUUID(), label, JSON.stringify(payload), actor.userId]);
   return configuration(result.rows[0]);
 }
 
 export async function updateLaunchConfiguration(db: LaunchDatabase, actor: LaunchActor, id: string, input: { label: unknown; payload: unknown; revision: unknown }): Promise<LaunchConfiguration> {
-  const revision = parseLaunchRevision(input.revision), label = parseLaunchLabel(input.label), payload = parseLaunchDraft(input.payload);
+  const revision = parseLaunchRevision(input.revision), label = parseLaunchLabel(input.label), payload = parseLaunchDraft(input.payload, {editable:true});
   const result = await mutateLaunchConfiguration(db, `UPDATE manekineko_launch_configurations SET label=$2,payload=$3::jsonb,revision=revision+1,updated_by=$4
     WHERE id=$1 AND revision=$5 AND status='draft' RETURNING *`, [parseLaunchId(id), label, JSON.stringify(payload), actor.userId, revision]);
   if (!result.rows[0]) {

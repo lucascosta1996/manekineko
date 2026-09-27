@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 
-export type SiteSection = "seasons" | "history" | "nfts" | "docs";
+export type SiteSection = "seasons" | "history" | "nfts" | "docs" | "prizes";
 
 export function SiteNavigation({ section }: { section: SiteSection }) {
   const [open, setOpen] = useState(false);
@@ -47,6 +47,7 @@ export function SiteNavigation({ section }: { section: SiteSection }) {
     <nav id={navigationId} aria-label="Main navigation">
       <Link href="/seasons" aria-current={section === "seasons" ? "page" : undefined} onClick={() => setOpen(false)}>Seasons</Link>
       <Link href="/history" aria-current={section === "history" ? "page" : undefined} onClick={() => setOpen(false)}>Results</Link>
+      <Link href="/prizes" aria-current={section === "prizes" ? "page" : undefined} onClick={() => setOpen(false)}>Claim your prizes</Link>
       <Link href="/my-nfts" aria-current={section === "nfts" ? "page" : undefined} onClick={() => setOpen(false)}>My Tickets</Link>
       <Link href="/docs" aria-current={section === "docs" ? "page" : undefined} onClick={() => setOpen(false)}>How It Works</Link>
     </nav>

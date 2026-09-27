@@ -32,23 +32,29 @@ export function createV10CreditLineageVerifier(provider: Provider, registryAddre
     if (cached?.number === block.number && cached.hash === block.hash && cached.timestamp === block.timestamp) return;
     cached = undefined;
     const at = { blockTag: block.number };
-    check(await current.WINNER_CREDITS_VERSION(at) === "winner-credits-v6", "the current registry must be V6.");
-    const root = String(await current.legacyMerkleRoot(at)).toLowerCase();
-    let address = getAddress(await current.previousRegistry(at)), upperVersion = 6;
+    const [currentVersion, currentRoot, currentPrevious] = await Promise.all([current.WINNER_CREDITS_VERSION(at), current.legacyMerkleRoot(at), current.previousRegistry(at)]);
+    check(currentVersion === "winner-credits-v6", "the current registry must be V6.");
+    const root = String(currentRoot).toLowerCase();
+    let address = getAddress(currentPrevious), upperVersion = 6;
     const seen = new Set<string>();
+    const registries: { address: string; artifact: Artifact }[] = [];
     while (address !== ZeroAddress) {
       check(!seen.has(address) && seen.size < 4, "the predecessor lineage is cyclic or too deep.");
       seen.add(address);
       const prior = new Contract(address, LINEAGE_ABI, provider);
-      const version = Number(/^winner-credits-v([2-5])$/.exec(await prior.WINNER_CREDITS_VERSION(at))?.[1]);
+      const [marker, code, priorRoot] = await Promise.all([prior.WINNER_CREDITS_VERSION(at), provider.getCode(address, block.number), prior.legacyMerkleRoot(at)]);
+      const version = Number(/^winner-credits-v([2-5])$/.exec(marker)?.[1]);
       check(version >= 2 && version < upperVersion, "predecessor versions must strictly descend from V5 through V2.");
       const artifact = await loadArtifact(version === 2 ? "ManekinekoWinnerCredits" : `ManekinekoWinnerCreditsV${version}`);
-      check(matchesRuntime(await provider.getCode(address, block.number), artifact), "a predecessor runtime differs from its reviewed compiled build.");
-      check(String(await prior.legacyMerkleRoot(at)).toLowerCase() === root, "all predecessor ledgers must preserve the current historical winner root.");
-      await verifyRetiredRegistryTargets(provider, address, artifact.abi, block);
+      check(matchesRuntime(code, artifact), "a predecessor runtime differs from its reviewed compiled build.");
+      check(String(priorRoot).toLowerCase() === root, "all predecessor ledgers must preserve the current historical winner root.");
+      registries.push({ address, artifact });
       upperVersion = version;
       address = version === 2 ? ZeroAddress : getAddress(await prior.previousRegistry(at));
     }
+    // Every ledger is independently checked at the same pinned block. The shared
+    // provider limits wire requests; concurrency removes serial RTTs, not checks.
+    await Promise.all(registries.map(({ address, artifact }) => verifyRetiredRegistryTargets(provider, address, artifact.abi, block, loadArtifact)));
     await anchor();
     cached = { ...block };
   };

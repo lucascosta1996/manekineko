@@ -1,6 +1,8 @@
 import { contrastTextColor, DEFAULT_COLLECTION_COLOR } from "@manekineko/contract-abi/season-appearance";
 import type { LaunchConfiguration, LaunchPayload } from "../../lib/launch-config";
 
+export const DEFAULT_SPONSORED_MINT_BUDGET_ETH = "2";
+
 export type DurationUnit = "days" | "hours" | "seconds";
 export type LaunchForm = {
   seasonId?: string; seasonName?: string; collectionColor?: string;
@@ -23,7 +25,7 @@ export function createSeasonId(): string {
 }
 
 export function defaultLaunchForm(chainId: "1" | "11155111" = "1"): LaunchForm {
-  return { seasonId: "", seasonName: "", collectionColor: "#FFFFFF", label: "New collection", affiliateEligibilityAddress: "", winnerCreditsAddress: "", winnerCreditSponsorshipEth: "", algorithmVersion: "unique-rank-v6", maxMintsPerWallet: "20", winnerCount: "6", minAffiliateReferrals: "1", affiliatePayoutCapPercent: "30", saleStartAt: "0", name: "", symbol: "", chainId, maxSupply: "1000", mintPriceEth: "0.01", duration: "30", durationUnit: "days", prizePercent: "60", slots: "10", affiliatePoolPercent: "20", rates: [], initialOwner: "", enrollmentSigner: "", requestConfirmations: "64", callbackGasLimit: "200000", fundingEth: "", factoryMode: "new", factoryAddress: "", deployerAddress: "", factoryOwnerAddress: "", enrollmentDuration: "900", enrollmentDurationUnit: "seconds", notes: "" };
+  return { seasonId: "", seasonName: "", collectionColor: "#FFFFFF", label: "New collection", affiliateEligibilityAddress: "", winnerCreditsAddress: "", winnerCreditSponsorshipEth: DEFAULT_SPONSORED_MINT_BUDGET_ETH, algorithmVersion: "unique-rank-v6", maxMintsPerWallet: "20", winnerCount: "6", minAffiliateReferrals: "1", affiliatePayoutCapPercent: "30", saleStartAt: "0", name: "", symbol: "", chainId, maxSupply: "1000", mintPriceEth: "0.01", duration: "24", durationUnit: "hours", prizePercent: "60", slots: "10", affiliatePoolPercent: "20", rates: [], initialOwner: "", enrollmentSigner: "", requestConfirmations: "64", callbackGasLimit: "200000", fundingEth: "", factoryMode: "new", factoryAddress: "", deployerAddress: "", factoryOwnerAddress: "", enrollmentDuration: "900", enrollmentDurationUnit: "seconds", notes: "" };
 }
 
 export function toScaled(value: string, decimals: number, label: string): string {
@@ -88,7 +90,7 @@ export function collectionEconomics(form: LaunchForm): { sales: string; prize: s
 
 /** Changing the collection version requires a fresh compatible factory. */
 export function useAffiliatePool(form: LaunchForm): LaunchForm {
-  return { ...form, seasonId: form.seasonId ?? "", seasonName: form.seasonName ?? "", collectionColor: form.collectionColor ?? DEFAULT_COLLECTION_COLOR, affiliateEligibilityAddress: "", winnerCreditsAddress: "", winnerCreditSponsorshipEth: "", affiliatePoolPercent: "10", algorithmVersion: "unique-rank-v3", factoryMode: "new", factoryAddress: "" };
+  return { ...form, seasonId: form.seasonId ?? "", seasonName: form.seasonName ?? "", collectionColor: form.collectionColor ?? DEFAULT_COLLECTION_COLOR, affiliateEligibilityAddress: "", winnerCreditsAddress: "", winnerCreditSponsorshipEth: DEFAULT_SPONSORED_MINT_BUDGET_ETH, affiliatePoolPercent: "10", algorithmVersion: "unique-rank-v3", factoryMode: "new", factoryAddress: "" };
 }
 
 
@@ -114,7 +116,7 @@ export function winnerCreditBudget(form: LaunchForm): { sponsorshipEth: string; 
 /** Explicit draft conversion. Old deployment and registry addresses must never be silently reused. */
 export function useTwoPrizeModel(form: LaunchForm, preset: "growth" | "standard" = "growth"): LaunchForm {
   const { winnerCount: _winnerCount, maxMintsPerWallet: _mintCap, ...legacy } = form;
-  return { ...legacy, seasonId: form.seasonId ?? "", seasonName: form.seasonName ?? "", collectionColor: form.collectionColor ?? DEFAULT_COLLECTION_COLOR, algorithmVersion: "unique-rank-v4", maxSupply: "1000", mintPriceEth: "0.01", prizePercent: "60", secondPrizePercent: "20", minAffiliateReferrals: "1", affiliatePayoutCapPercent: "30", affiliatePoolPercent: preset === "growth" ? "20" : "10", rates: [], slots: "10", saleStartAt: "0", factoryMode: "new", factoryAddress: "", affiliateEligibilityAddress: "", winnerCreditsAddress: "", winnerCreditSponsorshipEth: "", enrollmentDuration: "900", enrollmentDurationUnit: "seconds" };
+  return { ...legacy, seasonId: form.seasonId ?? "", seasonName: form.seasonName ?? "", collectionColor: form.collectionColor ?? DEFAULT_COLLECTION_COLOR, algorithmVersion: "unique-rank-v4", maxSupply: "1000", mintPriceEth: "0.01", prizePercent: "60", secondPrizePercent: "20", minAffiliateReferrals: "1", affiliatePayoutCapPercent: "30", affiliatePoolPercent: preset === "growth" ? "20" : "10", rates: [], slots: "10", saleStartAt: "0", factoryMode: "new", factoryAddress: "", affiliateEligibilityAddress: "", winnerCreditsAddress: "", winnerCreditSponsorshipEth: DEFAULT_SPONSORED_MINT_BUDGET_ETH, enrollmentDuration: "900", enrollmentDurationUnit: "seconds" };
 }
 
 export function twoPrizeEconomics(form: LaunchForm): { first: string; second: string } | null {
@@ -154,7 +156,7 @@ export function useEqualPrizeModel(form: LaunchForm): LaunchForm {
     algorithmVersion: "unique-rank-v6", maxMintsPerWallet: "20", winnerCount: "6", maxSupply: "1000", mintPriceEth: "0.01", prizePercent: "60",
     minAffiliateReferrals: modern ? form.minAffiliateReferrals : "1", affiliatePayoutCapPercent: modern ? form.affiliatePayoutCapPercent : "30",
     affiliatePoolPercent: form.affiliatePoolPercent ?? "20", rates: [], slots: form.slots || "10", saleStartAt: "0",
-    factoryMode: "new", factoryAddress: "", affiliateEligibilityAddress: "", winnerCreditsAddress: "", winnerCreditSponsorshipEth: "",
+    factoryMode: "new", factoryAddress: "", affiliateEligibilityAddress: "", winnerCreditsAddress: "", winnerCreditSponsorshipEth: DEFAULT_SPONSORED_MINT_BUDGET_ETH,
     enrollmentDuration: modern ? form.enrollmentDuration : "900", enrollmentDurationUnit: modern ? form.enrollmentDurationUnit : "seconds" };
 }
 

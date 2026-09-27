@@ -15,5 +15,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
+      - run: npm run season:typecheck
+      - run: node --import tsx --test --test-concurrency=1 scripts/season-runner/*.test.ts
       - run: npm run contracts:export
       - run: git diff --exit-code -- packages/contracts/src

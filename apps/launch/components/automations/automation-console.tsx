@@ -7,7 +7,7 @@ import { NetworkSocialPanel } from "./network-social-panel";
 import { SeasonRuntimePanel } from "./season-runtime-panel";
 import { MAX_SEASON_COLLECTIONS } from "@manekineko/contract-abi/season-appearance";
 import { SeasonAppearanceFields, previewAppearance } from "../launch/season-appearance-fields";
-import { createSeasonId } from "../launch/form-values";
+import { DEFAULT_SPONSORED_MINT_BUDGET_ETH, createSeasonId } from "../launch/form-values";
 import { isCurrentCollection, isCurrentSeason } from "../../lib/current-launch";
 import { HistoricalSnapshot } from "../launch/historical-snapshot";
 
@@ -54,15 +54,15 @@ function summaryOf(record: AutomationPlan): AutomationSummary {
   return { id: record.id, currentModel: isCurrentSeason(record.plan), seasonOrder: record.seasonOrder, name: record.plan.name, chainId: record.plan.chainId, collectionCount: record.plan.steps.length, status: record.status, revision: record.revision, contentHash: record.contentHash, createdAt: record.createdAt, updatedAt: record.updatedAt, preparedAt: record.preparedAt };
 }
 
-export function AutomationConsole({ username, allowedChainId = null }: { username: string; allowedChainId?: "1" | "11155111" | null }) {
+export function AutomationConsole({ username, allowedChainId = null, initialNetwork = "1", initialAutomationId }: { username: string; allowedChainId?: "1" | "11155111" | null; initialNetwork?: "1" | "11155111"; initialAutomationId?: string }) {
   const [profileEpoch, setProfileEpoch] = useState(0);
-  const [network, setNetwork] = useState<"1" | "11155111">("1");
+  const [network, setNetwork] = useState<"1" | "11155111">(initialNetwork);
   const [records, setRecords] = useState<AutomationSummary[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [templates, setTemplates] = useState<LaunchConfiguration[]>([]);
   const [selected, setSelected] = useState<AutomationPlan | null>(null);
-  const [form, setForm] = useState<AutomationForm>(() => defaultAutomationForm([], "1"));
-  const [baseline, setBaseline] = useState(() => JSON.stringify(defaultAutomationForm([], "1")));
+  const [form, setForm] = useState<AutomationForm>(() => defaultAutomationForm([], initialNetwork));
+  const [baseline, setBaseline] = useState(() => JSON.stringify(defaultAutomationForm([], initialNetwork)));
   const [stepId, setStepId] = useState("");
   const [count, setCount] = useState("3");
   const [templateId, setTemplateId] = useState("");
@@ -107,14 +107,16 @@ export function AutomationConsole({ username, allowedChainId = null }: { usernam
       setRecords(plans.automations); setNextCursor(plans.nextCursor); setTemplates(configurations.configurations.filter(item => isCurrentCollection(item.payload) && item.payload.contract.chainId === network));
       if (!initialized.current) {
         const firstSummary = plans.automations.find(record => record.currentModel !== false);
-        const first = firstSummary ? (await api<{ automation: AutomationPlan }>(`/automations/${firstSummary.id}`)).automation : null;
+        const selectedId = network === initialNetwork && initialAutomationId ? initialAutomationId : firstSummary?.id;
+        const first = selectedId ? (await api<{ automation: AutomationPlan }>(`/automations/${selectedId}`)).automation : null;
+        if (first && first.plan.chainId !== network) throw new Error("The selected season belongs to another network.");
         if (request !== generation.current) return;
         openRecord(first);
       }
       initialized.current = true;
     } catch (cause) { if (request === generation.current) { setError(cause instanceof Error ? cause.message : "Seasons could not be loaded."); setSessionExpired(cause instanceof SessionExpired); setLoadFailed(true); } }
     finally { if (request === generation.current) setLoading(false); }
-  }, [openRecord, network]);
+  }, [openRecord, network, initialNetwork, initialAutomationId]);
 
   useEffect(() => { void load(); return () => { generation.current++; }; }, [load]);
   useEffect(() => { if (error) errorRef.current?.focus(); }, [error]);
@@ -311,14 +313,14 @@ export function AutomationConsole({ username, allowedChainId = null }: { usernam
                 <Field label="Ticket supply"><input inputMode="numeric" value={current.maxSupply} onChange={(event) => edit("maxSupply", event.target.value)} disabled={disabled} /></Field>
                 <Field label="Ticket price"><div className="launch-input-unit"><input inputMode="decimal" value={current.mintPriceEth} onChange={(event) => edit("mintPriceEth", event.target.value)} disabled={disabled} /><span>ETH</span></div></Field>
                 <Field label="Deadline type" wide><select value={step.deadlineMode} onChange={(event) => editStep({ ...step, deadlineMode: event.target.value as "duration" | "fixed" })} disabled={disabled}><option value="duration">Duration from scheduled mint opening</option><option value="fixed">Fixed calendar deadline</option></select></Field>
-                {step.deadlineMode === "duration" ? <Duration label="Collection lifetime" value={current.duration} unit={current.durationUnit} disabled={disabled} onValue={(value) => edit("duration", value)} onUnit={(value) => edit("durationUnit", value)} hint="The sale duration starts at the scheduled mint opening. Affiliate enrollment happens before it." /> : <Field label="Collection deadline (UTC)" hint={`In ${timezone}. This deadline will not move if the previous collection is delayed.`}><input type="datetime-local" step="1" value={step.deadlineInput} onChange={(event) => editStep({ ...step, deadlineInput: event.target.value })} disabled={disabled} /></Field>}
+                {step.deadlineMode === "duration" ? <Duration label="Collection lifetime" value={current.duration} unit={current.durationUnit} disabled={disabled} onValue={(value) => edit("duration", value)} onUnit={(value) => edit("durationUnit", value)} hint="New plans: 1–24 hours from scheduled mint opening. Enrollment happens before it." /> : <Field label="Collection deadline (UTC)" hint={`In ${timezone}. This deadline will not move if the previous collection is delayed.`}><input type="datetime-local" step="1" value={step.deadlineInput} onChange={(event) => editStep({ ...step, deadlineInput: event.target.value })} disabled={disabled} /></Field>}
                 <Duration label="Affiliate enrollment window" value={current.enrollmentDuration} unit={current.enrollmentDurationUnit} disabled={disabled} onValue={(value) => edit("enrollmentDuration", value)} onUnit={(value) => edit("enrollmentDurationUnit", value)} hint="Must fit inside the sellout-to-launch delay, leaving time to confirm deployment. Enrollment closes at the fixed mint opening." />
               </div>
               <SeasonAppearanceFields form={{ ...current, ...(form.seasonId !== undefined ? { seasonId: form.seasonId, seasonName: form.name } : {}) }} disabled={disabled} inheritedSeason={form.seasonId !== undefined} onChange={(next) => editStep({ ...step, form: next })} />
               <WalletMintCap form={current} disabled={disabled} onUpgrade={() => change({ ...form, steps: form.steps.map(item => ({ ...item, form: useWalletMintCap(item.form) })) })}/>
               <PrizeFields form={current} disabled={disabled} onChange={next => editStep({ ...step, form: next })}/>
               <AffiliateEligibilityFields mintCap={current.maxMintsPerWallet} version={current.algorithmVersion} address={form.steps[0]?.form.affiliateEligibilityAddress} disabled={disabled} inherited={stepIndex > 0} onAddress={(value) => change({ ...form, steps: form.steps.map(item => ({ ...item, form: { ...item.form, affiliateEligibilityAddress: value } })) })}/>
-              <WinnerCreditFields form={current} disabled={disabled} onRegistry={(value) => edit("winnerCreditsAddress", value)} onBudget={(value) => edit("winnerCreditSponsorshipEth", value)} onConfigure={() => editStep({ ...step, form: { ...current, winnerCreditsAddress: "", winnerCreditSponsorshipEth: "" } })}/>
+              <WinnerCreditFields form={current} disabled={disabled} onRegistry={(value) => edit("winnerCreditsAddress", value)} onBudget={(value) => edit("winnerCreditSponsorshipEth", value)} onConfigure={() => editStep({ ...step, form: { ...current, winnerCreditsAddress: "", winnerCreditSponsorshipEth: DEFAULT_SPONSORED_MINT_BUDGET_ETH } })}/>
               <details className="launch-advanced automation-advanced"><summary>Ownership & randomness <span>Wallets and VRF funding</span></summary><div className="launch-fields">
                 {address("Collection owner", "initialOwner", "Wallet controlling this collection. A production multisig can be used here.")}
                 {address("Affiliate enrollment signer", "enrollmentSigner", "Dedicated enrollment signer; separate from collection owner and deployment authority.")}

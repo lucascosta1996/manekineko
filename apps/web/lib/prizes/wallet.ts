@@ -12,3 +12,12 @@ export async function prepareRankedPrizeClaim(session: WalletSession, target: Co
   await assertWallet(session);
   return { ...await contract.claimPrizeForRank.populateTransaction(award.rank,session.address), value:0n };
 }
+
+export async function prepareLegacyPrizeClaim(session: WalletSession,target: ContractTarget,award: Pick<CollectionAward,'rank'|'tokenId'|'amountWei'>) {
+  if (!["affiliate-v3","affiliate-v4","affiliate-v5","affiliate-v6"].includes(target.contractVersion??"") || award.rank!==1) throw new Error("Unsupported historical claim.");
+  const contract=await verifiedRound(session,target);
+  if (await contract.winningTokenId()!==BigInt(award.tokenId) || await contract.prizeAmount()!==BigInt(award.amountWei) || await contract.prizePaid()) throw new Error("Prize state changed. Refresh before claiming.");
+  if (String(await contract.ownerOf(award.tokenId)).toLowerCase()!==session.address.toLowerCase()) throw new Error("Only the current winning NFT holder can claim.");
+  await contract.claimPrize.staticCall(session.address); await assertWallet(session);
+  return {...await contract.claimPrize.populateTransaction(session.address),value:0n};
+}

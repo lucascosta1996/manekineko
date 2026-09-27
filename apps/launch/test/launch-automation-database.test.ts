@@ -21,7 +21,7 @@ function fixture(): AutomationPayload {
     name: "Sepolia launch sequence", chainId: "11155111", startAt: "2030-01-02T00:00:00Z", intervalSeconds: "3600", failurePolicy: "pause",
     steps: [
       { id: randomUUID(), label: "First collection", payload: first, deadline: { mode: "duration", at: null } },
-      { id: randomUUID(), label: "Second collection", payload: second, deadline: { mode: "fixed", at: "2030-02-01T00:00:00Z" } },
+      { id: randomUUID(), label: "Second collection", payload: second, deadline: { mode: "fixed", at: "2030-01-02T20:00:00Z" } },
     ],
   };
 }
@@ -54,7 +54,7 @@ test("automation plans persist independent collection terms and immutable review
       assert.equal(saved.plan.steps[0].payload.contract.maxSupply, "1000");
       assert.equal(saved.plan.steps[1].payload.contract.maxSupply, "2000");
       assert.deepEqual(saved.plan.steps[1].payload.contract.affiliateRatesBps, ["500", "0", "100"]);
-      assert.equal(saved.plan.steps[1].deadline.at, "2030-02-01T00:00:00Z");
+      assert.equal(saved.plan.steps[1].deadline.at, "2030-01-02T20:00:00Z");
       assert.equal(saved.status, "draft"); assert.equal(saved.revision, 1);
       const page = await listLaunchAutomations(db);
       assert.equal(page.automations.length, 1); assert.equal(page.automations[0].collectionCount, 2); assert.equal(page.nextCursor, null);

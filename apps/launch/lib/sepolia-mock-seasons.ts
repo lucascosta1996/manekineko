@@ -38,7 +38,7 @@ export function mockSepoliaSeason(source: AutomationPayload, used = new Set<stri
     let symbol: string;
     do { symbol = `S${randomBytes(5).toString("hex").toUpperCase()}`; } while (used.has(symbol.toLowerCase()));
     used.add(symbol.toLowerCase());
-    Object.assign(contract, { chainId: plan.chainId, seasonId: plan.seasonId, seasonName: plan.name, name: step.label, symbol, initialOwner: "", enrollmentSigner: "", saleStartAt: "0" });
+    Object.assign(contract, { chainId: plan.chainId, seasonId: plan.seasonId, seasonName: plan.name, name: step.label, symbol, initialOwner: "", enrollmentSigner: "", saleStartAt: "0", mintDurationSeconds: "86400" });
     delete contract.vrfCoordinator; delete contract.keyHash;
     Object.assign(operations, { factoryMode: "new", factoryAddress: "", deployerAddress: "", factoryOwnerAddress: "", affiliateEligibilityAddress: "", winnerCreditsAddress: "", notes: "" });
   }

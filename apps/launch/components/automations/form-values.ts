@@ -98,7 +98,7 @@ function fixedDeadlineFallback(form: LaunchForm): LaunchForm {
   const seconds = /^\d{1,16}$/.test(value) ? BigInt(value) * multiplier : 0n;
   if (seconds >= 3600n && seconds <= 31_536_000n) return form;
   // The selected absolute date is authoritative. A hidden, unfinished duration must not block its draft.
-  return { ...form, duration: "30", durationUnit: "days" };
+  return { ...form, duration: "24", durationUnit: "hours" };
 }
 
 export function payloadFromAutomationForm(form: AutomationForm): AutomationPayload {

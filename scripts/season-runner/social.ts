@@ -21,8 +21,9 @@ export type XMedia = { id: string; expiresAfterSecs: number; processingState: "s
 export class XApiError extends Error {
   readonly status: number | undefined;
   readonly retryAfterSeconds: number | undefined;
-  constructor(message: string, status?: number, retryAfterSeconds?: number) {
-    super(message); this.name = "XApiError"; this.status = status; this.retryAfterSeconds = retryAfterSeconds;
+  readonly diagnostics?: { codes: number[]; problem: string | null };
+  constructor(message: string, status?: number, retryAfterSeconds?: number, diagnostics?: { codes: number[]; problem: string | null }) {
+    super(message); this.name = "XApiError"; this.status = status; this.retryAfterSeconds = retryAfterSeconds; this.diagnostics = diagnostics;
   }
 }
 /** A post may already exist. Persist this state and reconcile in X before any
@@ -58,8 +59,7 @@ export function xOAuth1Authorization(method: string, endpoint: string, credentia
   return `OAuth ${Object.entries(oauth).sort(([a], [b]) => a.localeCompare(b)).map(([key, value]) => `${encode(key)}="${encode(value)}"`).join(", ")}`;
 }
 
-async function limitedJson(response: Response): Promise<Record<string, any>> {
-  const maximum = 64 * 1024;
+async function limitedJson(response: Response, maximum = 64 * 1024): Promise<Record<string, any>> {
   if (Number(response.headers.get("content-length")) > maximum || !response.body) throw new Error("Invalid response");
   const reader = response.body.getReader();
   const chunks: Uint8Array[] = []; let length = 0;
@@ -73,6 +73,16 @@ async function limitedJson(response: Response): Promise<Record<string, any>> {
   const parsed: unknown = JSON.parse(Buffer.concat(chunks).toString("utf8"));
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("Invalid response");
   return parsed as Record<string, any>;
+}
+/** Retain only numeric provider codes and recognized problem categories, never arbitrary text or URLs. */
+export function safeXDiagnostics(body: Record<string, unknown>) {
+  const codes = (Array.isArray(body.errors) ? body.errors : []).slice(0, 8).flatMap(value => {
+    const code = value && typeof value === "object" ? (value as { code?: unknown }).code : undefined;
+    return typeof code === "number" && Number.isSafeInteger(code) && code >= 0 && code <= 99999 ? [code] : [];
+  });
+  const known = ["not-authorized-for-resource", "client-forbidden", "usage-capped", "rate-limit-exceeded", "unsupported-authentication", "invalid-request"];
+  const problem = typeof body.type === "string" ? known.find(value => body.type === `https://api.x.com/2/problems/${value}` || body.type === `https://api.twitter.com/2/problems/${value}`) ?? null : null;
+  return { codes, problem };
 }
 async function request(credentials: XCredentials, method: "GET" | "POST", path: string, body: unknown, options: XRequestOptions): Promise<Record<string, any>> {
   const endpoint = `https://api.x.com${path}`;
@@ -89,11 +99,12 @@ async function request(credentials: XCredentials, method: "GET" | "POST", path: 
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     });
     if (!response.ok) {
-      await response.body?.cancel();
+      let diagnostics: { codes: number[]; problem: string | null } | undefined;
+      try { diagnostics = safeXDiagnostics(await limitedJson(response, 4096)); } catch { /* No raw response is retained. */ }
       if (publicPost && (response.status >= 500 || response.status === 408)) throw new AmbiguousDelivery(undefined, response.status);
       const retryAfter = response.headers.get("retry-after");
       const seconds = retryAfter && /^\d{1,8}$/.test(retryAfter) ? Number(retryAfter) : undefined;
-      throw new XApiError(`X API request rejected (HTTP ${response.status})`, response.status, seconds);
+      throw new XApiError(`X API request rejected (HTTP ${response.status})`, response.status, seconds, diagnostics);
     }
     const result = await limitedJson(response);
     // HTTP success with partial API errors is not evidence that a post failed.

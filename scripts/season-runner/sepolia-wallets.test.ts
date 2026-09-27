@@ -82,3 +82,66 @@ test("V10 rehearsal mints with its exact algorithm and never accepts a relabeled
   await assert.rejects(runSepoliaRehearsalStep(invalid.options, `0x${"12".repeat(20)}`), /exact draw algorithm/);
   assert.equal(invalid.writes.length, 0);
 });
+
+test("refund scenario survives restart after each signed mint, stops at three and reconciles every refund burn",async()=>{
+  const f=rehearsalFixture(true,0n,1000n,"affiliate-v10","unique-rank-v6");
+  const scenario={kind:"refund-3-30m" as const,chainId:11155111 as const,collectionId:"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",mintTarget:3 as const,durationSeconds:1800 as const,expectedOutcome:"unsold/refundable" as const,maxTotalSpendWei:f.options.maxTotalSpendWei,maxFeePerGasWei:f.options.maxFeePerGasWei};
+  const iface=new Interface([...f.iface.fragments,"function saleStartAt() view returns(uint256)","function randomnessRequested() view returns(bool)","function totalAffiliateAccrued() view returns(uint256)","function totalRefunded() view returns(uint256)","function ownerOf(uint256) view returns(address)","function refund(uint256,address)","error ERC721NonexistentToken(uint256)"]);
+  const round=`0x${"12".repeat(20)}`,hash=`0x${"ab".repeat(32)}`,primary=new Map<string,bigint>(),owners=new Map<number,string>(),receipts=new Map<string,any>();let minted=0n,refunded=0n,expired=false;
+  const provider=f.options.provider as any;
+  provider.getBlock=async(tag:unknown)=>({number:tag==="latest"?101:Number(tag),hash,timestamp:expired?1910:100,baseFeePerGas:10n});
+  provider.getTransactionCount=async(address:string)=>[...receipts.values()].filter(r=>r.from===address).length;
+  provider.getTransactionReceipt=async(hash:string)=>receipts.get(hash)??null;
+  provider.call=async(request:{data:string})=>{
+    const call=iface.parseTransaction(request)!;
+    if(call.name==="ownerOf"&&!owners.has(Number(call.args[0])))throw Object.assign(new Error("burned"),{data:iface.encodeErrorResult("ERC721NonexistentToken",[call.args[0]])});
+    const values:Record<string,unknown>={CONTRACT_VERSION:"affiliate-v10",ALGORITHM_VERSION:"unique-rank-v6",MAX_MINTS_PER_WALLET:20n,maxSupply:1000n,totalMinted:minted,mintPrice:10000n,mintedPerWallet:primary.get(String(call.args.length?call.args[0]:""))??0n,saleActivated:true,mintDeadline:1900n,saleStartAt:100n,revealed:false,refundsAvailable:expired,randomnessRequested:false,totalAffiliateAccrued:0n,totalRefunded:refunded,ownerOf:owners.get(Number(call.args.length?call.args[0]:0))};
+    return iface.encodeFunctionResult(call.name,[values[call.name]]);
+  };
+  function confirm(){const tx=Transaction.from(f.writes.at(-1)!),call=iface.parseTransaction(tx)!;receipts.set(tx.hash!,{hash:tx.hash,status:1,from:tx.from,to:tx.to,blockNumber:100,blockHash:hash,gasUsed:100000n,gasPrice:22n});
+    if(call.name==="mint"){assert.equal(call.args[1],1n);primary.set(tx.from!,1n);owners.set(Number(++minted),String(call.args[0]));}
+    else{assert.equal(call.name,"refund");owners.delete(Number(call.args[0]));refunded+=10000n;}
+  }
+  for(let i=0;i<3;i++){
+    await assert.rejects(runSepoliaRehearsalStep({...f.options,scenario},round),ChainPendingError);assert.equal(f.writes.length,i+1);confirm();
+    assert.equal((await runSepoliaRehearsalStep({...f.options,scenario},round)).action,"reconciled");
+  }
+  assert.equal((await runSepoliaRehearsalStep({...f.options,scenario},round)).action,"waiting-for-refund-expiry");assert.equal(f.writes.length,3);
+  expired=true;
+  for(let i=0;i<3;i++){
+    await assert.rejects(runSepoliaRehearsalStep({...f.options,scenario},round),ChainPendingError);confirm();
+    await runSepoliaRehearsalStep({...f.options,scenario},round);
+  }
+  assert.equal((await runSepoliaRehearsalStep({...f.options,scenario},round)).action,"refunded");
+  assert.equal(f.writes.length,6);assert.equal(owners.size,0);assert.equal(refunded,30000n);
+  assert.deepEqual(f.state.scenarios![round].verifiedRefunds,[1,2,3]);
+  assert.equal((await runSepoliaRehearsalStep({...f.options,scenario},round)).action,"refunded");assert.equal(f.writes.length,6);
+});
+
+test("affiliate scenario requires real enrollment, signs paid referrals and claims from the enrolled wallet", async () => {
+  for (const mode of ["unenrolled", "referral", "commission"] as const) {
+    const f = rehearsalFixture(true, 0n, mode === "commission" ? 0n : 1000n, "affiliate-v10", "unique-rank-v6");
+    const affiliate = f.wallets[1];
+    const scenario = { kind: "affiliate-sellout" as const, chainId: 11155111 as const, collectionId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", affiliateWallet: affiliate.address, affiliateId: 7, expectedOutcome: "soldout/commission-claimed" as const, maxTotalSpendWei: f.options.maxTotalSpendWei, maxFeePerGasWei: f.options.maxFeePerGasWei };
+    const iface = new Interface([...f.iface.fragments,
+      "function affiliateWallet(uint256) view returns(address)", "function affiliateMinimumReferrals() view returns(uint256)",
+      "function affiliateAccrued(uint256) view returns(uint256)", "function affiliateEqualShare() view returns(uint256)",
+      "function affiliateQualifiedCount() view returns(uint256)", "function affiliatePoolAmount() view returns(uint256)",
+      "function affiliateClaimable(uint256) view returns(uint256)", "function mintWithAffiliate(address,uint256,uint256) payable", "function claimAffiliateCommission(address)",
+    ]);
+    const provider = f.options.provider as any, originalCall = provider.call;
+    provider.call = async (request: { data: string }) => {
+      const call = iface.parseTransaction(request)!;
+      const values: Record<string, unknown> = { affiliateWallet: mode === "unenrolled" ? `0x${"00".repeat(20)}` : affiliate.address, affiliateMinimumReferrals: 1n, affiliateAccrued: 2000n, affiliateEqualShare: 2000n, affiliateQualifiedCount: 1n, affiliatePoolAmount: 2000n, affiliateClaimable: 2000n };
+      return call.name in values ? iface.encodeFunctionResult(call.name, [values[call.name]]) : originalCall(request);
+    };
+    await assert.rejects(runSepoliaRehearsalStep({ ...f.options, scenario }, `0x${"12".repeat(20)}`), mode === "unenrolled" ? /genuine_enrolled_affiliate/ : ChainPendingError);
+    if (mode === "unenrolled") { assert.equal(f.writes.length, 0); continue; }
+    assert.equal(f.writes.length, 1);
+    const signed = Transaction.from(f.writes[0]), call = iface.parseTransaction(signed)!;
+    assert.equal(call.name, mode === "referral" ? "mintWithAffiliate" : "claimAffiliateCommission");
+    assert.equal(signed.from, mode === "referral" ? f.wallets[0].address : affiliate.address);
+    assert.equal(call.args[0], signed.from);
+    if (mode === "referral") { assert.equal(call.args[2], 7n); assert.equal(signed.value, 200000n); }
+  }
+});

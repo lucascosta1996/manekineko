@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { lifecycleStage, observationFresh, enrollmentTiming } from "@manekineko/contract-abi/lifecycle";
 import { useEffect, useState } from "react";
 import type { CollectionPublic } from "../lib/collections/model";
 import type { AffiliateProgram } from "../lib/affiliates/types";
@@ -66,11 +67,13 @@ export function AffiliateWindow({ program, initialNow, canLink = false }: { prog
   const now = useProtocolClock(initialNow);
   if (now === null || program.mode !== "live") return null;
   const closed = program.enrollmentStatus === "closed" || program.saleActivated || program.soldOut || program.refundable || enrollmentWindowClosed(program.contractVersion, program.saleStartAt, now / 1000);
-  const available = !closed && program.enrollmentStatus === "open" && program.readiness.canEnroll;
+  const timing = enrollmentTiming(program.enrollmentOpensAt, program.saleStartAt, now);
+  const available = timing.state !== "scheduled" && !closed && program.enrollmentStatus === "open" && program.readiness.canEnroll;
   return <div className="affiliate-window">
-    <div className="activity-counter"><span>{closed ? "Affiliate enrollment closed" : program.availableSlots === 0 ? "Affiliate positions filled" : available ? "Affiliate enrollment open" : "Affiliate enrollment unavailable"}</span><strong>{closed ? `${program.enrolledSlots} / ${program.maxSlots}` : `${program.availableSlots} / ${program.maxSlots}`}</strong></div>
+    <div className="activity-counter"><span>{closed ? "Affiliate enrollment closed" : timing.state === "scheduled" ? "Affiliate enrollment scheduled" : program.availableSlots === 0 ? "Affiliate positions filled" : available ? "Affiliate enrollment open" : "Affiliate enrollment unavailable"}</span><strong>{closed ? `${program.enrolledSlots} / ${program.maxSlots}` : `${program.availableSlots} / ${program.maxSlots}`}</strong></div>
     <p>{closed ? "Enrolled positions" : "Positions remaining"}</p>
-    {available && program.saleStartAt && <ProtocolCountdown target={program.saleStartAt} label="Enrollment closes in" now={now} expiredLabel="Enrollment closed" />}
+    {!closed && timing.target && <ProtocolCountdown target={timing.target} label={timing.label} now={now} expiredLabel="Checking enrollment" />}
+    {!closed && program.saleStartAt && <ProtocolCountdown target={program.saleStartAt} label="Mint scheduled in" now={now} />}
     {canLink && <Link className="activity-link" href={`/mint/${program.collectionId}/affiliates`}>{available ? "Join the affiliate program" : "View affiliate rewards"}<span aria-hidden="true">↗</span></Link>}
   </div>;
 }
@@ -89,7 +92,7 @@ export function CollectionActivity({ collection, previous, initialNow, showEnrol
   const total = refunded ? collection.totalMinted : showAwards ? awards.length : collection.maxSupply;
   const freshProgram = enrollment.program && now - enrollment.receivedAt < 45000 ? enrollment.program : null;
   return <div className="collection-activity">
-    <span className="activity-label">{activity.label}</span>
+    <span className="lifecycle-badge" data-live={lifecycleStage(collection.phase).live && observationFresh(collection.updatedAt, now) && activity.label === "Mint open"} data-busy={lifecycleStage(collection.phase).busy && observationFresh(collection.updatedAt, now)} role="status">{collection.phase === "minting" && !observationFresh(collection.updatedAt, now) ? "Mint status awaiting fresh confirmation" : activity.label}</span>
     {activity.target && <ProtocolCountdown target={activity.target} label={activity.countdownLabel} now={now} />}
     <p className="activity-detail">{activity.detail}</p>
     <div className="activity-counter"><span>{refunded ? "Tickets refunded" : showAwards ? "Prizes claimed" : "Tickets minted"}</span><strong>{count.toLocaleString("en-US")} / {total.toLocaleString("en-US")}</strong></div>

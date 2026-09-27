@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { LiveCollection } from "../components/live-collection";
 import artwork from "./artwork.json";
 import { NewsletterSignup } from "./newsletter-signup";
 import { TinctaWordmark } from "../components/tincta-logo";
@@ -388,6 +389,7 @@ export function LandingExperience({
               <p className="hero-description">
                 ETH prizes and affiliate rewards, governed by smart contracts.
               </p>
+              <LiveCollection />
               <div className="hero-actions">
                 <a className="button button-dark" href="#rewards">
                   Explore the rewards

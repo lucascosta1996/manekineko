@@ -90,9 +90,12 @@ export async function getSeasonRuntime(db: Query, automationId: string, env: Rec
   return { profile, run: runtimeRun(runRow), encryptionConfigured: runtimeEncryptionConfigured(env), events: events.rows.map(row => ({ id: row.id, event: row.event, message: row.message, createdAt: row.created_at.toISOString() })), actions: actions.rows.map(row => ({ id: row.id, actionKey: row.action_key, kind: row.kind, status: row.status, txHash: row.tx_hash, postId: row.post_id, lastError: row.last_error, createdAt: row.created_at.toISOString(), updatedAt: row.updated_at.toISOString() })) };
 }
 export async function requestSeasonStart(db: Pool, actor: LaunchActor, automationId: string, input: Record<string, unknown>): Promise<RuntimeRun> {
+  return withRuntimeTransaction(db, client => requestSeasonStartInTransaction(client, actor, automationId, input));
+}
+/** Reuses the same start guards inside an existing transaction, including atomic CLI preparation. */
+export async function requestSeasonStartInTransaction(client: PoolClient, actor: LaunchActor, automationId: string, input: Record<string, unknown>): Promise<RuntimeRun> {
   const revision = runtimeRevision(input.revision), profileRevision = runtimeRevision(input.profileRevision);
   if (typeof input.preparedHash !== "string" || !/^[a-f0-9]{64}$/.test(input.preparedHash)) throw new AutomationError("invalid_hash", "Reload the prepared season before starting.");
-  return withRuntimeTransaction(db, async client => {
     await lockActor(client, actor);
     const saved = (await client.query<{ revision: number; status: string; content_hash: string | null; prepared_artifact: AutomationArtifact | null }>("SELECT revision,status,content_hash,prepared_artifact FROM manekineko_launch_automations WHERE id=$1 FOR SHARE", [runtimeId(automationId)])).rows[0];
     if (!saved || saved.status !== "prepared" || !saved.prepared_artifact || saved.revision !== revision || saved.content_hash !== input.preparedHash) throw new AutomationError("revision_conflict", "Start requires the exact saved prepared season revision and hash.", 409);
@@ -110,7 +113,6 @@ export async function requestSeasonStart(db: Pool, actor: LaunchActor, automatio
       VALUES($1,$2,$3,$4,$5,$6,$7,$7) RETURNING ${runColumns}`, [randomUUID(), automationId, revision, saved.content_hash, artifact.chainId, profile.revision, actor.userId])).rows[0];
     await client.query("INSERT INTO manekineko_season_runtime_events(run_id,event,message) VALUES($1,'start_requested','Operator requested season execution. Waiting for the version-pinned worker preflight.')", [run.id]);
     return runtimeRun(run);
-  });
 }
 export async function requestSeasonControl(db: Pool, actor: LaunchActor, automationId: string, input: Record<string, unknown>): Promise<RuntimeRun> {
   const revision = runtimeRevision(input.revision);
@@ -127,6 +129,14 @@ export async function requestSeasonControl(db: Pool, actor: LaunchActor, automat
     if (input.action === "resume" && (!profile?.enabled || input.profileRevision !== profile.revision)) throw new AutomationError("runtime_profile", "Reload and explicitly review the current X account before resuming.", 409);
     if (input.action === "resume" && saved.lease_expires_at && saved.lease_expires_at.getTime() > Date.now()) throw new AutomationError("runtime_busy", "Wait for the worker to finish pausing before resuming.", 409);
     const resumed = input.action === "resume";
+    if (resumed) {
+      const superseded = await client.query(`SELECT 1 FROM manekineko_season_runtime_runs newer
+        JOIN manekineko_launch_automations next ON next.id=newer.automation_id
+        JOIN manekineko_launch_automations old ON old.id=$1
+        WHERE newer.chain_id=$2 AND newer.automation_id<>$1 AND newer.created_at>(SELECT created_at FROM manekineko_season_runtime_runs WHERE id=$3)
+        AND next.prepared_artifact->>'seasonId'=old.prepared_artifact->>'seasonId' LIMIT 1`, [automationId, found.chain_id, saved.id]);
+      if (superseded.rows.length) throw new AutomationError("superseded_run", "This run is superseded history. Open the newer prepared season; do not resume this run.", 409);
+    }
     const result = await client.query<RuntimeRunRow>(`UPDATE manekineko_season_runtime_runs SET desired_state=$2,
       status=CASE WHEN status='completed' THEN 'completed' WHEN $2='running' THEN 'queued' WHEN lease_expires_at>now() THEN status ELSE 'paused' END,
       profile_revision=$3,revision=revision+1,updated_by=$4,last_error=CASE WHEN $2='running' THEN NULL ELSE last_error END

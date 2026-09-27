@@ -11,6 +11,12 @@ export function AnnouncedActivity({ season, collection }: { season: AnnouncedSea
   return <div className="collection-activity">
     {activity.target ? <ProtocolCountdown target={activity.target} label={activity.label} now={now} /> : <span className="activity-label">{activity.label}</span>}
     <p className="activity-detail">{activity.detail}</p>
+    {collection.originalSaleStartAt && <p>Rescheduled from <time dateTime={collection.originalSaleStartAt}>{new Date(collection.originalSaleStartAt).toUTCString()}</time>.</p>}
+    {collection.saleStartAt && activity.target !== collection.saleStartAt && (season.status === "running" && Date.parse(collection.saleStartAt) > now && !["sold_out", "revealed", "refundable"].includes(collection.status)
+      ? <ProtocolCountdown target={collection.saleStartAt} label="Scheduled mint opening" now={now} />
+      : <p>Scheduled mint: <time dateTime={collection.saleStartAt}>{new Date(collection.saleStartAt).toUTCString()}</time>.</p>)}
+    {collection.enrollmentOpensAt && <p>Enrollment: <time dateTime={collection.enrollmentOpensAt}>{new Date(collection.enrollmentOpensAt).toUTCString()}</time> until the scheduled mint opening.</p>}
+    <small>Last update: {new Date(collection.observedAt ?? season.updatedAt).toUTCString()}</small>
     {collection.contractAddress && collection.status === "enrollment" && <Link className="activity-link" href={`/mint/${collection.id}/affiliates`}>View affiliate rewards ↗</Link>}
   </div>;
 }

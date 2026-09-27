@@ -1,4 +1,5 @@
 import "server-only";
+import { affiliateAvailability } from "./availability";
 import { randomBytes, randomUUID } from "node:crypto";
 import { AffiliateError, authenticationData, enrollmentNftSelection, ipDigest, normalizedWallet, trustedIp, validTurnstileResult } from "./policy";
 import { affiliateReferralUrl, readAffiliateAccount } from "./account";
@@ -6,7 +7,7 @@ import { getAffiliateNftCandidates } from "./eligibility-repository";
 import { trustedAffiliateEligibility } from "./eligibility-chain";
 import { completeEnrollment } from "./enrollment";
 import { createChallenge, consumeChallenge, demoRecord, demoReferralRecord, programRecord, rateLimit, readChallenge, type ProgramRecord } from "./repository";
-import { enrollmentConfigured, enrollmentWallet, trustedSnapshot, type ChainSnapshot } from "./chain";
+import { enrollmentConfigured, enrollmentDiagnostics, enrollmentWallet, trustedSnapshot, type ChainSnapshot } from "./chain";
 import { DEMO_SCENARIOS, type AffiliateChallenge, type AffiliatePermit, type AffiliateProgram, type AffiliateReferral, type DemoScenario, type AffiliateEnrollmentEligibility } from "./types";
 import { enrollmentWindowClosed } from "./enrollment-window";
 /** The versioned enrollment offer binds V4 personal rates or the V5 collection pool. */
@@ -51,10 +52,12 @@ export async function getAffiliateProgram(collectionId: string, walletValue?: st
   await snapshot.assertCanonical();
   const enrollmentStatus=snapshot.saleActivated||snapshot.refundable||enrollmentWindowClosed(record.contractVersion,record.saleStartAt,snapshot.blockTimestamp)?"closed":snapshot.affiliateCount>=record.maxSlots?"full":"open";
   const configured=record.enrollmentEnabled&&enrollmentConfigured(snapshot.enrollmentSigner);
-  const canEnroll=configured&&!enrollmentEligibility?.reason&&enrollmentStatus==="open"&&(!account||account.status==="unregistered");
+  const availability = affiliateAvailability({now:snapshot.blockTimestamp*1000,opensAt:record.enrollmentOpensAt,closesAt:record.saleStartAt?.toISOString(),closed:enrollmentStatus==="closed",full:enrollmentStatus==="full",configured,eligibilityReason:enrollmentEligibility?.reason,enrolled:!!account&&account.status!=="unregistered",walletConnected:!!wallet,holderRequired:enrollmentEligibility?.policy==="nft_holder",hasEligibleNft:!!enrollmentEligibility?.tokens.some(t=>t.eligible),hasMoreNfts:!!enrollmentEligibility?.hasMore});
+  const canEnroll=availability.canEnroll;
+  if (enrollmentStatus === "open" && !configured) console.warn("affiliate_admission_unavailable", {collectionId, enabled:record.enrollmentEnabled, checks:enrollmentDiagnostics(snapshot.enrollmentSigner)});
   const offer=enrollmentStatus==="open"&&snapshot.nextAvailableAffiliateId?{affiliateId:snapshot.nextAvailableAffiliateId,commissionBps:offerBps(record,snapshot.nextAvailableAffiliateId)}:null;
-  return {...programBase(record),commissionBps:offer?.commissionBps??0,enrollmentOffer:offer,enrollmentEligibility,source:"ethereum",...((["affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(record.contractVersion ?? "")) ? {minAffiliateReferrals:record.minAffiliateReferrals,affiliatePayoutCapBps:record.affiliatePayoutCapBps,winnerCount:record.winnerCount,secondPrizeBps:record.secondPrizeBps,saleStartAt:record.saleStartAt?.toISOString(),qualifiedSlots:snapshot.equalPool?.qualifiedCount,equalShareWei:snapshot.equalPool?.equalShareWei,unallocatedPoolWei:snapshot.equalPool?.unallocatedWei}:{}),enrolledSlots:snapshot.affiliateCount,availableSlots:record.maxSlots-snapshot.affiliateCount,enrollmentStatus,
-    readiness:{canEnroll,canMint:snapshot.saleActivated&&!snapshot.soldOut&&!snapshot.refundable&&(!record.saleStartAt||snapshot.blockTimestamp>=record.saleStartAt.getTime()/1000),canClaim:!!account&&BigInt(account.claimableWei)>0n,reason:enrollmentEligibility?.reason ?? (enrollmentStatus==="open"&&!configured?"Automated enrollment is not configured for this deployment yet.":null)},
+  return {...programBase(record),enrollmentOpensAt:record.enrollmentOpensAt,availabilityCode:availability.code,commissionBps:offer?.commissionBps??0,enrollmentOffer:offer,enrollmentEligibility,source:"ethereum",...((["affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(record.contractVersion ?? "")) ? {minAffiliateReferrals:record.minAffiliateReferrals,affiliatePayoutCapBps:record.affiliatePayoutCapBps,winnerCount:record.winnerCount,secondPrizeBps:record.secondPrizeBps,saleStartAt:record.saleStartAt?.toISOString(),qualifiedSlots:snapshot.equalPool?.qualifiedCount,equalShareWei:snapshot.equalPool?.equalShareWei,unallocatedPoolWei:snapshot.equalPool?.unallocatedWei}:{}),enrolledSlots:snapshot.affiliateCount,availableSlots:record.maxSlots-snapshot.affiliateCount,enrollmentStatus:availability.code==="scheduled"?"scheduled":enrollmentStatus,
+    readiness:{canEnroll,canMint:snapshot.saleActivated&&!snapshot.soldOut&&!snapshot.refundable&&(!record.saleStartAt||snapshot.blockTimestamp>=record.saleStartAt.getTime()/1000),canClaim:!!account&&BigInt(account.claimableWei)>0n,reason:availability.reason},
     saleActivated:snapshot.saleActivated,soldOut:snapshot.soldOut,refundable:snapshot.refundable,prizePaid:snapshot.prizePaid,mintDeadline:new Date(Number(snapshot.mintDeadline)*1000).toISOString(),totalMinted:snapshot.totalMinted,totalReferredMints:snapshot.totalReferredMints,
     totalAccruedWei:String(snapshot.totalAccrued),totalClaimedWei:String(snapshot.totalClaimed),snapshotBlock:snapshot.blockNumber,snapshotBlockHash:snapshot.blockHash,enrollmentSigner:snapshot.enrollmentSigner,runtimeCodeHash:snapshot.codeHash,turnstileSiteKey:process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY??null,account,demoScenario:null};
 }
@@ -76,7 +79,8 @@ export async function resolveAffiliate(collectionId: string, affiliateValue: str
 async function openEnrollment(record: ProgramRecord, wallet: string): Promise<ChainSnapshot> {
   if (record.mode!=="live") throw new AffiliateError("demo_read_only", "This is a fictional example. Enrollment requires a deployed collection.", 409);
   const snapshot=await trustedSnapshot(record);
-  if (!record.enrollmentEnabled||!enrollmentConfigured(snapshot.enrollmentSigner)) throw new AffiliateError("enrollment_unavailable", "Automated enrollment is not configured yet.",503);
+  if (record.enrollmentOpensAt && snapshot.blockTimestamp*1000 < Date.parse(record.enrollmentOpensAt)) throw new AffiliateError("enrollment_scheduled", "Enrollment has not opened yet.",409);
+  if (!record.enrollmentEnabled||!enrollmentConfigured(snapshot.enrollmentSigner)) throw new AffiliateError("enrollment_unavailable", "Enrollment is temporarily unavailable. Please check again later.",503);
   if (snapshot.saleActivated||snapshot.refundable||snapshot.affiliateCount>=record.maxSlots||enrollmentWindowClosed(record.contractVersion,record.saleStartAt,snapshot.blockTimestamp)) throw new AffiliateError("enrollment_closed", "Affiliate enrollment is closed or all positions are occupied.",409);
   if (BigInt(await snapshot.call("affiliateIdOf",[wallet]) as bigint)!==0n) throw new AffiliateError("already_enrolled", "This wallet already has a position in this collection.",409);
   await snapshot.assertCanonical();
@@ -95,7 +99,7 @@ export async function issueChallenge(collectionId:string,request:Request,body:Re
   if(offer&&(body.affiliateId!==offer.affiliateId||body.commissionBps!==offer.commissionBps)) throw new AffiliateError("offer_changed","The offered position changed. Review the new position and rate before signing.",409);
   const eligibility = (record.contractVersion === "affiliate-v6" || record.contractVersion === "affiliate-v7" || (record.contractVersion === "affiliate-v8" || record.contractVersion === "affiliate-v9" || record.contractVersion === "affiliate-v10")) ? enrollmentNftSelection(body.sourceCollection,body.sourceTokenId) : undefined;
   if (eligibility) { const gate = await trustedAffiliateEligibility(snapshot); await gate.assertEligible(wallet,eligibility); await snapshot.assertCanonical(); }
-  const deadline=Math.min(Math.floor(Date.now()/1000)+300,Number(snapshot.mintDeadline));
+  const deadline=Math.min(Math.floor(Date.now()/1000)+300,Number(snapshot.mintDeadline),record.saleStartAt ? Math.floor(record.saleStartAt.getTime()/1000) : Infinity);
   if(deadline<=Math.floor(Date.now()/1000)+30) throw new AffiliateError("enrollment_closed","There is not enough time remaining to enroll.",409);
   const nonce=`0x${randomBytes(32).toString("hex")}`,id=randomUUID(),expiresAt=new Date(deadline*1000);
   await createChallenge({id,collectionId:record.collectionId,wallet,chainId:record.chainId,contractAddress:record.contractAddress!,origin,nonce,ipDigest:digest,expiresAt,consumedAt:null,contractVersion:record.contractVersion,affiliateId:offer?.affiliateId??null,commissionBps:offer?.commissionBps??null,eligibilitySourceAddress:eligibility?.sourceCollection??null,eligibilityTokenId:eligibility?.sourceTokenId??null});
@@ -103,7 +107,7 @@ export async function issueChallenge(collectionId:string,request:Request,body:Re
 }
 export async function validateTurnstile(token:string,ip:string,origin:string,challengeId:string):Promise<void> {
   const secret=process.env.TURNSTILE_SECRET_KEY;
-  if(!secret) throw new AffiliateError("enrollment_unavailable","Automated enrollment is not configured yet.",503);
+  if(!secret) throw new AffiliateError("enrollment_unavailable","Enrollment is temporarily unavailable. Please check again later.",503);
   let response:Response;
   try { response=await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({secret,response:token,remoteip:ip}),cache:"no-store",signal:AbortSignal.timeout(10_000)}); }
   catch { throw new AffiliateError("verification_unavailable","Bot verification is temporarily unavailable. Please try again.",503); }

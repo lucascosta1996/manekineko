@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "./launch.css";
 import "./automations.css";
+import "./earnings.css";
 
 export const metadata: Metadata = {
   title: "Tincta | Launch workspace",

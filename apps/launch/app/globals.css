@@ -1,3 +1,4 @@
+@import "@manekineko/contract-abi/lifecycle.css";
 :root {
   --background: #ffffff;
   --ink: #111111;
@@ -66,3 +67,5 @@ p {
 .season-network-switch button:focus-visible { outline: 2px solid #111; outline-offset: 3px; }
 .season-network-switch button:disabled { cursor: wait; }
 @media (max-width: 480px) { .season-network-switch { display: flex; } .season-network-switch button { flex: 1; padding-inline: 10px; } }
+
+.operations-shell main{padding-top:32px}.operations-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin:28px 0;font-size:13px;line-height:1.7}.operations-facts dt{color:var(--muted);margin-bottom:6px}.operations-facts dd{margin:0;overflow-wrap:anywhere}.operations-links{font-size:13px;line-height:1.8;margin-top:12px}.operations-links a{text-decoration:underline;text-underline-offset:4px}.operations-shell .earnings-card>p{line-height:1.7}.operations-shell .launch-hero{margin-top:32px}@media(max-width:760px){.operations-facts{grid-template-columns:1fr 1fr}.operations-shell .launch-hero{align-items:flex-start;gap:16px}.operations-shell .launch-hero h1{font-size:36px}}@media(max-width:420px){.operations-facts{grid-template-columns:1fr}}

@@ -60,6 +60,8 @@
     "eligibility:test": "node --import tsx --test scripts/affiliate-eligibility-*.test.mjs",
     "season:run": "node --import tsx -- scripts/season-runner/cli.ts",
     "season:run:sepolia": "node --import tsx -- scripts/season-runner/sepolia.ts",
+    "season:prepare:sepolia": "node --import tsx -- scripts/season-runner/prepare-sepolia.ts",
+    "season:recover:airy-garden": "node --import tsx -- scripts/season-runner/recover-airy-garden.ts",
     "season:run:mainnet": "node --import tsx -- scripts/season-runner/mainnet.ts",
     "season:test": "node --import tsx --test scripts/season-runner/*.test.ts",
     "season:typecheck": "tsc --noEmit --target es2022 --module esnext --moduleResolution bundler --allowImportingTsExtensions --resolveJsonModule --esModuleInterop --skipLibCheck scripts/season-runner/*.ts"

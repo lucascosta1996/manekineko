@@ -1,4 +1,5 @@
 import { Transaction, getAddress } from "ethers";
+import { createHash } from "node:crypto";
 import type { Provider, Signer, TransactionReceipt, TransactionRequest } from "ethers";
 import { cappedFees, checkSignedIntent, DeploymentError } from "../../apps/contracts/scripts/deployment-journal.ts";
 
@@ -14,9 +15,18 @@ export type ChainTransaction = {
 };
 export type ChainJournal = {
   version: 1; chainId: number; from: string; maxFeePerGasWei: string; maxTotalSpendWei: string;
+  verifications?: Record<string, import("./explorer-verification.ts").VerificationJob>;
   transactions: ChainTransaction[];
   collections: Record<string, { inputHash: string; configTimestamp: string; config: Record<string, string>; factory: string; roundId: string }>;
 };
+type ConfirmedPrefix = { count: number; fingerprint: string; anchor: { number: number; hash: string } };
+// Process-local proof only. A saved journal never populates this cache without
+// live receipt verification; provider and complete signed-prefix identity bind it.
+const confirmedPrefixes = new WeakMap<Provider, Map<string, ConfirmedPrefix>>();
+const prefixFingerprint = (entries: ChainTransaction[]) => createHash("sha256").update(JSON.stringify(entries.map(entry => [
+  entry.action, entry.state, entry.rawTransaction, entry.hash, entry.nonce,
+  entry.blockNumber, entry.blockHash, entry.gasUsed, entry.gasPrice, entry.broadcastDeadline,
+]))).digest("hex");
 
 export function transactionSpend(entry: ChainTransaction): bigint {
   const signed = Transaction.from(entry.rawTransaction);
@@ -36,45 +46,119 @@ export function createTransactionPipeline(options: {
   const ceiling = BigInt(journal.maxFeePerGasWei), budget = BigInt(journal.maxTotalSpendWei);
   if (![1, 11155111].includes(journal.chainId) || journal.version !== 1 || ceiling <= 0n || budget <= 0n || !Number.isInteger(confirmations) || confirmations < 2)
     throw new DeploymentError("Invalid pinned chain, spending policy or confirmation depth.");
-  const actions = new Set<string>();
-  journal.transactions.forEach((entry, i) => {
-    const tx = Transaction.from(entry.rawTransaction);
-    if (actions.has(entry.action) || tx.hash !== entry.hash || tx.from !== getAddress(journal.from) || tx.chainId !== BigInt(journal.chainId)
+  const policyIdentity = () => JSON.stringify([journal.version, journal.chainId, journal.from, journal.maxFeePerGasWei, journal.maxTotalSpendWei]);
+  const pinnedPolicy = policyIdentity();
+  let validatedFingerprint: string | undefined;
+  function validateEntry(entry: ChainTransaction, tx: Transaction) {
+    if (policyIdentity() !== pinnedPolicy || tx.hash !== entry.hash || tx.from !== getAddress(journal.from) || tx.chainId !== BigInt(journal.chainId)
       || tx.nonce !== entry.nonce || tx.type !== 2 || tx.maxFeePerGas === null || tx.maxFeePerGas > ceiling
       || tx.maxPriorityFeePerGas === null || tx.maxPriorityFeePerGas > tx.maxFeePerGas || tx.gasLimit <= 0n
       || (tx.accessList?.length ?? 0) > 0 || (tx.authorizationList?.length ?? 0) > 0
       || !["prepared", "submitted", "confirmed"].includes(entry.state)
-      || (entry.broadcastDeadline !== undefined && (!Number.isSafeInteger(entry.broadcastDeadline) || entry.broadcastDeadline <= 0))
-      || (i > 0 && (journal.transactions[i - 1].state !== "confirmed" || entry.nonce !== journal.transactions[i - 1].nonce + 1)))
+      || (entry.broadcastDeadline !== undefined && (!Number.isSafeInteger(entry.broadcastDeadline) || entry.broadcastDeadline <= 0)))
       throw new DeploymentError("The run journal has an invalid transaction, signer, policy or action order.");
-    actions.add(entry.action);
-  });
-  if (journal.transactions.reduce((sum, entry) => sum + transactionSpend(entry), 0n) > budget)
-    throw new DeploymentError("Saved transactions exceed this run's spending cap.");
+  }
+  function validateJournal() {
+    if (policyIdentity() !== pinnedPolicy) throw new DeploymentError("The run journal spending policy changed after validation.");
+    const fingerprint = prefixFingerprint(journal.transactions);
+    if (fingerprint === validatedFingerprint) return;
+    const actions = new Set<string>();
+    journal.transactions.forEach((entry, i) => {
+      validateEntry(entry, Transaction.from(entry.rawTransaction));
+      if (actions.has(entry.action) || (i > 0 && (journal.transactions[i - 1].state !== "confirmed" || entry.nonce !== journal.transactions[i - 1].nonce + 1)))
+        throw new DeploymentError("The run journal has an invalid transaction, signer, policy or action order.");
+      actions.add(entry.action);
+    });
+    if (journal.transactions.reduce((sum, entry) => sum + transactionSpend(entry), 0n) > budget)
+      throw new DeploymentError("Saved transactions exceed this run's spending cap.");
+    validatedFingerprint = fingerprint;
+  }
+  validateJournal();
 
   async function canonicalReceipt(entry: ChainTransaction): Promise<TransactionReceipt | null> {
+    if (persistenceFailed) throw new DeploymentError("Reload the durable transaction journal after its failed save.");
+    const signed = Transaction.from(entry.rawTransaction);
+    validateEntry(entry, signed);
+    const originalFingerprint = prefixFingerprint([entry]);
+    function unchanged(expected = originalFingerprint) {
+      if (policyIdentity() !== pinnedPolicy || prefixFingerprint([entry]) !== expected)
+        throw new DeploymentError("Signed journal prefix changed during receipt verification.");
+    }
     const receipt = await provider.getTransactionReceipt(entry.hash);
+    unchanged();
     if (!receipt) {
       if (entry.state === "confirmed") throw new DeploymentError("A previously confirmed transaction lost its receipt; reconcile this run.");
       return null;
     }
-    const signed = Transaction.from(entry.rawTransaction);
     if (receipt.status !== 1 || receipt.hash !== entry.hash || receipt.from !== getAddress(journal.from) || receipt.to !== signed.to)
       throw new DeploymentError("Saved transaction reverted or receipt provenance differs; manual reconciliation is required.");
     const [block, head] = await Promise.all([provider.getBlock(receipt.blockNumber), provider.getBlock("latest")]);
+    unchanged();
     if (block?.hash !== receipt.blockHash || (entry.blockHash !== undefined && (entry.blockHash !== receipt.blockHash || entry.blockNumber !== receipt.blockNumber)))
       throw new DeploymentError("Saved transaction receipt changed canonical block; reconcile this run.");
+    if ((entry.gasUsed !== undefined && entry.gasUsed !== String(receipt.gasUsed)) || (entry.gasPrice !== undefined && entry.gasPrice !== String(receipt.gasPrice)))
+      throw new DeploymentError("Saved transaction receipt gas accounting differs from canonical evidence.");
     if (!head || head.number - receipt.blockNumber + 1 < confirmations) return null;
     if (entry.state !== "confirmed") {
       entry.state = "confirmed"; entry.blockNumber = receipt.blockNumber; entry.blockHash = receipt.blockHash;
       entry.gasUsed = String(receipt.gasUsed); entry.gasPrice = String(receipt.gasPrice);
+      const confirmedFingerprint = prefixFingerprint([entry]);
       await persist();
+      unchanged(confirmedFingerprint);
     }
     return receipt;
   }
 
+  /** Completion needs durable canonical receipt evidence even when a resumed
+   * operation's desired contract storage already exists and skips send(). */
+  async function confirmAll(): Promise<void> {
+    if (persistenceFailed) throw new DeploymentError("Reload the durable transaction journal after its failed save.");
+    validateJournal();
+    if (journal.transactions.length === 0) return;
+    const [network, head] = await Promise.all([provider.getNetwork(), provider.getBlock("latest")]);
+    if (network.chainId !== BigInt(journal.chainId)) throw new DeploymentError("Provider chain differs from the confirmed journal.");
+    if (!head || head.number < confirmations - 1) throw new DeploymentError("Confirmed journal anchor is unavailable.");
+    const anchor = await provider.getBlock(head.number - confirmations + 1);
+    if (!anchor?.hash || anchor.number !== head.number - confirmations + 1) throw new DeploymentError("Confirmed journal anchor is unavailable.");
+    let cache = confirmedPrefixes.get(provider);
+    if (!cache) { cache = new Map(); confirmedPrefixes.set(provider, cache); }
+    const key = JSON.stringify([journal.chainId, getAddress(journal.from), confirmations, journal.maxFeePerGasWei, journal.maxTotalSpendWei, journal.transactions[0].hash]);
+    const previous = cache.get(key);
+    let reused = 0;
+    if (previous && previous.count <= journal.transactions.length && previous.anchor.number <= anchor.number
+      && prefixFingerprint(journal.transactions.slice(0, previous.count)) === previous.fingerprint) {
+      const oldAnchor = previous.anchor.number === anchor.number ? anchor : await provider.getBlock(previous.anchor.number);
+      if (oldAnchor?.hash === previous.anchor.hash) reused = previous.count;
+    }
+    // Any failed or interrupted pass leaves no reusable approval for this key.
+    cache.delete(key);
+    // Preserve the proof's original identity across the awaited ancestor read;
+    // never capture potentially changed journal fields as if they were proved.
+    const length = journal.transactions.length, reusedFingerprint = reused > 0 ? previous!.fingerprint : prefixFingerprint([]);
+    let eligible = reused;
+    const verifiedFingerprints: string[] = [];
+    for (let offset = reused; offset < journal.transactions.length; offset += 8) {
+      const entries = journal.transactions.slice(offset, offset + 8), receipts = await Promise.all(entries.map(canonicalReceipt));
+      for (let index = 0; index < entries.length; index++) {
+        if (!receipts[index]) throw new ChainPendingError(entries[index].action, entries[index].hash);
+        // A receipt that became confirmed during this pass is valid live, but
+        // cannot join a prefix anchored before its block existed.
+        if (eligible === offset + index && receipts[index]!.blockNumber <= anchor.number) eligible++;
+        verifiedFingerprints.push(prefixFingerprint([entries[index]]));
+      }
+    }
+    const currentAnchor = await provider.getBlock(anchor.number);
+    if (currentAnchor?.hash !== anchor.hash) throw new DeploymentError("Confirmed journal anchor reorganized during verification.");
+    if (persistenceFailed) throw new DeploymentError("Reload the durable transaction journal after its failed save.");
+    if (journal.transactions.length !== length || policyIdentity() !== pinnedPolicy || prefixFingerprint(journal.transactions.slice(0, reused)) !== reusedFingerprint
+      || verifiedFingerprints.some((fingerprint, index) => prefixFingerprint([journal.transactions[reused + index]]) !== fingerprint))
+      throw new DeploymentError("Signed journal prefix changed during receipt verification.");
+    if (eligible > 0) cache.set(key, { count: eligible, fingerprint: prefixFingerprint(journal.transactions.slice(0, eligible)), anchor: { number: anchor.number, hash: anchor.hash } });
+  }
+
   async function send(action: string, request: TransactionRequest, policy: { broadcastDeadline?: number } = {}): Promise<TransactionReceipt> {
     if (persistenceFailed) throw new DeploymentError("Reload the durable transaction journal after its failed save.");
+    validateJournal();
     if (!execute || !signer) throw new DeploymentError("Transaction execution requires explicit execute and a local signer.");
     if ((await provider.getNetwork()).chainId !== BigInt(journal.chainId) || getAddress(await signer.getAddress()) !== getAddress(journal.from))
       throw new DeploymentError("Provider chain or local signer differs from this run.");
@@ -82,11 +166,8 @@ export function createTransactionPipeline(options: {
     if (policy.broadcastDeadline !== undefined && (!Number.isSafeInteger(policy.broadcastDeadline) || policy.broadcastDeadline <= 0)) throw new DeploymentError("Invalid transaction broadcast deadline.");
     if (entry && policy.broadcastDeadline !== undefined && entry.broadcastDeadline !== policy.broadcastDeadline) throw new DeploymentError("Saved transaction broadcast deadline differs from the original action.");
     if (!entry) {
-      // Reconcile every receipt on every new write; never build on an orphaned dependency.
-      for (let offset = 0; offset < journal.transactions.length; offset += 8) {
-        const entries = journal.transactions.slice(offset, offset + 8), receipts = await Promise.all(entries.map(canonicalReceipt));
-        for (let index = 0; index < entries.length; index++) if (!receipts[index]) throw new ChainPendingError(entries[index].action, entries[index].hash);
-      }
+      // Reconcile every dependency against fresh canonical ancestry before a new write.
+      await confirmAll();
       const [nonce, pending, head, fees] = await Promise.all([
         provider.getTransactionCount(journal.from, "latest"), provider.getTransactionCount(journal.from, "pending"),
         provider.getBlock("latest"), provider.getFeeData(),
@@ -124,5 +205,5 @@ export function createTransactionPipeline(options: {
     }
     throw new ChainPendingError(action, entry.hash);
   }
-  return { send, canonicalReceipt };
+  return { send, canonicalReceipt, confirmAll };
 }

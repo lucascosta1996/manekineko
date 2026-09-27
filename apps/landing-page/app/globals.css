@@ -1,3 +1,4 @@
+@import "../../../packages/contracts/src/lifecycle.css";
 :root {
   --paper: #fafaf7;
   --ink: #1a1a1a;
@@ -587,3 +588,5 @@ h1 { font-size: clamp(32px, 4.3vw, 62px); font-weight: 500; line-height: 1.08; l
   .newsletter-field { flex-direction: column; gap: 10px; }
   .newsletter-field .button { width: 100%; }
 }
+
+.hero-live{margin:1.4rem 0;max-width:34rem}.hero-live p{margin:.45rem 0}.hero-live small{display:block;font-size:.72rem;line-height:1.5;opacity:.7}

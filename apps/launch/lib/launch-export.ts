@@ -12,7 +12,7 @@ export function verifyLaunchExport(input: unknown, expectedHash: string): Launch
   if (Object.keys(raw).length !== keys.length || Object.keys(raw).some(key => !keys.includes(key)) || raw.schemaVersion !== 1 || !["affiliate-v4", "affiliate-v5", "affiliate-v6", "affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(String(raw.contractVersion))) {
     throw new Error("Unsupported launch export schema or fields.");
   }
-  const payload = requireValidLaunchPayload({ contract: raw.contract, operations: raw.operations });
+  const payload = requireValidLaunchPayload({ contract: raw.contract, operations: raw.operations }, {preserveHistoricalDuration:true});
   const artifact: LaunchArtifact = { schemaVersion: 1, contractVersion: launchContractVersion(payload), ...payload };
   if (raw.contractVersion !== artifact.contractVersion) throw new Error("Contract version does not match the financial model.");
   // Finalized exports already contain normalized addresses and the reviewed VRF values.

@@ -97,7 +97,12 @@
     "./winner-credits-v6": "./src/ManekinekoWinnerCreditsV6.json",
     "./winner-credits-v6-source": "./src/ManekinekoWinnerCreditsV6.source.json",
     "./v10-config": "./src/v10-config.ts",
-    "./permanent-combinations": "./src/permanent-combinations.ts"
+    "./permanent-combinations": "./src/permanent-combinations.ts",
+    "./retired-round-owner": "./src/ManekinekoRetiredRoundOwner.json",
+    "./retired-round-owner-source": "./src/ManekinekoRetiredRoundOwner.source.json",
+    "./lifecycle": "./src/lifecycle.ts",
+    "./lifecycle.css": "./src/lifecycle.css",
+    "./mint-duration": "./src/mint-duration.ts"
   },
   "dependencies": {
     "ethers": "6.17.0"

@@ -62,8 +62,8 @@ test("each collection keeps independent terms while sharing the first factory au
   form.steps[1].form.affiliatePoolPercent = "20";
   const payload = payloadFromAutomationForm(form);
   assert.equal(payload.steps[1].payload.contract.mintPriceWei, "25000000000000000");
-  assert.equal(payload.steps[1].payload.contract.mintDurationSeconds, "604800");
-  assert.equal(payload.steps[0].payload.contract.mintDurationSeconds, "2592000");
+  assert.equal(payload.steps[1].payload.contract.mintDurationSeconds, "25200");
+  assert.equal(payload.steps[0].payload.contract.mintDurationSeconds, "86400");
   assert.equal(payload.steps[1].payload.contract.affiliatePoolBps, "2000");
   assert.equal(payload.steps[0].payload.contract.affiliatePoolBps, "2000");
   for (const step of payload.steps) {
@@ -111,12 +111,12 @@ test("fixed deadlines keep their exact date when an unfinished hidden duration n
     step.form.durationUnit = "days";
     const result = payloadFromAutomationForm(form);
     assert.equal(result.steps[0].deadline.at, "2030-12-01T06:30:45Z");
-    assert.equal(result.steps[0].payload.contract.mintDurationSeconds, "2592000");
+    assert.equal(result.steps[0].payload.contract.mintDurationSeconds, "86400");
     assert.equal(step.form.duration, value, "Conversion must not mutate the editor state.");
   }
   step.form.duration = "3599";
   step.form.durationUnit = "seconds";
-  assert.equal(payloadFromAutomationForm(form).steps[0].payload.contract.mintDurationSeconds, "2592000");
+  assert.equal(payloadFromAutomationForm(form).steps[0].payload.contract.mintDurationSeconds, "86400");
   step.form.duration = "3601";
   assert.equal(payloadFromAutomationForm(form).steps[0].payload.contract.mintDurationSeconds, "3601", "Valid saved durations remain unchanged.");
   step.deadlineMode = "duration";

@@ -12,6 +12,7 @@ export type LaunchPayload = {
     maxSupply: string;
     mintPriceWei: string;
     mintDurationSeconds: string;
+    sepoliaRehearsal?: string;
     initialOwner: string;
     requestConfirmations: string;
     callbackGasLimit: string;

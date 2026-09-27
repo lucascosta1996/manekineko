@@ -140,6 +140,12 @@ test("isolated PostgreSQL provision, rerun and runtime role boundaries", {
     const denied = (operation) => assert.rejects(operation, (error) => error.code === "42501");
     await t.test("public web cannot read launch accounts, edit catalog, claim ownership or create schema objects", async () => {
       await web.query("SELECT * FROM manekineko_collections");
+      await launch.query("SELECT id,name,season_name,chain_id,round_id,contract_version FROM manekineko_collections");
+      await launch.query("SELECT collection_id,phase,total_minted,sold_out_at,prize_paid,updated_at FROM manekineko_collection_state");
+      await denied(() => launch.query("UPDATE manekineko_collection_state SET total_minted=0"));
+      await launch.query("SELECT collection_id,chain_id,status,contract_address FROM manekineko_deployments");
+      await denied(() => launch.query("UPDATE manekineko_collections SET name='Compromised'"));
+      await denied(() => launch.query("DELETE FROM manekineko_deployments"));
       await web.query("SELECT * FROM manekineko_collection_awards");
       await denied(() => web.query("DELETE FROM manekineko_collection_awards"));
       await denied(() => web.query("SELECT * FROM manekineko_launch_users"));

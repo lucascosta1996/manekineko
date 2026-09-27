@@ -81,6 +81,8 @@ test("runtime persistence, concurrency, immutable binding and network guards on 
     assert.equal(permanentRun.preparedHash, permanentPrepared.contentHash);
     await requestSeasonControl(pool, actor, permanentPrepared.id, { action: "pause", revision: permanentRun.revision });
     assert.deepEqual(await exportLaunchAutomation(pool, prepared.id), historicalExport);
+    const oldPaused = await requestSeasonControl(pool, actor, prepared.id, { action: "pause", revision: monitoringResumed.revision });
+    await assert.rejects(() => requestSeasonControl(pool!, actor, prepared.id, { action: "resume", revision: oldPaused.revision, profileRevision: 3 }), /superseded history/);
     await assert.rejects(() => pool!.query("UPDATE manekineko_launch_automations SET prepared_artifact=jsonb_set(prepared_artifact,'{contractVersion}','\"affiliate-v9\"') WHERE id=$1", [permanentPrepared.id]), /immutable/);
     await pool.query("UPDATE manekineko_launch_users SET disabled_at=now() WHERE id=$1", [actor.userId]);
     await assert.rejects(() => saveRuntimeProfile(pool!, actor, "11155111", { ...config, revision: 2 }), /inactive/);

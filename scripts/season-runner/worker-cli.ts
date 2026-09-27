@@ -10,7 +10,11 @@ import { MediaPending } from "./outbox.ts";
 import { AmbiguousDelivery, XApiError, verifyXPost } from "./social.ts";
 import { getRuntimeWorkerProfile } from "../../apps/launch/lib/season-runtime-store.ts";
 import { encryptRuntimeSecret, decryptRuntimeSecret } from "../../apps/launch/lib/season-runtime-crypto.ts";
+import { assertLogPathSeparate, openWorkerLog } from "./logging.ts";
 
+import { createV9ChainAdapter, createV10ChainAdapter } from "./chain.ts";
+import { retryVerification } from "./explorer-verification.ts";
+import type { SeasonState } from "./runner.ts";
 import { seasonVersionPolicy } from "./version.ts";
 
 function help(chainId: 1 | 11155111) {
@@ -20,16 +24,17 @@ function help(chainId: 1 | 11155111) {
   ${command} --run-id UUID --env-file PRIVATE_ENV --execute${chainId === 1 ? " --allow-mainnet" : " --sepolia-rehearsal"}
   ${command} --setup-registries --setup-config PRIVATE_JSON --journal PRIVATE_FILE --env-file PRIVATE_ENV [--execute]${chainId === 1 ? " [--allow-mainnet]" : ""}
   ${command} --run-id UUID --env-file PRIVATE_ENV --execute --reconcile-action ACTION_KEY --post-id X_POST_ID${chainId === 1 ? " --allow-mainnet" : ""}
-Options: --interval-ms 1000..30000.${chainId === 11155111 ? " --wallet-vault PRIVATE_FILE, --recycle-sepolia-funds (require --sepolia-rehearsal)." : ""}
+Verification only: --verify-explorer [--execute] [--retry-verification ADDRESS]. Paused-run maintenance; no chain or X writes.
+Options: --interval-ms 1000..30000. --log-file PRIVATE_LOG (append timestamped diagnostic NDJSON).${chainId === 11155111 ? " --sepolia-scenario PRIVATE_JSON, --wallet-vault PRIVATE_FILE, --recycle-sepolia-funds (require --sepolia-rehearsal)." : ""}
 ${chainId === 1 ? "Uses the configured operator only; buyer-wallet creation, funding and simulated purchases are forbidden." : "Rehearsal uses a persistent encrypted 50-wallet vault. Keep the same vault and master key across runs."}
 Read docs/season-automation.md before execution.`;
 }
 export type RehearsalSupport = {
-  options: Pick<RunnerOptions, "wallets" | "donors" | "recycleSepoliaFunds">;
+  options: Pick<RunnerOptions, "wallets" | "donors" | "recycleSepoliaFunds" | "scenario">;
   step: NonNullable<RunnerDependencies["runSepoliaRehearsalStep"]>;
 };
 type PrepareRehearsal = (args: ReturnType<typeof parseArguments>) => Promise<RehearsalSupport>;
-const report = (value: unknown) => process.stdout.write(`${JSON.stringify(value)}\n`);
+const stdoutReport = (value: unknown) => process.stdout.write(`${JSON.stringify(value)}\n`);
 export function safeError(error: unknown) {
   if (error instanceof RunnerStop) return error.code;
   if (error instanceof AmbiguousDelivery) return "x_delivery_requires_reconciliation";
@@ -39,9 +44,7 @@ export function safeError(error: unknown) {
   return "dependency_or_chain_validation_failed_review_configuration_and_activity";
 }
 
-async function main(expectedChain: 1 | 11155111, prepareRehearsal?: PrepareRehearsal) {
-  const args = parseArguments(process.argv.slice(2), expectedChain);
-  if (args.help) { process.stdout.write(`${help(expectedChain)}\n`); return; }
+async function main(args: ReturnType<typeof parseArguments>, report: (value: unknown) => void, prepareRehearsal?: PrepareRehearsal) {
   await loadPrivateEnvironment(args.envFiles as string[]);
   const chainId = Number(args.chain) as 1 | 11155111, execute = args.execute === true, config = connectionConfig(chainId, execute);
   const pool = new pg.Pool({ connectionString: config.databaseUrl, max: 4, connectionTimeoutMillis: 10000, idleTimeoutMillis: 30000 });
@@ -80,6 +83,24 @@ async function main(expectedChain: 1 | 11155111, prepareRehearsal?: PrepareRehea
     const store = await openRunStore(pool, String(args["run-id"]), chainId, execute);
     let runner: Awaited<ReturnType<typeof createSeasonRunner>> | undefined;
     try {
+      if (args["verify-explorer"]) {
+        ensure(!execute || store.row.desired_state === "paused", "pause_run_before_verification_maintenance");
+        const state = store.state as SeasonState;
+        ensure(state.journal && state.collections, "verification_deployment_journal_required");
+        const adapter = await (store.artifact.contractVersion === "affiliate-v10" ? createV10ChainAdapter : createV9ChainAdapter)({ ...config, ...registryPins(chainId,process.env,seasonVersionPolicy(store.artifact.contractVersion).contractVersion), chainId, execute,
+          owner: store.artifact.steps[0].payload.contract.initialOwner, journal: state.journal, saveJournal: async journal => { state.journal=journal; await store.save(state); } });
+        try {
+          for (const item of Object.values(state.collections)) if(item.deployment) await adapter.queueExistingVerification(item.deployment);
+          if(args["retry-verification"]) {
+            ensure(execute, "verification_retry_requires_execute");
+            const address=getAddress(String(args["retry-verification"])).toLowerCase(), job=state.journal.verifications?.[address];
+            ensure(job, "verification_job_not_found"); retryVerification(job); await store.save(state);
+          }
+          if(execute) for(let i=0;i<Object.keys(state.journal.verifications??{}).length;i++)await adapter.verifyExplorer();
+          report({mode:execute?"verification-maintenance":"verification-preflight",runId:store.row.id,jobs:Object.values(state.journal.verifications??{}).map(({address,contractName,state,reason,attempts,fingerprint})=>({address,contractName,state,reason,attempts,fingerprint}))});
+        } finally {adapter.destroy();}
+        return;
+      }
       if (args["reconcile-action"]) {
         ensure(store.row.desired_state === "paused", "pause_run_before_reconciling_x_delivery");
         const action = await store.action(String(args["reconcile-action"]));
@@ -127,6 +148,31 @@ async function main(expectedChain: 1 | 11155111, prepareRehearsal?: PrepareRehea
   } finally { await pool.end(); process.removeListener("SIGINT", stop); process.removeListener("SIGTERM", stop); }
 }
 export async function runWorkerCli(chainId: 1 | 11155111, prepareRehearsal?: PrepareRehearsal) {
-  try { await main(chainId, prepareRehearsal); }
-  catch (error) { report({ mode: "stopped", reason: safeError(error) }); process.exitCode = 1; }
+  let log: ReturnType<typeof openWorkerLog> | undefined;
+  const report = (value: unknown) => { log?.write(value); stdoutReport(value); };
+  try {
+    const args = parseArguments(process.argv.slice(2), chainId);
+    if (args.help) { process.stdout.write(`${help(chainId)}\n`); return; }
+    if (args["log-file"]) {
+      const defaultVault = ".private/season-runner/sepolia-wallets.enc", vault = String(args["wallet-vault"] ?? defaultVault);
+      const privatePaths = [...(args.envFiles as string[]), defaultVault, `${defaultVault}.lock`, vault, `${vault}.lock`,
+        ...[args["setup-config"], args.journal].filter((path): path is string => typeof path === "string")];
+      assertLogPathSeparate(String(args["log-file"]), privatePaths);
+      log = openWorkerLog(String(args["log-file"]), { chainId, runId: typeof args["run-id"] === "string" ? args["run-id"] : undefined });
+      log.write({ mode: "worker_started", execute: args.execute === true, once: args.once === true,
+        sepoliaRehearsal: args["sepolia-rehearsal"] === true, recycleSepoliaFunds: args["recycle-sepolia-funds"] === true });
+    }
+    await main(args, report, prepareRehearsal);
+  } catch (error) {
+    const result = { mode: "stopped", reason: safeError(error) };
+    try { log?.write(result); } catch { /* The stdout fallback still reports a safe failure code. */ }
+    stdoutReport(result); process.exitCode = 1;
+  } finally {
+    if (log) {
+      try { log.write({ mode: "worker_stopped", exitCode: Number(process.exitCode ?? 0) }); }
+      catch (error) { stdoutReport({ mode: "stopped", reason: safeError(error) }); process.exitCode = 1; }
+      try { log.close(); }
+      catch (error) { stdoutReport({ mode: "stopped", reason: safeError(error) }); process.exitCode = 1; }
+    }
+  }
 }

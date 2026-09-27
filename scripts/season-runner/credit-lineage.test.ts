@@ -64,7 +64,7 @@ function fixture(versions = [6, 5, 4, 3, 2]) {
     assert(version >= 2 && version <= 5);
     return { abi, deployedBytecode: code(version) };
   });
-  return { verify, state, ledgers };
+  return { verify, state, ledgers, provider };
 }
 
 test("V10 checks the complete compiled V5-to-V2 lineage and caches only one canonical block", async () => {
@@ -126,4 +126,34 @@ test("an explicitly fresh V6 ledger may have no predecessor, while another curre
   assert.equal(fresh.state.scans, 0); assert.equal(fresh.state.loaded.length, 0);
   const wrong = fixture([6]); wrong.ledgers.get(address(6))!.version = 5;
   await assert.rejects(() => wrong.verify(wrong.state.block), /current registry must be V6/);
+});
+
+test("concurrent predecessor checks must all finish and a delayed failure never caches approval", async () => {
+  const f = fixture(), original = f.provider.getLogs.bind(f.provider);
+  const releases = new Map<string, () => void>();
+  let allStarted!: () => void;
+  const started = new Promise<void>(resolve => { allStarted = resolve; });
+  f.provider.getLogs = async filter => {
+    await new Promise<void>(resolve => { releases.set(filter.address.toLowerCase(), resolve); if (releases.size === 4) allStarted(); });
+    if (filter.address.toLowerCase() === address(2)) throw new Error("delayed_registry_proof_failed");
+    return original(filter);
+  };
+  let finished = false;
+  const check = f.verify(f.state.block).finally(() => { finished = true; });
+  const rejected = assert.rejects(check, /delayed_registry_proof_failed/);
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+  try {
+    await Promise.race([started, new Promise<never>((_, reject) => { timeout = setTimeout(() => reject(new Error("Predecessor checks were serialized")), 2000); })]);
+    for (const [key, release] of releases) if (key !== address(2)) release();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(finished, false, "Three successful ledgers cannot approve while the fourth is unresolved");
+    releases.get(address(2))!(); await rejected;
+  } finally {
+    if (timeout) clearTimeout(timeout);
+    for (const release of releases.values()) release();
+  }
+  f.provider.getLogs = original;
+  const calls = f.state.calls;
+  await f.verify(f.state.block);
+  assert(f.state.calls > calls, "A failed parallel check must not leave a same-block approval");
 });

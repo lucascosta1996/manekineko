@@ -7,6 +7,11 @@ function fixture(): AnnouncedSeason {
   return { version: 1, runId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", chainId: 11155111, seasonId: `0x${"12".repeat(32)}`, seasonName: "Moonlight Study", seasonNumber: 1, colors: ["#330000", "#660000"], status: "running", announcedAt: "2030-01-01T11:00:00Z", updatedAt: "2030-01-01T12:00:00Z", collections: [{ id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb", number: 1, name: "Cinder Study", color: "#330000", status: "preparing", enrollmentOpensAt: "2030-01-01T12:30:00Z", saleStartAt: "2030-01-01T13:00:00Z", mintDeadline: "2030-01-02T13:00:00Z", contractAddress: null }] };
 }
 const activity = (season: AnnouncedSeason, time = now) => announcedCollectionActivity(season, season.collections[0], time);
+test("rescheduled announcements retain the original opening and validate both dates",()=>{
+  const value=fixture();value.collections[0].originalSaleStartAt="2030-01-01T01:00:00Z";
+  assert.equal(parseAnnouncedSeason(value).collections[0].originalSaleStartAt,"2030-01-01T01:00:00.000Z");
+  value.collections[0].originalSaleStartAt="invalid";assert.throws(()=>parseAnnouncedSeason(value));
+});
 test("public schedule parser whitelists season and collection fields and preserves palette order", () => {
   const source = fixture();
   const result = parseAnnouncedSeason({ ...source, encryptedCredentials: "never-public", preparedArtifact: { privateKey: "never-public" }, collections: [{ ...source.collections[0], deploymentJournal: "never-public" }] });
@@ -48,11 +53,13 @@ test("zero countdown never announces an unconfirmed live mint or refund", () => 
   result = activity(value, Date.parse(value.updatedAt));
   assert.equal(result.label, "Mint deadline reached"); assert.equal(result.target, null); assert.doesNotMatch(result.detail, /refunds available|confirmed active/i);
 });
-test("stale, future-dated and paused worker snapshots suppress countdowns", () => {
+test("stale observations preserve scheduled intent without claiming readiness; paused workers stay paused", () => {
   const value = fixture();
-  assert.equal(activity(value, now + 180001).label, "Checking season status");
+  assert.equal(activity(value, now + 180001).label, "Mint scheduled in");
+  assert.equal(activity(value, now + 180001).target, value.collections[0].saleStartAt);
+  assert.match(activity(value, now + 180001).detail, /Readiness is unconfirmed/);
   value.updatedAt = "2030-01-01T12:02:00Z";
-  assert.equal(activity(value).label, "Checking season status");
+  assert.equal(activity(value).label, "Mint scheduled in");
   value.status = "paused";
   assert.equal(activity(value).label, "Season automation paused"); assert.equal(activity(value).target, null);
   value.status = "completed";

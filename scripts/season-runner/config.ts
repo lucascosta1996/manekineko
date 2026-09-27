@@ -9,8 +9,8 @@ import { seasonVersionPolicy, type SeasonContractVersion } from "./version.ts";
 
 export function parseArguments(args: string[], expectedChain?: 1 | 11155111) {
   const options: Record<string, string | boolean | string[]> = { envFiles: [] };
-  const flags = new Set(["execute", "once", "allow-mainnet", "sepolia-rehearsal", "recycle-sepolia-funds", "setup-registries", "help"]);
-  const values = new Set(["chain", "run-id", "env-file", "wallet-vault", "interval-ms", "setup-config", "journal", "reconcile-action", "post-id"]);
+  const flags = new Set(["execute", "once", "allow-mainnet", "sepolia-rehearsal", "recycle-sepolia-funds", "setup-registries", "verify-explorer", "help"]);
+  const values = new Set(["chain", "run-id", "env-file", "wallet-vault", "interval-ms", "setup-config", "journal", "reconcile-action", "post-id", "log-file", "sepolia-scenario", "retry-verification"]);
   for (let index = 0; index < args.length; index++) {
     ensure(args[index].startsWith("--"), "invalid_command_option"); const name = args[index].slice(2);
     ensure(name === "env-file" || options[name] === undefined, "duplicate_command_option");
@@ -23,10 +23,13 @@ export function parseArguments(args: string[], expectedChain?: 1 | 11155111) {
     ensure(options.chain === undefined || options.chain === String(expectedChain), "entrypoint_chain_mismatch");
     options.chain = String(expectedChain);
   }
-  ensure(options.chain !== "1" || (!options["sepolia-rehearsal"] && !options["recycle-sepolia-funds"] && !options["wallet-vault"]), "test_wallets_are_sepolia_only");
+  ensure(options.chain !== "1" || (!options["sepolia-rehearsal"] && !options["recycle-sepolia-funds"] && !options["wallet-vault"] && !options["sepolia-scenario"]), "test_wallets_are_sepolia_only");
+  ensure(!options["retry-verification"] || options["verify-explorer"], "verification_retry_requires_verification_mode");
+  ensure(!options["verify-explorer"] || !options["setup-registries"] && !options["reconcile-action"] && !options["sepolia-rehearsal"], "verification_mode_must_be_separate");
   if (options.help) return options;
   ensure(options.chain === "1" || options.chain === "11155111", "explicit_chain_required");
   ensure(options.chain !== "1" || !options.execute || options["allow-mainnet"], "mainnet_requires_allow_mainnet");
+  ensure(!options["sepolia-scenario"] || options["sepolia-rehearsal"], "scenario_requires_sepolia_rehearsal");
   ensure(!options["wallet-vault"] || options["sepolia-rehearsal"], "wallet_vault_requires_sepolia_rehearsal");
   ensure(!options["recycle-sepolia-funds"] || options["sepolia-rehearsal"], "recycling_requires_sepolia_rehearsal");
   ensure(options["setup-registries"] ? options["setup-config"] && options.journal && !options["run-id"] && !options["reconcile-action"] : typeof options["run-id"] === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(options["run-id"]), "run_id_or_setup_configuration_required");

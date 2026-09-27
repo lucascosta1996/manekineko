@@ -6,6 +6,7 @@ import { Contract, Transaction, Wallet, getAddress } from "ethers";
 import type { Provider, TransactionRequest } from "ethers";
 import { ChainPendingError, createTransactionPipeline, transactionSpend, type ChainJournal } from "./chain-transactions.ts";
 
+import { refundMintQuantity, type SepoliaScenario } from "./sepolia-scenarios.ts";
 import { ensure } from "./store.ts";
 
 const AAD = Buffer.from("tincta:sepolia-rehearsal-wallets:v1:11155111");
@@ -62,12 +63,14 @@ export async function ensureSepoliaWallets(options: { chainId: number; path: str
 }
 
 export type SepoliaRehearsalState = {
+  scenarios?: Record<string, { manifest: SepoliaScenario; recipients: string[]; verifiedRefunds?: number[]; refundedWei?: string; blockHash?: string }>;
   journals: Record<string, ChainJournal>;
   refunds: Record<string, number>;
   /** Immutable transfer intents survive a funding confirmation arriving between ticks. */
   funding: Record<string, { from: string; to: string; value: string }>;
 };
 export type SepoliaRehearsalOptions = {
+  scenario?: SepoliaScenario;
   chainId: number; provider: Provider; operator: Wallet; wallets: Wallet[];
   /** Only explicitly supplied existing test wallets can donate; keys are never discovered from environment files. */
   donors?: Wallet[]; execute: boolean; state: SepoliaRehearsalState; saveState: (state: SepoliaRehearsalState) => Promise<void>;
@@ -84,6 +87,9 @@ const abi = [
   "function mint(address,uint256) payable", "function claimPrizeForRank(uint256,address)", "function refund(uint256,address)",
   "function owner() view returns(address)", "function withdrawableBalance() view returns(uint256)", "function growthReserveBalance() view returns(uint256)",
   "function subscriptionClosed() view returns(bool)", "function withdraw(address,uint256)", "function withdrawGrowthReserve(address,uint256)", "function withdrawRandomnessFunding(address)",
+  "function saleStartAt() view returns(uint256)", "function totalRefunded() view returns(uint256)", "function totalAffiliateAccrued() view returns(uint256)", "function randomnessRequested() view returns(bool)",
+  "function affiliateWallet(uint256) view returns(address)", "function affiliateMinimumReferrals() view returns(uint256)", "function affiliateReferredMints(uint256) view returns(uint256)", "function affiliateAccrued(uint256) view returns(uint256)", "function affiliateClaimed(uint256) view returns(uint256)", "function affiliateClaimable(uint256) view returns(uint256)", "function affiliateEqualShare() view returns(uint256)", "function affiliateQualifiedCount() view returns(uint256)", "function affiliatePoolAmount() view returns(uint256)",
+  "function mintWithAffiliate(address,uint256,uint256) payable", "function claimAffiliateCommission(address)",
   "error ERC721NonexistentToken(uint256 tokenId)",
 ];
 
@@ -94,6 +100,18 @@ export async function runSepoliaRehearsalStep(options: SepoliaRehearsalOptions, 
   if (options.wallets.length !== WALLET_COUNT || new Set(options.wallets.map(wallet => wallet.address)).size !== WALLET_COUNT) throw new Error("Rehearsal requires its persistent 50 unique wallets.");
   if (!/^[1-9]\d*$/.test(options.maxFeePerGasWei) || !/^[1-9]\d*$/.test(options.maxTotalSpendWei)) throw new Error("Explicit rehearsal gas and total-spending caps are required.");
   const confirmations = options.confirmations ?? 2, state = options.state;
+  const scenario = options.scenario;
+  if (scenario) {
+    ensure(scenario.chainId === options.chainId && scenario.maxTotalSpendWei === options.maxTotalSpendWei && scenario.maxFeePerGasWei === options.maxFeePerGasWei, "scenario_spending_policy_mismatch");
+    const key = getAddress(roundAddress).toLowerCase(), recipients = options.wallets.slice(0, 3).map(wallet => wallet.address);
+    state.scenarios ??= {};
+    const existing = state.scenarios[key];
+    if (existing) ensure(JSON.stringify(existing.manifest) === JSON.stringify(scenario) && JSON.stringify(existing.recipients) === JSON.stringify(recipients), "scenario_manifest_changed");
+    else {
+      ensure(!Object.values(state.journals).some(journal => journal.transactions.some(tx => tx.action.startsWith(`mint:${key}:`))), "scenario_cannot_attach_to_existing_mints");
+      state.scenarios[key] = { manifest: scenario, recipients }; await options.saveState(state);
+    }
+  }
   const signers = new Map([options.operator, ...options.wallets, ...(options.donors ?? [])].map(wallet => [wallet.address, wallet]));
   const limit = BigInt(options.maxTotalSpendWei), ceiling = BigInt(options.maxFeePerGasWei);
   const spent = () => Object.values(state.journals).reduce((sum, journal) => sum + journal.transactions.reduce((total, entry) => total + transactionSpend(entry), 0n), 0n);
@@ -124,6 +142,23 @@ export async function runSepoliaRehearsalStep(options: SepoliaRehearsalOptions, 
   const [rawSupply, rawMinted, rawPrice, revealed, refundable] = await Promise.all([round.maxSupply(at), round.totalMinted(at), round.mintPrice(at), round.revealed(at), round.refundsAvailable(at)]);
   const supply = BigInt(rawSupply), minted = BigInt(rawMinted), price = BigInt(rawPrice);
   if (supply < 1n || supply > 1000n) throw new Error("The 50-wallet rehearsal supports collections of at most 1000 tickets.");
+  if (scenario?.kind === "refund-3-30m") {
+    ensure(version === "affiliate-v10" && supply > 3n && minted <= 3n && !revealed && !await round.randomnessRequested(at), "refund_scenario_terms_mismatch");
+    ensure(BigInt(await round.mintDeadline(at)) - BigInt(await round.saleStartAt(at)) === 1800n, "refund_scenario_duration_mismatch");
+    ensure(await round.totalAffiliateAccrued(at) === 0n, "unsold_affiliate_entitlement_invalid");
+    const counts = await Promise.all(options.wallets.slice(0, 3).map(wallet => round.mintedPerWallet(wallet.address, at)));
+    ensure(counts.every(value => value === 0n || value === 1n) && counts.reduce((sum, value) => sum + value, 0n) === minted, "refund_scenario_unexpected_primary_mints");
+  }
+  let affiliate: Wallet | undefined;
+  if (scenario?.kind === "affiliate-sellout") {
+    affiliate = options.wallets.find(wallet => wallet.address === getAddress(scenario.affiliateWallet));
+    ensure(affiliate && getAddress(await round.affiliateWallet(scenario.affiliateId, at)) === affiliate.address, "scenario_requires_genuine_enrolled_affiliate");
+    ensure(await round.affiliateMinimumReferrals(at) <= 20n, "scenario_referral_threshold_exceeds_buyer_cap");
+    if (minted === supply) {
+      const [accrued, equalShare, qualified, pool] = await Promise.all([round.affiliateAccrued(scenario.affiliateId, at), round.affiliateEqualShare(at), round.affiliateQualifiedCount(at), round.affiliatePoolAmount(at)]);
+      ensure(accrued > 0n && accrued === equalShare && accrued * qualified <= pool, "scenario_affiliate_allocation_mismatch");
+    }
+  }
   async function canonical() { if ((await options.provider.getBlock(block!.number))?.hash !== block!.hash) throw new Error("Rehearsal snapshot reorganized; retry before writing."); }
   const walletByAddress = new Map(options.wallets.map(wallet => [wallet.address, wallet]));
   const gasReserve = BigInt(options.mintGasReserve ?? "2500000") * ceiling;
@@ -147,6 +182,15 @@ export async function runSepoliaRehearsalStep(options: SepoliaRehearsalOptions, 
     if (!intent) throw new Error("Explicit Sepolia funding wallets cannot cover the next wallet's shortfall while preserving gas and remaining mints.");
     const donor = signers.get(intent.from); if (!donor) throw new Error("Saved funding donor is no longer configured.");
     await canonical(); await send(donor, key, { to: intent.to, value: BigInt(intent.value) }); return true;
+  }
+  if (affiliate && scenario?.kind === "affiliate-sellout" && minted === supply) {
+    const amount = await round.affiliateClaimable(scenario.affiliateId, at);
+    if (amount > 0n) {
+      if (await fundIfNeeded(affiliate, gasReserve, "affiliate-claim")) return { action: "fund-affiliate-claim" };
+      await canonical(); await send(affiliate, `affiliate-claim:${roundAddress.toLowerCase()}:${scenario.affiliateId}`, await round.claimAffiliateCommission.populateTransaction(affiliate.address));
+      return { action: "claim-affiliate", amountWei: String(amount) };
+    }
+    ensure(await round.affiliateClaimed(scenario.affiliateId, at) === await round.affiliateAccrued(scenario.affiliateId, at), "scenario_affiliate_claim_not_reconciled");
   }
   if (revealed) {
     const count = Number(await round.awardCount(at));
@@ -181,25 +225,41 @@ export async function runSepoliaRehearsalStep(options: SepoliaRehearsalOptions, 
       try { holder = getAddress(await round.ownerOf(token, at)); }
       catch (error) {
         const data = (error as { data?: string }).data;
-        if (data && round.interface.parseError(data)?.name === "ERC721NonexistentToken") { state.refunds[key] = token + 1; continue; }
+        if (data && round.interface.parseError(data)?.name === "ERC721NonexistentToken") {
+          if (scenario?.kind === "refund-3-30m") ensure(Object.values(state.journals).some(journal => journal.transactions.some(tx => tx.action === `refund:${key}:${token}` && tx.state === "confirmed")), "refund_burn_without_confirmed_receipt");
+          state.refunds[key] = token + 1; continue;
+        }
         throw error;
       }
       const wallet = walletByAddress.get(holder);
-      if (!wallet) { state.refunds[key] = token + 1; continue; }
+      if (!wallet) { ensure(scenario?.kind !== "refund-3-30m", "refund_holder_left_controlled_manifest"); state.refunds[key] = token + 1; continue; }
       if (await fundIfNeeded(wallet, gasReserve, `refund:${token}`)) return { action: "fund-refund", wallet: holder };
       await canonical(); await send(wallet, `refund:${key}:${token}`, await round.refund.populateTransaction(token, holder));
       state.refunds[key] = token + 1; await options.saveState(state); return { action: "refund", wallet: holder, tokenId: token };
     }
+    if (scenario?.kind === "refund-3-30m" && end >= Number(minted)) {
+      ensure(minted === 3n && await round.totalRefunded(at) === price * 3n, "refund_scenario_amount_mismatch");
+      for (let token = 1; token <= 3; token++) {
+        ensure(Object.values(state.journals).some(journal => journal.transactions.some(tx => tx.action === `refund:${key}:${token}` && tx.state === "confirmed")), "refund_receipt_missing");
+        let burned = false;
+        try { await round.ownerOf(token, at); } catch (error) { const data = (error as {data?: string}).data; burned = !!data && round.interface.parseError(data)?.name === "ERC721NonexistentToken"; }
+        ensure(burned, "refunded_nft_not_burned");
+      }
+      await canonical(); Object.assign(state.scenarios![key], { verifiedRefunds: [1,2,3], refundedWei: String(price * 3n), blockHash: block.hash });
+    }
     await options.saveState(state); return { action: end >= Number(minted) ? "refunded" : "scan-refunds" };
   }
   if (minted >= supply || !await round.saleActivated(at) || BigInt(block.timestamp) >= await round.mintDeadline(at)) return { action: "waiting" };
-  for (const wallet of options.wallets) {
+  if (scenario?.kind === "refund-3-30m" && minted === 3n) return { action: "waiting-for-refund-expiry", mintTarget: 3 };
+  for (const [walletIndex, wallet] of options.wallets.entries()) {
     const primaryMinted = BigInt(await round.mintedPerWallet(wallet.address, at));
     if (primaryMinted > 20n) throw new Error("V9/V10 wallet count violates the expected immutable cap.");
-    const quantity = (supply - minted) < 20n - primaryMinted ? supply - minted : 20n - primaryMinted;
+    const quantity = scenario?.kind === "refund-3-30m" ? refundMintQuantity(minted, primaryMinted, walletIndex) : (supply - minted) < 20n - primaryMinted ? supply - minted : 20n - primaryMinted;
     if (quantity === 0n) continue;
     if (await fundIfNeeded(wallet, quantity * price + gasReserve, `mint:${primaryMinted}`)) return { action: "fund-mint", wallet: wallet.address };
-    await canonical(); await send(wallet, `mint:${roundAddress.toLowerCase()}:${primaryMinted}`, await round.mint.populateTransaction(wallet.address, quantity, { value: quantity * price }));
+    const referred = scenario?.kind === "affiliate-sellout" && wallet.address !== affiliate?.address;
+    const request = referred ? await round.mintWithAffiliate.populateTransaction(wallet.address, quantity, scenario.affiliateId, { value: quantity * price }) : await round.mint.populateTransaction(wallet.address, quantity, { value: quantity * price });
+    await canonical(); await send(wallet, `mint:${roundAddress.toLowerCase()}:${primaryMinted}`, request);
     return { action: "mint", wallet: wallet.address, quantity: String(quantity) };
   }
   throw new Error("The persistent 50 wallets have exhausted their V9/V10 allowance before sellout; reconcile supply and prior mints.");

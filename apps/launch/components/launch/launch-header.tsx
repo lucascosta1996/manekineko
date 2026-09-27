@@ -10,7 +10,7 @@ export function LaunchHeader({
   pending = false,
 }: {
   username: string;
-  active: "configurations" | "seasons";
+  active: "configurations" | "seasons" | "earnings" | "active" | "upcoming";
   onLogout: () => void;
   pending?: boolean;
 }) {
@@ -105,6 +105,9 @@ export function LaunchHeader({
             >
               Collections
             </a>
+            <a href="/active-collection" aria-current={active === "active" ? "page" : undefined}>Active collection</a>
+            <a href="/upcoming-collection" aria-current={active === "upcoming" ? "page" : undefined}>Upcoming collection</a>
+            <a href="/earnings" aria-current={active === "earnings" ? "page" : undefined} onClick={() => setOpen(false)}>Creator earnings</a>
           </nav>
           <div className="launch-account">
             <span className="launch-account-avatar" aria-hidden="true">

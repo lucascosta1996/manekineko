@@ -128,3 +128,13 @@ test("new finalization and automation preparation reject omitted V6 reward field
   await assert.rejects(() => prepareLaunchAutomation(db, actor, id, 1, AUTOMATION_NOW), error => error instanceof Error && "issues" in error && String(error.issues).includes("winner credits registry"));
   assert.equal(writes, 0);
 });
+
+test("new collection and season budgets default to 2 ETH and preserve explicit saved budgets", () => {
+  const form = defaultLaunchForm();
+  assert.equal(form.winnerCreditSponsorshipEth, "2");
+  assert.equal(defaultAutomationForm(["first"]).steps[0].form.winnerCreditSponsorshipEth, "2");
+  const saved = { payload: payloadFromForm({ ...form, winnerCreditSponsorshipEth: "0.025" }), label: "Saved budget" } as LaunchConfiguration;
+  assert.equal(formFromConfiguration(saved).winnerCreditSponsorshipEth, "0.025");
+  assert.equal(winnerCreditBudget(form)?.maximumClaims, "200");
+  assert.equal(payloadFromForm(form).operations.winnerCreditSponsorshipWei, "2000000000000000000");
+});

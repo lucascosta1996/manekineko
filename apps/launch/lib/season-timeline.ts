@@ -117,9 +117,9 @@ export function resolveTimedAutomationStep(plan: AutomationPayload, context: Aut
     if (!UINT.test(result.operations.enrollmentWindowSeconds) || launch - now <= BigInt(result.operations.enrollmentWindowSeconds)) invalid("Insufficient time remains to deploy, confirm and complete affiliate enrollment before the fixed launch.");
     result.contract.saleStartAt = launch.toString();
     const duration = step.deadline.mode === "fixed" ? (step.deadline.at ? timestamp(step.deadline.at, "Mint deadline") - launch : -1n) : (UINT.test(result.contract.mintDurationSeconds) ? BigInt(result.contract.mintDurationSeconds) : -1n);
-    if (duration < 3600n || duration > 31_536_000n) invalid("The mint deadline must be between 1 hour and 365 days after the fixed sale start.");
+    if (duration < (result.contract.sepoliaRehearsal === "refund-3-30m" && plan.chainId === "11155111" ? 1800n : 3600n) || duration > 31_536_000n) invalid("The mint deadline must be between 1 hour and 365 days after the fixed sale start.");
     result.contract.mintDurationSeconds = duration.toString();
-    const validation = validateLaunchPayload(result, { requireSeasonAppearance: true, requireWinnerCredits: true, requireAffiliateEligibility: true });
+    const validation = validateLaunchPayload(result, { requireSeasonAppearance: true, requireWinnerCredits: true, requireAffiliateEligibility: true, preserveHistoricalDuration: true });
     if (!validation.valid || !validation.payload) invalid(validation.issues.join(" "));
     return { status: "ready_for_preflight", stepId: step.id, payload: validation.payload, mintDeadline: (launch + duration).toString(), earliestAt: instant(now) };
   } catch (error) { return { status: "pause", reason: error instanceof Error ? error.message : "Invalid season timing." }; }

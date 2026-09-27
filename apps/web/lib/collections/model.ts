@@ -9,6 +9,7 @@ export interface CollectionPublic {
   algorithmVersion: AlgorithmVersion;
   randomnessProvider: RandomnessProvider;
   randomnessRequestId: string | null;
+  drawEvents?: { name: string; transactionHash: string; at: string }[];
   randomnessState: "not_requested" | "pending" | "fulfilled" | null;
   id: string;
   slug: string;

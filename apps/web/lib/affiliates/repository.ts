@@ -9,6 +9,7 @@ import { AFFILIATE_CONSUME_SQL, AFFILIATE_RATE_SQL } from "./queries";
 
 export interface ProgramRecord {
   minAffiliateReferrals?: number; affiliatePayoutCapBps?: number; winnerCount?: number; secondPrizeBps?: number; saleStartAt?: Date;
+  enrollmentOpensAt?: string | null;
   collectionId: string; collectionName: string; chainId: number; roundId: string;
   mode: "demo" | "live"; maxSlots: number; enrollmentEnabled: boolean; enrollmentSigner: string | null;
   contractAddress: string | null; factoryAddress: string | null; deploymentStatus: string;
@@ -20,6 +21,9 @@ export async function programRecord(collectionId: string): Promise<ProgramRecord
   if (!process.env.DATABASE_URL) throw new AffiliateError("database_unavailable", "Affiliate data requires the configured database.", 503);
   const result = await database().query<ProgramRecord>(`SELECT p.collection_id AS "collectionId",c.name AS "collectionName",c.chain_id::integer AS "chainId",c.round_id::text AS "roundId",
     c.min_affiliate_referrals AS "minAffiliateReferrals",c.affiliate_payout_cap_bps AS "affiliatePayoutCapBps",c.winner_count AS "winnerCount",c.second_prize_bps AS "secondPrizeBps",c.sale_start_at AS "saleStartAt",
+    (SELECT item->>'enrollmentOpensAt' FROM manekineko_season_runtime_public r,
+      LATERAL jsonb_array_elements(r.payload->'collections') item
+      WHERE r.chain_id=c.chain_id AND item->>'id'=c.id::text ORDER BY r.updated_at DESC LIMIT 1) AS "enrollmentOpensAt",
     p.mode,p.contract_version AS "contractVersion",c.contract_version AS "collectionContractVersion",c.prize_bps AS "prizeBps",c.affiliate_pool_bps AS "affiliatePoolBps",p.affiliate_rates_bps AS "affiliateRatesBps",p.max_slots AS "maxSlots",p.enrollment_enabled AS "enrollmentEnabled",p.enrollment_signer AS "enrollmentSigner",
     d.contract_address AS "contractAddress",d.factory_address AS "factoryAddress",d.status AS "deploymentStatus",
     c.mint_price_wei::text AS "mintPriceWei",c.max_supply AS "maxSupply",c.algorithm_version AS "algorithmVersion",d.mint_deadline AS "mintDeadline"

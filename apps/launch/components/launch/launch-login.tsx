@@ -7,7 +7,7 @@ import { LaunchBrand } from "./brand";
 export function LaunchLogin({
   destination = "/seasons",
 }: {
-  destination?: "/seasons" | "/launch";
+  destination?: ReturnType<typeof import("../../lib/launch-navigation").safeLaunchDestination>;
 }) {
   const router = useRouter();
   const [pending, setPending] = useState(false);

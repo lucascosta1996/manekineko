@@ -1,0 +1,43 @@
+Run 1st season on testnet - notes
+
+- It shows “Checking season status” on https://manekineko-staging-web.vercel.app/seasons/11155111/0xd532e78151b2f58444b3a87563ee0edd3514b173d51cb7dea444e7ea287f1dfc
+
+- It was supposed to show a counter.
+- Maybe it’s because the funding is happening now… But it should be showing a counter if it’s already scheduled to launch at X time
+- I dont see the season with 2 collections in the launch app anymore
+- Okay now that event “deployed:1 “ shows on terminal, I can see the counter on https://manekineko-staging-web.vercel.app/seasons/11155111/0xd532e78151b2f58444b3a87563ee0edd3514b173d51cb7dea444e7ea287f1dfc
+- I tried enrolling to the affiliate program but I see a disabled button after connecting my wallet, and also, I see a prompt “Check your qualifying NFT” even though this is the first collection of the first season ever so we shouldn’t prompt users to enter qualifying NFTs
+- Also I dont know what “Automated enrollment is not configured for this deployment yet.” means in this page.
+- Oh never mind, I see now in the X post that Affiliate enrollment opens in 30m.
+- But still, affiliate program page should show a counter so that the user can have a clear vision of what is going on in the project and launch
+- Right now I see a counter saying “Mint scheduled in”. So Mint and affiliates enrollment happen at the same time?
+- I noticed we have a warning like “No collection is minting right now”, I think we can customize this message indicating that no collections are minting but there is one scheduled, check below…
+- After the counter ends, it shows “awaiting activation”. If that actually means that the deploy is happening, please change it to something like “contract deployment in progress”
+- And yeah, I wasn’t able to enroll in the affiliates program… and no wallets were enrolled as well.
+- Mint is live post on X was published. That is great.
+- currently there are too many information on the minting page, we need to make them more compact
+- On this collection, that no affiliates were enrolled, we need to decide what to do with the portion that was reserved for them. I think it should go to the operator and on the next collection I can make the prize bigger. Let’s add that to the docs.
+- And do never set a minting close time longer than 1 day. It should be set for 24 hours by standard
+- The label “Paid, referral and sponsored tickets share the same allowance. Transferring NFTs does not reset it.” Is too big and is confusing, let’s compact it or dont even show it
+- The contract shows as unverified. Can we automate its verification?
+- Do we use a canonical contract (like a factory) that generates new contracts?
+- On app.tincta.xyz, we must have a page “claim your prizes” where the user connects their wallet and if the wallet has any prizes to claim or already claimed prizes, it will show up there
+- The label “mint open” that stays over the counter could have a different style, more highlighted
+- We could have a subtle animation where it says that a mint is live, across all applications
+- The hero on landing page must display the current minting collection when a collection is live and a counter when a collection is about to be live.
+- In the NFT, remove the labels that says “permanent edition numbers fixed at mint”
+- On the next season run, let’s make a collection refund, set the ending time to 30 minutes and mint only 3 NFTs
+- Create a page on launch app “active collection”
+- Create a page on launch app “upcoming collection”
+- On the label “The collection is sold out and waiting for Chainlink VRF.”, please make it clearer what chainlink vrf is.
+- After sold out I noticed we have this label on mint page: Minting is not available for this collection. I think we should remove it or replace it saying the winners are currently being revealed or something like that
+- Couldnt test affiliates commission claim because nobody was able to enroll.
+- After sell out, the minting page of the sold out collection should change completely to display that the collection is sold out and how to claim the prizes and commissions. If the Chainlink VRF is still pending, display that too with a loading animation that matches the project visual identity.
+- The transaction Request Randomness was completed 8 minutes ago and still I dont see any changes in the UI indicating the winner…
+- We should also have a post for displaying the winners, still dont see it
+- Been 13 minutes and cant see the winners yet… And I cant even see if there is anything pending on chainlink side for example, we need that to be displayed very transparently to the public.
+- Ok I see it now on X the winners revealed post, looks good, but still, we need a progress indication after the collection is sold out
+- But yeah, the eth that was supposed to go to the affiliates seems to be basically lost. Only 2 ETH is available for the creator to withdraw, 6 ETH for the winners and and the other 2 ETH might be lost forever. It should not be this way. If there are no affiliates, the ETH should go to the creator
+- After finalized draw, the X post failed. Even though the cost until the Winners revealed post was 0.22 cents and I topped up X console with 15 dollars.: {"mode":"pending","action":"369e50fc-47f3-496f-938d-53e5ea0f9d02:finalize-draw:0","transactionHash":"0x9c87a0c0711ed74257f5a84e02150302952b53489704e9933eda8d76779033b3"}
+- {"mode":"paused","reason":"x_request_rejected_http_403","runId":"257c7ab9-9e56-4daf-b5db-917a05d15d1c"}
+- Now I cant even test if I can withdraw 2ETH because the contract is not verified. Please make the contract verified and make it always be verified on deploy.
