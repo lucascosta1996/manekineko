@@ -89,6 +89,10 @@ The new source reader separately verified both Airy collections' current zero ba
 
 Release must apply migration 029 first, review indexer reconciliation frequency, deploy compatible Web/Landing/Launch/Indexer revisions, configure the intended WalletConnect project/origin if mobile sessions are wanted, then verify fresh hosted views. The separate manual sellout rehearsal still needs approved target IDs/dates, verified affiliate eligibility, role addresses, budgets and explicit live execution. The pre-existing three-mint/30-minute refund scenario remains separate. No key export or new live operation is implied by this implementation.
 
+### Authorized migration follow-up — 2026-09-27 23:55 UTC
+
+After the source release, the user explicitly requested migration 029. It was applied to the verified dedicated Sepolia staging database at `2026-09-27T23:55:25.011Z`, using the existing direct TLS-verified administrator connection and migration runner. All 28 prior migration checksums matched; 029 was the only pending migration. Its missing `BEGIN`/`COMMIT` wrapper was corrected before application so the schema change and ledger entry committed together. Recorded SHA-256: `5258db03a698efaa84e4f291167aaed9e4e805aad81199f20daa3694c98533eb`. The nullable `timestamptz` column has no default; Web read and indexer insert/update privileges were verified without changing grants. No fixture data, timestamp backfill, worker execution or chain transaction was performed. This completes the hosted schema prerequisite; hosted application behavior and fresh indexer observations remain separate verification boundaries.
+
 ### Final local regression results
 
 | Package / boundary | Result |
