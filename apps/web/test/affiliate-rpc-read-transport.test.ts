@@ -8,6 +8,13 @@ const params = [{ to: `0x${"2".repeat(40)}`, data: "0x12345678" }, { blockHash, 
 const options = { limiter: createRpcReadLimiter({ minIntervalMs: 0 }), random: () => 0 };
 const reply = (init: RequestInit | undefined, value: unknown = "0x1") => Response.json({ jsonrpc: "2.0", id: JSON.parse(String(init?.body)).id, result: value });
 
+test("paid prize discovery can read receipts while transaction broadcasts stay forbidden",async()=>{
+  let calls=0;const receipt={status:"0x1",transactionHash:blockHash,logs:[]};
+  const rpc=createReadRpc(secretUrl,{...options,fetch:async(_url,init)=>{calls++;assert.equal(JSON.parse(String(init?.body)).method,"eth_getTransactionReceipt");return reply(init,receipt);}});
+  assert.deepEqual(await rpc("eth_getTransactionReceipt",[blockHash]),receipt);
+  await assert.rejects(rpc("eth_sendRawTransaction",["0xdead"]),RpcReadUnavailable);assert.equal(calls,1);
+});
+
 test("read RPC recovers from 429 and preserves the exact request ID, params and canonical block", async () => {
   const bodies: string[] = [], waits: number[] = [];
   const rpc = createReadRpc(secretUrl, { ...options, sleep: async ms => { waits.push(ms); }, fetch: async (_url, init) => {

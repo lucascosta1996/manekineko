@@ -1,4 +1,4 @@
-const READ_METHODS = new Set(["eth_chainId", "eth_getBlockByNumber", "eth_getCode", "eth_call"]);
+const READ_METHODS = new Set(["eth_chainId", "eth_getBlockByNumber", "eth_getCode", "eth_call", "eth_getTransactionReceipt"]);
 const RETRYABLE_HTTP = new Set([429, 502, 503, 504]);
 const MAX_ATTEMPTS = 3;
 const MAX_RETRY_DELAY_MS = 2000;

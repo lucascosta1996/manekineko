@@ -5,7 +5,7 @@ import { chainEnabled } from "../chain-policy";
 import { isCollectionId } from "../collections/model";
 import { AffiliateError, validateAffiliatePool, validateAffiliateRates } from "./policy";
 import type { DemoScenario } from "./types";
-import { AFFILIATE_CONSUME_SQL, AFFILIATE_RATE_SQL } from "./queries";
+import { AFFILIATE_CONSUME_SQL, AFFILIATE_RATE_SQL, AFFILIATE_PROGRAM_SQL } from "./queries";
 
 export interface ProgramRecord {
   minAffiliateReferrals?: number; affiliatePayoutCapBps?: number; winnerCount?: number; secondPrizeBps?: number; saleStartAt?: Date;
@@ -19,16 +19,7 @@ export interface ProgramRecord {
 export async function programRecord(collectionId: string): Promise<ProgramRecord> {
   if (!isCollectionId(collectionId)) throw new AffiliateError("not_found", "Collection not found.", 404);
   if (!process.env.DATABASE_URL) throw new AffiliateError("database_unavailable", "Affiliate data requires the configured database.", 503);
-  const result = await database().query<ProgramRecord>(`SELECT p.collection_id AS "collectionId",c.name AS "collectionName",c.chain_id::integer AS "chainId",c.round_id::text AS "roundId",
-    c.min_affiliate_referrals AS "minAffiliateReferrals",c.affiliate_payout_cap_bps AS "affiliatePayoutCapBps",c.winner_count AS "winnerCount",c.second_prize_bps AS "secondPrizeBps",c.sale_start_at AS "saleStartAt",
-    (SELECT item->>'enrollmentOpensAt' FROM manekineko_season_runtime_public r,
-      LATERAL jsonb_array_elements(r.payload->'collections') item
-      WHERE r.chain_id=c.chain_id AND item->>'id'=c.id::text ORDER BY r.updated_at DESC LIMIT 1) AS "enrollmentOpensAt",
-    p.mode,p.contract_version AS "contractVersion",c.contract_version AS "collectionContractVersion",c.prize_bps AS "prizeBps",c.affiliate_pool_bps AS "affiliatePoolBps",p.affiliate_rates_bps AS "affiliateRatesBps",p.max_slots AS "maxSlots",p.enrollment_enabled AS "enrollmentEnabled",p.enrollment_signer AS "enrollmentSigner",
-    d.contract_address AS "contractAddress",d.factory_address AS "factoryAddress",d.status AS "deploymentStatus",
-    c.mint_price_wei::text AS "mintPriceWei",c.max_supply AS "maxSupply",c.algorithm_version AS "algorithmVersion",d.mint_deadline AS "mintDeadline"
-    FROM manekineko_affiliate_programs p JOIN manekineko_collections c ON c.id=p.collection_id
-    LEFT JOIN manekineko_deployments d ON d.collection_id=p.collection_id WHERE p.collection_id=$1::uuid`, [collectionId]);
+  const result = await database().query<ProgramRecord>(AFFILIATE_PROGRAM_SQL, [collectionId]);
   if (!result.rows[0]) throw new AffiliateError("not_found", "This collection does not have an affiliate program.", 404);
   const record = result.rows[0];
   if (!chainEnabled(record.chainId)) throw new AffiliateError("not_found", "This collection is not available on this network.", 404);
