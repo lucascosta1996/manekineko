@@ -68,7 +68,9 @@ test("verification docs link identity and score checks to actual V10 read functi
 
 test("V10 docs preserve rollout, pending-result and explorer boundaries", () => {
   const text = (slug: string) => docSearchEntry(docPages.find(page => page.slug === slug)!).text;
-  assert.match(text("overview"), /V10 rollout is pending.*no live V10 deployment is recorded/);
+  assert.match(text("overview"), /September 27, 2026 Sepolia test recorded a V10 collection selling out and revealing six winning NFTs/);
+  assert.match(text("overview"), /testnet observation does not establish Mainnet availability/);
+  assert.doesNotMatch(text("overview"), /no live V10 deployment is recorded/);
   assert.match(text("verification"), /result = 0.*pending/);
   assert.match(text("verification"), /RevealNotAvailable/);
   assert.match(text("my-nfts"), /metadata deliberately omits score, award rank, prize and status/);
