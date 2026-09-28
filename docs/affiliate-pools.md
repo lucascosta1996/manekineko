@@ -37,4 +37,4 @@ V6 additionally requires a currently held NFT from an earlier completed official
 
 Migration `013_shared_affiliate_pools.sql` adds V5 terms without rewriting historical collections or finalized exports. New V5 public collections store `affiliate_pool_bps`; their program rate array is empty. The existing database demo fixtures remain V4 illustrations. V5 requires a matching V5 factory, verified deployment record and chain snapshot before live enrollment. The public app supports both models and shows their respective terms.
 
-The implementation is locally tested, including 1,000/2,000 unique ranks, all 100 active positions, rounding, refunds, signatures and reserve protection. It is not an audit or a Mainnet deployment. Follow the [V5 deployment runbook](deployment-v5.md) for public-chain qualification.
+The implementation is locally tested, including 1,000/2,000 unique ranks, all 100 active positions, rounding, refunds, signatures and reserve protection. It is not an audit or a Mainnet deployment. Follow the V5 deployment runbook (superseded guide; available in Git history) for public-chain qualification.

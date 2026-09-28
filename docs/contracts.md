@@ -25,7 +25,7 @@ For the selection proof and external dependency boundaries, see [unique combinat
 
 ## Legacy V1 contract reference
 
-Everything below describes the original `ManekinekoRound` and `ManekinekoFactory` only. Its blockhash source, owner-only payout, 50% prize and single-winner rules are historical. Do not apply its commands or lifecycle to V9/V10. The corresponding [V1 deployment guide](deployment.md) and [V2 deployment guide](deployment-v2.md) remain version-specific records.
+Everything below describes the original `ManekinekoRound` and `ManekinekoFactory` only. Its blockhash source, owner-only payout, 50% prize and single-winner rules are historical. Do not apply its commands or lifecycle to V9/V10. The corresponding V1 deployment guide (superseded guide; available in Git history) and V2 deployment guide (superseded guide; available in Git history) remain version-specific records.
 
 `ManekinekoRound` is one finite ERC-721 collection and competition. Every paid token receives a unique ordered combination of four integers, and the contract computes the complete score and winning token. The owner can deliver exactly 50% of primary mint receipts to the current winning token holder, then withdraw the remainder. `ManekinekoFactory` records successive round deployments and requires the previous round to sell out and deliver its prize before creating another.
 

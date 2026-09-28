@@ -4,7 +4,7 @@ New V6 collections combine [the shared affiliate pool](affiliate-pools.md) with 
 
 Each wallet can enroll once per collection, and each qualifying NFT unlocks one position per destination even after transfer. Ownership is checked when enrollment executes. Later transfers do not move or revoke the affiliate position or earnings; the NFT can qualify its current holder again for another collection. Automated checks still apply, positions are limited, and the applicant pays enrollment gas. Only successful referrals earn a share of the pool; no referrals or an unsold collection earn no payout.
 
-The enrollment page displays these rules before wallet connection, identifies the first-collection exception from verified registry data, and preserves the original terms for older deployments. The mint entry, enrollment review and contract source page use the same version distinction. See [V6 deployment](deployment-v6.md) for the new release and [V5 deployment](deployment-v5.md) for existing pool collections.
+The enrollment page displays these rules before wallet connection, identifies the first-collection exception from verified registry data, and preserves the original terms for older deployments. The mint entry, enrollment review and contract source page use the same version distinction. See V6 deployment (superseded guide; available in Git history) for the new release and V5 deployment (superseded guide; available in Git history) for existing pool collections.
 
 ## Historical V4 behavior
 
@@ -89,7 +89,7 @@ npm run typecheck
 npm run build
 ```
 
-Use `/mint/8fa5f8c0-6ef4-47f6-9af3-60b8101c9321/affiliates` to inspect the database-backed demo states. Wallet enrollment and claims are enabled only for a verified live deployment with the necessary configuration. See `apps/web/.env.example` and [V4 deployment](deployment-v4.md). Historical V3 tooling remains documented in [V3 deployment](deployment-v3.md).
+Use `/mint/8fa5f8c0-6ef4-47f6-9af3-60b8101c9321/affiliates` to inspect the database-backed demo states. Wallet enrollment and claims are enabled only for a verified live deployment with the necessary configuration. See `apps/web/.env.example` and V4 deployment (superseded guide; available in Git history). Historical V3 tooling remains documented in V3 deployment (superseded guide; available in Git history).
 
 ## Qualification before Mainnet
 

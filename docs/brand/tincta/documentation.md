@@ -17,7 +17,7 @@ Content lives in `apps/web/lib/docs/content.ts`; the typed block model and local
 - Season planning is distinct from autonomous deployment and social posting. A version-aware V9/V10 worker exists in source; no V9/V10 season or live X delivery is recorded.
 - On-chain metadata, settlement and rules are distinguished from oracle fulfillment, off-chain enrollment checks, the database/indexer and third-party rendering.
 
-The content is grounded in the versioned Solidity implementations and the current `docs/architecture.md` and `docs/permanent-combinations-v10.md` handoff. Historical references include `docs/season-v8-implementation.md`, `docs/affiliate-holder-eligibility.md` and the corresponding winner-credit registries. Recheck contract changes before updating public guarantees.
+The content is grounded in the versioned Solidity implementations and the current `docs/architecture.md` and `docs/permanent-combinations-v10.md` handoff. Historical references include the versioned V8 Solidity sources, `docs/affiliate-holder-eligibility.md` and the corresponding winner-credit registries. Recheck contract changes before updating public guarantees.
 
 ## Structure references
 

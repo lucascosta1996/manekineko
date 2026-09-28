@@ -46,7 +46,7 @@ V2 NFT transfers stop at sellout until prize delivery. The owner can pay 50% of 
 
 V5 keeps that randomness lifecycle and reserves an immutable collection-wide affiliate pool, allocated at sellout in proportion to each affiliate’s referred ticket count. Pool and winner percentages are independent immutable terms; see [V5 accounting](affiliate-pools.md).
 
-V4 keeps that randomness lifecycle and adds immutable collection financial terms. `contract_version` identifies the financial implementation separately from the scoring algorithm, and `prize_bps` specifies the prize used by the mint UI and payout validation. Each affiliate position has its own fixed referral rate. Legacy and V3 collections retain the original half-revenue prize. See [affiliate programs](affiliates.md) and [V4 configuration and deployment](deployment-v4.md).
+V4 keeps that randomness lifecycle and adds immutable collection financial terms. `contract_version` identifies the financial implementation separately from the scoring algorithm, and `prize_bps` specifies the prize used by the mint UI and payout validation. Each affiliate position has its own fixed referral rate. Legacy and V3 collections retain the original half-revenue prize. See [affiliate programs](affiliates.md) and V4 configuration and deployment (superseded guide; available in Git history).
 
 ## Historical V1 number generation
 

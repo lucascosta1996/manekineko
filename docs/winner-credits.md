@@ -77,7 +77,7 @@ Review the output before updating `packages/contracts/src/winner-credits-legacy.
 
 5. Funding preparation subtracts `totalFunded(collection)` from the reviewed **cumulative** budget. Spending or withdrawal does not reduce that counter, so repeating setup cannot silently refill it. To intentionally add funds, review a higher cumulative budget. Verify the spendable balance separately before activation.
 
-6. Deploy web/launch changes, apply the existing V6 schema migration and configure the collection/indexer as described in [V6 deployment](deployment-v6.md). Rehearse legacy and native redemption using different winning wallets, repeat-win rejection, direct mint indexing, failed-mint rollback and full prize/affiliate settlement on Sepolia.
+6. Deploy web/launch changes, apply the existing V6 schema migration and configure the collection/indexer as described in V6 deployment (superseded guide; available in Git history). Rehearse legacy and native redemption using different winning wallets, repeat-win rejection, direct mint indexing, failed-mint rollback and full prize/affiliate settlement on Sepolia.
 
 The launch console and automation plans still do not hold signing keys or execute transactions. This workflow prepares deterministic operations; it does not add a background signing service.
 

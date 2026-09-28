@@ -585,15 +585,13 @@ Private setup lives in ignored environment files such as `.env.staging.local`, `
 | --- | --- |
 | **This file** | Primary current architecture and agent handoff |
 | [V10 permanent combinations](permanent-combinations-v10.md) | Contract behavior, static metadata, completed local runtime integration, new registry lineage and pending live rollout |
-| [V9 wallet mint cap](wallet-mint-cap-v9.md) | V9 behavior, affiliate payment history and rollout |
 | [Seasons](seasons.md) | Catalog, names/colors, planning persistence and network separation |
 | [Launch console](launch-console.md) / [automation plans](launch-automations.md) | Authentication, saved reviews and planner infrastructure; check version references |
 | [Season worker](season-automation.md) / [social automation](season-social-automation.md) | V9/V10 execution, reusable Sepolia wallets, durable X posting, templates and recovery |
-| [V8 implementation](season-v8-implementation.md) | Equal-award design inherited by V9; historical minimum/deployment statements are superseded here |
-| [V7 implementation](season-v7-implementation.md) | Historical two-prize design; not current default |
 | [Automatic indexing](automatic-indexing.md) | Architecture and provider verification runbook; version pins must match the current deployment |
 | [Winner credits](winner-credits.md) / [affiliate holder eligibility](affiliate-holder-eligibility.md) | Original subsystem details; use current registry source and migration caveats |
-| [Staging](staging.md) / [Sepolia test plan](sepolia-test-plan.md) | Historical setup and V8 rehearsal procedure; not live V9 deployment evidence |
 | [NFT gallery](nft-gallery.md) / [Tincta brand](brand/tincta/README.md) | Metadata display and visual system |
 | [Randomness](blockchain-randomness.md), [unique winners](unique-winner.md), [contracts](contracts.md) | V10 identity/draw guarantees with version-scoped historical references |
-| [Affiliate pools](affiliate-pools.md), older deployment guides | Historical version-specific economics/lifecycle; check the named version before reuse |
+| [Affiliate pools](affiliate-pools.md) | Historical deployed pool accounting; current V10 economics are defined above |
+
+Superseded V1–V9 deployment, implementation and rehearsal guides have been removed; retrieve them from Git history only when investigating that version. See the [documentation index](README.md) for current guides. Executed registry/retirement records and historical accounting references remain because current compatibility depends on them.

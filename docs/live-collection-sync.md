@@ -37,4 +37,4 @@ The integration test accepts localhost only, creates an isolated randomly named 
 
 For explicit cleanup of the former local demonstration database, `inspectMockRemoval(client)` and `removeMockRecords(client, preview)` are exported. Use a transaction on that known local database, inspect the returned IDs, then call removal with that same preview and commit. Do not pass arbitrary IDs; the removal function reselects and compares eligible rows before deleting dependencies.
 
-V6 exports must contain `algorithmVersion: "unique-rank-v3"` and use their own factory, bytecode and trust pins. Registration stores the exact contract/algorithm pair; V6 winner archives also retain `combinationKey()` and verify the inverse encoding. Existing V5 records are never relabeled. See [V6 deployment](deployment-v6.md).
+V6 exports must contain `algorithmVersion: "unique-rank-v3"` and use their own factory, bytecode and trust pins. Registration stores the exact contract/algorithm pair; V6 winner archives also retain `combinationKey()` and verify the inverse encoding. Existing V5 records are never relabeled. See V6 deployment (superseded guide; available in Git history).

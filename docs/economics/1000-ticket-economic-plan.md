@@ -38,7 +38,7 @@ Review the first season's sales, acquisition costs, concentration and treasury n
 
 The current timing plan is fast paced: the next collection opens one hour after the preceding collection's canonical sellout, with its opening announced thirty minutes after that sellout. These are configurable season settings. The first opening requires an explicit UTC timestamp; the default affiliate enrollment window is fifteen minutes. A collection's mint duration runs from its scheduled opening, not its deployment time. The old weekly completion assumption is no longer the launch cadence.
 
-Results cannot name winners before the verified VRF draw. Draw, deployment, enrollment and announcement readiness must fit the fixed schedule; otherwise the future automation pauses instead of quietly moving the opening. Winner withdrawals do not delay progression when all unpaid awards remain fully backed. The automation worker and actual X posts are a later phase; saving these settings does not execute them. See [V8 implementation and rollout](../season-v8-implementation.md).
+Results cannot name winners before the verified VRF draw. Draw, deployment, enrollment and announcement readiness must fit the fixed schedule; otherwise the future automation pauses instead of quietly moving the opening. Winner withdrawals do not delay progression when all unpaid awards remain fully backed. The automation worker and actual X posts are a later phase; saving these settings does not execute them. See V8 implementation and rollout (superseded guide; available in Git history).
 
 ## Equal affiliate sharing with a qualification minimum
 
@@ -112,4 +112,4 @@ V8 contracts, shared configuration and the six-award paths have local tests. Bef
 
 The spreadsheets [1000-ticket-economic-plan.xlsx](1000-ticket-economic-plan.xlsx) and [seasons-economic-plan.xlsx](seasons-economic-plan.xlsx) are **historical models**, not updated V8 calculations. The former retains the two-prize assumptions and smaller winner-credit allowance; the latter is an earlier small-collection proposal. Use this document for the current six-prize arithmetic.
 
-Sources within the repository: `seasons.json`, `ManekinekoRoundV8.sol`, `MultiAwardRank.sol`, `ManekinekoWinnerCreditsV4.sol`, shared `v8-config.ts`, and the [V8 implementation notes](../season-v8-implementation.md). The [V7 implementation notes](../season-v7-implementation.md) document the preceding version without changing its historical terms.
+Sources within the repository: `seasons.json`, `ManekinekoRoundV8.sol`, `MultiAwardRank.sol`, `ManekinekoWinnerCreditsV4.sol`, shared `v8-config.ts`, and the V8 implementation notes (superseded guide; available in Git history). The V7 implementation notes (superseded guide; available in Git history) document the preceding version without changing its historical terms.

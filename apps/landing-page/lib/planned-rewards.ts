@@ -36,7 +36,7 @@ function formatEth(wei: bigint): string {
  * Public, planned sellout baseline for the catalog; never collected or paid ETH.
  * The original allocation uses Growth for seasons 1–4 and the first two
  * collections of every later season, and Standard for the remaining editions
- * (scripts/upgrade-season-drafts-v7.mjs; docs/season-v7-implementation.md).
+ * (scripts/upgrade-season-drafts-v7.mjs).
  * V8 changed the prize split to six equal awards and preserved affiliate terms
  * (scripts/upgrade-season-drafts-v8.mjs); V9/V10 retain those economics.
  * Draft terms remain editable. This is not a read of current private plans,
