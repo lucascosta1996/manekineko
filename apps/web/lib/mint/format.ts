@@ -31,3 +31,11 @@ export function formatDuration(seconds: number): string {
   }
   return `${formatCount(seconds)} seconds`;
 }
+
+/** Stable UTC copy across server and browser ICU versions (Safari uses a different date separator). */
+export function formatUtcDateTime(value: string): string {
+  const date = new Date(value);
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const hour = date.getUTCHours();
+  return `${months[date.getUTCMonth()]} ${date.getUTCDate()}, ${date.getUTCFullYear()}, ${hour % 12 || 12}:${String(date.getUTCMinutes()).padStart(2, "0")} ${hour < 12 ? "AM" : "PM"}`;
+}

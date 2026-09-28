@@ -1,5 +1,7 @@
 # Tincta web identity
 
+This page is a historical Web implementation record. New frontend work across Web, Landing and Launch follows the [cross-app visual identity standard](../../design/visual-identity.md) and [quality gates](../../design/quality-gates.md); those supersede conflicting presentation guidance below. Historical verification is not a current compliance result.
+
 Applied to `apps/web` only. Public branding is Tincta; internal package names, typed-data signing domains, contract names and historical collection records remain unchanged.
 
 ## Visual system

@@ -1,4 +1,6 @@
 "use client";
+import { Button, TextAction } from "@manekineko/ui/button";
+
 
 import { useEffect, useRef, useState } from "react";
 import { connectWallet, invalidateWallet, requestWalletAccounts, walletError, type WalletSession } from "../../lib/affiliates/wallet";
@@ -71,26 +73,26 @@ export function WalletAccountPicker({ chainId, onConnected, onCancel, purpose = 
   }
 
   return <section className="affiliate-wallet-picker" aria-label="Choose wallet account" aria-busy={busy}>
-    <h3>{selected ? `Choose an account · ${selected.name}` : "Choose your wallet"}</h3>
+    <h2>{selected ? `Choose an account · ${selected.name}` : "Choose your wallet"}</h2>
     {!selected ? <>
       <p>Select your wallet, then choose its authorized account. Connecting does not submit a transaction.</p>
-      <div className="affiliate-wallet-options">{wallets.map((option) => <button type="button" className="secondary-button" key={option.id} disabled={busy} onClick={() => void loadAccounts(option)}>{option.name}</button>)}</div>
-      {walletConnectConfigured() ? <button type="button" className="secondary-button" disabled={busy} onClick={()=>void mobileWallet()}>WalletConnect · mobile wallet</button> : <p>WalletConnect is not configured on this site. Mobile users can use their wallet’s in-app browser.</p>}
+      <div className="affiliate-wallet-options">{wallets.map((option) => <Button busy={busy} variant="secondary" type="button"  key={option.id} disabled={busy} onClick={() => void loadAccounts(option)}>{option.name}</Button>)}</div>
+      {walletConnectConfigured() ? <Button busy={busy} variant="secondary" type="button"  disabled={busy} onClick={()=>void mobileWallet()}>WalletConnect · mobile wallet</Button> : <p>WalletConnect is not configured on this site. Mobile users can use their wallet’s in-app browser.</p>}
       {wallets.length === 0 && <p>No Ethereum wallet was found. Open this page in the browser where your wallet is installed and unlocked.</p>}
     </> : <>
       <p>Choose the address for your {purpose}. These are the accounts this wallet has shared with this site.</p>
-      <div className="affiliate-wallet-options">{accounts.map((address) => <button type="button" className="affiliate-account-option" key={address} disabled={busy} onClick={() => void chooseAccount(address)}><span>Use account</span><strong>{address}</strong></button>)}</div>
+      <div className="affiliate-wallet-options">{accounts.map((address) => <Button busy={busy} variant="secondary" type="button" className="ui-card-action affiliate-account-option" key={address} disabled={busy} onClick={() => void chooseAccount(address)}><span>Use account</span><strong>{address}</strong></Button>)}</div>
       {!busy && accounts.length === 0 && !error && <p>No account is authorized yet.</p>}
       <div className="affiliate-wallet-picker-actions">
-        <button type="button" className="text-button" disabled={busy} onClick={() => void loadAccounts(selected)}>Refresh accounts</button>
-        <button type="button" className="text-button" disabled={busy} onClick={() => void loadAccounts(selected, true)}>Authorize another account</button>
-        {selected.id === "walletconnect" && <button type="button" className="text-button" disabled={busy} onClick={()=>void manageWalletConnect().catch(cause=>setError(walletError(cause)))}>Manage mobile wallet connection</button>}
-        <button type="button" className="text-button" disabled={busy} onClick={() => { setSelected(null); setAccounts([]); setError(""); }}>Change wallet</button>
+        <TextAction busy={busy} type="button"  disabled={busy} onClick={() => void loadAccounts(selected)}>Refresh accounts</TextAction>
+        <TextAction busy={busy} type="button"  disabled={busy} onClick={() => void loadAccounts(selected, true)}>Authorize another account</TextAction>
+        {selected.id === "walletconnect" && <TextAction busy={busy} type="button"  disabled={busy} onClick={()=>void manageWalletConnect().catch(cause=>setError(walletError(cause)))}>Manage mobile wallet connection</TextAction>}
+        <TextAction busy={busy} type="button"  disabled={busy} onClick={() => { setSelected(null); setAccounts([]); setError(""); }}>Change wallet</TextAction>
       </div>
       <p>If your address is missing, use Authorize another account and complete the request in your wallet. Selecting an account here does not sign or submit a transaction.</p>
     </>}
     {busy && <p role="status">Waiting for your wallet. Complete or cancel its open request before trying again.</p>}
     {error && <p className="affiliate-wallet-picker-error" role="alert">{error}</p>}
-    <button type="button" className="text-button" onClick={() => { mounted.current = false; pending.current?.abort(); onCancel(); }}>Close account selector</button>
+    <TextAction type="button"  onClick={() => { mounted.current = false; pending.current?.abort(); onCancel(); }}>Close account selector</TextAction>
   </section>;
 }

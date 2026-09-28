@@ -1,4 +1,7 @@
 "use client";
+import { Button, IconButton } from "@manekineko/ui/button";
+import { buttonClassName } from "@manekineko/ui/button-styles";
+
 import { Icon } from "@manekineko/ui/icons";
 
 import { CompactSelect } from "@manekineko/ui/select";
@@ -9,7 +12,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { HistoryCollection, HistoryStats } from "../../lib/history/model";
 import type { CollectionPublic } from "../../lib/collections/model";
 import { collectionProgress } from "../../lib/collections/presentation";
-import { formatCount, formatWei, roundLabel } from "../../lib/mint/format";
+import { formatCount, formatWei, roundLabel, formatUtcDateTime } from "../../lib/mint/format";
 import { HistoryIcon } from "./history-icons";
 import { useLiveData } from "../use-live-data";
 import { LiveDataNotice } from "../live-data-notice";
@@ -50,14 +53,14 @@ function Address({ address, label }: { address: string; label: string }) {
 
   return <div><div className="history-full-wallet">
     <code>{address}</code>
-    <button className="history-copy" type="button" aria-label={`Copy ${label} address`} onClick={async () => {
+    <IconButton variant="secondary" className="history-copy" type="button" aria-label={`Copy ${label} address`} onClick={async () => {
       try {
         await navigator.clipboard.writeText(address);
         setCopyState("copied");
       } catch {
         setCopyState("failed");
       }
-    }}><HistoryIcon name={copyState === "copied" ? "check" : "copy"} /></button>
+    }}><HistoryIcon name={copyState === "copied" ? "check" : "copy"} /></IconButton>
   </div><p className={copyState === "failed" ? "history-copy-feedback" : "history-sr-only"} role="status">{copyState === "copied" ? "Address copied." : copyState === "failed" ? "Unable to copy. Select the address to copy it manually." : ""}</p></div>;
 }
 
@@ -120,7 +123,7 @@ function CurrentCollections({ collections }: { collections: CollectionPublic[] }
           <div><dt>Prize payment</dt><dd className="history-current-payment">{collection.awards?.length ? `${collection.awards.filter(award=>award.claimed).length} / ${collection.awards.length} prizes paid` : collection.prizePaid ? "Paid · outcome indexing" : "Not paid"}</dd></div>
         </dl>
         <div className="history-current-footer">
-          <div><p>Snapshot recorded <time dateTime={collection.updatedAt}>{new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }).format(new Date(collection.updatedAt))} UTC</time></p>
+          <div><p>Snapshot recorded <time dateTime={collection.updatedAt}>{formatUtcDateTime(collection.updatedAt)} UTC</time></p>
             {collection.contractAddress && <a href={`${collection.explorerUrl.replace(/\/$/, "")}/address/${collection.contractAddress}`} target="_blank" rel="noreferrer">View contract <code>{shortAddress(collection.contractAddress)}</code> <Icon name="diagonal" /></a>}
           </div>
           <Link className="history-feature-link" href={`/mint/${collection.id}`}>Explore collection <HistoryIcon name="arrow" /></Link>
@@ -196,7 +199,7 @@ export function HistoryExperience({ collections: initialCollections, inProgress:
   return <div className="history-page">
     <header className="history-heading">
       <div><p className="eyebrow">ON-CHAIN RESULTS</p><h1>Prizes and payouts, recorded on-chain.</h1><p>Explore winning tickets and confirmed prize and affiliate payments. Verify each payout on-chain.</p></div>
-      <Link href="/seasons" className="history-mint-link">Explore seasons <HistoryIcon name="arrow" /></Link>
+      <Link href="/seasons" className={buttonClassName({ variant: "secondary" })}>Explore seasons <HistoryIcon name="arrow" /></Link>
     </header>
     <LiveDataNotice retrying={retrying} />
 
@@ -205,17 +208,17 @@ export function HistoryExperience({ collections: initialCollections, inProgress:
         {stats.currencies.length ? stats.currencies.map(currency => <dd key={`${currency.chainId}-${currency.nativeCurrency.symbol}-${currency.nativeCurrency.decimals}`}>
           <span>{formatWei(currency.totalAffiliatePaidWei, currency.nativeCurrency.decimals)}</span><small>{currency.nativeCurrency.symbol}{stats.currencies.length > 1 ? ` · ${currency.networkName}` : ""}</small>
         </dd>) : <dd>0</dd>}
-        <p>Confirmed affiliate withdrawals</p>
+        <dd className="history-stat-description">Confirmed affiliate withdrawals</dd>
       </div>
       <div className="history-stat"><dt>Prizes paid <HistoryIcon name="trophy" /></dt>
         {stats.currencies.length ? stats.currencies.map((currency) => <dd key={`${currency.chainId}-${currency.nativeCurrency.symbol}-${currency.nativeCurrency.decimals}`}>
           <span>{formatWei(currency.totalPrizePaidWei, currency.nativeCurrency.decimals)}</span><small>{currency.nativeCurrency.symbol}{stats.currencies.length > 1 ? ` · ${currency.networkName}` : ""}</small>
         </dd>) : <dd>0</dd>}
-        <p>Confirmed payments, including partial prize claims</p>
+        <dd className="history-stat-description">Confirmed payments, including partial prize claims</dd>
       </div>
-      <div className="history-stat"><dt>Collections completed <HistoryIcon name="check" /></dt><dd>{formatCount(stats.completedCount)}</dd><p>Sold out and every prize delivered</p></div>
-      <div className="history-stat"><dt>Tickets minted <HistoryIcon name="ticket" /></dt><dd>{formatCount(stats.totalTicketsMinted)}</dd><p>Across {formatCount(stats.collectionCount)} {stats.collectionCount === 1 ? "collection" : "collections"}</p></div>
-      <div className="history-stat"><dt>Winning wallets <HistoryIcon name="sparkle" /></dt><dd>{formatCount(stats.uniqueWinners)}</dd><p>Distinct winning holder wallets</p></div>
+      <div className="history-stat"><dt>Collections completed <HistoryIcon name="check" /></dt><dd>{formatCount(stats.completedCount)}</dd><dd className="history-stat-description">Sold out and every prize delivered</dd></div>
+      <div className="history-stat"><dt>Tickets minted <HistoryIcon name="ticket" /></dt><dd>{formatCount(stats.totalTicketsMinted)}</dd><dd className="history-stat-description">Across {formatCount(stats.collectionCount)} {stats.collectionCount === 1 ? "collection" : "collections"}</dd></div>
+      <div className="history-stat"><dt>Winning wallets <HistoryIcon name="sparkle" /></dt><dd>{formatCount(stats.uniqueWinners)}</dd><dd className="history-stat-description">Distinct winning holder wallets</dd></div>
     </dl>
 
     <CurrentCollections collections={inProgress} />
@@ -225,7 +228,7 @@ export function HistoryExperience({ collections: initialCollections, inProgress:
       <div className="history-feature" style={latest.collectionColor ? { borderLeft: `3px solid ${latest.collectionColor}` } : undefined}>
         <div><p className="history-feature-round">{latest.seasonName ?? `COLLECTION ${roundLabel(latest.roundId)}`} · {latest.networkName}</p><h2 id="history-latest-title">{latest.name}</h2><div className="history-feature-wallet"><span className="history-wallet-mark" aria-hidden="true" /><span>{shortAddress(latest.winner.winningHolder)}</span><span className="history-muted">Winning holder</span></div></div>
         <div><p className="history-feature-label"><span>Winning combination</span><span>TICKET #{formatCount(latest.winner.tokenId)}</span></p><Combination numbers={latest.winner.combination} /><p className="history-feature-score">Winning score <strong>{latest.winner.score}</strong></p></div>
-        <div className="history-feature-prize"><p>{latest.awards ? "First prize paid" : "Prize paid"}</p><strong className="history-feature-amount">{formatWei(latest.winner.prizePaidWei, latest.nativeCurrency.decimals)} <small>{latest.nativeCurrency.symbol}</small></strong><span><time dateTime={latest.winner.paidAt}>{dateLabel(latest.winner.paidAt)}</time></span><button type="button" className="history-feature-link" onClick={showLatest}>See winning details <HistoryIcon name="arrow" /></button></div>
+        <div className="history-feature-prize"><p>{latest.awards ? "First prize paid" : "Prize paid"}</p><strong className="history-feature-amount">{formatWei(latest.winner.prizePaidWei, latest.nativeCurrency.decimals)} <small>{latest.nativeCurrency.symbol}</small></strong><span><time dateTime={latest.winner.paidAt}>{dateLabel(latest.winner.paidAt)}</time></span><Button icon={<HistoryIcon name="arrow" />} iconPosition="end" variant="secondary" type="button" className="history-feature-link" onClick={showLatest}>See winning details </Button></div>
       </div>
     </section>}
 
@@ -233,16 +236,16 @@ export function HistoryExperience({ collections: initialCollections, inProgress:
       <div className="history-archive-heading"><h2 id="history-archive-title">Past collections</h2><span className="history-count">{formatCount(collections.length)}</span></div>
       <div className="history-tools">
         <div className="history-filters" role="group" aria-label="Filter collection outcome">
-          {([["all", "All collections"], ["completed", "Prize paid"], ["refunded", "Refunded"]] as const).map(([value, label]) => <button className="history-filter" type="button" key={value} aria-pressed={filter === value} onClick={() => { setFilter(value); setPage(1); }}>{label}</button>)}
+          {([["all", "All collections"], ["completed", "Prize paid"], ["refunded", "Refunded"]] as const).map(([value, label]) => <Button variant="ghost" className="history-filter ui-segment" type="button" key={value} aria-pressed={filter === value} onClick={() => { setFilter(value); setPage(1); }}>{label}</Button>)}
         </div>
         <div className="history-tool-inputs">
-          <label className="history-search"><span className="history-sr-only">Search collections, tickets, or wallets</span><HistoryIcon name="search" /><input type="search" placeholder="Collection, ticket, or wallet" value={query} onChange={(event) => { setQuery(event.target.value); setPage(1); }} /></label>
-          <label className="history-sort"><span className="history-sr-only">Sort past collections</span><CompactSelect value={sort} onChange={(event) => { setSort(event.target.value as HistorySort); setPage(1); }}><option value="newest">Newest first</option><option value="oldest">Oldest first</option>{canComparePrizes && <option value="prize">Largest prize</option>}</CompactSelect><HistoryIcon name="chevron" /></label>
+          <label className="history-search"><span className="history-sr-only">Search collections, tickets, or wallets</span><HistoryIcon name="search" /><input className="ui-input" type="search" placeholder="Collection, ticket, or wallet" value={query} onChange={(event) => { setQuery(event.target.value); setPage(1); }} /></label>
+          <label className="history-sort"><span className="history-sr-only">Sort past collections</span><CompactSelect value={sort} onChange={(event) => { setSort(event.target.value as HistorySort); setPage(1); }}><option value="newest">Newest first</option><option value="oldest">Oldest first</option>{canComparePrizes && <option value="prize">Largest prize</option>}</CompactSelect></label>
         </div>
       </div>
       <div className="history-list">
         {visibleRecords.length > 0 && <div className="history-columns" aria-hidden="true"><span>Collection</span><span>Winner / ticket</span><span>Prize paid</span><span>Closed (UTC)</span><span /></div>}
-        {visibleRecords.map((collection) => <details className="history-record" key={collection.id} id={`history-record-${collection.id}`} open={expandedId === collection.id}>
+        {visibleRecords.map((collection) => <details className="ui-disclosure history-record" key={collection.id} id={`history-record-${collection.id}`} open={expandedId === collection.id}>
           <summary className="history-row-summary" onClick={(event) => { event.preventDefault(); setExpandedId(expandedId === collection.id ? null : collection.id); }}>
             <span className="history-row-collection"><span className="history-round-art" data-refunded={collection.status === "refunded"} style={collection.collectionColor ? { backgroundColor: collection.collectionColor, color: collection.textColor ?? "#111111" } : undefined} aria-hidden="true"><HistoryIcon name={collection.winner ? "sparkle" : "ticket"} /></span><span className="history-row-collection-text"><strong>{collection.name}</strong><span className="history-row-meta"><span>#{roundLabel(collection.roundId)}</span><span className="history-status" data-refunded={collection.status === "refunded"}>{collection.winner && <HistoryIcon name="check" />}{collection.status === "completed" ? "Prize paid" : "Refunded"}</span></span></span></span>
             <span className="history-row-winner">{collection.winner ? <><strong><span className="history-wallet-mark history-wallet-mark-small" aria-hidden="true" />{shortAddress(collection.winner.winningHolder)}</strong><small>Ticket #{formatCount(collection.winner.tokenId)}</small></> : <span className="history-row-refunded">No winner</span>}</span>
@@ -252,9 +255,9 @@ export function HistoryExperience({ collections: initialCollections, inProgress:
           </summary>
           <RecordDetails collection={collection} />
         </details>)}
-        {visibleRecords.length === 0 && <div className="history-empty"><HistoryIcon name={collections.length ? "search" : "ticket"} /><h3>{collections.length ? "No collections found" : "The archive starts here."}</h3><p>{collections.length ? "Try a different collection name, ticket number, or wallet address." : "Completed collections and their outcomes will appear here."}</p>{collections.length > 0 && <button type="button" onClick={resetFilters}>Clear filters</button>}</div>}
+        {visibleRecords.length === 0 && <div className="history-empty"><HistoryIcon name={collections.length ? "search" : "ticket"} /><h3>{collections.length ? "No collections found" : "The archive starts here."}</h3><p>{collections.length ? "Try a different collection name, ticket number, or wallet address." : "Completed collections and their outcomes will appear here."}</p>{collections.length > 0 && <Button variant="secondary" type="button" onClick={resetFilters}>Clear filters</Button>}</div>}
       </div>
-      <div className="history-pagination"><p aria-live="polite" role="status">{records.length ? `Showing ${formatCount((currentPage - 1) * PAGE_SIZE + 1)}–${formatCount(Math.min(currentPage * PAGE_SIZE, records.length))} of ${formatCount(records.length)} collections` : "0 collections"}</p>{pageCount > 1 && <nav className="history-pagination-controls" aria-label="Collection history pages"><button type="button" aria-label="Previous page" disabled={currentPage === 1} onClick={() => { setPage(currentPage - 1); setExpandedId(null); }}><HistoryIcon name="arrow" /></button><span>Page {currentPage} of {pageCount}</span><button type="button" aria-label="Next page" disabled={currentPage === pageCount} onClick={() => { setPage(currentPage + 1); setExpandedId(null); }}><HistoryIcon name="arrow" /></button></nav>}</div>
+      <div className="history-pagination"><p aria-live="polite" role="status">{records.length ? `Showing ${formatCount((currentPage - 1) * PAGE_SIZE + 1)}–${formatCount(Math.min(currentPage * PAGE_SIZE, records.length))} of ${formatCount(records.length)} collections` : "0 collections"}</p>{pageCount > 1 && <nav className="history-pagination-controls" aria-label="Collection history pages"><IconButton variant="secondary" type="button" aria-label="Previous page" disabled={currentPage === 1} onClick={() => { setPage(currentPage - 1); setExpandedId(null); }}><HistoryIcon name="arrow" /></IconButton><span>Page {currentPage} of {pageCount}</span><IconButton variant="secondary" type="button" aria-label="Next page" disabled={currentPage === pageCount} onClick={() => { setPage(currentPage + 1); setExpandedId(null); }}><HistoryIcon name="arrow" /></IconButton></nav>}</div>
     </section>
     <aside className="history-footnote"><HistoryIcon name="sparkle" /><p>The current Tincta format awards six equal prizes to six distinct winning NFTs. Earlier collections retain their original winner count and prize split; each collection’s displayed results follow its contract. Ticket totals include deployed collections in progress. Paid prizes count only verified on-chain claims, including claims before all prizes are collected. Refunded collections are included in ticket totals and excluded from completed collections and prizes.</p></aside>
   </div>;

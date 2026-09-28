@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import "./globals.css";
-
 import "@manekineko/ui/styles.css";
+import "./globals.css";
 import "./compact.css";
 
 export const metadata: Metadata = {

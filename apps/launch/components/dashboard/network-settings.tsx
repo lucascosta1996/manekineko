@@ -1,4 +1,5 @@
 "use client";
+import { useConfirm } from "@manekineko/ui/confirm";
 import { useRef, useState } from "react";
 import { LaunchHeader } from "../launch/launch-header";
 import { useLaunchNetwork } from "../launch/use-launch-network";
@@ -13,20 +14,21 @@ export function NetworkSettings({
   initialChainId: LaunchChainId;
   allowedChainId: LaunchChainId | null;
 }) {
+  const confirm = useConfirm();
   const [chainId, setChainId] = useLaunchNetwork(initialChainId),
     [dirty, setDirty] = useState(false),
     [error, setError] = useState("");
   const leaveApproved = useRef(false);
   const [pending, setPending] = useState(false);
-  const canLeave = () =>
-    !pending && (!dirty || window.confirm("Discard unsaved network settings?"));
-  const approveNavigation = () => {
-    const accepted = canLeave();
+  const canLeave = async () =>
+    !pending && (!dirty || await confirm("Discard unsaved network settings?"));
+  const approveNavigation = async () => {
+    const accepted = await canLeave();
     leaveApproved.current = accepted;
     return accepted;
   };
   async function logout() {
-    if (!approveNavigation()) return;
+    if (!await approveNavigation()) return;
     try {
       const response = await fetch("/api/launch/auth/logout", {
         method: "POST",
@@ -46,8 +48,8 @@ export function NetworkSettings({
         username={username}
         active="settings"
         chainId={chainId}
-        onNetworkChange={(next) => {
-          if (next !== chainId && canLeave()) {
+        onNetworkChange={async (next) => {
+          if (next !== chainId && await canLeave()) {
             setDirty(false);
             setChainId(next);
           }

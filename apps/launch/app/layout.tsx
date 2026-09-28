@@ -1,11 +1,12 @@
+import { ConfirmProvider } from "@manekineko/ui/confirm";
 import type { Metadata } from "next";
+import "@manekineko/ui/styles.css";
 import "./globals.css";
 import "./launch.css";
 import "./automations.css";
 import "./earnings.css";
 
-import "@manekineko/ui/styles.css";
-import "./compact.css";
+import "./workspace.css";
 
 export const metadata: Metadata = {
   title: "Tincta | Launch workspace",
@@ -19,7 +20,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}<footer className="dashboard-footer">Tincta · Private operator workspace</footer></body>
+      <body><ConfirmProvider>{children}</ConfirmProvider><footer className="dashboard-footer">Tincta · Private operator workspace</footer></body>
     </html>
   );
 }

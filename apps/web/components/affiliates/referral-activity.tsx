@@ -1,4 +1,6 @@
 "use client";
+import { TextAction } from "@manekineko/ui/button";
+
 
 import { useEffect, useRef, useState } from "react";
 import { unseenReferrals, type ReferralActivity, type ReferralActivityEvent } from "../../lib/affiliates/referral-activity";
@@ -37,7 +39,7 @@ export function AffiliateReferralActivity({ collectionId, chainId, wallet, onCon
   const explorer = chainId === 1 ? "https://etherscan.io" : "https://sepolia.etherscan.io";
   return <section className="affiliate-referral-activity" aria-label="Confirmed referral activity">
     <h3>Confirmed referrals</h3>
-    {notifications.length > 0 && !error && <p role="status" aria-live="polite">Confirmed: {notifications.reduce((sum, event) => sum + event.quantity, 0)} referred ticket(s) were attributed to your wallet. <button type="button" className="text-button" onClick={() => setNotifications([])}>Dismiss notification</button></p>}
+    {notifications.length > 0 && !error && <p role="status" aria-live="polite">Confirmed: {notifications.reduce((sum, event) => sum + event.quantity, 0)} referred ticket(s) were attributed to your wallet. <TextAction type="button"  onClick={() => setNotifications([])}>Dismiss notification</TextAction></p>}
     {error && <p role="alert">{error} {activity && "The previous observation is stale."}</p>}
     {activity ? <><p>{activity.referredMints} referred tickets · Verified at block {activity.blockNumber} · {new Date(activity.observedAt).toUTCString()}</p>
       <p>Referral receipts count toward qualification. Commission follows this collection's sellout and payout rules.</p>
@@ -45,6 +47,6 @@ export function AffiliateReferralActivity({ collectionId, chainId, wallet, onCon
       {!activity.events.length && <p>{activity.referredMints > 0 ? "Referrals are recorded on chain; their receipts are still indexing." : "No confirmed referrals found for this wallet."}</p>}
       {activity.hasMore && <p>Showing the 20 most recent verified receipts. The referral total includes all attributed tickets.</p>}
     </> : !error && <p role="status">Checking confirmed referral receipts…</p>}
-    <button type="button" className="text-button" onClick={() => setRefresh(value => value + 1)}>Refresh referral activity</button>
+    <TextAction type="button"  onClick={() => setRefresh(value => value + 1)}>Refresh referral activity</TextAction>
   </section>;
 }

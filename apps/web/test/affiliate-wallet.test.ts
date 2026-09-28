@@ -176,6 +176,9 @@ test("plain wallet RPC errors explain pending requests, revoked permissions, and
   assert.match(walletError({ code: 4001, message: "Declined" }), /declined/);
   assert.equal(walletError({ code: -32000, message: "Open the wallet to unlock this account." }), "Open the wallet to unlock this account.");
   assert.match(walletError({ message: "x".repeat(301) }), /could not be completed/);
+  const unknown = walletError({ code: "UNKNOWN_ERROR", message: 'could not coalesce error (payload={"method":"eth_getCode","params":["0x123"]})' });
+  assert.match(unknown, /Check its activity and any pending transaction/);
+  assert.doesNotMatch(unknown, /payload|eth_getCode|0x123/);
 });
 
 test("ordinary connection reuses authorization and verifies the requested network after switching", async () => {

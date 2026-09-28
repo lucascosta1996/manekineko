@@ -1,4 +1,5 @@
 "use client";
+import { formatUtcDateTime } from "../lib/mint/format";
 import { Icon } from "@manekineko/ui/icons";
 
 import Link from "next/link";
@@ -30,7 +31,7 @@ export function useProtocolClock(initialNow?: number) {
 export function ProtocolCountdown({ target, label, now, expiredLabel = "Waiting for confirmation" }: { target: string; label: string; now: number; expiredLabel?: string }) {
   const parts = countdownParts(target, now);
   if (!parts) return null;
-  const date = new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }).format(new Date(target));
+  const date = formatUtcDateTime(target);
   return <div className="protocol-countdown">
     <span className="activity-label">{label}</span>
     {parts.expired ? <strong>{expiredLabel}</strong> : <div className="countdown-units" role="timer" aria-live="off" aria-label={`${parts.days} days, ${parts.hours} hours, ${parts.minutes} minutes, ${parts.seconds} seconds remaining`}>

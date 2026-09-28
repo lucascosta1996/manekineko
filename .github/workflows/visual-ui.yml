@@ -1,0 +1,39 @@
+name: Visual UI contracts
+on:
+  pull_request:
+    paths: ['apps/web/**', 'apps/launch/**', 'apps/landing-page/**', 'packages/ui/**', 'tests/visual/**', 'scripts/visual/**', 'playwright.config.ts', 'package.json', 'package-lock.json', 'docs/design/**', 'scripts/generate-tincta-brand.mjs', 'scripts/generate-landing-artwork.mjs', 'packages/contracts/src/tincta-artwork.ts', 'packages/contracts/src/season-appearance.ts', 'packages/contracts/src/permanent-combinations.ts', 'docs/brand/tincta/identity/**', 'seasons.json', 'collection-names.json', '.github/workflows/visual-ui.yml']
+  push:
+    paths: ['apps/web/**', 'apps/launch/**', 'apps/landing-page/**', 'packages/ui/**', 'tests/visual/**', 'scripts/visual/**', 'playwright.config.ts', 'package.json', 'package-lock.json', 'scripts/generate-tincta-brand.mjs', 'scripts/generate-landing-artwork.mjs', 'packages/contracts/src/tincta-artwork.ts', 'packages/contracts/src/season-appearance.ts', 'packages/contracts/src/permanent-combinations.ts', 'docs/brand/tincta/identity/**', 'seasons.json', 'collection-names.json', '.github/workflows/visual-ui.yml']
+permissions:
+  contents: read
+jobs:
+  visual:
+    runs-on: macos-15
+    timeout-minutes: 45
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install chromium firefox webkit
+      - run: npm run ui:source
+      - run: npm run ui:typecheck
+      - run: node scripts/generate-tincta-brand.mjs --check
+      - run: node --import tsx scripts/generate-landing-artwork.mjs --check
+      - run: npm run landing:test && npm run web:test && npm run launch:test
+      - run: npm run typecheck --workspace @manekineko/landing-page && npm run typecheck --workspace @manekineko/web && npm run typecheck --workspace @manekineko/launch
+      - run: npm run build:landing && npm run build:web && npm run build:launch
+      - run: npm run ui:fixtures:build
+      - run: npm run ui:test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: visual-ui-${{ github.sha }}
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: error

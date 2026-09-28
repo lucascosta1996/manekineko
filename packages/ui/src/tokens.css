@@ -1,0 +1,95 @@
+/* Canonical Tincta foundation and component tokens. Default root: 16px. */
+:root {
+  --ui-font-sans: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --ui-font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --ui-canvas: #ffffff;
+  --ui-background: var(--ui-canvas);
+  --ui-surface: #fafafa;
+  --ui-surface-hover: #f0f0f0;
+  --ui-surface-pressed: #e8e8e8;
+  --ui-ink: #171717;
+  --ui-muted: #666666;
+  --ui-line: #e4e4e4;
+  --ui-control-border: #767676;
+  --ui-on-ink: #ffffff;
+  --ui-focus: #555555;
+  --ui-success: #166534;
+  --ui-success-bg: #f0fdf4;
+  --ui-warning: #854d0e;
+  --ui-warning-bg: #fffbeb;
+  --ui-danger: #b42318;
+  --ui-danger-bg: #fff4f2;
+  --ui-primary-hover: #333333;
+  --ui-primary-pressed: #000000;
+  --ui-danger-hover: #921f16;
+  --ui-danger-pressed: #7a1a13;
+  --ui-radius: 0.1875rem;
+  --ui-hero: clamp(1.875rem, 3.5vw, 2.5rem);
+  --ui-page: clamp(1.75rem, 3vw, 2.25rem);
+  --ui-marketing-section: clamp(1.5rem, 3vw, 2.25rem);
+  --ui-section: clamp(1.25rem, 2vw, 1.5rem);
+  --ui-subheading: 1.125rem;
+  --ui-body: 0.9375rem;
+  --ui-body-line: 1.5rem;
+  --ui-control: 0.875rem;
+  --ui-control-line: 1.25rem;
+  --ui-label: 0.8125rem;
+  --ui-caption: 0.75rem;
+  --ui-caption-line: 1.125rem;
+  --ui-footer-type: 0.8125rem;
+  --ui-space-0: 0;
+  --ui-space-1: 0.25rem;
+  --ui-space-2: 0.5rem;
+  --ui-space-3: 0.75rem;
+  --ui-space-4: 1rem;
+  --ui-space-5: 1.25rem;
+  --ui-space-6: 1.5rem;
+  --ui-space-8: 2rem;
+  --ui-space-10: 2.5rem;
+  --ui-space-12: 3rem;
+  --ui-space-16: 4rem;
+  --ui-space-20: 5rem;
+  --ui-space-24: 6rem;
+  --ui-space: var(--ui-space-2);
+  --ui-control-height: 2.5rem;
+  --ui-button-min-width: 0;
+  --ui-button-padding-block: 0.5625rem;
+  --ui-button-padding-inline: 0.875rem;
+  --ui-icon-padding: 0.625rem;
+  --ui-icon-size: 1.125rem;
+  --ui-footer-icon-size: 1rem;
+  --ui-field-padding-block: 0.5625rem;
+  --ui-field-padding-inline: 0.75rem;
+  --ui-field-type: var(--ui-control);
+  --ui-text-action-height: 2rem;
+  --ui-card-padding: var(--ui-space-4);
+  --ui-focus-width: 2px;
+  --ui-focus-offset: 3px;
+  --ui-shadow-menu: 0 12px 36px rgb(0 0 0 / 0.12);
+  --ui-shadow-dialog: 0 20px 80px rgb(0 0 0 / 0.12);
+  --ui-backdrop: rgb(0 0 0 / 0.33);
+  --ui-motion-fast: 120ms;
+  --ui-motion-menu: 160ms;
+  --ui-motion-dialog: 200ms;
+  --ui-ease: cubic-bezier(0.2, 0, 0, 1);
+  --ui-z-base: 0;
+  --ui-z-shell: 50;
+  --ui-z-popover: 100;
+  --ui-z-modal-backdrop: 150;
+  --ui-z-modal: 160;
+  --ui-z-modal-popup: 170;
+  --ui-z-toast: 180;
+  --ui-z-tooltip: 190;
+}
+@media (min-width: 600px) { :root { --ui-card-padding: var(--ui-space-6); } }
+@media (any-pointer: coarse) {
+  :root {
+    --ui-control-height: 2.75rem;
+    --ui-button-min-width: var(--ui-control-height);
+    --ui-button-padding-block: 0.6875rem;
+    --ui-icon-padding: 0.75rem;
+    --ui-field-padding-block: 0.6875rem;
+    --ui-field-type: 1rem;
+    --ui-text-action-height: 2.75rem;
+  }
+}

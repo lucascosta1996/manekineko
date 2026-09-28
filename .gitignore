@@ -19,3 +19,9 @@ apps/contracts/deployments/*.json
 !apps/contracts/deployments/.gitkeep
 .private/
 *.wallet-vault.enc
+
+# Reproducible local visual fixture outputs
+test-results/
+playwright-report/
+.visual/
+tests/visual/apps/*/public/

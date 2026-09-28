@@ -4,6 +4,13 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./button": "./src/button.tsx",
+    "./button-styles": "./src/button-styles.ts",
+    "./forms": "./src/forms.tsx",
+    "./components": "./src/components.tsx",
+    "./confirm": "./src/confirm.tsx",
+    "./specimens": "./src/specimens.tsx",
+    "./tokens.css": "./src/tokens.css",
     "./icons": "./src/icons.tsx",
     "./select": "./src/select.tsx",
     "./dialog": "./src/dialog.tsx",

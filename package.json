@@ -66,9 +66,20 @@
     "season:resume:airy-garden": "node scripts/season-runner/resume-airy-garden.mjs",
     "season:run:mainnet": "node --import tsx -- scripts/season-runner/mainnet.ts",
     "season:test": "node --import tsx --test scripts/season-runner/*.test.ts",
-    "season:typecheck": "tsc --noEmit --target es2022 --module esnext --moduleResolution bundler --allowImportingTsExtensions --resolveJsonModule --esModuleInterop --skipLibCheck scripts/season-runner/*.ts"
+    "season:typecheck": "tsc --noEmit --target es2022 --module esnext --moduleResolution bundler --allowImportingTsExtensions --resolveJsonModule --esModuleInterop --skipLibCheck scripts/season-runner/*.ts",
+    "ui:source": "node --test scripts/visual/*.test.mjs && node scripts/visual/source-policy.mjs",
+    "ui:typecheck": "tsc --project tests/visual/tsconfig.json",
+    "ui:fixtures:build": "node scripts/visual/build.mjs",
+    "ui:test": "playwright test",
+    "ui:test:chromium": "playwright test --project=chromium",
+    "ui:baselines": "playwright test --update-snapshots",
+    "ui:check": "npm run ui:source && npm run ui:typecheck && node scripts/generate-tincta-brand.mjs --check && node --import tsx scripts/generate-landing-artwork.mjs --check && npm run ui:fixtures:build && npm run ui:test"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.11.1",
+    "@playwright/test": "1.58.2",
+    "playwright-core": "1.58.2",
+    "postcss": "8.5.6",
     "turbo": "2.10.12"
   },
   "overrides": {

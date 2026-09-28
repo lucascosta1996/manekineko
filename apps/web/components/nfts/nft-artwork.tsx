@@ -1,4 +1,6 @@
 "use client";
+import { TextAction } from "@manekineko/ui/button";
+
 import { Icon } from "@manekineko/ui/icons";
 
 import { useEffect, useRef, useState } from "react";
@@ -11,6 +13,7 @@ export function useNftMetadata(item: NftItem, enabled = true, live = false) {
   const [data, setData] = useState<NftArtworkResponse | null>(null);
   const [error, setError] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const requesting = useRef(false);
   const key = `${item.collectionId}/${item.tokenId}`;
   useEffect(() => {
     if (!enabled) return;
@@ -19,7 +22,7 @@ export function useNftMetadata(item: NftItem, enabled = true, live = false) {
     let controller: AbortController | null = null;
     const load = async () => {
       if (inFlight || disposed) return;
-      inFlight = true; controller = new AbortController();
+      inFlight = true; requesting.current = true; controller = new AbortController();
       try {
         const response = await fetch(`/api/nfts/${key}`, { cache: "no-store", signal: AbortSignal.any([controller.signal, AbortSignal.timeout(20_000)]) });
         if (!response.ok) throw new Error();
@@ -27,17 +30,17 @@ export function useNftMetadata(item: NftItem, enabled = true, live = false) {
         if (result.collectionId !== item.collectionId || result.tokenId !== item.tokenId || !["available", "burned"].includes(result.status)) throw new Error();
         if (!disposed) { setData(result); setError(false); }
       } catch { if (!disposed) setError(true); }
-      finally { inFlight = false; }
+      finally { inFlight = false; if (!disposed) requesting.current = false; }
     };
     void load();
     const refresh = () => { if (document.visibilityState === "visible" && navigator.onLine) void load(); };
     const timer = live ? setInterval(refresh, 30_000) : null;
     if (live) { window.addEventListener("focus", refresh); document.addEventListener("visibilitychange", refresh); }
-    return () => { disposed = true; controller?.abort(); if (timer) clearInterval(timer); window.removeEventListener("focus", refresh); document.removeEventListener("visibilitychange", refresh); };
+    return () => { disposed = true; requesting.current = false; controller?.abort(); if (timer) clearInterval(timer); window.removeEventListener("focus", refresh); document.removeEventListener("visibilitychange", refresh); };
   }, [key, item.collectionId, item.tokenId, item.phase, item.revealed, item.refunded, enabled, live, attempt]);
   const current = data?.collectionId === item.collectionId && data.tokenId === item.tokenId
     && (live || (data.nft.phase === item.phase && data.nft.refunded === item.refunded && data.nft.revealed === item.revealed));
-  return { data: current ? data : null, error, retry: () => setAttempt((value) => value + 1) };
+  return { data: current ? data : null, error, retry: () => { if (requesting.current) return; requesting.current = true; setError(false); setAttempt((value) => value + 1); } };
 }
 
 export function useArtworkVisibility() {
@@ -52,18 +55,20 @@ export function useArtworkVisibility() {
   return { ref, visible };
 }
 
-export function NftArt({ item, data, error, retry }: { item: NftItem; data: NftArtworkResponse | null; error: boolean; retry: () => void }) {
+export function NftArt({ item, data, error, retry, interactive = true }: { item: NftItem; data: NftArtworkResponse | null; error: boolean; retry: () => void; interactive?: boolean }) {
+  const [failedImage, setFailedImage] = useState<string | null>(null);
+  const imageFailed = !!data?.image && failedImage === data.image;
   const portrait = (item.contractVersion === "affiliate-v8" || item.contractVersion === "affiliate-v9" || item.contractVersion === "affiliate-v10");
-  if (data?.image) return <img src={data.image} width="640" height={portrait ? "800" : "640"} alt={`Ticket #${item.tokenId}${data.numbers ? ` · ${data.numbers.join(", ")}${data.score ? ` · score ${data.score}` : item.phase === "refundable" ? " · no draw" : " · draw pending"}` : item.phase === "refundable" ? " · refundable on-chain artwork" : " · sealed on-chain artwork"}`} decoding="async" />;
+  if (data?.image && !imageFailed) return <img onError={() => setFailedImage(data.image)} src={data.image} width="640" height={portrait ? "800" : "640"} alt={`Ticket #${item.tokenId}${data.numbers ? ` · ${data.numbers.join(", ")}${data.score ? ` · score ${data.score}` : item.phase === "refundable" ? " · no draw" : " · draw pending"}` : item.phase === "refundable" ? " · refundable on-chain artwork" : " · sealed on-chain artwork"}`} decoding="async" />;
   return <div className="nft-art-placeholder" style={{ aspectRatio: portrait ? "4 / 5" : "1" }}>
     <span className="nft-art-symbol" aria-hidden="true"><Icon name="diamond" /></span>
-    <span>{item.currentOwner === null || data?.status === "burned" ? "This ticket was burned" : error ? "Artwork unavailable" : "Loading on-chain artwork"}</span>
-    {error && item.currentOwner !== null && <button type="button" className="text-button" onClick={retry}>Try again</button>}
+    <span>{item.currentOwner === null || data?.status === "burned" ? "This ticket was burned" : error || imageFailed ? "Artwork unavailable" : "Loading on-chain artwork"}</span>
+    {interactive && (error || imageFailed) && item.currentOwner !== null && <TextAction type="button"  onClick={() => { setFailedImage(null); retry(); }}>Try again</TextAction>}
   </div>;
 }
 
 export function NftNumbers({ data, revealed, permanent = false }: { data: NftArtworkResponse | null; revealed: boolean; permanent?: boolean }) {
-  return <div className="nft-numbers" aria-label={data?.numbers ? `Combination: ${data.numbers.join(", ")}` : revealed || permanent ? "Loading on-chain numbers" : "Numbers sealed until reveal"}>
+  return <div className="nft-numbers" role="group" aria-label={data?.numbers ? `Combination: ${data.numbers.join(", ")}` : revealed || permanent ? "Loading on-chain numbers" : "Numbers sealed until reveal"}>
     {(data?.numbers ?? [null, null, null, null]).map((number, index) => <span key={index} aria-hidden="true">{number ?? (revealed || permanent ? "—" : "?")}</span>)}
   </div>;
 }

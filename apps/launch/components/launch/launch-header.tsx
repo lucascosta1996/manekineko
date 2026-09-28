@@ -1,5 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import { IconButton, TextAction } from "@manekineko/ui/button";
+
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { LaunchBrand } from "./brand";
 import { launchDestination } from "../../lib/launch-navigation";
 import type { LaunchChainId } from "../../lib/chain-policy";
@@ -63,11 +65,24 @@ export function LaunchHeader({
   pending?: boolean;
   chainId: LaunchChainId;
   onNetworkChange: (chainId: LaunchChainId) => void;
-  beforeNavigate?: () => boolean;
+  beforeNavigate?: () => boolean | Promise<boolean>;
 }) {
   const [open, setOpen] = useState(false);
+  const navigationPending = useRef(false);
+  async function navigate(event: MouseEvent<HTMLAnchorElement>) {
+    if (!beforeNavigate) { setOpen(false); return; }
+    event.preventDefault();
+    if (navigationPending.current || pending) return;
+    const destination = event.currentTarget.href;
+    navigationPending.current = true;
+    try {
+      if (!await beforeNavigate()) return;
+      setOpen(false);
+      window.location.assign(destination);
+    } finally { navigationPending.current = false; }
+  }
   useEffect(() => {
-    const media = window.matchMedia("(min-width: 961px)");
+    const media = window.matchMedia("(min-width: 960px)");
     const close = () => {
       if (media.matches) setOpen(false);
     };
@@ -79,12 +94,10 @@ export function LaunchHeader({
       <a
         className="dashboard-brand"
         href={launchDestination("/dashboard", chainId)}
-        onClick={(event) => {
-          if (beforeNavigate && !beforeNavigate()) event.preventDefault();
-        }}
-        aria-label="Tincta dashboard"
+        onClick={navigate}
+        aria-label="Tincta home"
       >
-        <LaunchBrand />
+        <LaunchBrand decorative />
         <span>Launch</span>
       </a>
       <nav className="dashboard-nav" aria-label="Launch workspace">
@@ -93,13 +106,7 @@ export function LaunchHeader({
             key={page.path}
             href={launchDestination(page.path, chainId)}
             aria-current={active === page.active ? "page" : undefined}
-            onClick={(event) => {
-              if (beforeNavigate && !beforeNavigate()) {
-                event.preventDefault();
-                return;
-              }
-              setOpen(false);
-            }}
+            onClick={navigate}
           >
             <Icon name={page.icon} />
             {page.label}
@@ -110,20 +117,14 @@ export function LaunchHeader({
           <a
             href={launchDestination("/active-collection", chainId)}
             aria-current={active === "active" ? "page" : undefined}
-            onClick={(event) => {
-              if (beforeNavigate && !beforeNavigate()) event.preventDefault();
-              else setOpen(false);
-            }}
+            onClick={navigate}
           >
             Deployed collections
           </a>
           <a
             href={launchDestination("/upcoming-collection", chainId)}
             aria-current={active === "upcoming" ? "page" : undefined}
-            onClick={(event) => {
-              if (beforeNavigate && !beforeNavigate()) event.preventDefault();
-              else setOpen(false);
-            }}
+            onClick={navigate}
           >
             Upcoming collections
           </a>
@@ -131,10 +132,10 @@ export function LaunchHeader({
       </nav>
       <div className="dashboard-account">
         <span title={username}>{username}</span>
-        <button type="button" onClick={onLogout} disabled={pending}>
-          <Icon name="logout" />
+        <TextAction icon={<Icon name="logout" />} iconPosition="start" type="button" onClick={onLogout} disabled={pending}>
+
           Sign out
-        </button>
+        </TextAction>
       </div>
     </>
   );
@@ -146,11 +147,8 @@ export function LaunchHeader({
           Skip to workspace
         </a>
         <Dialog.Root open={open} onOpenChange={setOpen}>
-          <Dialog.Trigger
-            className="dashboard-menu"
-            aria-label="Open navigation"
-          >
-            <Icon name="menu" />
+          <Dialog.Trigger asChild>
+            <IconButton className="dashboard-menu" variant="secondary" aria-label="Open navigation"><Icon name="menu" /></IconButton>
           </Dialog.Trigger>
           <Dialog.Portal>
             <Dialog.Overlay className="ui-dialog-overlay" />
@@ -161,12 +159,7 @@ export function LaunchHeader({
               <Dialog.Description className="dashboard-sr-only">
                 Choose a workspace page. The selected network is retained.
               </Dialog.Description>
-              <Dialog.Close
-                className="ui-dialog-close"
-                aria-label="Close navigation"
-              >
-                <Icon name="close" />
-              </Dialog.Close>
+              <Dialog.Close asChild><IconButton className="dashboard-drawer-close" variant="ghost" aria-label="Close navigation"><Icon name="close" /></IconButton></Dialog.Close>
               {nav()}
             </Dialog.Content>
           </Dialog.Portal>

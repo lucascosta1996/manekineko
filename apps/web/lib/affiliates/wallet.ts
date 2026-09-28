@@ -249,6 +249,7 @@ export function walletError(error: unknown): string {
   if (code === 4901) return "Your wallet is not connected to this collection's network. Choose the correct network and reconnect.";
   if (code === "CALL_EXCEPTION") return "The contract could not confirm this action. Its current state may have changed, or verification is unavailable. Refresh the collection before continuing.";
   if (code === "NETWORK_ERROR" || code === "TIMEOUT") return "Wallet verification is temporarily unavailable. Check the network and any pending transaction before trying again.";
+  if (code === "UNKNOWN_ERROR") return "The wallet could not confirm this request. Check its activity and any pending transaction before trying again.";
   if (code === "INSUFFICIENT_FUNDS") return "Your wallet needs enough ETH for the payment and network fee.";
   if (typeof detail?.message === "string" && detail.message.trim() && detail.message.length <= 300) return detail.message;
   return "The request could not be completed. Check your wallet activity before trying again.";

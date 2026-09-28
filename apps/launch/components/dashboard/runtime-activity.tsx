@@ -1,4 +1,6 @@
 "use client";
+import { Button } from "@manekineko/ui/button";
+
 import { useEffect, useState } from "react";
 import { Icon } from "@manekineko/ui/icons";
 import type { RuntimeSnapshot } from "../../lib/season-runtime";
@@ -73,13 +75,13 @@ export function RuntimeActivity({
             {snapshot?.run?.heartbeatAt ?? "unavailable"}
           </p>
         </div>
-        <button
-          className="launch-button launch-button-secondary"
+        {(!loading || snapshot) && <Button icon={<Icon name="refresh" />} iconPosition="start" variant="secondary"
+
           disabled={loading}
           onClick={() => setRefresh((value) => value + 1)}
         >
-          <Icon name="refresh" /> Refresh activity
-        </button>
+           Refresh activity
+        </Button>}
       </div>
       {error && (
         <p className="dashboard-alert" role="alert">
@@ -93,14 +95,14 @@ export function RuntimeActivity({
       {snapshot && (
         <p className="dashboard-observation">
           {attention.length} recorded actions need review.{" "}
-          <a href={launchDestination("/seasons", chainId, automationId)}>
+          <a className="ui-text-action ui-text-action-inline" href={launchDestination("/seasons", chainId, automationId)}>
             Open season controls <Icon name="arrow" />
           </a>
         </p>
       )}
       {!compact && (
         <>
-          <details className="launch-advanced">
+          <details className="ui-disclosure launch-advanced">
             <summary>
               Transactions and X outbox · {snapshot?.actions.length ?? "—"}{" "}
               records <Icon name="chevron" className="ui-disclosure-icon" />
@@ -127,7 +129,7 @@ export function RuntimeActivity({
                       <td>
                         {action.lastError && <p>{action.lastError}</p>}
                         {action.txHash && (
-                          <a
+                          <a className="ui-text-action"
                             href={`${explorer}/tx/${action.txHash}`}
                             target="_blank"
                             rel="noreferrer"
@@ -136,7 +138,7 @@ export function RuntimeActivity({
                           </a>
                         )}
                         {action.postId && (
-                          <a
+                          <a className="ui-text-action"
                             href={`https://x.com/i/status/${action.postId}`}
                             target="_blank"
                             rel="noreferrer"
@@ -157,7 +159,7 @@ export function RuntimeActivity({
               </table>
             </div>
           </details>
-          <details className="launch-advanced">
+          <details className="ui-disclosure launch-advanced">
             <summary>
               Worker event history{" "}
               <Icon name="chevron" className="ui-disclosure-icon" />

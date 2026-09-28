@@ -1,0 +1,133 @@
+{
+  "standard": "docs/design/visual-identity.md v1.0",
+  "landing": {
+    "routes": [
+      "/"
+    ],
+    "boundaries": [
+      "error",
+      "not-found"
+    ],
+    "states": [
+      "initial-pending",
+      "held-0.5s-3s-10s",
+      "empty",
+      "loaded",
+      "malformed",
+      "timeout",
+      "failure",
+      "retry",
+      "stale",
+      "offline",
+      "recovered",
+      "newsletter-invalid",
+      "newsletter-pending",
+      "newsletter-error",
+      "newsletter-success",
+      "mobile-navigation",
+      "support-dialog",
+      "missing-artwork",
+      "expanded-faq",
+      "hidden-visible-recovery",
+      "offline-response-race",
+      "focus-recovery",
+      "motion-pause-resume",
+      "reduced-motion"
+    ]
+  },
+  "web": {
+    "routes": [
+      "/",
+      "/seasons",
+      "/seasons/[chainId]/[seasonId]",
+      "/mint",
+      "/mint/[collectionId]",
+      "/mint/[collectionId]/affiliates",
+      "/mint/[collectionId]/contract",
+      "/history",
+      "/my-nfts",
+      "/nfts/[collectionId]/[tokenId]",
+      "/prizes",
+      "/docs",
+      "/docs/[slug]"
+    ],
+    "redirects": {
+      "/": "/seasons",
+      "/mint": "/seasons"
+    },
+    "boundaries": [
+      "root-loading",
+      "root-error",
+      "root-not-found",
+      "docs-loading",
+      "docs-error",
+      "docs-not-found",
+      "mint-error",
+      "mint-not-found",
+      "seasons-error",
+      "seasons-not-found",
+      "history-error",
+      "nft-error",
+      "nft-not-found"
+    ],
+    "states": [
+      "loaded",
+      "empty",
+      "error",
+      "disconnected",
+      "wallet-lookup",
+      "drawing",
+      "refundable",
+      "docs-search",
+      "mobile-navigation",
+      "artwork-pending-error-retry",
+      "connected-read-only-wallet",
+      "claim-available",
+      "claim-read-pending",
+      "claim-read-error",
+      "expanded-disclosures"
+    ]
+  },
+  "launch": {
+    "routes": [
+      "/",
+      "/login",
+      "/dashboard",
+      "/activity",
+      "/settings",
+      "/seasons",
+      "/launch",
+      "/automations",
+      "/active-collection",
+      "/upcoming-collection",
+      "/earnings"
+    ],
+    "redirects": {
+      "/": "/dashboard",
+      "/automations": "/seasons"
+    },
+    "boundaries": [
+      "root-loading",
+      "root-error",
+      "root-not-found"
+    ],
+    "states": [
+      "authenticated-fixture",
+      "login",
+      "invalid",
+      "pending",
+      "empty",
+      "error",
+      "recovery",
+      "confirm-cancel",
+      "confirm-intercepted",
+      "mobile-drawer",
+      "collection-editor-all-four-tabs",
+      "expanded-season-settings",
+      "expanded-cadence",
+      "expanded-collection-terms",
+      "sequence-review"
+    ]
+  },
+  "fixtureBoundary": "Separate Next production-mode fixture applications import production components and styles. They do not import auth/database repositories. Browser requests intercept every API and block external origins and all real writes. Route SSR repositories, real sessions, real wallets, devices and hosted deployment require separate evidence."
+}

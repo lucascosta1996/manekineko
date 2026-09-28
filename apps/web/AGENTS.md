@@ -8,6 +8,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
+## Visual identity
+
+Follow the root visual-identity instructions and read [the shared standard](../../docs/design/visual-identity.md) and [quality gates](../../docs/design/quality-gates.md). Include public docs, wallet/disconnected states, claims feedback, portals and footers in applicable checks. Report vendor-wallet, authenticated and hosted verification separately.
+
 ## Protocol version handoff
 
 Read [the root architecture](../../docs/architecture.md) and [V10 permanent combinations](../../docs/permanent-combinations-v10.md) before protocol changes. Local Web runtime supports V10 (`affiliate-v10`, `unique-rank-v6`) alongside historical versions; deployment remains separate. V10 uses an independently pinned V10 factory, Eligibility V5 and Winner Credits V6. Keep exact contract/algorithm pairs and never reuse historical pins under new labels.

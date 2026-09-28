@@ -1,4 +1,6 @@
 "use client";
+import { Button, TextAction } from "@manekineko/ui/button";
+
 import { Icon } from "@manekineko/ui/icons";
 
 import Link from "next/link";
@@ -40,7 +42,7 @@ export function RankedAwards({ collection, claim = false }: { collection: Collec
     <h3>Winning tickets</h3><p>{allPaid ? "All prizes paid. Results and payment receipts remain available below." : "The draw is finalized. Each prize is reserved until its winning NFT holder claims it. One wallet may hold several winning tickets."}</p>
     {claim && !allPaid && <div>
       {wallet.session && <p>{wallet.session.providerName ?? "Connected wallet"} · <code title={wallet.session.address}>{shortWallet(wallet.session.address)}</code> · {collection.chainId === 1 ? "Ethereum Mainnet" : "Sepolia testnet"}</p>}
-      <button type="button" className="secondary-button" disabled={claims.busy} onClick={() => wallet.openPicker(collection.chainId)}>{wallet.session ? "Switch wallet or account" : "Connect wallet"}</button>
+      <Button busy={claims.busy} variant="secondary" type="button"  disabled={claims.busy} onClick={() => wallet.openPicker(collection.chainId)}>{wallet.session ? "Switch wallet or account" : "Connect wallet"}</Button>
       {wallet.pickerChain !== null && <WalletAccountPicker chainId={wallet.pickerChain} onConnected={wallet.connect} onCancel={wallet.closePicker} purpose="prize claims" />}
       {wallet.notice && <p role="status">{wallet.notice}</p>}
     </div>}
@@ -52,15 +54,15 @@ export function RankedAwards({ collection, claim = false }: { collection: Collec
         <p><Link href={`/nfts/${collection.id}/${award.tokenId}`}>Ticket #{award.tokenId}</Link> · Score {award.score}</p>
         <p>{award.numbers.join(" / ")} · {paid ? "Paid" : "Available to its holder"}</p>
         {payment && <a href={`${collection.explorerUrl}/tx/${payment}`} target="_blank" rel="noreferrer">View prize payment <Icon name="diagonal" /></a>}
-        {claim && !paid && <button type="button" className="primary-button" disabled={claims.busy || !!recoveryError} onClick={() => {
+        {claim && !paid && <Button busy={claims.busy} icon={<Icon name="arrow" />} reserveLabels={["Confirm in your wallet", "Checking receipt…", "Checking this ticket…", `Check prize #${award.rank} receipt`, `Claim prize #${award.rank}`, `Connect to claim prize #${award.rank}`]} variant="primary" type="button"  disabled={claims.busy || !!recoveryError} onClick={() => {
           if (!wallet.session) { wallet.openPicker(collection.chainId); return; }
           void claims.claim({ ...award, collectionId: collection.id }, wallet.session, target, recoveryHash);
-        }}>{claims.busy && operation ? operation.phase === "wallet" ? "Confirm in your wallet" : operation.phase === "pending" ? "Checking receipt…" : "Checking this ticket…" : operation?.journal ? `Check prize #${award.rank} receipt` : wallet.session ? `Claim prize #${award.rank}` : `Connect to claim prize #${award.rank}`}</button>}
-        {operation && <div role="status" aria-live="polite"><p>{operation.message}</p>{operation.phase==="wallet"&&<WalletOpenAction provider={wallet.session?.injected}/> }{operation.phase === "error" && !paid && <button type="button" className="text-button" disabled={claims.busy} onClick={() => wallet.openPicker(collection.chainId)}>Switch wallets</button>}
+        }}>{claims.busy && operation ? operation.phase === "wallet" ? "Confirm in your wallet" : operation.phase === "pending" ? "Checking receipt…" : "Checking this ticket…" : operation?.journal ? `Check prize #${award.rank} receipt` : wallet.session ? `Claim prize #${award.rank}` : `Connect to claim prize #${award.rank}`}</Button>}
+        {operation && <div role="status" aria-live="polite"><p>{operation.message}</p>{operation.phase==="wallet"&&<WalletOpenAction provider={wallet.session?.injected}/> }{operation.phase === "error" && !paid && <TextAction busy={claims.busy} type="button"  disabled={claims.busy} onClick={() => wallet.openPicker(collection.chainId)}>Switch wallets</TextAction>}
           {operation.journal && <div className="mint-recovery">
             <p>Original account: <code>{operation.journal.wallet}</code></p>
             {operation.hash && <a href={`${collection.explorerUrl}/tx/${operation.hash}`} target="_blank" rel="noreferrer">View submitted transaction</a>}
-            {!operation.hash && <><label htmlFor={`prize-recovery-${collection.id}`}>Transaction hash from your wallet</label><input id={`prize-recovery-${collection.id}`} value={recoveryHash} onChange={event => setRecoveryHash(event.target.value)} placeholder="0x…" autoComplete="off" spellCheck={false} disabled={claims.busy} /><p>Recovery verifies the original account, prize, recipient, network and nonce. It never submits another transaction.</p></>}
+            {!operation.hash && <><label htmlFor={`prize-recovery-${collection.id}`}>Transaction hash from your wallet</label><input className="ui-input" id={`prize-recovery-${collection.id}`} value={recoveryHash} onChange={event => setRecoveryHash(event.target.value)} placeholder="0x…" autoComplete="off" spellCheck={false} disabled={claims.busy} /><p>Recovery verifies the original account, prize, recipient, network and nonce. It never submits another transaction.</p></>}
           </div>}
         </div>}
       </div>;

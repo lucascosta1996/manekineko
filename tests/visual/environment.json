@@ -1,0 +1,29 @@
+{
+  "platform": "darwin",
+  "architecture": "arm64",
+  "osMajor": "15",
+  "osVersion": "15.4.1",
+  "playwright": "1.58.2",
+  "browsers": [
+    {
+      "name": "chromium",
+      "revision": "1208",
+      "browserVersion": "145.0.7632.6"
+    },
+    {
+      "name": "firefox",
+      "revision": "1509",
+      "browserVersion": "146.0.1"
+    },
+    {
+      "name": "webkit",
+      "revision": "2248",
+      "browserVersion": "26.0"
+    }
+  ],
+  "fonts": {
+    "/System/Library/Fonts/SFNS.ttf": "1c81ead87ca36eee7d51dbe816c3202ba8052fc88228a46de930339c4ec1df22",
+    "/System/Library/Fonts/HelveticaNeue.ttc": "a43317500f5c8086ebbe479b32e86f53ce7c075c14283aa9894cc23be5bfd8e2",
+    "/System/Library/Fonts/Supplemental/Arial.ttf": "525979822591a3447cfc49d943d6f7683508e25543407871c0ed8fed05fd2bd9"
+  }
+}

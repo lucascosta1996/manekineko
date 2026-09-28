@@ -1,4 +1,6 @@
 "use client";
+import { Button, LinkButton } from "@manekineko/ui/button";
+
 import { Icon } from "@manekineko/ui/icons";
 
 import { LaunchBrand } from "../components/launch/brand";
@@ -11,8 +13,8 @@ export default function LaunchError({ retry }: { error: Error & { digest?: strin
       <h1 id="launch-unavailable-title">We couldn’t open the workspace.</h1>
       <p>The launch workspace is temporarily unavailable. Please try again in a moment.</p>
       <div className="launch-unavailable-actions">
-        <button className="launch-button launch-button-primary" onClick={retry}>Try again <span aria-hidden="true"><Icon name="diagonal" /></span></button>
-        <a className="launch-button launch-button-secondary" href="/login">Back to sign in</a>
+        <Button icon={<Icon name="diagonal" />} iconPosition="end" variant="primary"  onClick={retry}>Try again </Button>
+        <LinkButton variant="secondary"  href="/login">Back to sign in</LinkButton>
       </div>
     </section>
   </main>;

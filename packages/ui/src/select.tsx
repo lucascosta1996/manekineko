@@ -62,7 +62,7 @@ export function CompactSelect({
           className="ui-select-content"
           position="popper"
           sideOffset={5}
-          collisionPadding={12}
+          collisionPadding={16}
         >
           <Select.ScrollUpButton className="ui-select-scroll">
             <Icon name="up" />

@@ -1,4 +1,6 @@
 "use client";
+import { buttonClassName } from "@manekineko/ui/button-styles";
+
 import { Icon } from "@manekineko/ui/icons";
 import Link from "next/link";
 import type { CollectionPublic } from "../lib/collections/model";
@@ -80,7 +82,7 @@ export function SeasonExperience({ initialCollections, initialNow, seasonId, cha
     <LiveDataNotice retrying={retrying || schedules.retrying} />
     <section className="catalog-grid" aria-label="Announced collections">{announcement.collections.map(collection => <AnnouncedCollectionCard key={collection.id} season={announcement} collection={collection} />)}</section>
   </>;
-  if (!season) return <section className="route-message"><h1>This season is unavailable.</h1><Link href="/seasons" className="text-link">All seasons <Icon name="arrow" /></Link></section>;
+  if (!season) return <section className="route-message"><h1>This season is unavailable.</h1><Link href="/seasons" className="ui-text-action ui-text-action-standalone">All seasons <Icon name="arrow" /></Link></section>;
   const live = currentLiveCollection(season.collections, now);
   const colors = announcement?.collections.map(c => c.color) ?? season.collections.map(c => c.collectionColor ?? "#e8e8eb");
   const scheduled = announcement?.collections.filter(item => !season.collections.some(collection => collection.id === item.id)) ?? [];
@@ -89,9 +91,9 @@ export function SeasonExperience({ initialCollections, initialNow, seasonId, cha
   return <>
     <nav className="breadcrumbs" aria-label="Breadcrumb"><Link href="/seasons">Seasons</Link><span aria-hidden="true">/</span><span aria-current="page">{season.name}</span></nav>
     <header className="season-heading"><div><p className="eyebrow">{season.networkName.toUpperCase()} / TINCTA SEASON</p><h1>{season.name}</h1><p>Explore each collection’s prize pool, ticket price and affiliate rewards.</p></div><div className="season-heading-count"><strong>{season.collections.length.toString().padStart(2, "0")}</strong><span>published collections</span></div></header>
-    {live ? <section className="season-live-summary" aria-label="Current live collection"><div><p className="eyebrow">MINTING NOW</p><h2>{live.name}</h2><p>{collectionPrizeCopy(live)}</p><p>{collectionReferralCopy(live)}</p></div><Link className="primary-button" href={`/mint/${live.id}`}>Mint a ticket <span aria-hidden="true"><Icon name="diagonal" /></span></Link></section>
+    {live ? <section className="season-live-summary" aria-label="Current live collection"><div><p className="eyebrow">MINTING NOW</p><h2>{live.name}</h2><p>{collectionPrizeCopy(live)}</p><p>{collectionReferralCopy(live)}</p></div><Link className={buttonClassName({ variant: "primary" })} href={`/mint/${live.id}`}>Mint a ticket <span aria-hidden="true"><Icon name="diagonal" /></span></Link></section>
       : <div className="season-closed-note">{announcement && next ? <><strong>Next announced collection</strong><AnnouncedActivity season={announcement} collection={next} /></> : <><strong>{announcement && lifecycle.state === "complete" ? "Season complete" : lifecycle.state === "unavailable" ? "Season observation delayed" : "Collection results"}</strong><p>{announcement && lifecycle.completedCollections !== null ? `${lifecycle.completedCollections} / ${lifecycle.totalCollections} collections complete. ` : ""}{lifecycle.allPrizesPaid ? "All prizes paid. Explore the results and payment history below." : lifecycle.unpaidPrizes ? `${lifecycle.unpaidPrizes} prizes remain available to their current winning ticket holders.` : "View each collection’s last confirmed state below."}</p>{Boolean(lifecycle.unpaidPrizes) && <Link href="/prizes">View available prizes <Icon name="arrow" /></Link>}</>}</div>}
-    <div className="catalog-section-heading"><h2>Collections <span>{season.collections.length}</span></h2><Link className="text-link" href="/seasons">All seasons <Icon name="arrow" /></Link></div>
+    <div className="catalog-section-heading"><h2>Collections <span>{season.collections.length}</span></h2><Link className="ui-text-action ui-text-action-standalone" href="/seasons">All seasons <Icon name="arrow" /></Link></div>
     {announcement && (announcement.status === "paused" || announcement.status === "failed") && <p className="season-section-note">Worker {announcement.status}. Collection results and remaining rewards are shown separately; deployed deadlines remain in effect.</p>}
     <LiveDataNotice retrying={retrying || schedules.retrying} /><CollectionGrid collections={season.collections} liveId={live?.id} now={now} colors={colors}>
       {announcement && scheduled.map(collection => <AnnouncedCollectionCard key={collection.id} season={announcement} collection={collection} />)}

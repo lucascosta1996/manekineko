@@ -1,0 +1,447 @@
+.launch-shell {
+  max-width: none;
+  margin-left: 224px;
+  padding: 0 var(--ui-space-8) var(--ui-space-10);
+}
+.dashboard-sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 224px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--ui-line);
+  background: var(--ui-surface);
+  padding: var(--ui-space-6) var(--ui-space-4) var(--ui-space-4);
+  z-index: var(--ui-z-shell);
+}
+.dashboard-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-3);
+  padding: 0 var(--ui-space-3) var(--ui-space-6);
+  color: var(--ui-muted);
+  text-decoration: none;
+  font-size: var(--ui-caption);
+  line-height: 1.5;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.dashboard-brand .launch-brand {
+  width: 6rem;
+}
+.dashboard-nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-1);
+}
+.dashboard-nav a {
+  display: flex;
+  gap: var(--ui-space-2);
+  align-items: center;
+  padding: var(--ui-space-3) var(--ui-space-3);
+  min-height: 40px;
+  color: var(--ui-muted);
+  text-decoration: none;
+  font-size: var(--ui-control);
+  border-radius: var(--ui-radius);
+  line-height: 1.428571;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.dashboard-nav a:hover {
+  background: var(--ui-surface-hover);
+  color: var(--ui-ink);
+}
+.dashboard-nav a[aria-current="page"] {
+  background: var(--ui-surface-pressed);
+  color: var(--ui-ink);
+  font-weight: 500;
+}
+.dashboard-nav-secondary {
+  margin-top: var(--ui-space-6);
+  padding-top: var(--ui-space-5);
+  border-top: 1px solid var(--ui-line);
+}
+.dashboard-nav-secondary > span {
+  display: block;
+  color: var(--ui-muted);
+  padding: 0 var(--ui-space-3) var(--ui-space-2);
+  font-size: var(--ui-caption);
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+.dashboard-account {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-3);
+  padding: var(--ui-space-4) var(--ui-space-3) 0;
+  border-top: 1px solid var(--ui-line);
+  color: var(--ui-muted);
+  font-size: var(--ui-footer-type);
+  line-height: 1.538462;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.dashboard-account > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dashboard-account button {
+  display: flex;
+  text-align: left;
+}
+.dashboard-topbar {
+  display: flex;
+  gap: var(--ui-space-4);
+  align-items: center;
+  justify-content: space-between;
+  min-height: 3.5rem;
+  padding-block: var(--ui-space-2);
+  border-bottom: 1px solid var(--ui-line);
+  margin-bottom: var(--ui-space-6);
+}
+.dashboard-page-label {
+  font-size: var(--ui-footer-type);
+  color: var(--ui-muted);
+  line-height: 1.538462;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.dashboard-network {
+  width: 190px;
+}
+.dashboard-menu {
+  display: none;
+}
+.dashboard-drawer {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: var(--ui-z-modal);
+  background: var(--ui-surface);
+  width: min(300px, calc(100vw - 40px));
+  padding: var(--ui-space-20) var(--ui-space-4) var(--ui-space-6);
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  font-family: var(--ui-font-sans);
+  color: var(--ui-ink);
+}
+.dashboard-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.launch-shell h1,
+.launch-login-shell h1 {
+  font-size: var(--ui-page);
+  line-height: 1.15;
+  font-weight: 500;
+  letter-spacing: -0.035em;
+}
+.launch-shell h2, .launch-login-shell h2 { font-size: var(--ui-section); font-weight: 500; line-height: 1.25; letter-spacing: -0.025em; }
+.launch-shell h3, .launch-login-shell h3 { font-size: var(--ui-subheading); font-weight: 500; line-height: 1.35; letter-spacing: -0.01em; }
+.launch-hero {
+  padding: var(--ui-space-4) 0 var(--ui-space-8);
+  gap: var(--ui-space-5);
+}
+.launch-hero p {
+  font-size: var(--ui-body);
+  line-height: 1.6;
+  max-width: 680px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.launch-fields {
+  gap: var(--ui-space-6);
+}
+.launch-field small {
+  font-size: var(--ui-body);
+  line-height: 1.6;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.launch-workflow {
+  padding: var(--ui-space-4);
+  font-size: var(--ui-label);
+  line-height: 1.538462;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.automation-plan-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--ui-space-2);
+  max-height: 330px;
+  overflow: auto;
+  padding: var(--ui-space-1);
+}
+.automation-plan-card {
+  width: 100%;
+  min-width: 0;
+  text-align: left;
+}
+.automation-service-status,
+.season-runtime,
+.automation-plan-settings {
+  padding: var(--ui-card-padding);
+}
+.dashboard-filters {
+  display: flex;
+  gap: var(--ui-space-3);
+  margin: var(--ui-space-4) 0;
+  align-items: center;
+}
+.dashboard-filters input {
+  min-width: 0;
+  flex: 1;
+}
+.dashboard-filters .ui-select {
+  width: 180px;
+}
+.dashboard-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--ui-space-3);
+  margin: var(--ui-space-2) 0 var(--ui-space-6);
+}
+.dashboard-metric {
+  border: 1px solid var(--ui-line);
+  padding: var(--ui-space-5);
+  background: var(--ui-canvas);
+  border-radius: var(--ui-radius);
+}
+.dashboard-metric h2 {
+  font-size: var(--ui-label);
+  color: var(--ui-muted);
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.538462;
+}
+.dashboard-metric strong {
+  display: block;
+  font-size: var(--ui-section);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  margin: var(--ui-space-3) 0 var(--ui-space-2);
+  overflow-wrap: anywhere;
+  line-height: 1.25;
+}
+.dashboard-metric small {
+  font-size: var(--ui-caption);
+  color: var(--ui-muted);
+  line-height: 1.5;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.dashboard-section {
+  margin: var(--ui-space-6) 0;
+}
+.dashboard-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ui-space-3);
+  margin-bottom: var(--ui-space-4);
+  flex-wrap: wrap;
+}
+.dashboard-rows {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius);
+}
+.dashboard-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--ui-space-5);
+  padding: var(--ui-space-5);
+  border-bottom: 1px solid var(--ui-line);
+  min-width: 0;
+}
+.dashboard-row:last-child {
+  border: 0;
+}
+.dashboard-row h3 {
+  font-size: var(--ui-subheading);
+  margin-bottom: var(--ui-space-2);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+.dashboard-row p,
+.dashboard-observation {
+  font-size: var(--ui-body);
+  line-height: 1.6;
+  color: var(--ui-muted);
+  overflow-wrap: anywhere;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.dashboard-status {
+  border: 1px solid var(--ui-line);
+  padding: var(--ui-space-1) var(--ui-space-2);
+  border-radius: var(--ui-radius);
+  font-size: var(--ui-caption);
+  white-space: normal;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+  line-height: 1.5;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.dashboard-alert {
+  border-left: 2px solid var(--ui-ink);
+  background: var(--ui-surface);
+  padding: var(--ui-space-4) var(--ui-space-5);
+  font-size: var(--ui-body);
+  margin: var(--ui-space-3) 0;
+  line-height: 1.6;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.dashboard-footer {
+  margin: var(--ui-space-8) var(--ui-space-8) 0 16rem;
+  border-top: 1px solid var(--ui-line);
+  padding: var(--ui-space-6) 0;
+  color: var(--ui-muted);
+  font-size: var(--ui-caption);
+  line-height: 1.5;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.dashboard-table-scroll {
+  overflow: auto;
+}
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--ui-label);
+  line-height: 1.538462;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.dashboard-table :is(th, td) {
+  text-align: left;
+  vertical-align: top;
+  padding: var(--ui-space-3);
+  border-bottom: 1px solid var(--ui-line);
+  overflow-wrap: anywhere;
+}
+.dashboard-table th {
+  color: var(--ui-muted);
+  font-weight: 500;
+}
+.dashboard-table td:first-child {
+  min-width: 180px;
+}
+@media (max-width: 1200px) {
+  .dashboard-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .launch-shell {
+    padding-inline: var(--ui-space-6);
+  }
+}
+@media (max-width: 959px) {
+  .dashboard-sidebar {
+    display: none;
+  }
+  .launch-shell {
+    margin-left: 0;
+    padding-inline: var(--ui-space-5);
+  }
+  .dashboard-menu {
+    display: grid;
+  }
+  .dashboard-page-label {
+    margin-right: auto;
+  }
+  .dashboard-topbar {
+    gap: var(--ui-space-3);
+  }
+  .dashboard-footer {
+    margin: var(--ui-space-8) var(--ui-space-6) 0;
+    color: var(--ui-muted);
+  }
+}
+@media (max-width: 520px) {
+  .launch-shell {
+    padding-inline: var(--ui-space-4);
+  }
+  .dashboard-page-label {
+    display: none;
+  }
+  .dashboard-network {
+    width: 190px;
+    margin-left: auto;
+  }
+  .dashboard-metrics {
+    gap: var(--ui-space-2);
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .dashboard-metric {
+    padding: var(--ui-space-4);
+  }
+  .dashboard-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--ui-space-3);
+    min-width: 0;
+  }
+  .dashboard-filters {
+    flex-wrap: wrap;
+  }
+  .dashboard-filters .ui-select {
+    width: 100%;
+  }
+  .launch-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }.dashboard-section-heading { flex-direction: column; align-items: flex-start; }
+}
+
+.launch-advanced {
+  border-radius: var(--ui-radius);
+}
+.launch-advanced summary > span {
+  float: none;
+  margin-left: auto;
+  font-size: var(--ui-caption);
+  line-height: 1.5;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.launch-advanced summary > .ui-icon {
+  margin-left: auto;
+}
+.launch-duration .ui-select {
+  width: 7.5rem;
+  flex: none;
+}
+.automation-editor {
+  padding: 0;
+}
+@media (max-width: 600px) {
+  .launch-advanced summary {
+    flex-wrap: wrap;
+  }
+  .launch-advanced summary > span {
+    margin-left: 0;
+  }
+  .automation-editor .launch-editor-body {
+    padding: var(--ui-space-4);
+  }
+  .automation-editor .launch-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.dashboard-drawer-close { position: absolute; top: 1rem; right: 1rem; }
+body:has(.launch-login-shell) .dashboard-footer { max-width: 71rem; margin-inline: auto; padding-inline: var(--ui-space-6); }
+@media (any-pointer: coarse) { .dashboard-nav a { min-height: 2.75rem; } }
+
+.launch-tab-number { flex: none; white-space: nowrap; }

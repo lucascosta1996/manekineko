@@ -2,22 +2,29 @@
 import type { ReactNode } from "react";
 import * as Dialog from "./dialog";
 import { Icon } from "./icons";
+import { IconButton, LinkButton, TextAction } from "./button";
 import type { PublicLinks } from "./links";
 export function PublicFooter({
   links,
   brand,
+  legal,
+  actions,
+  year = new Date().getFullYear(),
 }: {
   links: PublicLinks;
   brand?: ReactNode;
+  legal?: ReactNode;
+  actions?: ReactNode;
+  year?: number;
 }) {
   const group = (title: string, entries: [string, string | null][]) => (
     <nav aria-label={title}>
-      <strong>{title}</strong>
+      <strong className="ui-footer-heading">{title}</strong>
       {entries.map(([label, url]) =>
         url ? (
-          <a key={label} href={url}>
+          <a className="ui-footer-link" key={label} href={url}>
             {label}
-            <Icon name="diagonal" />
+            <Icon name="diagonal" size="footer" />
           </a>
         ) : (
           <span className="ui-footer-unavailable" key={label}>
@@ -31,12 +38,8 @@ export function PublicFooter({
   return (
     <footer className="ui-footer">
       <div className="ui-footer-brand">
-        {brand ?? <strong>Tincta</strong>}
-        <p>
-          Rewards governed by
-          <br />
-          smart contracts.
-        </p>
+        {brand}
+        <p className="ui-footer-copy">Rewards governed by smart contracts.</p>
       </div>
       {group("Explore", [
         ["Website", links.website],
@@ -49,36 +52,33 @@ export function PublicFooter({
         ["X", links.social],
       ])}
       <div className="ui-footer-support">
-        <strong>Here to help</strong>
+        <strong className="ui-footer-heading">Here to help</strong>
         <Dialog.Root>
-          <Dialog.Trigger className="ui-button ui-button-secondary">
-            Support
-            <Icon name="arrow" />
+          <Dialog.Trigger asChild>
+            <TextAction icon={<Icon name="arrow" size="footer" />} iconPosition="end">Support</TextAction>
           </Dialog.Trigger>
           <Dialog.Portal>
             <Dialog.Overlay className="ui-dialog-overlay" />
             <Dialog.Content className="ui-dialog-content">
-              <Dialog.Title>Support — coming soon</Dialog.Title>
-              <Dialog.Description>
+              <Dialog.Title className="ui-dialog-title">Support — coming soon</Dialog.Title>
+              <Dialog.Description className="ui-dialog-description">
                 Support is not available yet. You can review the documentation
                 while we prepare this service.
               </Dialog.Description>
               {links.docs && (
-                <a className="ui-button" href={links.docs}>
-                  Read documentation
-                  <Icon name="arrow" />
-                </a>
+                <LinkButton href={links.docs} icon={<Icon name="arrow" />} iconPosition="end">Read documentation</LinkButton>
               )}
-              <Dialog.Close
-                className="ui-dialog-close"
-                aria-label="Close support"
-              >
-                <Icon name="close" />
+              <Dialog.Close asChild>
+                <IconButton className="ui-dialog-close" aria-label="Close support"><Icon name="close" /></IconButton>
               </Dialog.Close>
             </Dialog.Content>
           </Dialog.Portal>
         </Dialog.Root>
-        <small>© {new Date().getFullYear()} Tincta</small>
+      </div>
+      <div className="ui-footer-legal">
+        <span>© {year} Tincta</span>
+        {legal && <p>{legal}</p>}
+        {actions && <div className="ui-footer-actions">{actions}</div>}
       </div>
     </footer>
   );

@@ -1,8 +1,10 @@
 "use client";
+import { Button } from "@manekineko/ui/button";
+
 import { Icon } from "@manekineko/ui/icons";
 import Link from "next/link";
 import { SiteShell } from "../../components/site-shell";
-export default function MintError({ reset }: { reset: () => void }) {
+export default function MintError({ retry }: { retry: () => void }) {
   return (
     <SiteShell>
       <div className="route-message">
@@ -12,10 +14,10 @@ export default function MintError({ reset }: { reset: () => void }) {
           We couldn’t load the collection’s settings. Please try again in a
           moment.
         </p>
-        <button className="primary-button" onClick={reset}>
+        <Button variant="primary"  onClick={retry}>
           Try again <span aria-hidden="true"><Icon name="refresh" /></span>
-        </button>
-        <Link className="text-link" href="/seasons">
+        </Button>
+        <Link className="ui-text-action ui-text-action-standalone" href="/seasons">
           Back to seasons
         </Link>
       </div>

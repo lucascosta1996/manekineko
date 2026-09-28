@@ -1,7 +1,9 @@
 "use client";
+import { Button } from "@manekineko/ui/button";
+
 import { Icon } from "@manekineko/ui/icons";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { LaunchBrand } from "./brand";
 
@@ -13,11 +15,23 @@ export function LaunchLogin({
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  const [invalidField, setInvalidField] = useState("");
+  const submitting = useRef(false);
 
   async function login(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (pending) return;
-    const data = new FormData(event.currentTarget);
+    if (submitting.current) return;
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    const missing = !String(data.get("username") ?? "").trim() ? "username" : !data.get("password") ? "password" : "";
+    if (missing) {
+      setInvalidField(missing);
+      setError(missing === "username" ? "Enter your username." : "Enter your password.");
+      (form.elements.namedItem(missing) as HTMLInputElement)?.focus();
+      return;
+    }
+    setInvalidField("");
+    submitting.current = true;
     setPending(true);
     setError("");
     try {
@@ -45,6 +59,7 @@ export function LaunchLogin({
           : "We could not sign you in. Please try again."
       );
       setPending(false);
+      submitting.current = false;
     }
   }
 
@@ -87,11 +102,13 @@ export function LaunchLogin({
           </span>
           <h2>Welcome back.</h2>
           <p>Sign in to your launch workspace.</p>
-          <form onSubmit={login}>
+          <form onSubmit={login} noValidate aria-busy={pending}>
             <label className="launch-field">
               <span>Username</span>
-              <input
+              <input className="ui-input"
                 name="username"
+                aria-invalid={invalidField === "username"}
+                aria-describedby={error ? "launch-login-error" : undefined}
                 autoComplete="username"
                 autoCapitalize="none"
                 spellCheck={false}
@@ -103,8 +120,10 @@ export function LaunchLogin({
             </label>
             <label className="launch-field">
               <span>Password</span>
-              <input
+              <input className="ui-input"
                 name="password"
+                aria-invalid={invalidField === "password"}
+                aria-describedby={error ? "launch-login-error" : undefined}
                 type="password"
                 autoComplete="current-password"
                 required
@@ -113,18 +132,18 @@ export function LaunchLogin({
               />
             </label>
             {error && (
-              <p className="launch-error" role="alert">
+              <p id="launch-login-error" className="launch-error" role="alert">
                 {error}
               </p>
             )}
-            <button
-              className="launch-button launch-button-primary"
+            <Button icon={<Icon name="diagonal" />} iconPosition="end" busy={Boolean(pending)} reserveLabels={["Signing in…","Sign in"]} variant="primary"
+
               type="submit"
               disabled={pending}
             >
               {pending ? "Signing in…" : "Sign in"}
-              <span aria-hidden="true"><Icon name="diagonal" /></span>
-            </button>
+
+            </Button>
           </form>
           <p className="launch-login-help">
             Access is reserved for provisioned operators. Contact your workspace

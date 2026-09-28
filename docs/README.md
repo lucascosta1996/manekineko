@@ -9,6 +9,7 @@ V10 is the current protocol. Start with [architecture](architecture.md) and [per
 - [Automatic indexing](automatic-indexing.md) and [Git deployments](git-deployments.md)
 - [Randomness](blockchain-randomness.md) and [winner uniqueness](unique-winner.md)
 - [Brand and artwork](brand/tincta/README.md)
+- [Cross-app visual identity standard](design/visual-identity.md), [reusable UI prompt](design/agent-prompt.md), [quality gates](design/quality-gates.md) and [adoption audit](design/adoption-audit.md)
 
 Subsystem documents may contain dated implementation sections. Use the current architecture, exact versioned source and immutable deployed terms when those sections differ from V10.
 

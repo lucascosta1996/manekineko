@@ -1,3 +1,4 @@
+import { buttonClassName } from "@manekineko/ui/button-styles";
 import { Icon } from "@manekineko/ui/icons";
 import { configuredChainId } from "../../lib/chain-policy";
 import Link from "next/link";
@@ -12,7 +13,7 @@ export default function NotFound() {
           We couldn’t find a collection with this ID. Explore the available
           collections to find your next ticket.
         </p>
-        <Link className="primary-button" href="/seasons">
+        <Link className={buttonClassName({ variant: "primary" })} href="/seasons">
           Explore seasons <span aria-hidden="true"><Icon name="diagonal" /></span>
         </Link>
       </div>

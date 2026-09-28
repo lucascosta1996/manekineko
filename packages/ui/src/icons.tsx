@@ -66,17 +66,18 @@ const icons = {
 export type IconName = keyof typeof icons;
 export function Icon({
   name = "arrow",
+  size = "default",
   className = "",
   ...props
-}: Omit<LucideProps, "ref"> & { name?: IconName }) {
+}: Omit<LucideProps, "ref" | "size"> & { name?: IconName; size?: "default" | "footer" | 16 | 18 }) {
   const Glyph = icons[name];
   return (
     <Glyph
-      width={18}
-      height={18}
+      width={size === "footer" || size === 16 ? 16 : 18}
+      height={size === "footer" || size === 16 ? 16 : 18}
       strokeWidth={1.6}
       {...props}
-      className={`ui-icon ${className}`}
+      className={`ui-icon${size === "footer" || size === 16 ? " ui-icon-footer" : ""} ${className}`}
       aria-hidden="true"
       focusable="false"
     />

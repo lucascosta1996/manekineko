@@ -1,4 +1,6 @@
 "use client";
+import { Button } from "@manekineko/ui/button";
+
 import { Icon } from "@manekineko/ui/icons";
 
 import Link from "next/link";
@@ -13,7 +15,7 @@ export function SiteNavigation({ section }: { section: SiteSection }) {
   const toggle = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const desktop = window.matchMedia("(min-width: 761px)");
+    const desktop = window.matchMedia("(min-width: 1101px)");
     const closeOnDesktop = () => { if (desktop.matches) setOpen(false); };
     desktop.addEventListener("change", closeOnDesktop);
     return () => desktop.removeEventListener("change", closeOnDesktop);
@@ -37,12 +39,12 @@ export function SiteNavigation({ section }: { section: SiteSection }) {
         toggle.current?.focus();
       }
     }}>
-    <button type="button" className="mobile-menu-toggle" ref={toggle}
+    <Button icon={<Icon name={open ? "close" : "menu"} />} iconPosition="end" variant="ghost" type="button" className="mobile-menu-toggle" ref={toggle}
       aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} aria-controls={navigationId}
       onClick={() => setOpen(value => !value)}>
       <span>{open ? "Close" : "Menu"}</span>
-      <Icon name={open ? "close" : "menu"} />
-    </button>
+
+    </Button>
     <nav id={navigationId} aria-label="Main navigation">
       <Link href="/seasons" aria-current={section === "seasons" ? "page" : undefined} onClick={() => setOpen(false)}>Seasons</Link>
       <Link href="/history" aria-current={section === "history" ? "page" : undefined} onClick={() => setOpen(false)}>Results</Link>

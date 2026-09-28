@@ -2,6 +2,10 @@
 
 Read [docs/architecture.md](docs/architecture.md) before changing protocol behavior. It is the current architecture and handoff guide, including a dated deployment snapshot, code map, invariants, known gaps and verification boundaries. Follow applicable `apps/*/AGENTS.md` instructions for app work too.
 
+## Visual identity and UI acceptance
+
+Before frontend work, read [the cross-app visual standard](docs/design/visual-identity.md) and [its quality gates](docs/design/quality-gates.md). They govern Landing, Web/docs, Launch and `packages/ui`, including first paint, loading, error, retry and footer states. Use the [reusable agent prompt](docs/design/agent-prompt.md) for scoped UI tasks and check the [adoption audit](docs/design/adoption-audit.md) for known gaps. Preserve the approved Tincta identity, use shared tokens/components and verify final rendered behavior. A build alone is not visual acceptance; the documented browser/CI pipeline must not be reported as installed or passed until it actually exists and runs.
+
 ## Current baseline
 
 - Public brand: **Tincta**. Internal `manekineko` names remain intentional.

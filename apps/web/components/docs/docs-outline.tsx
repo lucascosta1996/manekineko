@@ -16,5 +16,5 @@ export function DocsOutline({ sections }: { sections: { id: string; title: strin
     window.addEventListener("scroll", update, { passive: true });
     return () => window.removeEventListener("scroll", update);
   }, [sections]);
-  return <aside className="docs-outline"><p className="docs-nav-label">On this page</p><nav aria-label="On this page">{sections.map(section => <a key={section.id} href={`#${section.id}`} aria-current={active === section.id ? "location" : undefined}>{section.title}</a>)}</nav><a className="docs-top-link" href="#docs-title">Back to top <Icon name="up" /></a></aside>;
+  return <aside aria-label="Page outline" className="docs-outline"><p className="docs-nav-label">On this page</p><nav aria-label="On this page">{sections.map(section => <a key={section.id} href={`#${section.id}`} aria-current={active === section.id ? "location" : undefined}>{section.title}</a>)}</nav><a className="docs-top-link" href="#docs-title">Back to top <Icon name="up" /></a></aside>;
 }

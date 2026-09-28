@@ -1,4 +1,5 @@
 "use client";
+import { Button, IconButton, LinkButton, TextAction } from "@manekineko/ui/button";
 import { PublicFooter } from "@manekineko/ui/footer";
 import type { PublicLinks } from "@manekineko/ui/links";
 import { Icon } from "@manekineko/ui/icons";
@@ -149,6 +150,7 @@ export function LandingExperience({
   seasons: Season[];
   plannedRewards: PlannedRewards;
 }) {
+  const [failedArtwork, setFailedArtwork] = useState<string[]>([]);
   const [paused, setPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [heroSeason, setHeroSeason] = useState(0);
@@ -273,14 +275,14 @@ export function LandingExperience({
           <a href="#affiliates">Affiliates</a>
           <a href="#how-it-works">How it works</a>
         </nav>
-        <a
-          className="button button-dark header-cta"
+        <LinkButton
+          className="header-cta"
           href="#launch-list"
         >
           Join the launch list
           <Icon name="diagonal" />
-        </a>
-        <button
+        </LinkButton>
+        <IconButton
           ref={menuButton}
           className="menu-toggle"
           aria-label={menuOpen ? "Close navigation" : "Open navigation"}
@@ -289,7 +291,7 @@ export function LandingExperience({
           onClick={() => setMenuOpen(!menuOpen)}
         >
           <Icon name={menuOpen ? "close" : "menu"} />
-        </button>
+        </IconButton>
         {menuOpen && (
           <nav
             id="mobile-nav"
@@ -322,6 +324,7 @@ export function LandingExperience({
       </header>
 
       <main id="main">
+        <noscript><p className="wrap">JavaScript is needed for live collection status, newsletter signup and interactive previews. The collection information below remains available.</p></noscript>
         <section className="hero wrap" aria-labelledby="hero-title">
           <div className="hero-main">
             <div className="hero-copy">
@@ -344,18 +347,18 @@ export function LandingExperience({
               <p className="hero-description">
                 ETH prizes and affiliate rewards, governed by smart contracts.
               </p>
-              <LiveCollection />
               <div className="hero-actions">
-                <a className="button button-dark" href="#rewards">
+                <LinkButton  href="#rewards">
                   Explore the rewards
                   <Icon name="down" />
-                </a>
+                </LinkButton>
               </div>
+              <LiveCollection />
             </div>
             <div className="hero-art">
               <ColorSculpture colors={currentPalette.colors} />
               <div className="art-controls">
-                <button
+                <IconButton
                   className="motion-toggle"
                   aria-label={
                     motionOff ? "Play animations" : "Pause animations"
@@ -370,7 +373,7 @@ export function LandingExperience({
                   onClick={() => setPaused(!paused)}
                 >
                   <Icon name={motionOff ? "play" : "pause"} />
-                </button>
+                </IconButton>
               </div>
             </div>
           </div>
@@ -413,7 +416,7 @@ export function LandingExperience({
                 {plannedRewards.seasonCount} seasons. {plannedRewards.collectionCount} collections.
                 <br />Prizes and commissions onchain.
               </p>
-              <a className="text-link" href="#reward-details">
+              <a className="ui-text-action" href="#reward-details">
                 Explore prize amounts
                 <Icon name="down" />
               </a>
@@ -463,13 +466,13 @@ export function LandingExperience({
               The operator cannot withdraw funds owed as prizes or earned
               affiliate commissions.
             </p>
-            <a
-              className="round-link"
+            <LinkButton
+              className="ui-icon-button"
               href="#collection"
               aria-label="Explore your NFT’s role in the draw"
             >
               <Icon name="down" />
-            </a>
+            </LinkButton>
           </div>
         </section>
 
@@ -534,8 +537,8 @@ export function LandingExperience({
                   </p>
                 </div>
                 <div className="step-controls">
-                  <button
-                    className="circle-button"
+                  <IconButton
+
                     aria-label="Previous season"
                     onClick={() =>
                       setCatalogSeason(
@@ -544,23 +547,24 @@ export function LandingExperience({
                     }
                   >
                     <Icon className="flip" />
-                  </button>
+                  </IconButton>
                   <span className="mono">
                     {String(catalogSeason + 1).padStart(2, "0")} /{" "}
                     {seasons.length}
                   </span>
-                  <button
-                    className="circle-button"
+                  <IconButton
+
                     aria-label="Next season"
                     onClick={() =>
                       setCatalogSeason((catalogSeason + 1) % seasons.length)
                     }
                   >
                     <Icon />
-                  </button>
+                  </IconButton>
                 </div>
               </div>
-              <button
+              <Button
+                variant="secondary"
                 className="catalog-disclosure"
                 aria-expanded={showCatalog}
                 aria-controls="season-catalog"
@@ -570,25 +574,26 @@ export function LandingExperience({
                   ? "Close season list"
                   : "View all 22 seasons"}
                 <Icon name="plus" className={showCatalog ? "rotate" : ""} />
-              </button>
+              </Button>
               {showCatalog && (
                 <div className="season-catalog" id="season-catalog">
                   {seasons.map((season, i) => (
-                    <button
+                    <Button
+                      variant="secondary"
                       key={season.season}
                       aria-label={`Select Season ${season.season}`}
                       aria-pressed={catalogSeason === i}
                       onClick={() => setCatalogSeason(i)}
                     >
-                      <span className="mini-palette">
+                      <span className="season-option"><span className="mini-palette">
                         {season.colors.map((color) => (
                           <span key={color} style={{ background: color }} />
                         ))}
                       </span>
                       <span className="mono">
                         SEASON {String(season.season).padStart(2, "0")}
-                      </span>
-                    </button>
+                      </span></span>
+                    </Button>
                   ))}
                 </div>
               )}
@@ -640,22 +645,22 @@ export function LandingExperience({
               </p>
               <div className="gallery-controls">
                 <span className="mono">COLLECTION PREVIEWS</span>
-                <button
-                  className="circle-button"
+                <IconButton
+
                   aria-label="Previous artwork"
                   disabled={galleryEdges.start}
                   onClick={() => moveGallery(-1)}
                 >
                   <Icon className="flip" />
-                </button>
-                <button
-                  className="circle-button"
+                </IconButton>
+                <IconButton
+
                   aria-label="Next artwork"
                   disabled={galleryEdges.end}
                   onClick={() => moveGallery(1)}
                 >
                   <Icon />
-                </button>
+                </IconButton>
               </div>
             </div>
           </div>
@@ -680,7 +685,8 @@ export function LandingExperience({
                 style={{ "--card-color": art.color } as CSSProperties}
               >
                 <div className="nft-image-wrap">
-                  <img
+                  {failedArtwork.includes(art.file) ? <div className="artwork-fallback" role="img" aria-label={`Artwork preview unavailable for Season ${art.season}, Collection ${art.collection}`}>Artwork preview unavailable</div> : <img
+                    onError={() => setFailedArtwork(current => [...current, art.file])}
                     src={art.file}
                     width="640"
                     height="800"
@@ -690,7 +696,7 @@ export function LandingExperience({
                     ).padStart(2, "0")}, Collection ${String(
                       art.collection
                     ).padStart(2, "0")}, geometric linework on ${art.color}`}
-                  />
+                  />}
                 </div>
                 <figcaption>
                   <span>
@@ -749,7 +755,7 @@ export function LandingExperience({
                   1 ETH<small>PER PRIZE</small>
                 </span>
               </div>
-              <a className="text-link" href="#questions">
+              <a className="ui-text-action" href="#questions">
                 Understand the draw
                 <Icon name="diagonal" />
               </a>
@@ -819,13 +825,13 @@ export function LandingExperience({
                   Up to <strong>2 ETH</strong>
                   <small>budgeted per sold-out Growth collection</small>
                 </span>
-                <a
-                  className="circle-button"
+                <LinkButton
+                  className="ui-icon-button"
                   href="#questions"
                   aria-label="Read affiliate eligibility and payout terms"
                 >
                   <Icon name="diagonal" />
-                </a>
+                </LinkButton>
               </div>
               <p className="affiliate-note">
                 Planned pools are up to 2 ETH for Growth collections and up to
@@ -938,10 +944,10 @@ export function LandingExperience({
           </div>
           <div className="faq-list">
             {faqs(plannedRewards).map((faq) => (
-              <details key={faq.question} name="tincta-faq">
+              <details className="ui-disclosure" key={faq.question} name="tincta-faq">
                 <summary>
                   {faq.question}
-                  <Icon name="plus" />
+                  <Icon name="chevron" className="ui-disclosure-icon" />
                 </summary>
                 <p>{faq.answer}</p>
               </details>
@@ -964,39 +970,22 @@ export function LandingExperience({
               Know the rules
               <br />before you <span className="serif">enter.</span>
             </h2>
-            <a className="button button-dark" href="#launch-list">
+            <LinkButton  href="#launch-list">
               Join the launch list
               <Icon name="diagonal" />
-            </a>
+            </LinkButton>
             <span className="closing-note">
               Get notified when the first collection opens for minting.
             </span>
           </div>
         </section>
       </main>
-      <PublicFooter brand={<TinctaWordmark title="Tincta" className="ui-footer-wordmark" />} links={footerLinks} />
-      <footer className="footer wrap">
-        <div className="footer-bottom">
-          <span>© {new Date().getFullYear()} Tincta</span>
-          <p>
-            Launch preview. Rewards shown use planned default terms and require
-            sellout. Prizes and affiliate earnings are not guaranteed. Review
-            each collection’s final terms.
-          </p>
-          <button
-            className="footer-motion"
-            disabled={reducedMotion}
-            onClick={() => setPaused(!paused)}
-          >
-            <Icon name={motionOff ? "play" : "pause"} />
-            {reducedMotion
-              ? "Reduced motion"
-              : paused
-              ? "Play motion"
-              : "Pause motion"}
-          </button>
-        </div>
-      </footer>
+      <PublicFooter
+        brand={<TinctaWordmark title="" className="ui-footer-wordmark" />}
+        links={footerLinks}
+        legal={<>Launch preview. Rewards shown use planned default terms and require sellout. Prizes and affiliate earnings are not guaranteed. Review each collection’s final terms.</>}
+        actions={<TextAction disabled={reducedMotion} onClick={() => setPaused(!paused)} icon={<Icon name={motionOff ? "play" : "pause"} size="footer" />}>{reducedMotion ? "Reduced motion" : paused ? "Play motion" : "Pause motion"}</TextAction>}
+      />
     </div>
   );
 }

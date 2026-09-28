@@ -1,4 +1,6 @@
 "use client";
+import { Button } from "@manekineko/ui/button";
+
 import { Icon } from "@manekineko/ui/icons";
 
 import Link from "next/link";
@@ -31,22 +33,22 @@ function Navigation({ entries, pathname }: { entries: DocSearchEntry[]; pathname
     return () => window.removeEventListener("keydown", shortcut);
   }, []);
 
-  return <aside className="docs-sidebar" data-open={open} onKeyDown={event => {
+  return <aside aria-label="Documentation navigation" className="docs-sidebar" data-open={open} onKeyDown={event => {
     if (event.key === "Escape") {
       if (query) { setQuery(""); return; }
       setOpen(false);
       toggle.current?.focus();
     }
   }}>
-    <button className="docs-mobile-toggle" ref={toggle} type="button" aria-expanded={open} aria-controls="docs-navigation-panel" onClick={() => setOpen(value => !value)}>
-      <span><span className="docs-mobile-label">How It Works</span>{current?.title ?? "Browse topics"}</span><span aria-hidden="true">{open ? "−" : "+"}</span>
-    </button>
+    <Button variant="ghost" className="docs-mobile-toggle" ref={toggle} type="button" aria-expanded={open} aria-controls="docs-navigation-panel" onClick={() => setOpen(value => !value)}>
+      <span><span className="docs-mobile-label">How It Works</span>{current?.title ?? "Browse topics"}</span><Icon name={open ? "minus" : "plus"} />
+    </Button>
     <div className="docs-navigation-panel" id="docs-navigation-panel">
       <Link className="docs-sidebar-title" href="/docs">How It Works <span>01 / TINCTA</span></Link>
       <div className="docs-search-field">
         <Icon name="search" />
-        <input type="search" ref={search} aria-label="Search reward guides" placeholder="Search guides…" value={query} onChange={event => setQuery(event.target.value)} />
-        {!query && <kbd title="Command or Control K">Ctrl / Cmd K</kbd>}
+        <input className="ui-input" type="search" ref={search} aria-label="Search reward guides" placeholder="Search guides…" value={query} onChange={event => setQuery(event.target.value)} />
+
       </div>
       {query.trim() ? <div className="docs-search-results"><p className="docs-nav-label" role="status">{results.length} {results.length === 1 ? "result" : "results"}</p>
         {results.length ? results.map(entry => <Link href={docHref(entry.slug)} key={entry.slug} onClick={() => setOpen(false)}><strong>{entry.title}</strong><span>{entry.description}</span></Link>)

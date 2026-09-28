@@ -1,4 +1,6 @@
 "use client";
+import { Button } from "@manekineko/ui/button";
+
 import { useState } from "react";
 import { Icon } from "@manekineko/ui/icons";
 import { CompactSelect } from "@manekineko/ui/select";
@@ -127,18 +129,18 @@ export function LaunchDashboard({
                 : "Collection progress, upcoming openings and funds at a glance."}
             </p>
           </div>
-          <button
-            className="launch-button launch-button-secondary"
+          {(!query.loading || query.data) && <Button icon={<Icon name="refresh" />} iconPosition="start" variant="secondary"
+
             onClick={refresh}
             disabled={query.loading || earnings.loading}
           >
-            <Icon name="refresh" /> Refresh
-          </button>
+             Refresh
+          </Button>}
         </section>
         {(error || query.error) && (
           <p className="dashboard-alert" role="alert">
             {error || query.error}{" "}
-            <a href={launchDestination("/dashboard", chainId)}>
+            <a className="ui-text-action ui-text-action-inline" href={launchDestination("/dashboard", chainId)}>
               Retry dashboard
             </a>
           </p>
@@ -173,7 +175,7 @@ export function LaunchDashboard({
               </article>
               <article className="dashboard-metric">
                 <h2>Next scheduled opening</h2>
-                <strong style={{ fontSize: 18 }}>
+                <strong>
                   {upcoming
                     ? new Date(upcoming.saleStartAt!).toLocaleString(
                         undefined,
@@ -235,7 +237,7 @@ export function LaunchDashboard({
                     ? `Block ${funds?.blockNumber}`
                     : "Current balance unavailable"}{" "}
                   ·{" "}
-                  <a href={launchDestination("/earnings", chainId)}>
+                  <a className="ui-text-action ui-text-action-inline" href={launchDestination("/earnings", chainId)}>
                     View earnings
                   </a>
                 </small>
@@ -249,7 +251,7 @@ export function LaunchDashboard({
             <section className="dashboard-section">
               <div className="dashboard-section-heading">
                 <h2>Season progress</h2>
-                <a href={launchDestination("/seasons", chainId)}>
+                <a className="ui-text-action" href={launchDestination("/seasons", chainId)}>
                   All seasons <Icon name="arrow" />
                 </a>
               </div>
@@ -288,7 +290,7 @@ export function LaunchDashboard({
               {!query.loading && !seasons.length && (
                 <p className="dashboard-observation">
                   No prepared runs on this network.{" "}
-                  <a href={launchDestination("/seasons", chainId)}>
+                  <a className="ui-text-action ui-text-action-inline" href={launchDestination("/seasons", chainId)}>
                     Open Seasons
                   </a>{" "}
                   to view drafts.
@@ -305,7 +307,7 @@ export function LaunchDashboard({
                       row.lastError ||
                       operationPresentation(row, now ?? 0).label}{" "}
                     ·{" "}
-                    <a
+                    <a className="ui-text-action ui-text-action-inline"
                       href={launchDestination(
                         "/seasons",
                         chainId,
@@ -342,7 +344,7 @@ export function LaunchDashboard({
         <section className="dashboard-section">
           <div className="dashboard-section-heading">
             <h2>{activity ? "Current runs" : "Collections"}</h2>
-            <a
+            <a className="ui-text-action"
               href={launchDestination(
                 activity ? "/seasons" : "/active-collection",
                 chainId
@@ -373,7 +375,7 @@ export function LaunchDashboard({
           ) : (
             <>
               <div className="dashboard-filters">
-                <input
+                <input className="ui-input"
                   type="search"
                   aria-label="Search collections"
                   placeholder="Search season or collection"
@@ -430,7 +432,7 @@ export function LaunchDashboard({
           )}
         </section>
         {seasons.some((season) => season.superseded) && (
-          <details className="launch-advanced">
+          <details className="ui-disclosure launch-advanced">
             <summary>
               Superseded audit history{" "}
               <Icon name="chevron" className="ui-disclosure-icon" />
@@ -439,7 +441,7 @@ export function LaunchDashboard({
               .filter((season) => season.superseded)
               .map((season) => (
                 <p key={season.runId}>
-                  <a
+                  <a className="ui-text-action ui-text-action-inline"
                     href={launchDestination(
                       "/seasons",
                       chainId,
@@ -457,7 +459,7 @@ export function LaunchDashboard({
           {query.data
             ? `Operations checked ${query.data.checkedAt}. Canonical block and time are reported per collection.`
             : "No current operations snapshot."}{" "}
-          <a href={launchDestination("/activity", chainId)}>
+          <a className="ui-text-action ui-text-action-inline" href={launchDestination("/activity", chainId)}>
             Review social delivery and worker activity <Icon name="arrow" />
           </a>
         </p>

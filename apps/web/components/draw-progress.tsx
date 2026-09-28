@@ -1,4 +1,6 @@
 "use client";
+import { buttonClassName } from "@manekineko/ui/button-styles";
+
 import { Icon } from "@manekineko/ui/icons";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -34,7 +36,7 @@ export function DrawProgress({ collection }: { collection: CollectionPublic }) {
     {collection.drawEvents?.map(event => <p key={event.name}><a href={`${collection.explorerUrl}/tx/${event.transactionHash}`} target="_blank" rel="noreferrer">{event.name} <Icon name="diagonal" /></a> · <time dateTime={event.at}>{new Date(event.at).toUTCString()}</time></p>)}
     <small>{fresh ? "Last indexed" : "Observation may be delayed"}: <time dateTime={collection.updatedAt}>{new Date(collection.updatedAt).toUTCString()}</time>. Unrecorded stages have no confirmed timestamp or ETA.</small>
     {locallyPaid || lifecycle.state === "paid" ? <p><strong>All prizes paid</strong> · <Link href={`/mint/${collection.id}#prizes`}>View results and payment history</Link></p>
-      : lifecycle.state === "claimable" ? <p><Link className="primary-button" href="/prizes">Claim your prizes <Icon name="arrow" /></Link></p>
+      : lifecycle.state === "claimable" ? <p><Link className={buttonClassName({ variant: "primary" })} href="/prizes">Claim your prizes <Icon name="arrow" /></Link></p>
       : <p>{lifecycle.state === "unavailable" ? "Prize availability awaits a fresh observation." : "Winning tickets will appear after the draw is finalized."}</p>}
     <Link href={`/mint/${collection.id}/affiliates`}>View affiliate commissions <Icon name="arrow" /></Link>
   </section>;

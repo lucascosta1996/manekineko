@@ -1,4 +1,7 @@
 "use client";
+import { useConfirm } from "@manekineko/ui/confirm";
+import { Button, TextAction } from "@manekineko/ui/button";
+
 import { Icon } from "@manekineko/ui/icons";
 
 import { useEffect, useState } from "react";
@@ -16,6 +19,7 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
 
 /** Network settings remain available even when the network has no saved season. */
 export function NetworkSocialPanel({ chainId, allowedChainId, onSaved, onDirtyChange, leaveApproved, onPendingChange }: { chainId: RuntimeChainId; allowedChainId: RuntimeChainId | null; onSaved: () => void; onDirtyChange?: (dirty: boolean) => void; leaveApproved?: { current: boolean }; onPendingChange?: (pending: boolean) => void }) {
+  const confirm = useConfirm();
   const [settings, setSettings] = useState<Settings | null>(null);
   const [loading, setLoading] = useState(true), [pending, setPending] = useState(false);
   const [error, setError] = useState(""), [notice, setNotice] = useState("");
@@ -42,7 +46,8 @@ export function NetworkSocialPanel({ chainId, allowedChainId, onSaved, onDirtyCh
     return () => { active = false; };
   }, [path]);
   async function reload() {
-    if (dirty && !window.confirm("Discard unsaved network settings and reload?")) return;
+    if (loading || pending) return;
+    if (dirty && !await confirm("Discard unsaved network settings and reload?")) return;
     setLoading(true); setError(""); setNotice("");
     try { populate(await request<Settings>(path)); } catch (cause) { setError(cause instanceof Error ? cause.message : "Unable to reload settings."); }
     finally { setLoading(false); }
@@ -62,17 +67,17 @@ export function NetworkSocialPanel({ chainId, allowedChainId, onSaved, onDirtyCh
     {error && <div className="launch-alert launch-alert-error" role="alert">{error}</div>}
     {notice && <div className="launch-alert launch-alert-success" role="status">{notice}</div>}
     {restricted && <p className="launch-context-note">Open this network’s execution environment to save its credentials.</p>}
-    <details><summary>{settings?.profile ? `@${settings.profile.handle} · Edit account settings` : "Configure account"}<Icon name="chevron" className="ui-disclosure-icon" /></summary>
+    <details className="ui-disclosure"><summary>{settings?.profile ? `@${settings.profile.handle} · Edit account settings` : "Configure account"}<Icon name="chevron" className="ui-disclosure-icon" /></summary>
       <div className="season-runtime-account"><p>Credentials are encrypted and never returned to the browser. Leave all four secret fields empty to keep saved credentials. Pause this network’s worker before changing settings.</p>
         <div className="launch-fields">
-          <label className="launch-field"><span>Account handle</span><input value={handle} onChange={event => setHandle(event.target.value)} autoComplete="off" placeholder={testnet ? "@your_test_account" : "@tincta"} disabled={blocked}/></label>
-          <label className="launch-field"><span>Numeric account ID</span><input value={accountId} onChange={event => setAccountId(event.target.value)} inputMode="numeric" autoComplete="off" disabled={blocked}/></label>
-          <label className="launch-field launch-field-wide"><span>Public website for this network</span><input type="url" value={baseUrl} onChange={event => setBaseUrl(event.target.value)} placeholder={testnet ? "https://your-test-website" : "https://tincta.xyz"} disabled={blocked}/><small>Every published thread uses this website.</small></label>
-          {fields.map(([key, label]) => <label className="launch-field" key={key}><span>{label}</span><input type="password" value={credentials[key]} onChange={event => setCredentials(values => ({ ...values, [key]: event.target.value }))} autoComplete="new-password" placeholder={settings?.profile ? "Saved · enter to replace" : "Required"} disabled={blocked}/></label>)}
+          <label className="launch-field"><span>Account handle</span><input className="ui-input" value={handle} onChange={event => setHandle(event.target.value)} autoComplete="off" placeholder={testnet ? "@your_test_account" : "@tincta"} disabled={blocked}/></label>
+          <label className="launch-field"><span>Numeric account ID</span><input className="ui-input" value={accountId} onChange={event => setAccountId(event.target.value)} inputMode="numeric" autoComplete="off" disabled={blocked}/></label>
+          <label className="launch-field launch-field-wide"><span>Public website for this network</span><input className="ui-input" type="url" value={baseUrl} onChange={event => setBaseUrl(event.target.value)} placeholder={testnet ? "https://your-test-website" : "https://tincta.xyz"} disabled={blocked}/><small>Every published thread uses this website.</small></label>
+          {fields.map(([key, label]) => <label className="launch-field" key={key}><span>{label}</span><input className="ui-input" type="password" value={credentials[key]} onChange={event => setCredentials(values => ({ ...values, [key]: event.target.value }))} autoComplete="new-password" placeholder={settings?.profile ? "Saved · enter to replace" : "Required"} disabled={blocked}/></label>)}
         </div>
-        <label className="launch-checkbox"><input type="checkbox" checked={enabled} onChange={event => setEnabled(event.target.checked)} disabled={blocked}/><span>Enable publishing for this network</span></label>
-        <button type="button" className="launch-button launch-button-secondary" disabled={blocked || !settings?.encryptionConfigured} onClick={() => void save()}>{pending ? "Saving…" : "Save Twitter / X configuration"}</button>{" "}
-        <button type="button" className="launch-inline-link" disabled={loading || pending} onClick={() => void reload()}>Reload saved settings</button>
+        <label className="ui-check-field launch-checkbox"><input className="ui-checkbox" type="checkbox" checked={enabled} onChange={event => setEnabled(event.target.checked)} disabled={blocked}/><span>Enable publishing for this network</span></label>
+        <Button busy={Boolean(pending)} reserveLabels={["Saving…","Save Twitter / X configuration"]} variant="secondary" type="button"  disabled={blocked || !settings?.encryptionConfigured} onClick={() => void save()}>{pending ? "Saving…" : "Save Twitter / X configuration"}</Button>{" "}
+        <TextAction type="button"  disabled={loading || pending} onClick={() => void reload()}>Reload saved settings</TextAction>
         {!loading && settings && !settings.encryptionConfigured && <p className="season-runtime-note">Configure the shared worker encryption key on Launch before saving credentials.</p>}
         {testnet && <p className="season-runtime-note">Names and accounts are independent. Shared colors, artwork, websites or wallets can still link public activity.</p>}
       </div>
