@@ -3,7 +3,7 @@ import factoryV10Abi from '@manekineko/contract-abi/factory-v10' with { type: 'j
 import { decodePermanentCombination, derivePermanentCombinationKey } from '@manekineko/contract-abi/permanent-combinations';
 import roundV9Abi from '@manekineko/contract-abi/round-v9' with { type: 'json' };
 import factoryV9Abi from '@manekineko/contract-abi/factory-v9' with { type: 'json' };
-import { FetchRequest, Interface, JsonRpcProvider, ZeroAddress, getAddress, keccak256, type Log } from 'ethers';
+import { FetchRequest, Interface, JsonRpcProvider, ZeroAddress, getAddress, keccak256, type Log, type JsonRpcPayload } from 'ethers';
 import roundAbi from '@manekineko/contract-abi/round-v5' with { type: 'json' };
 import factoryAbi from '@manekineko/contract-abi/factory-v5' with { type: 'json' };
 import roundV6Abi from '@manekineko/contract-abi/round-v6' with { type: 'json' };
@@ -11,6 +11,8 @@ import factoryV6Abi from '@manekineko/contract-abi/factory-v6' with { type: 'jso
 import { decodeScrambledCombination } from '@manekineko/contract-abi/scrambled-rank';
 import { normalizeSeasonAppearance } from '@manekineko/contract-abi/season-appearance';
 import { ensure, type ChainBlock, type ChainEvent, type ChainReader, type CollectionSnapshot, type IndexerConfig, type RegisteredCollection } from './types.ts';
+
+import { indexerRpcPacer } from './rpc-pacing.ts';
 
 import { awardCount, awardBps } from './awards.ts';
 import roundV8Abi from '@manekineko/contract-abi/round-v8' with { type: 'json' };
@@ -36,10 +38,17 @@ const phases = ['pending_activation', 'minting', 'awaiting_request', 'awaiting_r
 const same = (a: unknown, b: unknown) => String(a).toLowerCase() === String(b).toLowerCase();
 const lower = (address: string) => getAddress(address).toLowerCase();
 
+class PacedJsonRpcProvider extends JsonRpcProvider {
+  override async _send(payload: JsonRpcPayload | JsonRpcPayload[]) {
+    await indexerRpcPacer.acquire(Array.isArray(payload) ? payload.length : 1);
+    return super._send(payload);
+  }
+}
+
 export function createRpcProvider(config: IndexerConfig): JsonRpcProvider {
   const request = new FetchRequest(config.rpcUrl);
   request.timeout = 10000;
-  return new JsonRpcProvider(request, config.chainId, { staticNetwork: true, cacheTimeout: -1, batchMaxCount: 10, batchStallTime: 10 });
+  return new PacedJsonRpcProvider(request, config.chainId, { staticNetwork: true, cacheTimeout: -1, batchMaxCount: 10, batchStallTime: 10 });
 }
 
 export function snapshotFromValues(values: Record<string, any>, collection: RegisteredCollection): CollectionSnapshot {

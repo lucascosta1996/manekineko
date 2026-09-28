@@ -71,5 +71,11 @@ export function ensure(value: unknown, code: string): asserts value {
   if (!value) throw new IndexerError(code);
 }
 export function errorCode(error: unknown): string {
-  return error instanceof IndexerError ? error.code : 'dependency_unavailable';
+  if (error instanceof IndexerError) return error.code;
+  const e = error as { code?: unknown; error?: { code?: unknown; message?: unknown }; info?: { error?: { code?: unknown; message?: unknown }; responseStatus?: unknown } } | null;
+  const rpc = e?.error ?? e?.info?.error;
+  // Return only a fixed diagnostic code; never expose provider URLs or payloads.
+  if (rpc?.code === -32007 || rpc?.code === 429 || e?.info?.responseStatus === 429
+    || /rate limit|request limit reached|too many requests/i.test(String(rpc?.message ?? ''))) return 'rpc_rate_limited';
+  return 'dependency_unavailable';
 }

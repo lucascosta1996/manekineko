@@ -140,3 +140,14 @@ test('indexer rejects mismatched algorithms and factories before making contract
   const reader=new RpcChainReader({} as JsonRpcProvider,config);
   await assert.rejects(reader.verifyCollection({...c,contractVersion:'affiliate-v6',algorithmVersion:'unique-rank-v3'},{number:20,hash:hash(20),timestamp:1000}),/collection_trust_mismatch/);
 });
+
+test('provider throttling keeps the checkpoint and snapshot intact for the next scheduled retry', async () => {
+  const f=fixture({snapshot:async()=>{throw {code:'CALL_EXCEPTION',info:{error:{code:-32007,message:'50/second request limit reached'}}};}});
+  const before=structuredClone(f.store.checkpoint);
+  const result=await executeIndexerCycle({...f,config,now:()=>1000});
+  assert.equal(result.ok,false);
+  assert.equal(result.results[0].error,'rpc_rate_limited');
+  assert.deepEqual(f.store.checkpoint,before);
+  assert.equal(f.store.snapshots.length,0);
+  assert.equal(f.store.quarantined,false);
+});
