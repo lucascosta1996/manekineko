@@ -49,7 +49,8 @@ test.describe('Landing asynchronous production states', () => {
    response='failure';await page.clock.runFor(20000);
    await expect(page.locator('.hero-live')).toHaveAttribute('data-phase','stale');
    await expect(page.locator('.hero-live')).toContainText('Visual study');
-   await expect(page.locator('.hero-live')).toContainText('last known state');
+   await expect(page.locator('.hero-live .lifecycle-badge')).toHaveText('Status unavailable');
+   await expect(page.locator('.hero-live')).toContainText('Details may be out of date.');
    await expect(page.locator('.hero-live')).not.toContainText('tickets remaining');
    await expect(page.locator('.hero-live [data-live="true"]')).toHaveCount(0);
    await expect(page).toHaveScreenshot(`hero-stale-${width}.png`);

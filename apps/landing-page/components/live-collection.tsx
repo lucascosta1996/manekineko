@@ -95,12 +95,12 @@ export function LiveCollection() {
   return <div ref={region} className="hero-live" data-phase={phase} role="region" tabIndex={-1} aria-label="Collection status">
     <p className="hero-live-message" role="status" aria-atomic="true">{phase === "pending" ? "Checking collection status…" : phase === "empty" ? "No published collection is available yet." : failed ? "Collection status is temporarily unavailable." : ""}</p>
     {collection && <>
-      <span className="lifecycle-badge" data-live={live}>{!fresh && (failed || collection.status !== "scheduled") ? "Observation delayed · last known state" : collection.label}</span>
+      <span className="lifecycle-badge" data-live={live}>{!fresh && (failed || collection.status !== "scheduled") ? "Status unavailable" : collection.label}</span>
       <p><a ref={collectionLink} className="ui-text-action" href={collection.href}><strong>{collection.name}</strong><Icon name="diagonal" /></a></p>
       {live && collection.remainingSupply !== null && <p>{collection.remainingSupply.toLocaleString("en-US")} tickets remaining</p>}
       {seconds !== null && !failed && (fresh || collection.status === "scheduled") && <p role="timer" aria-live="off">{seconds === 0 ? "Scheduled time reached · checking availability" : `${collection.status === "live" ? "Mint closes" : "Mint scheduled"} in ${Math.floor(seconds / 3600)}h ${Math.floor(seconds % 3600 / 60)}m ${seconds % 60}s`}</p>}
       {fresh && collection.unpaidPrizes !== null && collection.unpaidPrizes > 0 && <p>{collection.unpaidPrizes} prizes available to their current winning ticket holders.</p>}
-      <small>{collection.status === "scheduled" ? "Published schedule; deployment and activation still require confirmation. " : ""}Last observed: {new Date(collection.updatedAt).toUTCString()}</small>
+      <small>{!fresh && (failed || collection.status !== "scheduled") ? "We couldn’t confirm the latest status. Details may be out of date. " : ""}{collection.status === "scheduled" ? "Published schedule; deployment and activation still require confirmation. " : ""}Last observed: {new Date(collection.updatedAt).toUTCString()}</small>
     </>}
     {failed && <TextAction ref={retry} busy={busy} onClick={() => request.current()} icon={<Icon name="refresh" />}>Refresh</TextAction>}
   </div>;

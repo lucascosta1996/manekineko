@@ -101,9 +101,9 @@ export function CollectionActivity({ collection, previous, initialNow, showEnrol
   const total = refunded ? collection.totalMinted : showAwards ? awards.length : collection.maxSupply;
   const freshProgram = enrollment.program && performance.now() - enrollment.receivedAt < 45000 ? enrollment.program : null;
   return <div className="collection-activity">
-    <span className="lifecycle-badge" data-live={lifecycleStage(collection.phase).live && fresh && chainNow !== null && activity.label === "Mint open"} data-busy={lifecycleStage(collection.phase).busy && fresh} role="status">{!fresh ? "Observation delayed · last known state" : activity.label}</span>
+    <span className="lifecycle-badge" data-live={lifecycleStage(collection.phase).live && fresh && chainNow !== null && activity.label === "Mint open"} data-busy={lifecycleStage(collection.phase).busy && fresh} role="status">{!fresh ? "Status unavailable" : activity.label}</span>
     {fresh && chainNow !== null && activity.target && <ProtocolCountdown target={activity.target} label={activity.countdownLabel} now={chainNow} />}
-    <p className="activity-detail">{activity.detail}</p>
+    <p className="activity-detail">{fresh ? activity.detail : "We couldn’t confirm the latest status. Details below may be out of date."}</p>
     <div className="activity-counter"><span>{refunded ? "Tickets refunded" : showAwards ? "Prizes claimed" : "Tickets minted"}</span><strong>{count.toLocaleString("en-US")} / {total.toLocaleString("en-US")}</strong></div>
     <progress value={count} max={Math.max(1, total)} aria-label={refunded ? "Refund progress" : showAwards ? "Prize claim progress" : "Mint progress"} />
     <small>{fresh ? "Observed" : "Last observed"} {new Date(collection.updatedAt).toUTCString()}{collection.observation ? ` · block ${collection.observation.blockNumber}` : ""}. {!collection.observation?.chainTimestamp && "Verified chain clock unavailable."}</small>

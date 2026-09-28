@@ -217,3 +217,16 @@ for (const width of [390, 1440]) for (const state of ['empty', 'error']) test(`N
   if (state === 'empty') await expect(page.locator('.nft-stats dd')).toHaveText(['0', '0', '0', '0']);
   await expect(page).toHaveScreenshot(`web-nft-wallet-${state}-${width}.png`, { fullPage:true });
 });
+
+for (const width of [390, 1440]) test(`Stale collection status explains unavailable updates ${width}`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 900 });
+  await prepare(page);
+  await page.route('**/api/clock', route => route.fulfill({ json: { now: '2026-09-28T13:00:00.000Z' } }));
+  await page.goto(`${urls.web}${mint}`);
+  const activity = page.locator('.collection-activity').first();
+  await expect(activity.locator('.lifecycle-badge')).toHaveText('Status unavailable');
+  await expect(activity).toContainText('Details below may be out of date.');
+  await expect(activity.locator('[data-live="true"], .protocol-countdown')).toHaveCount(0);
+  await expect(activity).not.toContainText('Observation delayed');
+  await expect(activity).toHaveScreenshot(`collection-stale-${width}.png`);
+});
