@@ -15,3 +15,12 @@ test("landing rejects unsafe destinations, invalid clocks and invented counts", 
   }
   assert.equal(parseLiveCollection(null, new URL("https://app.example")), null);
 });
+test("landing preserves ordered public colors and safely ignores malformed decorative palettes", () => {
+  const origin = new URL("https://app.example"), seasonColors = ["#330000", "#FF6600", "#abcdef"];
+  assert.deepEqual(parseLiveCollection({ ...summary, seasonColors }, origin)?.seasonColors, seasonColors);
+  for (const invalid of [undefined, null, "#330000", ["red"], ["#fff"], ["url(https://example.invalid)"], ["#330000", 123], Array(11).fill("#330000")]) {
+    const result = parseLiveCollection({ ...summary, seasonColors: invalid }, origin);
+    assert.deepEqual(result?.seasonColors, []);
+    assert.equal(result?.status, "complete");
+  }
+});

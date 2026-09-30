@@ -95,8 +95,47 @@ The final strict-run result above is the authority for automated pass/fail statu
 | VI-09 | Automated pass; manual acceptance unverified | Five primary widths, two secondary-engine widths, breakpoint edges, landscape, 320 px reflow, 200% text and spacing pass where exercised. Actual 400% browser zoom remains **unverified**. |
 | VI-10 | Automated pass; manual acceptance unverified | Axe and browser keyboard/focus journeys; shared dialog containment, cancellation and restoration; native WebKit link-navigation path. Manual screen-reader acceptance remains **unverified**. |
 | VI-11 | Automated pass; manual acceptance unverified | Contrast scans, canonical control borders, coarse metrics/taps, forced-colors focus and explicit reduced-motion checks. Physical hybrid/mobile input and software-keyboard acceptance remain **unverified**. |
-| VI-12 | Pass (local) | Shared icon metrics and asset parity; explicit pause/resume and reduced-motion behavior. Existing catalog/SVG identity retained. |
+| VI-12 | Pass (local, amended 2026-09-30) | Shared icon metrics and asset parity; device reduced-motion behavior retained. User-requested Landing exception removes hero/footer pause controls. Existing catalog/SVG identity retained. |
 | VI-13 | Local pass; remote enforcement unverified | Local cross-app component/route/state regressions and checked-in CI configuration. Remote CI execution and repository merge enforcement remain **unverified**. |
 | VI-14 | Pass (local) | Commands, route/state inventory, browser/font profile, reviewed references, reports and trace paths are recorded with limits. |
 
 The implementation is locally reviewable; it is not fully accepted against every manual/device/release gate. No hosted configuration, database mutation, wallet signing, deployment, season execution, repository publication or external message was performed.
+
+## Landing hero and announcement follow-up — 2026-09-30
+
+Scope: Landing `/` only, using the existing shared typography, spacing, status badge, text action, icons and buttons. The headline is now “100% onchain autonomous rewards.” The initial support read “Up to 6 ETH in prizes per collection.” (superseded by the requested typography refinement below). The existing sellout/default-terms explanation remains below. Claims and eligibility rules are unchanged.
+
+Collection status moved out of the hero into a slim announcement above navigation. Desktop retains supplemental supply/countdown information; phones retain the status and collection link. Long names and recovery messages wrap. The existing polling, retry, offline and focus behavior remains. Observation context is associated with the link for assistive technology. Expired live/scheduled deadlines now visibly say “Checking availability”; reaching zero never confirms activation. Pending geometry reserves the shared touch-target height to avoid shifting navigation or the hero on response.
+
+Verification for this scoped change:
+
+- Landing unit checks: 15 passed, 2 database-dependent skips; Landing typecheck and production build passed. The isolated Landing production fixture build passed.
+- Visual source checks: 10 passed plus ownership/inventory policy; visual harness typecheck and all 23 canonical brand artifacts passed. No shared token or asset changes.
+- Final strict browser run: **93 passed, 18 planned secondary-engine viewport skips, no failures**, with baseline updates disabled. Command: `UI_APP=landing npx playwright test landing.spec.ts routes.spec.ts resilience.spec.ts --grep 'Landing|landing / |landing breakpoint|landing coarse'`.
+- Coverage: all five primary viewports, phone/desktop in Firefox and WebKit, breakpoint edges, landscape, 200% text/spacing, coarse input, long names, pending/empty/error/stale/retry, timeout/offline/reconnect, deadline transitions, focus, menu/dialog/newsletter interactions, reduced motion and axe scans. Requests use local fixtures and intercepted writes.
+- Reviewed 21 changed reference images for the intentional headline, placement and hero-height changes, including full-page primary-engine layouts and secondary-engine hero/status states. References remain under `tests/visual/baselines/darwin/`; no masks or tolerance changes. Independent review found no new defect in scope.
+- Final log: `test-results/landing-hero-2026-09-30.log`; result/trace/report and environment paths are unchanged from above. Environment: macOS 15.4.1 arm64, Node 22.20.0, Playwright 1.58.2, Chromium 145.0.7632.6, Firefox 146.0.1, WebKit 26.0; fixed fixture clock, en-US, UTC, DPR 1. Diff checks passed.
+
+Local automated acceptance passed for the changed scope. Manual screen-reader use, actual 400% browser zoom, physical mobile devices, hosted UI and remote CI remain unverified. No deployment, database write, wallet transaction or season operation was performed. Unrelated existing worktree changes were preserved.
+
+### Requested typography refinement — 2026-09-30
+
+The user subsequently requested a large earnings line and a headline that does not wrap. The support now reads “Earn up to 6 ETH per collection.” in the existing 30–40 px hero role, weight 500, ink color. The headline no longer has the 22ch limit or balanced wrapping. Its copy-container-relative size keeps the full sentence on one line at standard text settings, with a 1rem floor that permits user-enlarged text to reflow. This narrow, user-directed exception is recorded in the visual standard; shared tokens and the announcement are unchanged.
+
+Actual DOM text-fragment measurements passed at 320/390/599/600/601/759/760/761/768/959/960/961/1280/1440 px in Chromium, Firefox and WebKit: **42 checks**, one headline line, no page overflow, and earnings text at least 30 px throughout. Measured headline sizes range from 18 px at 320 to approximately 38.51 px at 1440; the earnings line is 30 and 40 px respectively. Evidence: `test-results/hero-type-fit-2026-09-30.json`. Independent visual inspection confirmed the 320/390/1440 compositions, and secondary-engine screenshots were reviewed. Existing 200% text and text-spacing reflow checks remain in the scoped browser run.
+
+Landing and fixture production builds, visual source ownership checks and harness typecheck passed. No new tests were introduced for this typography-only change; the existing copy expectation and 21 affected reference images were updated. Verification remains local, with the manual/device/hosted boundaries above unchanged.
+
+The final strict typography regression run passed **33 checks, 6 planned secondary-engine viewport skips, no failures** with updates disabled: `UI_APP=landing npx playwright test landing.spec.ts routes.spec.ts resilience.spec.ts --grep 'announcement first paint|empty and failed retry|landing / [0-9]+$|landing breakpoint|landing coarse'`. It covers the changed screenshots, axe scans, announcement/CTA geometry, retries, breakpoint reflow, text enlargement and touch sizing. Final log: `test-results/hero-type-final-2026-09-30.log`. Diff checks passed.
+
+### Season-colored announcement — 2026-09-30
+
+The announcement now uses a stationary left-to-right gradient from the featured season's published palette. The Web featured endpoint carries an optional `seasonColors` field selected by season ID and network; the collection's published color is its fallback. Landing validates at most ten six-digit hex colors, preserves their order, and ignores malformed decorative data without losing collection status. Older API responses remain valid and use the neutral surface. Retained stale observations keep their palette and explicit stale warning.
+
+Each gradient stop mixes 40% source color with the white canvas token, with ink-colored text. All 216 catalog colors passed the contrast calculation; even an all-black source palette yields a minimum **6.29:1** against the ink token, above the 4.5:1 normal-text requirement. Intermediate gradient colors obey the same bound. Evidence: `test-results/announcement-contrast-2026-09-30.json`.
+
+Landing checks passed 16 tests with 2 database-dependent skips; six focused Web lifecycle/palette tests passed. Landing/Web typechecks and production builds, the Landing fixture build, visual harness typecheck and ten visual source tests plus ownership policy passed. Browser fixtures exercise palette changes, stale retention, malformed/missing palettes, status recovery and the existing responsive states. The earnings typography was scoped to `.hero-copy` after review found it also enlarged fallback-page text; the 18 original error/not-found references remain unchanged. The 21 announcement/hero references were reviewed for the intended background/text-color changes.
+
+No season colors, names, ordering, contract behavior or hosted data were changed. The optional Web response addition and Landing consumer need deployment together to expose season palettes in a hosted environment; older responses continue to render safely. This work remains local and retains the manual/device/hosted verification limits above.
+
+Final strict verification: **96 passed, 18 planned secondary-engine viewport skips, zero failures** in Chromium, Firefox and WebKit, with screenshot updates disabled. Command: `UI_APP=landing npx playwright test landing.spec.ts routes.spec.ts resilience.spec.ts --grep 'Landing|landing / |landing breakpoint|landing coarse'`. Log: `test-results/announcement-gradient-final-2026-09-30.log`. This supersedes the exploratory capture run, which was interrupted by a fixture rebuild; the final run used a stable completed build. Diff checks passed.

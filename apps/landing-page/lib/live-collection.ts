@@ -9,7 +9,10 @@ export function parseLiveCollection(input: unknown, origin: URL): FeaturedCollec
     || c.target !== null && !Number.isFinite(Date.parse(c.target)) || !Number.isFinite(Date.parse(c.updatedAt))
     || !Number.isFinite(Date.parse(c.serverNow)) || c.chainTimestamp !== null && !Number.isFinite(Date.parse(c.chainTimestamp)) || typeof c.stale !== "boolean"
     || [c.remainingSupply, c.unpaidPrizes, c.completedCollections, c.totalCollections].some(n => n !== null && (!Number.isSafeInteger(n) || n < 0))) throw new Error("Invalid summary");
-  return { name: c.name, href: new URL(c.href, origin).href, status: c.status, label: c.label, target: c.target,
+  // Decorative data must never invalidate otherwise useful collection status.
+  const seasonColors = Array.isArray(c.seasonColors) && c.seasonColors.length <= 10
+    && c.seasonColors.every(color => typeof color === "string" && /^#[0-9a-f]{6}$/i.test(color)) ? [...c.seasonColors] : [];
+  return { name: c.name, href: new URL(c.href, origin).href, status: c.status, label: c.label, target: c.target, seasonColors,
     updatedAt: c.updatedAt, stale: c.stale, serverNow: c.serverNow, chainTimestamp: c.chainTimestamp,
     remainingSupply: c.remainingSupply, unpaidPrizes: c.unpaidPrizes, completedCollections: c.completedCollections, totalCollections: c.totalCollections };
 }

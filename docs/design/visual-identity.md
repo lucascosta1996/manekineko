@@ -247,9 +247,13 @@ New component families need a contract with anatomy, tokens, state table, semant
 
 ### Landing hero
 
-One headline, one short support message, one dominant CTA and deliberate artwork/space. A live-status block is subordinate. Newsletter capture remains below rewards. Do not add dense facts, multiple bright badges or another competing CTA to the hero.
+One headline, one short support message, one dominant CTA and deliberate artwork/space. Current and upcoming collection information belongs in a slim announcement bar above the navbar, outside the hero. Keep the announcement to one line when space allows; allow long names and recovery feedback to wrap without clipping. On phones, retain the collection name, status and details link while omitting supplemental counts/countdowns. Newsletter capture remains below rewards. Do not add dense facts, multiple bright badges or another competing CTA to the hero.
 
-The initial live-data request MUST NOT render “Refresh,” “Retry,” an error badge or a browser-looking button. It gets a neutral, styled pending state in a stable status slot. Retry is a response to an actual failure. Background refresh does not replace the hero with a loading panel.
+User-directed typography exception (2026-09-30): the Landing headline “100% onchain autonomous rewards.” fits one line at standard text settings across supported widths. It uses the hero role capped at 40 px, a copy-container-relative fit of 6.25cqi, and a 1rem minimum so enlarged text can still reflow. The supporting “Earn up to 6 ETH per collection.” uses the full hero type role and ink color. This is scoped to Landing's exact copy; recheck fit when copy changes, and preserve the detailed prize terms below. Shared type tokens are unchanged.
+
+The announcement's initial live-data request MUST NOT render “Refresh,” “Retry,” an error badge or a browser-looking button. It gets a neutral, styled pending state in a stable status slot. Retry is a response to an actual failure. Background refresh does not replace the hero with a loading panel. Preserve stale-state warnings and accessible observation context alongside the collection link.
+
+The user-requested announcement gradient represents the featured season's published palette, preserving its color order. Render each source color at 40% mixed with the canvas token, use the ink token for readable text, and blend left to right without continuous animation. A published collection color is the fallback when no season palette is available; missing or invalid colors retain the neutral surface. Palette data is optional decorative information and must not invalidate collection status or imply fresh availability.
 
 ### Footer
 
@@ -289,7 +293,7 @@ Countdowns use tabular numerals, do not announce every second and never interpre
 ## 11. Motion, accessibility and resilience
 
 - Micro-interaction duration: 120 ms; menu/disclosure: 160 ms; dialog: 200 ms. Use `cubic-bezier(0.2, 0, 0, 1)` for entrances/state transitions; linear for a progress spinner. Animate opacity/transform without moving surrounding layout. No `transition: all`.
-- Existing bounded hero artwork motion may retain its documented composition. Continuous decorative motion needs a working pause control and a complete static reduced-motion state. Do not hide information behind reveal animations.
+- Existing bounded hero artwork motion may retain its documented composition. Continuous decorative motion needs a working pause control and a complete static reduced-motion state. User-directed Landing exception (2026-09-30): omit the hero and footer pause/play controls; continue honoring the device reduced-motion preference for artwork and palette cycling. Do not hide information behind reveal animations.
 - Reduced motion disables nonessential movement, shimmer and smooth scrolling. Forced-colors mode preserves semantic visibility. Motion must never be required to interpret status.
 - Support keyboard operation, clear focus order, Escape and focus restoration for overlays, screen-reader names/roles/states, and text selection. Hover is an enhancement, never the sole means to discover an action.
 - Additional hover/focus content must remain usable when magnified or reached with the pointer; follow [dismissible, hoverable and persistent feedback guidance](https://www.w3.org/WAI/WCAG22/Understanding/content-on-hover-or-focus.html).

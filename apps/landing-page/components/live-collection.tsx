@@ -92,16 +92,26 @@ export function LiveCollection() {
   const serverNow = anchor.current ? observedClock(anchor.current.server, anchor.current.received, performance.now()) : null;
   const fresh = !!collection && !failed && !collection.stale && serverNow !== null && serverNow - Date.parse(collection.updatedAt) <= 180000;
   const live = collection?.status === "live" && fresh && seconds !== 0;
-  return <div ref={region} className="hero-live" data-phase={phase} role="region" tabIndex={-1} aria-label="Collection status">
-    <p className="hero-live-message" role="status" aria-atomic="true">{phase === "pending" ? "Checking collection status…" : phase === "empty" ? "No published collection is available yet." : failed ? "Collection status is temporarily unavailable." : ""}</p>
-    {collection && <>
-      <span className="lifecycle-badge" data-live={live}>{!fresh && (failed || collection.status !== "scheduled") ? "Status unavailable" : collection.label}</span>
-      <p><a ref={collectionLink} className="ui-text-action" href={collection.href}><strong>{collection.name}</strong><Icon name="diagonal" /></a></p>
-      {live && collection.remainingSupply !== null && <p>{collection.remainingSupply.toLocaleString("en-US")} tickets remaining</p>}
-      {seconds !== null && !failed && (fresh || collection.status === "scheduled") && <p role="timer" aria-live="off">{seconds === 0 ? "Scheduled time reached · checking availability" : `${collection.status === "live" ? "Mint closes" : "Mint scheduled"} in ${Math.floor(seconds / 3600)}h ${Math.floor(seconds % 3600 / 60)}m ${seconds % 60}s`}</p>}
-      {fresh && collection.unpaidPrizes !== null && collection.unpaidPrizes > 0 && <p>{collection.unpaidPrizes} prizes available to their current winning ticket holders.</p>}
-      <small>{!fresh && (failed || collection.status !== "scheduled") ? "We couldn’t confirm the latest status. Details may be out of date. " : ""}{collection.status === "scheduled" ? "Published schedule; deployment and activation still require confirmation. " : ""}Last observed: {new Date(collection.updatedAt).toUTCString()}</small>
-    </>}
-    {failed && <TextAction ref={retry} busy={busy} onClick={() => request.current()} icon={<Icon name="refresh" />}>Refresh</TextAction>}
+  const unavailable = !fresh && (failed || collection?.status !== "scheduled");
+  const awaitingConfirmation = seconds === 0 && (collection?.status === "live" || collection?.status === "scheduled");
+  const colors = collection?.seasonColors ?? [];
+  const stops = colors.length === 1 ? [colors[0], colors[0]] : colors;
+  const backgroundImage = stops.length ? `linear-gradient(90deg, ${stops.map(color => `color-mix(in srgb, ${color} 40%, var(--ui-canvas))`).join(", ")})` : undefined;
+  return <div ref={region} className="collection-announcement" data-phase={phase} data-palette={Boolean(backgroundImage)} style={{ backgroundImage }} role="region" tabIndex={-1} aria-label="Collection status">
+    <div className="collection-announcement-content wrap">
+      <span className="collection-announcement-message" role="status" aria-atomic="true">{phase === "pending" ? "Checking collection status…" : phase === "empty" ? "No published collection is available yet." : failed ? collection ? "Details may be out of date." : "Collection status is temporarily unavailable." : ""}</span>
+      {collection && <>
+        <div className="collection-announcement-summary">
+          <span className="lifecycle-badge" data-live={live}>{unavailable ? "Status unavailable" : awaitingConfirmation ? "Checking availability" : collection.label}</span>
+          <a ref={collectionLink} className="ui-text-action" href={collection.href} aria-describedby="collection-observation"><strong>{collection.name}</strong><Icon name="diagonal" /></a>
+        </div>
+        {unavailable && !failed && <span>Details may be out of date.</span>}
+        {live && collection.remainingSupply !== null && <span className="collection-announcement-detail">{collection.remainingSupply.toLocaleString("en-US")} tickets remaining</span>}
+        {seconds !== null && !failed && (fresh || collection.status === "scheduled") && <span className="collection-announcement-detail" role="timer" aria-live="off">{seconds === 0 ? "Scheduled time reached · checking availability" : `${collection.status === "live" ? "Mint closes" : "Mint scheduled"} in ${Math.floor(seconds / 3600)}h ${Math.floor(seconds % 3600 / 60)}m ${seconds % 60}s`}</span>}
+        {fresh && collection.unpaidPrizes !== null && collection.unpaidPrizes > 0 && <span className="collection-announcement-detail">{collection.unpaidPrizes} prizes available to claim</span>}
+        <span id="collection-observation" className="visually-hidden">{unavailable ? "We couldn’t confirm the latest status. Details may be out of date. " : ""}{collection.status === "scheduled" ? "Published schedule; deployment and activation still require confirmation. " : ""}Last observed: {new Date(collection.updatedAt).toUTCString()}</span>
+      </>}
+      {failed && <TextAction ref={retry} busy={busy} onClick={() => request.current()} icon={<Icon name="refresh" />}>Refresh</TextAction>}
+    </div>
   </div>;
 }

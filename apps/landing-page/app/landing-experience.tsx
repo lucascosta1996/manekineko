@@ -1,5 +1,5 @@
 "use client";
-import { Button, IconButton, LinkButton, TextAction } from "@manekineko/ui/button";
+import { Button, IconButton, LinkButton } from "@manekineko/ui/button";
 import { PublicFooter } from "@manekineko/ui/footer";
 import type { PublicLinks } from "@manekineko/ui/links";
 import { Icon } from "@manekineko/ui/icons";
@@ -151,7 +151,6 @@ export function LandingExperience({
   plannedRewards: PlannedRewards;
 }) {
   const [failedArtwork, setFailedArtwork] = useState<string[]>([]);
-  const [paused, setPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [heroSeason, setHeroSeason] = useState(0);
   const [catalogSeason, setCatalogSeason] = useState(0);
@@ -161,7 +160,7 @@ export function LandingExperience({
   const root = useRef<HTMLDivElement>(null);
   const gallery = useRef<HTMLDivElement>(null);
   const menuButton = useRef<HTMLButtonElement>(null);
-  const motionOff = paused || reducedMotion;
+  const motionOff = reducedMotion;
   const featuredSeasons = [0, 5, 10, 13, 15, 19];
   const currentPalette = seasons[featuredSeasons[heroSeason]];
   const selectedSeason = seasons[catalogSeason];
@@ -267,6 +266,7 @@ export function LandingExperience({
       <a className="skip-link" href="#main">
         Skip to content
       </a>
+      <LiveCollection />
       <header className="header wrap">
         <Brand />
         <nav className="desktop-nav" aria-label="Main navigation">
@@ -329,8 +329,7 @@ export function LandingExperience({
           <div className="hero-main">
             <div className="hero-copy">
               <h1 id="hero-title">
-                Autonomous rewards.
-                <br />Verifiable{" "}
+                100%{" "}
                 <span className="win-word">
                   onchain
                   <svg viewBox="0 0 200 20" fill="none" aria-hidden="true">
@@ -342,10 +341,10 @@ export function LandingExperience({
                     />
                   </svg>
                 </span>
-                .
+                {" "}autonomous rewards.
               </h1>
               <p className="hero-description">
-                ETH prizes and affiliate rewards, governed by smart contracts.
+                Earn up to 6 ETH per collection.
               </p>
               <div className="hero-actions">
                 <LinkButton  href="#rewards">
@@ -353,28 +352,9 @@ export function LandingExperience({
                   <Icon name="down" />
                 </LinkButton>
               </div>
-              <LiveCollection />
             </div>
             <div className="hero-art">
               <ColorSculpture colors={currentPalette.colors} />
-              <div className="art-controls">
-                <IconButton
-                  className="motion-toggle"
-                  aria-label={
-                    motionOff ? "Play animations" : "Pause animations"
-                  }
-                  aria-pressed={motionOff}
-                  disabled={reducedMotion}
-                  title={
-                    reducedMotion
-                      ? "Reduced motion enabled in your device settings"
-                      : undefined
-                  }
-                  onClick={() => setPaused(!paused)}
-                >
-                  <Icon name={motionOff ? "play" : "pause"} />
-                </IconButton>
-              </div>
             </div>
           </div>
         </section>
@@ -984,7 +964,6 @@ export function LandingExperience({
         brand={<TinctaWordmark title="" className="ui-footer-wordmark" />}
         links={footerLinks}
         legal={<>Launch preview. Rewards shown use planned default terms and require sellout. Prizes and affiliate earnings are not guaranteed. Review each collection’s final terms.</>}
-        actions={<TextAction disabled={reducedMotion} onClick={() => setPaused(!paused)} icon={<Icon name={motionOff ? "play" : "pause"} size="footer" />}>{reducedMotion ? "Reduced motion" : paused ? "Play motion" : "Pause motion"}</TextAction>}
       />
     </div>
   );

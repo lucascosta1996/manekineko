@@ -61,3 +61,13 @@ test("countdown ignores device clock skew, survives fresh reload, stops on stale
   assert.equal(collectionChainNow(c, now + 180001), null);
   assert.equal(collectionObservationFresh({ ...c, observation: { ...c.observation!, chainTimestamp: new Date(now - 600000).toISOString() } }, now), false);
 });
+test("featured colors follow the selected season and network, with a collection-color fallback", () => {
+  const live = collection({ phase: "minting", totalMinted: 42, awards: [], prizePaid: false, collectionColor: "#330000" });
+  const season = { chainId: live.chainId, seasonId: live.seasonId, colors: ["#330000", "#FF6600"], updatedAt: observedAt, collections: [] } as unknown as AnnouncedSeason;
+  const otherNetwork = { ...season, chainId: 1 as const, colors: ["#0000FF"] };
+  assert.deepEqual(featuredPublicCollection([live], [otherNetwork, season], now)?.seasonColors, season.colors);
+  assert.deepEqual(featuredPublicCollection([live], [otherNetwork], now)?.seasonColors, ["#330000"]);
+  const scheduled = { ...season, colors: ["#003366", "#3399FF"], collections: [{ id: "next", name: "Next", number: 1, status: "scheduled", saleStartAt: new Date(now + 3600000).toISOString() }] } as AnnouncedSeason;
+  assert.deepEqual(featuredPublicCollection([], [scheduled], now)?.seasonColors, scheduled.colors);
+  assert.deepEqual(featuredPublicCollection([collection()], [season], now)?.seasonColors, season.colors);
+});

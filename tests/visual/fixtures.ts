@@ -1,10 +1,11 @@
 import { expect, type Page } from '@playwright/test';
 import { webVisualResponse, visualNow } from '../../apps/web/test/visual-data';
 import { launchFixtureResponse } from '../../apps/launch/test/visual-data';
+import seasonCatalog from '../../seasons.json';
 export const browserErrors = new WeakMap<Page, string[]>();
 export const urls = { landing: 'http://127.0.0.1:4311', web: 'http://127.0.0.1:4312', launch: 'http://127.0.0.1:4313' };
 export const widths = [[320,800],[390,844],[768,1024],[1280,800],[1440,900]] as const;
-export const collection = { name: 'Visual study', href: `${urls.web}/mint/11111111-1111-4111-8111-111111111111`, status: 'live', label: 'Mint open', target: '2026-09-29T00:00:00.000Z', updatedAt: visualNow, serverNow: visualNow, stale: false, chainTimestamp: visualNow, remainingSupply: 750, unpaidPrizes: 0, completedCollections: 0, totalCollections: 2 };
+export const collection = { name: 'Visual study', href: `${urls.web}/mint/11111111-1111-4111-8111-111111111111`, status: 'live', label: 'Mint open', target: '2026-09-29T00:00:00.000Z', updatedAt: visualNow, serverNow: visualNow, stale: false, chainTimestamp: visualNow, remainingSupply: 750, unpaidPrizes: 0, completedCollections: 0, totalCollections: 2, seasonColors: seasonCatalog[0].collections };
 export async function prepare(page: Page, state = 'loaded') {
  const errors: string[] = []; browserErrors.set(page, errors);
  page.on('pageerror', error => errors.push(error.message));

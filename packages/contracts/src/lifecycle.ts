@@ -86,4 +86,6 @@ export type FeaturedCollectionSummary = {
   label: string; target: string | null; updatedAt: string; stale: boolean; serverNow: string;
   chainTimestamp: string | null; remainingSupply: number | null; unpaidPrizes: number | null;
   completedCollections: number | null; totalCollections: number | null;
+  /** Public season palette in its published order; optional for older API responses. */
+  seasonColors?: string[];
 };
