@@ -5,6 +5,7 @@ import { AffiliateError, configuredOrigin, normalizedWallet } from "./policy";
 import type { ProgramRecord } from "./repository";
 import { chainEnabled } from "../chain-policy";
 import { createReadRpc } from "./rpc-read-transport";
+import { trustedFactoryPin } from "../trusted-factories.ts";
 
 const ROUND = new Interface([
   "function winnerCount() view returns(uint256)", "function secondPrizeBps() view returns(uint256)", "function minAffiliateReferrals() view returns(uint256)", "function affiliatePayoutCapBps() view returns(uint256)", "function saleStartAt() view returns(uint256)",
@@ -67,8 +68,8 @@ export async function trustedSnapshot(record: ProgramRecord): Promise<ChainSnaps
   const v5 = record.contractVersion === "affiliate-v5" || v6;
   const v4=record.contractVersion!=="affiliate-v3";
   const rpcUrl = process.env[`AFFILIATE_RPC_URL_${record.chainId}`];
-  const factory = process.env[`AFFILIATE_TRUSTED_FACTORY_${record.contractVersion === "affiliate-v10" ? "V10_" : record.contractVersion === "affiliate-v9" ? "V9_" : v8?"V8_":v7?"V7_":v6?"V6_":v5?"V5_":v4?"V4_":""}${record.chainId}`]?.toLowerCase();
-  const factoryHash = process.env[`AFFILIATE_TRUSTED_FACTORY_CODEHASH_${record.contractVersion === "affiliate-v10" ? "V10_" : record.contractVersion === "affiliate-v9" ? "V9_" : v8?"V8_":v7?"V7_":v6?"V6_":v5?"V5_":v4?"V4_":""}${record.chainId}`]?.toLowerCase();
+  const pin = trustedFactoryPin(record.chainId, record.contractVersion, record.factoryAddress);
+  const factory = pin?.factory, factoryHash = pin?.factoryCodeHash;
   if (!rpcUrl || !factory || !/^0x[0-9a-f]{64}$/.test(factoryHash ?? "") || factory !== record.factoryAddress.toLowerCase()) throw new AffiliateError("deployment_unavailable", "The collection factory has not been approved for live transactions.", 503);
   try { if (new URL(rpcUrl).protocol !== "https:") throw new Error(); } catch { throw new AffiliateError("deployment_unavailable", "A secure Ethereum connection is not configured.", 503); }
   const readRpc = createReadRpc(rpcUrl);

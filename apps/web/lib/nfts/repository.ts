@@ -6,6 +6,7 @@ import { isCollectionId } from "../collections/model";
 import { collectionSource } from "../collections/source-policy";
 import { isNftTokenId, type IndexedNftRecord, type NftGalleryQuery, type NftGalleryResponse, type NftItem } from "./model";
 import { INDEXED_NFT_QUERY, NFT_GALLERY_QUERY } from "./queries";
+import { trustedFactoryPins } from "../trusted-factories.ts";
 
 interface NftRow extends Omit<IndexedNftRecord, "blockNumber" | "ownerWallet" | "burned" | "mintedAt"> {
   mintedAt: Date | string;
@@ -23,12 +24,8 @@ interface GalleryRow {
 
 function trustedFactories(): string {
   const enabled = configuredChainId();
-  const factories = [1, 11155111].filter((chain) => enabled === null || chain === enabled).flatMap((chain) => ["V5", "V6", "V7", "V8", "V9", "V10"].flatMap((version) => {
-    const factory = process.env[`AFFILIATE_TRUSTED_FACTORY_${version}_${chain}`]?.toLowerCase();
-    const hash = process.env[`AFFILIATE_TRUSTED_FACTORY_CODEHASH_${version}_${chain}`]?.toLowerCase();
-    return factory && /^0x[0-9a-f]{40}$/.test(factory) && !/^0x0{40}$/.test(factory) && /^0x[0-9a-f]{64}$/.test(hash ?? "")
-      ? [{ chain_id: chain, factory, contract_version: version === "V10" ? "affiliate-v10" : version === "V9" ? "affiliate-v9" : version === "V8" ? "affiliate-v8" : version === "V7" ? "affiliate-v7" : version === "V6" ? "affiliate-v6" : "affiliate-v5" }] : [];
-  }));
+  const factories = trustedFactoryPins().filter(pin => (enabled === null || pin.chainId === enabled) && Number(pin.contractVersion.slice(11)) >= 5)
+    .map(pin => ({chain_id:pin.chainId,factory:pin.factory,contract_version:pin.contractVersion}));
   if (factories.length === 0) throw new Error("The NFT gallery has no trusted collection factories configured.");
   return JSON.stringify(factories);
 }

@@ -31,7 +31,7 @@ ${chainId === 1 ? "Uses the configured operator only; buyer-wallet creation, fun
 Read docs/season-automation.md before execution.`;
 }
 export type RehearsalSupport = {
-  options: Pick<RunnerOptions, "wallets" | "donors" | "recycleSepoliaFunds" | "scenario">;
+  options: Pick<RunnerOptions, "wallets" | "donors" | "recycleSepoliaFunds" | "scenario" | "admissionSigner">;
   step: NonNullable<RunnerDependencies["runSepoliaRehearsalStep"]>;
 };
 type PrepareRehearsal = (args: ReturnType<typeof parseArguments>) => Promise<RehearsalSupport>;

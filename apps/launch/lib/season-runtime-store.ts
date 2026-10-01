@@ -93,7 +93,11 @@ export async function requestSeasonStart(db: Pool, actor: LaunchActor, automatio
   return withRuntimeTransaction(db, client => requestSeasonStartInTransaction(client, actor, automationId, input));
 }
 /** Reuses the same start guards inside an existing transaction, including atomic CLI preparation. */
-export async function requestSeasonStartInTransaction(client: PoolClient, actor: LaunchActor, automationId: string, input: Record<string, unknown>): Promise<RuntimeRun> {
+export async function requestSeasonStartInTransaction(client: PoolClient, actor: LaunchActor, automationId: string, input: Record<string, unknown>, reviewSeasonId?: string): Promise<RuntimeRun> {
+  const review = (await client.query("SELECT review_group FROM manekineko_season_review_members WHERE automation_id=$1", [runtimeId(automationId)])).rows[0]?.review_group;
+  if (review && review.seasonId !== reviewSeasonId) throw new AutomationError("review_script_required", "Start this review with its saved review script so wallet funding and the previous collection are checked first.", 409);
+  const replacement = await client.query("SELECT 1 FROM manekineko_season_review_superseded WHERE automation_id=$1", [automationId]);
+  if (replacement.rows.length) throw new AutomationError("superseded_run", "This review has been replaced. Use the new three-collection season.", 409);
   const revision = runtimeRevision(input.revision), profileRevision = runtimeRevision(input.profileRevision);
   if (typeof input.preparedHash !== "string" || !/^[a-f0-9]{64}$/.test(input.preparedHash)) throw new AutomationError("invalid_hash", "Reload the prepared season before starting.");
     await lockActor(client, actor);
@@ -130,6 +134,7 @@ export async function requestSeasonControl(db: Pool, actor: LaunchActor, automat
     if (input.action === "resume" && saved.lease_expires_at && saved.lease_expires_at.getTime() > Date.now()) throw new AutomationError("runtime_busy", "Wait for the worker to finish pausing before resuming.", 409);
     const resumed = input.action === "resume";
     if (resumed) {
+      if ((await client.query("SELECT 1 FROM manekineko_season_review_superseded WHERE automation_id=$1", [automationId])).rows.length) throw new AutomationError("superseded_run", "This review has been replaced. Use the new three-collection season.", 409);
       const superseded = await client.query(`SELECT 1 FROM manekineko_season_runtime_runs newer
         JOIN manekineko_launch_automations next ON next.id=newer.automation_id
         JOIN manekineko_launch_automations old ON old.id=$1

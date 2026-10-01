@@ -57,7 +57,7 @@ export function SeasonRuntimePanel({ automation, allowedChainId, dirty }: { auto
   const reviewBinding = `${automation.revision}:${snapshot?.profile?.revision ?? 0}:${run?.revision ?? 0}`;
   const reviewAccepted = accepted && acceptedBinding === reviewBinding;
   const blocked = loading || pending || restricted || !!loadError;
-  const canRun = !blocked && !dirty && automation.status === "prepared" && !!snapshot?.profile?.enabled && !!snapshot?.encryptionConfigured && automation.plan.social?.enabled === true;
+  const canRun = (!automation.reviewGroup || !!snapshot?.run) && !blocked && !dirty && automation.status === "prepared" && !!snapshot?.profile?.enabled && !!snapshot?.encryptionConfigured && automation.plan.social?.enabled === true;
   return <section className="season-runtime" aria-labelledby="season-runtime-title">
     <div className="season-runtime-heading"><div><span className="launch-eyebrow">SEASON EXECUTION / V9 + V10</span><h2 id="season-runtime-title">Worker and delivery.</h2><p>The prepared artifact records intended terms. Current chain lifecycle appears above; worker and X delivery status are separate.</p></div><span className="launch-status">{loading ? "Loading" : run?.status ?? "Not started"}</span></div>
     {error && <div className="launch-alert launch-alert-error" role="alert">{error}</div>}
@@ -71,6 +71,7 @@ export function SeasonRuntimePanel({ automation, allowedChainId, dirty }: { auto
         {run?.desiredState === "paused" && run.status !== "paused" && <p className="season-runtime-note">Pause requested. Waiting for the worker to finish its current action.</p>}
         {dirty && <p className="season-runtime-note">Save the latest changes to refresh previews and prepare the reviewed settings.</p>}
         {!automation.plan.social?.enabled && <p className="season-runtime-note">Enable automatic X posts in season cadence before preparing.</p>}
+        {automation.reviewGroup && !run && <p className="season-runtime-note">Start with the saved review script. It checks the correct wallets and recovers funds before scheduling the next mint opening.</p>}
         {!active && <><label className="ui-check-field launch-checkbox"><input className="ui-checkbox" type="checkbox" checked={reviewAccepted} onChange={event => { setAccepted(event.target.checked); setAcceptedBinding(reviewBinding); }} disabled={!canRun}/><span>I reviewed this version-pinned season and @{snapshot?.profile?.handle || "the X account"}. {run?.status === "completed" ? "Resume confirmed claim announcements" : "Start autonomous deployments and event posts"} on {automation.plan.chainId === "1" ? "Ethereum Mainnet" : "Sepolia"}.</span></label><Button busy={Boolean(pending)} reserveLabels={["Requesting…","Resume claim monitoring","Resume season","Start season"]} variant="primary" type="button"  onClick={() => void control(run ? "resume" : "start")} disabled={!canRun || !reviewAccepted}>{pending ? "Requesting…" : run?.status === "completed" ? "Resume claim monitoring" : run ? "Resume season" : "Start season"}</Button></>}
         {active && <Button variant="secondary" type="button"  disabled={blocked} onClick={() => void control("pause")}>{run.status === "completed" ? "Pause claim monitoring" : "Pause season"}</Button>}
       </div>

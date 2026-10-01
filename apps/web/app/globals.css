@@ -2006,3 +2006,9 @@ img {
 .mint-shell { padding-inline:var(--ui-space-4); }
 @media(min-width:600px) { .mint-shell { padding-inline:var(--ui-space-6); } }
 @media(min-width:960px) { .mint-shell { padding-inline:var(--ui-space-10); } }
+
+/* The ticket stepper already supplies accessible decrement/increment buttons. */
+.quantity-control input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
+.quantity-control input[type="number"]::-webkit-inner-spin-button,
+.quantity-control input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.affiliate-enrollment-submit { margin-top: var(--ui-space-6); }

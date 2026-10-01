@@ -14,7 +14,7 @@ import type { AffiliateEnrollmentEligibility } from "../lib/affiliates/types.ts"
 const wallet="0x1111111111111111111111111111111111111111",source="0x2222222222222222222222222222222222222222",target="0x3333333333333333333333333333333333333333",gate="0x4444444444444444444444444444444444444444",factory="0x5555555555555555555555555555555555555555";
 const code="0x60016000",hash=keccak256(code),factoryHash=keccak256("0x6002"),roundHash=keccak256("0x6003"),iface=new Interface(AFFILIATE_ELIGIBILITY_ABI),roundIface=new Interface(["function affiliateEligibility() view returns(address)"]);
 const selection={sourceCollection:source,sourceTokenId:"17"};
-const env={AFFILIATE_ELIGIBILITY_ADDRESS_11155111:gate,AFFILIATE_ELIGIBILITY_CODEHASH_11155111:hash,AFFILIATE_TRUSTED_FACTORY_CODEHASH_V6_11155111:factoryHash};
+const env={AFFILIATE_ELIGIBILITY_ADDRESS_11155111:gate,AFFILIATE_ELIGIBILITY_CODEHASH_11155111:hash,AFFILIATE_TRUSTED_FACTORY_V6_11155111:factory,AFFILIATE_TRUSTED_FACTORY_CODEHASH_V6_11155111:factoryHash};
 type Options={account?:string;chain?:string;code?:string;version?:string;configuredGate?:string;sequence?:bigint;sourceOnly?:boolean;status?:number;factory?:string;roundId?:bigint;roundHash?:string;factoryHash?:string;missingGetter?:boolean;revert?:boolean};
 function info(o:Options){return[o.factory??factory,o.roundId??2n,o.sequence??2n,o.roundHash??roundHash,o.sourceOnly??false];}
 function gateRead(name:string,args:readonly unknown[],o:Options):unknown[]{
@@ -50,6 +50,12 @@ test("canonical gate pins prove the exact target registration and permit bootstr
 });
 test("unregistered and imported source-only rounds cannot present open enrollment",async()=>{
  for(const o of [{sequence:0n},{sourceOnly:true}])assert.match((await trustedAffiliateEligibility(snapshot(o),env)).reason!,/not registered/);
+});
+test("an additional factory uses its own exact pin for canonical affiliate registration",async()=>{
+ const extra={AFFILIATE_ELIGIBILITY_ADDRESS_11155111:gate,AFFILIATE_ELIGIBILITY_CODEHASH_11155111:hash,
+  AFFILIATE_ADDITIONAL_TRUSTED_FACTORIES_JSON:JSON.stringify([{chainId:11155111,contractVersion:"affiliate-v6",factory,factoryCodeHash:factoryHash}])};
+ assert.equal((await trustedAffiliateEligibility(snapshot(),extra)).sequence,"2");
+ await assert.rejects(trustedAffiliateEligibility(snapshot({factoryHash:roundHash}),extra));
 });
 test("unpinned, substituted and outdated eligibility gates fail closed",async()=>{
  for(const bad of [{},{...env,AFFILIATE_ELIGIBILITY_ADDRESS_11155111:ZeroAddress},{...env,AFFILIATE_ELIGIBILITY_CODEHASH_11155111:roundHash}])await assert.rejects(trustedAffiliateEligibility(snapshot(),bad));
@@ -88,7 +94,7 @@ test("web eligibility ABI and source-bound enrollment fields match the compiled 
 
 test("V8 enrollment requires independent V3 registry and V8 factory pins in API and wallet preflight",async()=>{
  const v8=snapshot({version:"affiliate-eligibility-v3"});v8.record={...v8.record,contractVersion:"affiliate-v8"};
- const v8env={AFFILIATE_ELIGIBILITY_V3_ADDRESS_11155111:gate,AFFILIATE_ELIGIBILITY_V3_CODEHASH_11155111:hash,AFFILIATE_TRUSTED_FACTORY_CODEHASH_V8_11155111:factoryHash};
+ const v8env={AFFILIATE_ELIGIBILITY_V3_ADDRESS_11155111:gate,AFFILIATE_ELIGIBILITY_V3_CODEHASH_11155111:hash,AFFILIATE_TRUSTED_FACTORY_V8_11155111:factory,AFFILIATE_TRUSTED_FACTORY_CODEHASH_V8_11155111:factoryHash};
  await assert.rejects(trustedAffiliateEligibility(v8,env));
  const verified=await trustedAffiliateEligibility(v8,v8env);assert.equal((await verified.check(wallet,selection)).eligible,true);
  const v8target={...contractTarget,contractVersion:"affiliate-v8" as const};
@@ -99,7 +105,7 @@ test("V8 enrollment requires independent V3 registry and V8 factory pins in API 
 test("V9 and V10 require their own exact registry version and independent factory pins",async()=>{
  for (const [contractVersion,registryVersion,gateSuffix,factorySuffix] of [["affiliate-v9","affiliate-eligibility-v4","V4","V9"],["affiliate-v10","affiliate-eligibility-v5","V5","V10"]] as const) {
   const current=snapshot({version:registryVersion});current.record={...current.record,contractVersion};
-  const pins={ [`AFFILIATE_ELIGIBILITY_${gateSuffix}_ADDRESS_11155111`]:gate,[`AFFILIATE_ELIGIBILITY_${gateSuffix}_CODEHASH_11155111`]:hash,[`AFFILIATE_TRUSTED_FACTORY_CODEHASH_${factorySuffix}_11155111`]:factoryHash };
+  const pins={ [`AFFILIATE_ELIGIBILITY_${gateSuffix}_ADDRESS_11155111`]:gate,[`AFFILIATE_ELIGIBILITY_${gateSuffix}_CODEHASH_11155111`]:hash,[`AFFILIATE_TRUSTED_FACTORY_${factorySuffix}_11155111`]:factory,[`AFFILIATE_TRUSTED_FACTORY_CODEHASH_${factorySuffix}_11155111`]:factoryHash };
   await assert.rejects(trustedAffiliateEligibility(current,env));
   assert.equal((await (await trustedAffiliateEligibility(current,pins)).check(wallet,selection)).eligible,true);
   await verifyEnrollmentNft(session({version:registryVersion}),{...contractTarget,contractVersion},eligibility,selection);

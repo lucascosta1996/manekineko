@@ -117,6 +117,35 @@ test("manual post-draw winner reservation survives restart, holds unpaid rights 
   assert.equal(f.options.state.manual![f.round].checkpoint, "complete"); assert.equal(f.writes.length, 0);
 });
 
+test("one manual referral unlocks bot-paid gifts without consuming either reserved signer or exceeding twenty recipients' mints", async () => {
+  const f=manualFixture(),options={...f.options,scenario:{...f.options.scenario,manualMintPlan:"one-referral-then-gifts" as const}};
+  await runSepoliaRehearsalStep(options,f.round);
+  f.control.enrolled=true;f.control.wrongReferral=true; // Fixture emits exactly one genuine buyer referral.
+  const provider=options.provider as any,original=provider.call,receipts=new Map<string,any>();
+  let affiliateMints=0n,buyerMints=1n;
+  provider.call=async(request:any)=>{const call=f.iface.parseTransaction(request)!;
+    if(call.name==="mintedPerWallet")return f.iface.encodeFunctionResult(call.name,[call.args[0]===f.wallets[0].address?affiliateMints:call.args[0]===f.wallets[1].address?buyerMints:0n]);
+    if(call.name==="totalMinted")return f.iface.encodeFunctionResult(call.name,[affiliateMints+buyerMints]);
+    return original(request);
+  };
+  provider.getTransactionReceipt=async(hash:string)=>receipts.get(hash)??null;
+  provider.getTransactionCount=async()=>receipts.size;
+  for(const [recipient,quantity] of [[f.wallets[0].address,20n],[f.wallets[1].address,19n]] as const){
+    await assert.rejects(runSepoliaRehearsalStep(options,f.round),ChainPendingError);
+    const tx=Transaction.from(f.writes.at(-1)!),call=f.iface.parseTransaction(tx)!;
+    assert.equal(tx.from,f.wallets[2].address);assert.equal(call.name,"mint");assert.equal(call.args[0],recipient);assert.equal(call.args[1],quantity);
+    assert.equal(tx.value,quantity*10000n);
+    receipts.set(tx.hash!,{hash:tx.hash,status:1,from:tx.from,to:tx.to,blockNumber:100,blockHash:`0x${"ab".repeat(32)}`,gasUsed:100000n,gasPrice:22n});
+    if(recipient===f.wallets[0].address)affiliateMints=20n;else buyerMints=20n;
+    assert.equal((await runSepoliaRehearsalStep(options,f.round)).action,"reconciled");
+  }
+  assert.equal(f.state.manual![f.round].referralReceipts?.[0].quantity,"1");
+  await assert.rejects(runSepoliaRehearsalStep(options,f.round),ChainPendingError);
+  const normal=f.iface.parseTransaction(Transaction.from(f.writes.at(-1)!))!;
+  assert.equal(normal.name,"mintWithAffiliate");assert.equal(normal.args[0],f.wallets[2].address);assert.equal(normal.args[1],20n);
+  assert.equal(f.state.journals[f.wallets[0].address],undefined);assert.equal(f.state.journals[f.wallets[1].address],undefined);
+});
+
 test("manual rehearsal fails closed for wrong referral, attaching after purchases, changed roles or recycling", async () => {
   const f = manualFixture();
   await assert.rejects(runSepoliaRehearsalStep({ ...f.options, recycleOperatorFunds: true }, f.round), /unrecycled/);
@@ -232,4 +261,21 @@ test("affiliate scenario requires real enrollment, signs paid referrals and clai
     assert.equal(call.args[0], signed.from);
     if (mode === "referral") { assert.equal(call.args[2], 7n); assert.equal(signed.value, 200000n); }
   }
+});
+
+test("a later manual-wallet gas shortfall creates a new funding intent instead of replaying a confirmed transfer",async()=>{
+ const f=manualFixture(),recipient=f.wallets[0],base=`fund:${f.round}:${recipient.address}:manual-role`;
+ const provider=f.options.provider as any,receipts=new Map<string,any>();let balance=0n;
+ provider.getBalance=async(a:string)=>a===recipient.address?balance:10n**20n;
+ provider.getTransactionReceipt=async(hash:string)=>receipts.get(hash)??null;
+ provider.getTransactionCount=async()=>receipts.size;
+ await assert.rejects(runSepoliaRehearsalStep(f.options,f.round),ChainPendingError);
+ const first=Transaction.from(f.writes[0]);
+ receipts.set(first.hash!,{hash:first.hash,status:1,from:first.from,to:first.to,blockNumber:100,blockHash:`0x${"ab".repeat(32)}`,gasUsed:100000n,gasPrice:22n});
+ balance=first.value;
+ assert.equal((await runSepoliaRehearsalStep(f.options,f.round)).action,"reconciled");
+ balance-=1000n; // The human wallet paid an enrollment transaction fee.
+ await assert.rejects(runSepoliaRehearsalStep(f.options,f.round),ChainPendingError);
+ assert.equal(f.writes.length,2);const topup=Transaction.from(f.writes[1]);assert.equal(topup.to,recipient.address);assert.equal(topup.value,1000n);
+ assert(f.state.journals[f.operator.address].transactions.some(t=>t.action===`${base}:topup:1`));
 });

@@ -1,3 +1,4 @@
+import { parseSeasonReviewGroup, type SeasonReviewGroup } from "./season-review-group.ts";
 import { launchContractVersion } from "./launch-config.ts";
 import { configuredLaunchChain, requireLaunchChain, requireSeasonPlanningChain } from "./chain-policy.ts";
 import { randomUUID } from "node:crypto";
@@ -14,6 +15,8 @@ type Row = {
   id: string; plan: AutomationPlan["plan"]; status: AutomationPlan["status"]; revision: number;
   content_hash: string | null; created_at: Date; updated_at: Date; prepared_at: Date | null;
   created_by: string; updated_by: string; prepared_by: string | null; prepared_artifact: AutomationArtifact | null;
+  review_group?: SeasonReviewGroup | null;
+  superseded_by?: string | null;
   mock_catalog_order?: number | null;
   display_season_order?: number | null;
 };
@@ -36,7 +39,7 @@ async function mutateAutomation(db: AutomationDatabase, sql: string, values: unk
 
 function automation(row: Row): AutomationPlan {
   return {
-    id: row.id, seasonOrder: row.display_season_order ?? row.mock_catalog_order ?? catalogSeasonOrder(row.plan.seasonId), plan: row.plan, status: row.status, revision: row.revision, contentHash: row.content_hash,
+    id: row.id, ...(row.review_group ? {reviewGroup:parseSeasonReviewGroup(row.review_group)} : {}), supersededBy:row.superseded_by ?? null, seasonOrder: row.display_season_order ?? row.mock_catalog_order ?? catalogSeasonOrder(row.plan.seasonId), plan: row.plan, status: row.status, revision: row.revision, contentHash: row.content_hash,
     createdAt: row.created_at.toISOString(), updatedAt: row.updated_at.toISOString(), preparedAt: row.prepared_at?.toISOString() ?? null,
     createdBy: row.created_by, updatedBy: row.updated_by, preparedBy: row.prepared_by,
   };
@@ -51,7 +54,7 @@ function sharedMockOrder(alias: string): string {
 }
 
 async function findRow(db: AutomationDatabase, id: string): Promise<Row> {
-  const result = await db.query<Row>(`SELECT saved.*, ${sharedMockOrder("saved")} AS display_season_order
+  const result = await db.query<Row>(`SELECT saved.*, (SELECT review_group FROM manekineko_season_review_members WHERE automation_id=saved.id) AS review_group, (SELECT replacement_id FROM manekineko_season_review_superseded WHERE automation_id=saved.id) AS superseded_by, ${sharedMockOrder("saved")} AS display_season_order
     FROM manekineko_launch_automations saved WHERE saved.id=$1`, [automationId(id)]);
   if (!result.rows[0]) throw new AutomationError("not_found", "Launch automation not found.", 404);
   requireSeasonPlanningChain(result.rows[0].plan.chainId);
@@ -92,12 +95,15 @@ export async function listLaunchAutomations(db: AutomationDatabase, rawCursor?: 
   if (chainId !== null) requireSeasonPlanningChain(chainId);
   const cursor = parseCursor(rawCursor);
   const result = await db.query<SummaryRow>(`WITH ordered_seasons AS (
-    SELECT saved.*,COALESCE(${sharedMockOrder("saved")},($4::jsonb->>lower(plan->>'seasonId'))::integer,${UNLISTED_SEASON_ORDER}) AS season_order
+    SELECT saved.*,membership.review_group,replacement.replacement_id AS superseded_by,COALESCE(${sharedMockOrder("saved")},($4::jsonb->>lower(plan->>'seasonId'))::integer,${UNLISTED_SEASON_ORDER}) AS season_order
     FROM manekineko_launch_automations saved
+    LEFT JOIN manekineko_season_review_members membership ON membership.automation_id=saved.id
+    LEFT JOIN manekineko_season_review_superseded replacement ON replacement.automation_id=saved.id
     WHERE ($3::text IS NULL OR plan->>'chainId' = $3)
+      AND (membership.review_group IS NULL OR membership.review_group->'stages'->0->>'automationId'=saved.id::text)
   ) SELECT id,plan->>'name' AS name,plan->>'chainId' AS chain_id,season_order,
-    jsonb_array_length(plan->'steps') AS collection_count,status,revision,content_hash,created_at,updated_at,prepared_at,
-    (plan ? 'seasonId' AND plan ? 'timing' AND jsonb_array_length(plan->'steps') > 0 AND NOT EXISTS (
+    CASE WHEN review_group IS NULL THEN jsonb_array_length(plan->'steps') ELSE 3 END AS collection_count,review_group,superseded_by,status,revision,content_hash,created_at,updated_at,prepared_at,
+    (superseded_by IS NULL AND plan ? 'seasonId' AND plan ? 'timing' AND jsonb_array_length(plan->'steps') > 0 AND NOT EXISTS (
       SELECT 1 FROM jsonb_array_elements(plan->'steps') AS entry
       WHERE COALESCE(entry->'payload'->'contract'->>'algorithmVersion', '') NOT IN ('unique-rank-v5', 'unique-rank-v6')
     )) AS current_model,
@@ -109,7 +115,7 @@ export async function listLaunchAutomations(db: AutomationDatabase, rawCursor?: 
   const rows = result.rows.slice(0, 100), last = rows.at(-1);
   return {
     automations: rows.map(row => ({
-      id: row.id, currentModel: row.current_model, seasonOrder: row.season_order === UNLISTED_SEASON_ORDER ? null : row.season_order, name: row.name, chainId: row.chain_id, status: row.status, revision: row.revision, collectionCount: row.collection_count,
+      id: row.id, ...(row.review_group ? {reviewGroup:parseSeasonReviewGroup(row.review_group)} : {}), currentModel: row.current_model, seasonOrder: row.season_order === UNLISTED_SEASON_ORDER ? null : row.season_order, name: row.name, chainId: row.chain_id, status: row.status, revision: row.revision, collectionCount: row.collection_count,
       contentHash: row.content_hash, createdAt: row.created_at.toISOString(), updatedAt: row.updated_at.toISOString(), preparedAt: row.prepared_at?.toISOString() ?? null,
     })),
     nextCursor: result.rows.length > 100 && last ? Buffer.from(JSON.stringify({ updatedAt: last.cursor_time, id: last.id, seasonOrder: last.season_order })).toString("base64url") : null,

@@ -7,6 +7,7 @@ export type AnnouncedCollection = {
   contractAddress: string | null; observedAt?: string | null; originalSaleStartAt?: string | null;
 };
 export type AnnouncedSeason = {
+  reviewCollectionIds?: string[];
   version: 1; runId: string; chainId: 1 | 11155111; seasonId: string; seasonName: string;
   seasonNumber: number | null; colors: string[]; status: "running" | "paused" | "failed" | "completed";
   announcedAt: string; updatedAt: string; collections: AnnouncedCollection[];
@@ -50,9 +51,14 @@ export function parseAnnouncedSeason(input: unknown): AnnouncedSeason {
     return result;
   });
   if (new Set(collections.map(item => item.id)).size !== collections.length || new Set(collections.map(item => item.number)).size !== collections.length) throw new Error("Duplicate collection announcement.");
+  let reviewCollectionIds: string[] | undefined;
+  if(value.reviewCollectionIds !== undefined){
+    if(value.chainId!==11155111 || !Array.isArray(value.reviewCollectionIds) || value.reviewCollectionIds.length!==3 || colors.length!==3 || new Set(value.reviewCollectionIds).size!==3 || value.reviewCollectionIds.some(v=>typeof v!=="string" || !id.test(v)) || collections.some(c=>(value.reviewCollectionIds as string[])[c.number-1]!==c.id))throw new Error("Invalid review membership.");
+    reviewCollectionIds=value.reviewCollectionIds as string[];
+  }
   const announcedAt = date(value.announcedAt), updatedAt = date(value.updatedAt);
   if (!announcedAt || !updatedAt) throw new Error("An announcement needs confirmed publication time.");
-  return { version: 1, runId: String(value.runId), chainId: Number(value.chainId) as 1 | 11155111, seasonId: String(value.seasonId).toLowerCase(), seasonName: name(value.seasonName),
+  return { ...(reviewCollectionIds ? {reviewCollectionIds} : {}), version: 1, runId: String(value.runId), chainId: Number(value.chainId) as 1 | 11155111, seasonId: String(value.seasonId).toLowerCase(), seasonName: name(value.seasonName),
     seasonNumber: value.seasonNumber === null ? null : Number.isInteger(value.seasonNumber) && Number(value.seasonNumber) > 0 ? Number(value.seasonNumber) : null,
     colors, status: value.status as AnnouncedSeason["status"], announcedAt, updatedAt, collections };
 }
@@ -76,4 +82,20 @@ export function announcedCollectionActivity(season: AnnouncedSeason, collection:
   if (!collection.saleStartAt) return { label: "Schedule to be announced", target: null, detail: "The next opening is set after the preceding collection’s confirmed sellout." };
   if (collection.status !== "minting" || !collection.contractAddress || !collection.mintDeadline) return { label: "Waiting for on-chain activation", target: null, detail: "The scheduled time has arrived; minting is not confirmed open yet." };
   return { label: "Mint deadline in", target: collection.mintDeadline, detail: "Minting is confirmed active. View the collection for current availability and actions." };
+}
+
+/** Normal replacement runs still use the newest snapshot. Only explicitly bound
+ * review members combine across independent factories, preserving all outcomes. */
+export function mergeAnnouncedSeasons(seasons: AnnouncedSeason[]): AnnouncedSeason[] {
+  const groups = new Map<string,AnnouncedSeason[]>();
+  for(const s of seasons){const key=`${s.chainId}:${s.seasonId}`;groups.set(key,[...(groups.get(key)??[]),s]);}
+  return [...groups.values()].map(members=>{
+    const newest=members[0];if(!newest.reviewCollectionIds)return newest;
+    const ids=newest.reviewCollectionIds;
+    if(members.some(s=>JSON.stringify(s.reviewCollectionIds)!==JSON.stringify(ids)||JSON.stringify(s.colors)!==JSON.stringify(newest.colors)||s.seasonName!==newest.seasonName))throw new Error("Conflicting review season announcements.");
+    const collections=ids.map((id,index)=>members.flatMap(s=>s.collections).find(c=>c.id===id) ?? {id,number:index+1,name:null,color:newest.colors[index],status:"scheduled" as const,enrollmentOpensAt:null,saleStartAt:null,mintDeadline:null,contractAddress:null});
+    const active=[...members].sort((a,b)=>Math.max(...b.collections.map(c=>c.number))-Math.max(...a.collections.map(c=>c.number)))[0];
+    const lastNumber=Math.max(...active.collections.map(c=>c.number));
+    return {...newest,runId:active.runId,status:active.status==="completed"&&lastNumber<3?"paused" as const:active.status,announcedAt:members.map(s=>s.announcedAt).sort()[0],collections};
+  });
 }

@@ -1,3 +1,4 @@
+import { parseSeasonReviewGroup } from "../../apps/launch/lib/season-review-group.ts";
 import { randomUUID } from "node:crypto";
 import type { Pool, PoolClient } from "pg";
 import { automationArtifactHash } from "../../apps/launch/lib/launch-automation-artifact.ts";
@@ -21,8 +22,9 @@ export async function openRunStore(pool: Pool, runId: string, chainId: 1 | 11155
     const query = async (sql: string, values?: any[]) => { ensure(!lost, "database_lock_lost"); return db.query(sql, values); };
     const row = (await query("SELECT * FROM manekineko_season_runtime_runs WHERE id=$1 AND chain_id=$2", [runId, String(chainId)])).rows[0] as RuntimeRunRow | undefined;
     ensure(row, "run_not_found_on_selected_network");
-    const saved = (await query("SELECT revision,status,prepared_artifact,content_hash,mock_catalog_order FROM manekineko_launch_automations WHERE id=$1", [row.automation_id])).rows[0];
+    const saved = (await query("SELECT revision,status,prepared_artifact,content_hash,mock_catalog_order,(SELECT review_group FROM manekineko_season_review_members WHERE automation_id=$1) AS review_group FROM manekineko_launch_automations WHERE id=$1", [row.automation_id])).rows[0];
     ensure(saved?.status === "prepared" && saved.revision === row.automation_revision && saved.content_hash === row.prepared_hash && automationArtifactHash(saved.prepared_artifact) === row.prepared_hash, "prepared_artifact_changed");
+    const reviewGroup = saved.review_group ? parseSeasonReviewGroup(saved.review_group) : undefined;
     const artifact = saved.prepared_artifact as AutomationArtifact;
     assertRuntimeArtifact(artifact, new Date(), false);
     const decrypt = <T>(encrypted: string): T => JSON.parse(decryptRuntimeSecret(encrypted, `run-state:${runId}`));
@@ -79,7 +81,7 @@ export async function openRunStore(pool: Pool, runId: string, chainId: 1 | 11155
       await query(`INSERT INTO manekineko_season_runtime_public(run_id,chain_id,season_id,payload,updated_at) VALUES($1,$2,$3,$4::jsonb,$5::timestamptz)
         ON CONFLICT(run_id) DO UPDATE SET payload=excluded.payload,updated_at=excluded.updated_at`, [runId, String(chainId), artifact.seasonId, JSON.stringify(payload), payload.updatedAt]);
     }
-    return { db, query, row, artifact, seasonOrder: (saved.mock_catalog_order ?? null) as number | null, state, guard, save, event, pause, action, putAction, updateAction, replacePendingAction, publish,
+    return { reviewGroup, db, query, row, artifact, seasonOrder: (saved.mock_catalog_order ?? null) as number | null, state, guard, save, event, pause, action, putAction, updateAction, replacePendingAction, publish,
       async complete() { await guard(); const r = await query("UPDATE manekineko_season_runtime_runs SET status='completed',revision=revision+1 WHERE id=$1 AND status<>'completed'", [runId]); if (r.rowCount) await event("completed", "The season reached its terminal outcome. Confirmed claim monitoring continues."); },
       async close() { try { if (!lost) { if (execute) await query("UPDATE manekineko_season_runtime_runs SET lease_owner=NULL,lease_expires_at=NULL WHERE id=$1 AND lease_owner=$2", [runId, owner]); await query("SELECT pg_advisory_unlock(hashtextextended($1,0))", [`tincta-season-chain:${chainId}`]); } } finally { db.release(lost); } },
     };

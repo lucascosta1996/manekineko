@@ -23,7 +23,7 @@ const X_IDENTITY_POLL_REFRESH_MS = 5 * 60 * 1000;
 type PreparedCollection = { payload: LaunchPayload; enrollmentAt: string; announcementAt: string; deployment?: ChainDeployment; readinessAt?: string; snapshot?: ChainSnapshot; enrollmentChecked?: boolean };
 export type SeasonState = { version?: 1; binding?: string; journal?: ChainJournal; factory?: { factory: string; factoryCodeHash: string }; collections?: Record<string, PreparedCollection>;
   announcedAt?: string; firstThreadComplete?: boolean; observedAt?: string; completed?: boolean; rehearsal?: SepoliaRehearsalState; walletAddresses?: string[]; rehearsalCursor?: number; rehearsalDone?: string[]; airyRecovery?: AppliedAiryRecovery };
-export type RunnerOptions = Omit<V9ChainOptions, "journal" | "saveJournal" | "sponsorshipFundingWei"> & { databaseUrl: string; scenario?: SepoliaScenario; wallets?: Wallet[]; donors?: Wallet[]; recycleSepoliaFunds?: boolean; contractVersion?: SeasonContractVersion };
+export type RunnerOptions = Omit<V9ChainOptions, "journal" | "saveJournal" | "sponsorshipFundingWei"> & { databaseUrl: string; scenario?: SepoliaScenario; admissionSigner?: Wallet; wallets?: Wallet[]; donors?: Wallet[]; recycleSepoliaFunds?: boolean; contractVersion?: SeasonContractVersion };
 const defaultDependencies = { getRuntimeWorkerProfile, createV9ChainAdapter, createV10ChainAdapter, verifyXAccount, deliverMessage, indexSeasonFactory, registerVerifiedCollection,
   createTransactionPipeline, runSepoliaRehearsalStep: undefined as typeof runSepoliaRehearsalStep | undefined,
   resolveTimedAutomationStep, seasonActivationDecision, fetch: globalThis.fetch, now: Date.now };
@@ -44,7 +44,7 @@ export function socialIdentity(artifact: RunStore["artifact"], mockOrder?: numbe
 
 export async function createSeasonRunner(store: RunStore, pool: Pool, options: RunnerOptions, overrides: Partial<RunnerDependencies> = {}) {
   // Reject test configuration and resumed test state before any service access.
-  ensure(options.chainId === 11155111 || (options.wallets === undefined && options.donors === undefined && options.scenario === undefined && !options.recycleSepoliaFunds), "test_minting_is_sepolia_only");
+  ensure(options.chainId === 11155111 || (options.wallets === undefined && options.donors === undefined && options.scenario === undefined && options.admissionSigner === undefined && !options.recycleSepoliaFunds), "test_minting_is_sepolia_only");
   ensure(options.chainId === 11155111 || ["rehearsal", "walletAddresses", "rehearsalCursor", "rehearsalDone"].every(key => !(key in store.state)), "rehearsal_state_is_sepolia_only");
   ensure(options.chainId === 11155111 || store.artifact.steps.every(step => step.payload.contract.sepoliaRehearsal === undefined), "test_scenario_is_sepolia_only");
   ensure(!store.state.airyRecovery || options.chainId === 11155111, "recovery_is_sepolia_only");
@@ -58,10 +58,13 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
   ensure(profile.enabled && profile.revision === store.row.profile_revision, "profile_changed_pause_and_resume");
   socialPublicUrl(profile.publicBaseUrl);
   const artifact = store.artifact, state = store.state as SeasonState, first = artifact.steps[0].payload;
+  const review = store.reviewGroup;
+  const reviewIndex = review?.stages.findIndex(s=>s.automationId===store.row.automation_id) ?? 0;
+  if(review) ensure(options.chainId===11155111 && reviewIndex>=0 && artifact.steps.length===1 && review.seasonId===artifact.seasonId && review.seasonName===artifact.name && review.stages[reviewIndex].collectionId===artifact.steps[0].id && review.stages[reviewIndex].name===first.contract.name && review.stages[reviewIndex].color===first.contract.collectionColor, "review_group_binding_mismatch");
   const policy = seasonVersionPolicy(artifact.contractVersion);
   ensure(!options.contractVersion || options.contractVersion === policy.contractVersion, "prepared_version_mismatch");
   options = { ...options, contractVersion: policy.contractVersion };
-  const owner = getAddress(options.owner), binding = scheduleBinding(options, profile.expectedAccountId, profile.publicBaseUrl);
+  const owner = getAddress(options.owner), binding = scheduleBinding(options, profile.expectedAccountId, profile.publicBaseUrl) + (review ? JSON.stringify(review) : "");
   ensure(!state.binding || state.binding === binding, "immutable_runtime_configuration_changed");
   ensure(artifact.chainId === String(options.chainId) && artifact.steps.length > 0 && artifact.steps.every(step => step.payload.contract.chainId === String(options.chainId)), "prepared_network_mismatch");
   if (options.scenario) {
@@ -106,7 +109,7 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
     journal: state.journal, saveJournal: async journal => { state.journal = journal; if (state.rehearsal) state.rehearsal.journals[owner] = journal; await save(); } });
   state.journal = chain.journal;
   if (state.rehearsal) state.rehearsal.journals[owner] = chain.journal;
-  const season = socialIdentity(artifact, store.seasonOrder), base = profile.publicBaseUrl;
+  const season = {...socialIdentity(artifact, store.seasonOrder), ...(review ? {colors:review.stages.map(s=>s.color)} : {})}, base = profile.publicBaseUrl;
   let reconciledHistory = false;
   let identityVerifiedAt: number | undefined, identityClockAt: number | undefined;
   async function verifyPollingIdentity() {
@@ -136,13 +139,14 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
     return result;
   }
   async function message(event: SeasonSocialEvent, now: number, id?: string, snapshot?: ChainSnapshot, enqueueOnly = false) {
+    if(review && event === "season-complete") return null; // A member run cannot announce a whole-season result.
     let summaryEvidence: { blockNumber: number; blockHash: string } | undefined;
     const index = id ? artifact.steps.findIndex(step => step.id === id) : -1, step = index >= 0 ? artifact.steps[index] : undefined, prepared = id ? state.collections![id] : undefined;
     const terms = step?.payload.contract, path = id ? `${base}/mint/${id}` : undefined;
     const input: SeasonSocialInput = { event, contractVersion: policy.contractVersion, chainId: options.chainId, season, now: iso(now), urls: {
       season: `${base}/seasons/${options.chainId}/${season.id}`, collection: path, affiliate: path && `${path}/affiliates`, docs: `${base}/docs`,
       refund: path, commissions: path && `${path}/affiliates`, prizeClaim: path,
-    }, ...(terms ? { collection: { id: id!, number: index + 1, name: terms.name, color: terms.collectionColor!, supply: Number(terms.maxSupply), mintPriceEth: formatEther(terms.mintPriceWei), winnerCount: Number(terms.winnerCount),
+    }, ...(terms ? { collection: { id: id!, number: index + 1 + reviewIndex, name: terms.name, color: terms.collectionColor!, supply: Number(terms.maxSupply), mintPriceEth: formatEther(terms.mintPriceWei), winnerCount: Number(terms.winnerCount),
       prizePerWinnerEth: formatEther(BigInt(terms.maxSupply) * BigInt(terms.mintPriceWei) * BigInt(terms.prizeBps) / 10000n / BigInt(terms.winnerCount!)) } } : {}),
       enrollmentOpensAt: prepared?.enrollmentAt, saleStartsAt: prepared && iso(prepared.payload.contract.saleStartAt!), deadline: snapshot ? iso(snapshot.mintDeadline) : undefined, drawVerified: snapshot?.revealed };
     if ((event === "winners-revealed" || event === "prizes-paid") && snapshot && id) {
@@ -208,10 +212,11 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
     const published = new Set((await store.query("SELECT action_key FROM manekineko_season_runtime_actions WHERE run_id=$1 AND kind='x-post' AND status='confirmed' AND action_key=ANY($2::text[])", [store.row.id, keys])).rows.map(row => row.action_key));
     const announcedCollections = new Set(artifact.steps.filter(step => events.some(event => published.has(`${step.id}:${event}:root`))).map(step => step.id));
     await store.publish({ version: 1, runId: store.row.id, chainId: options.chainId, seasonId: season.id, seasonName: season.name, seasonNumber: season.number, colors: season.colors,
+      ...(review ? {reviewCollectionIds:review.stages.map(s=>s.collectionId)} : {}),
       status: state.completed ? "completed" : "running", announcedAt: state.announcedAt, updatedAt: state.observedAt ?? state.announcedAt, collections: artifact.steps.flatMap((step, index) => {
         const item = state.collections![step.id]; if (!item || dependencies.now() < Date.parse(item.announcementAt) || (index > 0 && !announcedCollections.has(step.id))) return [];
         const snap = item.snapshot;
-        return [{ id: step.id, number: index + 1, name: announcedCollections.has(step.id) ? step.payload.contract.name : null, color: season.colors[index], status: snap?.refundsAvailable ? "refundable" : snap?.revealed ? "revealed" : snap?.soldOut ? "sold_out" : snap?.saleActivated ? "minting" : item.enrollmentChecked ? "enrollment" : item.deployment ? "preparing" : "scheduled",
+        return [{ id: step.id, number: index + 1 + reviewIndex, name: announcedCollections.has(step.id) ? step.payload.contract.name : null, color: season.colors[index + reviewIndex], status: snap?.refundsAvailable ? "refundable" : snap?.revealed ? "revealed" : snap?.soldOut ? "sold_out" : snap?.saleActivated ? "minting" : item.enrollmentChecked ? "enrollment" : item.deployment ? "preparing" : "scheduled",
           enrollmentOpensAt: item.enrollmentAt, saleStartAt: iso(item.payload.contract.saleStartAt!), mintDeadline: iso(Number(item.payload.contract.saleStartAt) + Number(item.payload.contract.mintDurationSeconds)), contractAddress: item.deployment?.round ?? null,
           ...(state.airyRecovery?.plan.collectionId === step.id ? { originalSaleStartAt: state.airyRecovery.plan.original.saleStartAt } : {}),
           verification: item.deployment ? chain.journal.verifications?.[item.deployment.round.toLowerCase()]?.state ?? "unknown" : "pending", snapshotBlock: snap?.blockNumber ?? null, snapshotHash: snap?.blockHash ?? null, observedAt: snap ? iso(snap.timestamp) : null }];
@@ -296,6 +301,7 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
         ensure(created?.hash === item.deployment.deploymentBlockHash, "deployment_receipt_reorganized");
         await dependencies.registerVerifiedCollection(pool, step.id, item.deployment, item.payload, options.chainId, created.timestamp);
       } else ensure(head.timestamp < enrollment, "collection_announcement_not_confirmed_before_enrollment");
+      if (await manualFundingPending(item, snapshot)) { await save(); await project(); return true; }
       if (head.timestamp < Number(item.payload.contract.saleStartAt)) {
         // The quiet window must not suppress a still-required winner or enrollment
         // announcement. Existing outbox confirmation and beforePost checks apply.
@@ -347,7 +353,13 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
       state.collections![artifact.steps[0].id] = { payload: decision.payload, enrollmentAt: iso(Number(decision.payload.contract.saleStartAt) - Number(decision.payload.operations.enrollmentWindowSeconds)), announcementAt: iso(now) };
       await save();
     }
+    if(review && reviewIndex > 0 && !state.firstThreadComplete){
+      // The CLI verified the completed previous member before creating this run.
+      // Each later collection still publishes its own opening thread below.
+      state.announcedAt=iso(now); state.firstThreadComplete=true; await save();
+    }
     async function recordFirstRoot() {
+      if(review && reviewIndex > 0) return !!state.announcedAt;
       const published = await store.action("season:upcoming-season:root");
       if (!state.announcedAt && published?.status === "confirmed") {
         ensure(typeof published.result.confirmedAt === "string" && Number.isFinite(Date.parse(published.result.confirmedAt)), "first_announcement_confirmation_missing");
@@ -447,7 +459,7 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
       else ensure(now < enrollment, "collection_announcement_not_confirmed_before_enrollment");
       const snapshot = item.snapshot ?? await chain.snapshot(item.deployment.round); item.snapshot = snapshot;
       state.observedAt = new Date(dependencies.now()).toISOString();
-      if (options.scenario?.kind === "manual-affiliate-sellout" && !snapshot.saleActivated && !snapshot.refundsAvailable) await rehearsal(item);
+      if (await manualFundingPending(item, snapshot)) { await project(); return {mode:"running",priority:"manual-wallet-funding",runId:store.row.id}; }
       await enroll(index, item, snapshot, now);
       await activate(index, item, snapshot);
       if (snapshot.saleActivated && await openingCheckpoint()) return { mode: "running", runId: store.row.id, priority: "fixed-opening" };
@@ -483,16 +495,23 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
       state.rehearsalCursor = (state.rehearsalCursor ?? 0) + 1;
       await rehearsal(item);
     }
-    return { mode: state.completed ? "completed" : "running", runId: store.row.id, deployed: Object.values(state.collections!).filter(item => item.deployment).length, claimsMonitored: state.completed === true };
+    return { mode: state.completed ? "completed" : "running", runId: store.row.id, deployed: Object.values(state.collections!).filter(item => item.deployment).length, claimsMonitored: state.completed === true,
+      ...(state.rehearsal?.manual ? {manualReview: Object.entries(state.rehearsal.manual).map(([round,reservation])=>({round,...reservation}))} : {}) };
+  }
+  async function manualFundingPending(item: PreparedCollection, snapshot: ChainSnapshot) {
+    if (options.scenario?.kind !== "manual-affiliate-sellout" || snapshot.saleActivated || snapshot.refundsAvailable) return false;
+    const funding = await rehearsal(item);
+    return funding.action === "fund-manual-role" || funding.action === "reconciled";
   }
   async function rehearsal(item: PreparedCollection) {
     ensure(options.chainId === 11155111 && dependencies.runSepoliaRehearsalStep, "test_minting_is_sepolia_only");
     await store.guard();
     const result = await dependencies.runSepoliaRehearsalStep({ chainId: options.chainId, provider: chain.provider, operator: new Wallet(options.privateKey!), wallets: options.wallets!, donors: options.donors,
       execute: true, state: state.rehearsal!, saveState: async value => { state.rehearsal = value; await save(); }, maxFeePerGasWei: options.maxFeePerGasWei, maxTotalSpendWei: options.maxTotalSpendWei,
-      confirmations: options.confirmations, scenario: options.scenario, recycleOperatorFunds: options.recycleSepoliaFunds }, item.deployment!.round);
+      confirmations: options.confirmations, scenario: options.scenario, admissionSigner: options.admissionSigner, recycleOperatorFunds: options.recycleSepoliaFunds }, item.deployment!.round);
     if (["settled", "refunded"].includes(result.action)) { state.rehearsalDone ??= []; if (!state.rehearsalDone.includes(item.deployment!.round)) state.rehearsalDone.push(item.deployment!.round); }
     await save();
+    return result;
   }
   return { tick, close: () => chain.destroy(), project };
 }

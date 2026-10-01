@@ -19,10 +19,10 @@ import { featuredSeasonCollection } from "../lib/seasons/activity";
 import { announcedSeasonsResponse, type AnnouncedSeason } from "../lib/seasons/schedule";
 import { AnnouncedActivity, AnnouncedCollectionCard, AnnouncedSeasonCard } from "./announced-season";
 
-function useSeasonCatalog(initialCollections: CollectionPublic[], initialNow: number) {
+function useSeasonCatalog(initialCollections: CollectionPublic[], initialNow: number, announcements: AnnouncedSeason[]) {
   const { data: collections, retrying } = useLiveData("/api/collections", initialCollections, collectionsResponse);
   const now = useProtocolClock(initialNow) ?? initialNow;
-  return { collections, seasons: groupSeasons(collections), retrying, now };
+  return { collections, seasons: groupSeasons(collections, announcements), retrying, now };
 }
 
 function SeasonCard({ season, now, announcement }: { season: SeasonPublic; now: number; announcement?: AnnouncedSeason }) {
@@ -51,8 +51,8 @@ function SeasonCard({ season, now, announcement }: { season: SeasonPublic; now: 
 }
 
 export function SeasonsExperience({ initialCollections, initialNow, initialSchedules = [] }: { initialCollections: CollectionPublic[]; initialNow: number; initialSchedules?: AnnouncedSeason[] }) {
-  const { collections, seasons, retrying, now } = useSeasonCatalog(initialCollections, initialNow);
   const schedules = useLiveData("/api/seasons/schedules", initialSchedules, announcedSeasonsResponse);
+  const { collections, seasons, retrying, now } = useSeasonCatalog(initialCollections, initialNow, schedules.data);
   const announced = schedules.data.filter(item => !seasons.some(season => season.chainId === item.chainId && season.id === item.seasonId));
   const earlier = collections.filter(c => !c.seasonId);
   return <>
@@ -72,8 +72,8 @@ export function SeasonsExperience({ initialCollections, initialNow, initialSched
 }
 
 export function SeasonExperience({ initialCollections, initialNow, seasonId, chainId, initialSchedules = [] }: { initialCollections: CollectionPublic[]; initialNow: number; seasonId: string; chainId: number; initialSchedules?: AnnouncedSeason[] }) {
-  const { seasons, retrying, now } = useSeasonCatalog(initialCollections, initialNow);
   const schedules = useLiveData("/api/seasons/schedules", initialSchedules, announcedSeasonsResponse);
+  const { seasons, retrying, now } = useSeasonCatalog(initialCollections, initialNow, schedules.data);
   const announcement = schedules.data.find(item => item.chainId === chainId && item.seasonId === seasonId);
   const season = seasons.find(s => s.chainId === chainId && s.id === seasonId);
   if (!season && announcement) return <>
@@ -90,10 +90,10 @@ export function SeasonExperience({ initialCollections, initialNow, seasonId, cha
   const next = scheduled.find(c => c.saleStartAt && !["revealed", "sold_out", "refundable"].includes(c.status));
   return <>
     <nav className="breadcrumbs" aria-label="Breadcrumb"><Link href="/seasons">Seasons</Link><span aria-hidden="true">/</span><span aria-current="page">{season.name}</span></nav>
-    <header className="season-heading"><div><p className="eyebrow">{season.networkName.toUpperCase()} / TINCTA SEASON</p><h1>{season.name}</h1><p>Explore each collection’s prize pool, ticket price and affiliate rewards.</p></div><div className="season-heading-count"><strong>{season.collections.length.toString().padStart(2, "0")}</strong><span>published collections</span></div></header>
+    <header className="season-heading"><div><p className="eyebrow">{season.networkName.toUpperCase()} / TINCTA SEASON</p><h1>{season.name}</h1><p>Explore each collection’s prize pool, ticket price and affiliate rewards.</p></div><div className="season-heading-count"><strong>{(season.collections.length + scheduled.length).toString().padStart(2, "0")}</strong><span>{scheduled.length ? "planned collections" : "published collections"}</span></div></header>
     {live ? <section className="season-live-summary" aria-label="Current live collection"><div><p className="eyebrow">MINTING NOW</p><h2>{live.name}</h2><p>{collectionPrizeCopy(live)}</p><p>{collectionReferralCopy(live)}</p></div><Link className={buttonClassName({ variant: "primary" })} href={`/mint/${live.id}`}>Mint a ticket <span aria-hidden="true"><Icon name="diagonal" /></span></Link></section>
       : <div className="season-closed-note">{announcement && next ? <><strong>Next announced collection</strong><AnnouncedActivity season={announcement} collection={next} /></> : <><strong>{announcement && lifecycle.state === "complete" ? "Season complete" : lifecycle.state === "unavailable" ? "Season observation delayed" : "Collection results"}</strong><p>{announcement && lifecycle.completedCollections !== null ? `${lifecycle.completedCollections} / ${lifecycle.totalCollections} collections complete. ` : ""}{lifecycle.allPrizesPaid ? "All prizes paid. Explore the results and payment history below." : lifecycle.unpaidPrizes ? `${lifecycle.unpaidPrizes} prizes remain available to their current winning ticket holders.` : "View each collection’s last confirmed state below."}</p>{Boolean(lifecycle.unpaidPrizes) && <Link href="/prizes">View available prizes <Icon name="arrow" /></Link>}</>}</div>}
-    <div className="catalog-section-heading"><h2>Collections <span>{season.collections.length}</span></h2><Link className="ui-text-action ui-text-action-standalone" href="/seasons">All seasons <Icon name="arrow" /></Link></div>
+    <div className="catalog-section-heading"><h2>Collections <span>{season.collections.length + scheduled.length}</span></h2><Link className="ui-text-action ui-text-action-standalone" href="/seasons">All seasons <Icon name="arrow" /></Link></div>
     {announcement && (announcement.status === "paused" || announcement.status === "failed") && <p className="season-section-note">Worker {announcement.status}. Collection results and remaining rewards are shown separately; deployed deadlines remain in effect.</p>}
     <LiveDataNotice retrying={retrying || schedules.retrying} /><CollectionGrid collections={season.collections} liveId={live?.id} now={now} colors={colors}>
       {announcement && scheduled.map(collection => <AnnouncedCollectionCard key={collection.id} season={announcement} collection={collection} />)}

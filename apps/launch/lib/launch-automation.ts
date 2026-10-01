@@ -1,3 +1,4 @@
+import type { SeasonReviewGroup } from "./season-review-group.ts";
 import type { SeasonTiming, SeasonSocial } from "./season-timeline.ts";
 import { LaunchConfigurationError, type LaunchPayload } from "./launch-config.ts";
 
@@ -29,6 +30,8 @@ export type AutomationArtifact = {
 } & AutomationPayload;
 
 export type AutomationPlan = {
+  reviewGroup?: SeasonReviewGroup;
+  supersededBy?: string | null;
   id: string;
   /** Display metadata from seasons.json, excluded from the immutable deployment payload. */
   seasonOrder?: number | null;
@@ -45,6 +48,7 @@ export type AutomationPlan = {
 };
 
 export type AutomationSummary = {
+  reviewGroup?: SeasonReviewGroup;
   id: string;
   /** Display classification only; historical payloads and hashes are unchanged. */
   currentModel?: boolean;

@@ -40,7 +40,7 @@ test("automation plans persist independent collection terms and immutable review
     await admin.query(`CREATE SCHEMA ${schema}`); created = true;
     pool = new pg.Pool({ connectionString, max: 8, options: `-c search_path=${schema},public`, application_name: "manekineko-automation-regression" });
     const db = pool;
-    for (const name of ["009_launch_auth.sql", "012_launch_automations.sql", "027_sepolia_mock_seasons.sql"]) await db.query(await readFile(new URL(`../../../database/migrations/${name}`, import.meta.url), "utf8"));
+    for (const name of ["009_launch_auth.sql", "012_launch_automations.sql", "027_sepolia_mock_seasons.sql", "030_sepolia_review_group.sql"]) await db.query(await readFile(new URL(`../../../database/migrations/${name}`, import.meta.url), "utf8"));
     const actor = { userId: randomUUID() }, secondActor = { userId: randomUUID() };
     const passwordHash = `scrypt$131072$8$1$${"A".repeat(22)}$${"A".repeat(86)}`;
     await db.query("INSERT INTO manekineko_launch_users(id,username,password_hash) VALUES($1,'operator',$3),($2,'reviewer',$3)", [actor.userId, secondActor.userId, passwordHash]);

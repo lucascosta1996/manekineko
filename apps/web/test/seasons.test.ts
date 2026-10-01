@@ -108,3 +108,11 @@ test("published colors are not repeated as teasers and the catalog ends without 
   assert.deepEqual(upcomingCollectionColors(last), []);
   assert.deepEqual(upcomingSeasonPalettes([last]), []);
 });
+
+
+test("explicit review order wins over duplicate round numbers from separate factories", () => {
+  const items=[collection({id:"ruby",chainId:11155111,roundId:"1"}),collection({id:"coral",chainId:11155111,roundId:"1"}),collection({id:"amber",chainId:11155111,roundId:"2"})];
+  const announcement={chainId:11155111,seasonId:items[0].seasonId,reviewCollectionIds:["ruby","coral","amber"]} as import("../lib/seasons/schedule.ts").AnnouncedSeason;
+  assert.deepEqual(groupSeasons([...items].reverse(),[announcement])[0].collections.map(c=>c.id),["ruby","coral","amber"]);
+  assert.deepEqual(groupSeasons(items)[0].collections.map(c=>c.id),["coral","ruby","amber"]);
+});

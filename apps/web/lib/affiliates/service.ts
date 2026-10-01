@@ -1,7 +1,8 @@
+import { validateTurnstile } from "./turnstile";
 import "server-only";
 import { affiliateAvailability } from "./availability";
 import { randomBytes, randomUUID } from "node:crypto";
-import { AffiliateError, authenticationData, enrollmentNftSelection, ipDigest, normalizedWallet, trustedIp, validTurnstileResult } from "./policy";
+import { AffiliateError, authenticationData, enrollmentNftSelection, ipDigest, normalizedWallet, trustedIp } from "./policy";
 import { affiliateReferralUrl, readAffiliateAccount } from "./account";
 import { getAffiliateNftCandidates } from "./eligibility-repository";
 import { trustedAffiliateEligibility } from "./eligibility-chain";
@@ -104,16 +105,6 @@ export async function issueChallenge(collectionId:string,request:Request,body:Re
   const nonce=`0x${randomBytes(32).toString("hex")}`,id=randomUUID(),expiresAt=new Date(deadline*1000);
   await createChallenge({id,collectionId:record.collectionId,wallet,chainId:record.chainId,contractAddress:record.contractAddress!,origin,nonce,ipDigest:digest,expiresAt,consumedAt:null,contractVersion:record.contractVersion,affiliateId:offer?.affiliateId??null,commissionBps:offer?.commissionBps??null,eligibilitySourceAddress:eligibility?.sourceCollection??null,eligibilityTokenId:eligibility?.sourceTokenId??null});
   return {contractVersion:record.contractVersion,...offer,...eligibility,challengeId:id,typedData:authenticationData(wallet,record.collectionId,origin,nonce,String(deadline),record.chainId,record.contractAddress!,offer,(record.contractVersion === "affiliate-v5" || (record.contractVersion === "affiliate-v6" || record.contractVersion === "affiliate-v7" || (record.contractVersion === "affiliate-v8" || record.contractVersion === "affiliate-v9" || record.contractVersion === "affiliate-v10"))),eligibility),expiresAt:expiresAt.toISOString(),turnstileAction:"affiliate_enrollment",turnstileCData:id};
-}
-export async function validateTurnstile(token:string,ip:string,origin:string,challengeId:string):Promise<void> {
-  const secret=process.env.TURNSTILE_SECRET_KEY;
-  if(!secret) throw new AffiliateError("enrollment_unavailable","Enrollment is temporarily unavailable. Please check again later.",503);
-  let response:Response;
-  try { response=await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({secret,response:token,remoteip:ip}),cache:"no-store",signal:AbortSignal.timeout(10_000)}); }
-  catch { throw new AffiliateError("verification_unavailable","Bot verification is temporarily unavailable. Please try again.",503); }
-  if(!response.ok) throw new AffiliateError("verification_unavailable","Bot verification is temporarily unavailable. Please try again.",503);
-  const result=await response.json();
-  if(!validTurnstileResult(result,origin,challengeId)) throw new AffiliateError("verification_failed","Please complete a fresh bot verification for this enrollment.",403);
 }
 export async function issuePermit(collectionId:string,request:Request,body:Record<string,unknown>,origin:string):Promise<AffiliatePermit> {
   if(typeof body.challengeId!=="string"||typeof body.signature!=="string"||!/^0x[0-9a-fA-F]+$/.test(body.signature)||body.signature.length>8194||typeof body.turnstileToken!=="string"||body.turnstileToken.length<1||body.turnstileToken.length>2048) throw new AffiliateError("invalid_request","The enrollment proof is incomplete.");

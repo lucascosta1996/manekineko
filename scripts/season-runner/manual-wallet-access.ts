@@ -18,6 +18,15 @@ export function manualRoleAddress(chainId: number, reservation: ManualRehearsalR
  * This function never prints, returns or persists a plaintext private key. */
 export async function exportManualWallet(options: { chainId: number; reservation: ManualRehearsalReservation; role: ManualRole; wallets: Wallet[]; password: string; directory: string; runId: string }) {
   const address = manualRoleAddress(options.chainId, options.reservation, options.role);
+  const output = await exportSelectedSepoliaWallet({...options,address});
+  return { ...output, runId: options.runId, collectionId: options.reservation.collectionId,
+    ...(options.role === "winner" ? { tokenId: options.reservation.winner!.tokenId, rank: options.reservation.winner!.rank } : {}) };
+}
+
+/** Selected historical account access does not imply an unpaid prize or a future winner. */
+export async function exportSelectedSepoliaWallet(options: { chainId: number; address: string; role: ManualRole; wallets: Wallet[]; password: string; directory: string }) {
+  if (options.chainId !== 11155111 || !["affiliate", "buyer", "winner"].includes(options.role)) throw new Error("manual_wallet_access_is_sepolia_only");
+  const address = options.address;
   if (options.password.length < 16 || options.password.length > 1000) throw new Error("export_password_requires_16_or_more_characters");
   const wallet = options.wallets.find(item => item.address.toLowerCase() === address.toLowerCase());
   if (!wallet) throw new Error("reserved_role_missing_from_original_vault");
@@ -32,8 +41,7 @@ export async function exportManualWallet(options: { chainId: number; reservation
     const file = await open(output, constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, 0o600);
     try { await file.writeFile(encrypted); await file.sync(); } finally { await file.close(); }
     await parent.sync();
-    return { chainId: 11155111, runId: options.runId, collectionId: options.reservation.collectionId, role: options.role, address, path: output,
-      ...(options.role === "winner" ? { tokenId: options.reservation.winner!.tokenId, rank: options.reservation.winner!.rank } : {}) };
+    return { chainId: 11155111, role: options.role, address, path: output };
   } finally { await parent.close(); }
 }
 

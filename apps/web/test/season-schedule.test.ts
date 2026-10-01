@@ -73,3 +73,13 @@ test("unannounced next start remains unknown, while confirmed outcomes take prec
     assert.equal(activity(value).label, label); assert.equal(activity(value).target, null);
   }
 });
+
+test("three explicit review runs share one season and preserve refund and sellout history",async()=>{
+ const {mergeAnnouncedSeasons}=await import("../lib/seasons/schedule.ts");
+ const ids=["bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb","cccccccc-cccc-4ccc-8ccc-cccccccccccc","dddddddd-dddd-4ddd-8ddd-dddddddddddd"];
+ const stages=ids.map((id,index)=>{const s=fixture();s.reviewCollectionIds=ids;s.colors=["#330000","#660000","#990000"];s.collections=[{...s.collections[0],id,number:index+1,color:s.colors[index],status:index===1?"refundable":"revealed"}];s.status="completed";return parseAnnouncedSeason(s);});
+ const one=mergeAnnouncedSeasons([stages[0]])[0];assert.equal(one.collections.length,3);assert.equal(one.collections[1].saleStartAt,null);assert.equal(one.status,"paused");
+ const all=mergeAnnouncedSeasons([stages[2],stages[1],stages[0]]);assert.equal(all.length,1);assert.deepEqual(all[0].collections.map(c=>c.status),["revealed","refundable","revealed"]);assert.equal(all[0].status,"completed");
+ const conflict=structuredClone(stages[1]);conflict.colors[0]="#FFFFFF";assert.throws(()=>mergeAnnouncedSeasons([stages[2],conflict]));
+ const normal=fixture();assert.deepEqual(mergeAnnouncedSeasons([normal,{...normal,status:"completed"}]),[normal]);
+});

@@ -121,18 +121,23 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 .prize-copy > p, .affiliate-copy > p { margin-block: var(--ui-space-6); max-width: min(100%, 55ch); min-width: 0; }
 .prize-micro { display: flex; flex-wrap: wrap; gap: var(--ui-space-6); margin-block: var(--ui-space-8); }
 .prize-micro > span { font-size: var(--ui-section); }
-.prize-micro small, .affiliate-visual small { display: block; font-size: var(--ui-caption); line-height: 1.5; color: var(--ui-muted); margin-top: var(--ui-space-2); }
+.prize-micro small { display: block; font-size: var(--ui-caption); line-height: 1.5; color: var(--ui-muted); margin-top: var(--ui-space-2); }
 .prize-tickets { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: var(--ui-space-3); }
 .prize-ticket { background: var(--ui-canvas); padding: var(--ui-space-4); border: 1px solid var(--ui-line); border-radius: var(--ui-radius); }
 .ticket-top, .ticket-bottom { display: flex; align-items: center; justify-content: space-between; gap: var(--ui-space-2); }
 .ticket-amount { display: block; font-size: var(--ui-hero); line-height: 1.12; margin-block: var(--ui-space-4); font-variant-numeric: tabular-nums; }
 .ticket-bottom { border-top: 1px solid var(--ui-line); padding-top: var(--ui-space-3); font-size: var(--ui-caption); line-height: 1.5; color: var(--ui-muted); }
 .affiliate-panel { margin-top: var(--ui-space-6); }
-.affiliate-visual { position: relative; display: flex; align-items: center; justify-content: center; min-height: 20rem; }
-.affiliate-visual > svg { position: absolute; width: 100%; }
+.affiliate-visual { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--ui-space-6); min-width: 0; padding-block: var(--ui-space-6); }
+.affiliate-art { display: grid; place-items: center; width: 100%; max-width: 30rem; }
+.affiliate-art > svg, .affiliate-value { grid-area: 1 / 1; }
+.affiliate-art > svg { width: 100%; height: auto; aspect-ratio: 4 / 3; }
 .affiliate-rings { transform-origin: 200px 150px; animation: sculpture-turn 95s linear infinite reverse; }
-.affiliate-visual > span { position: relative; text-align: center; font-size: var(--ui-hero); letter-spacing: -.035em; line-height: 1.12; font-weight: 500; }
-.affiliate-visual sup { font-size: var(--ui-hero); font-weight: 400; }
+.affiliate-value { position: relative; display: grid; place-content: center; gap: var(--ui-space-2); width: min(100%, calc(var(--ui-hero) * 4)); aspect-ratio: 1; padding: var(--ui-space-4); border-radius: 50%; background: var(--ui-surface); text-align: center; }
+.affiliate-value-label { font-size: var(--ui-label); line-height: 1.538462; color: var(--ui-muted); }
+.affiliate-amount { font-size: var(--ui-hero); letter-spacing: -.035em; line-height: 1.12; font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.affiliate-caption { display: grid; gap: var(--ui-space-1); text-align: center; font-size: var(--ui-label); line-height: 1.538462; font-weight: 500; }
+.affiliate-caption small { font-size: var(--ui-caption); line-height: 1.5; font-weight: 400; color: var(--ui-muted); }
 .affiliate-detail { display: flex; align-items: center; justify-content: space-between; gap: var(--ui-space-5); padding-block: var(--ui-space-5); border-block: 1px solid var(--ui-line); }
 .affiliate-detail > span { font-size: var(--ui-subheading, 1.125rem); }
 .affiliate-detail small { display: block; font-size: var(--ui-label); line-height: 1.538462; color: var(--ui-muted); margin-top: var(--ui-space-1); }
@@ -144,6 +149,20 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 .step-caption { font-size: var(--ui-caption); line-height: 1.5; color: var(--ui-muted); }
 .trust-strip { display: flex; justify-content: center; flex-wrap: wrap; gap: var(--ui-space-8); border: 1px solid var(--ui-line); border-radius: var(--ui-radius); padding: var(--ui-space-6); margin-top: var(--ui-space-12); }
 .trust-strip > span { display: flex; gap: var(--ui-space-2); align-items: center; font-size: var(--ui-label); line-height: 1.538462; color: var(--ui-muted); }
+.refund-section { background: var(--ui-surface); border-block: 1px solid var(--ui-line); padding-block: var(--ui-space-12); margin-bottom: var(--ui-space-20); }
+.refund-layout { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: var(--ui-space-8) var(--ui-space-16); }
+.refund-copy h2 { max-width: 24ch; }
+.refund-intro { max-width: 55ch; margin-block: var(--ui-space-6); }
+.refund-intro, .refund-rules dd { color: var(--ui-muted); font-size: var(--ui-body); line-height: 1.6; }
+.refund-rules { margin: 0; }
+.refund-rules > div { padding-block: var(--ui-space-6); border-top: 1px solid var(--ui-line); }
+.refund-rules > div:first-child { padding-top: 0; border-top: 0; }
+.refund-rules > div:last-child { padding-bottom: 0; }
+.refund-rules dt { font-size: var(--ui-subheading); line-height: 1.35; font-weight: 500; letter-spacing: -.01em; }
+.refund-rules dd { margin: var(--ui-space-2) 0 0; max-width: 55ch; }
+.refund-terms { grid-column: 1 / -1; border-top: 1px solid var(--ui-line); padding-top: var(--ui-space-6); }
+.refund-terms p { max-width: 90ch; color: var(--ui-muted); font-size: var(--ui-label); line-height: 1.538462; margin-bottom: var(--ui-space-2); }
+.refund-terms p:last-child { margin-bottom: 0; }
 .faq-section { display: grid; grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); gap: var(--ui-space-16); padding-bottom: var(--ui-space-20); }
 .faq-section > div > p:not(.eyebrow) { margin-top: var(--ui-space-6); max-width: min(100%, 55ch); min-width: 0; }
 .faq-list details { border-bottom: 1px solid var(--ui-line); }
@@ -178,6 +197,8 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
   .mobile-nav { display: grid; position: absolute; top: 100%; left: var(--ui-space-4); right: var(--ui-space-4); padding: var(--ui-space-4); border: 1px solid var(--ui-control-border); border-radius: var(--ui-radius); background: var(--ui-canvas); box-shadow: var(--ui-shadow-menu); }
   .mobile-nav a { display: flex; align-items: center; justify-content: space-between; min-height: 2.75rem; gap: var(--ui-space-2); font-size: var(--ui-control); }
   .hero-main { grid-template-columns: minmax(0,1fr); }
+  .refund-layout { grid-template-columns: minmax(0,1fr); }
+  .refund-section { padding-block: var(--ui-space-8); }
   .collection-announcement-detail { display: none; }
   .hero-art { max-width: 24rem; margin-inline: auto; }
   .section-heading, .manifesto-bottom, .art-footnote { align-items: flex-start; flex-direction: column; }

@@ -23,6 +23,7 @@ test("V7 timing migrations preserve prepared history and persist immutable revis
     const names = (await readdir(root)).filter(n => /^\d+.*\.sql$/.test(n)).sort();
     for (const name of names.filter(n => n < "019")) await db.query(await readFile(new URL(name, root), "utf8"));
     await db.query(await readFile(new URL("027_sepolia_mock_seasons.sql", root), "utf8"));
+    await db.query(await readFile(new URL("030_sepolia_review_group.sql", root), "utf8"));
     const actor = { userId: randomUUID() };
     await db.query("INSERT INTO manekineko_launch_users(id,username,password_hash) VALUES($1,'timing-operator',$2)", [actor.userId, `scrypt$131072$8$1$${"A".repeat(22)}$${"A".repeat(86)}`]);
     const legacy = await createLaunchAutomation(db, actor, { plan: automationFixture() });

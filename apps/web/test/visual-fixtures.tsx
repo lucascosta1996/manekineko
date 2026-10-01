@@ -1,6 +1,9 @@
 "use client";
 
 /** Production components with isolated data. This module is never routed by apps/web. */
+import { useState } from "react";
+import { CollectionActivity } from "../components/collection-activity";
+import { EnrollmentConfirmation } from "../components/affiliates/enrollment-confirmation";
 import { SiteShell } from "../components/site-shell";
 import { SeasonsExperience, SeasonExperience } from "../components/seasons-experience";
 import { MintExperience } from "../components/mint-experience";
@@ -33,7 +36,14 @@ import { visualArchive, visualCollection, visualNft, visualNow, visualWallet } f
 export const webBoundaryRoutes = ["/visual/docs/loading", "/visual/docs/error", "/visual/docs/not-found", "/visual/mint/error", "/visual/mint/not-found", "/visual/seasons/error", "/visual/seasons/not-found", "/visual/history/error", "/visual/nft/error", "/visual/nft/not-found"];
 export const webVisualRoutes = ["/", "/seasons", `/seasons/11155111/${visualCollection.seasonId}`, "/mint", `/mint/${visualCollection.id}`, `/mint/${visualCollection.id}/affiliates`, `/mint/${visualCollection.id}/contract`, "/history", "/my-nfts", `/nfts/${visualCollection.id}/1`, "/prizes", "/docs", ...docPages.filter(page => page.slug !== "overview").map(page => `/docs/${page.slug}`), "/visual/loading", "/visual/error", "/visual/not-found", ...webBoundaryRoutes];
 
+function ReviewControlsFixture() {
+  const [token,setToken]=useState("");
+  const collection={...visualCollection,totalMinted:0,phase:"pending_activation" as const,saleStartAt:"2026-09-28T12:30:00.000Z"};
+  return <SiteShell section="seasons" chainId={11155111}><main><h1>Enrollment review</h1><CollectionActivity collection={collection} showEnrollment initialNow={Date.parse(visualNow)} /><EnrollmentConfirmation siteKey="isolated-fixture" challengeId="11111111-1111-4111-8111-111111111111" onToken={setToken} onConfirm={()=>{}} busy={false} disabled={!token}/></main></SiteShell>;
+}
+
 export function WebVisualFixture({ path = "/", state = "loaded" }: { path?: string; state?: string }) {
+  if(path === "/visual/review-controls") return <ReviewControlsFixture/>;
   const retry = () => window.location.reload(); // Only the isolated harness imports this callback.
   if (path === "/visual/mint/error") return <MintError retry={retry} />;
   if (path === "/visual/mint/not-found") return <MintNotFound />;

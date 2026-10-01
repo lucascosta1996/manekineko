@@ -81,7 +81,7 @@ const catalogOrder = new Map([1, 11155111].flatMap(chainId => Array.from({ lengt
   sha256(toUtf8Bytes(`manekineko:seasons.json:chain:${chainId}:season:${index + 1}`)), index + 1,
 ] as const)));
 
-export function groupSeasons(collections: readonly CollectionPublic[]): SeasonPublic[] {
+export function groupSeasons(collections: readonly CollectionPublic[], announcements: readonly AnnouncedSeason[] = []): SeasonPublic[] {
   const seasons = new Map<string, SeasonPublic>();
   for (const collection of collections) {
     if (!collection.seasonId || !isSeasonId(collection.seasonId) || !collection.seasonName
@@ -93,8 +93,13 @@ export function groupSeasons(collections: readonly CollectionPublic[]): SeasonPu
     season.collections.push(collection);
     seasons.set(key, season);
   }
-  for (const season of seasons.values()) season.collections.sort((a, b) => BigInt(a.roundId) === BigInt(b.roundId)
-    ? a.id.localeCompare(b.id) : BigInt(a.roundId) < BigInt(b.roundId) ? -1 : 1);
+  for (const season of seasons.values()) {
+    const order = announcements.find(a => a.chainId === season.chainId && a.seasonId === season.id)?.reviewCollectionIds;
+    season.collections.sort((a,b) => {
+      if (order?.includes(a.id) && order.includes(b.id)) return order.indexOf(a.id) - order.indexOf(b.id);
+      return BigInt(a.roundId) === BigInt(b.roundId) ? a.id.localeCompare(b.id) : BigInt(a.roundId) < BigInt(b.roundId) ? -1 : 1;
+    });
+  }
   return [...seasons.values()].sort((a, b) => (catalogOrder.get(a.id) ?? Number.MAX_SAFE_INTEGER)
     - (catalogOrder.get(b.id) ?? Number.MAX_SAFE_INTEGER) || a.chainId - b.chainId || a.id.localeCompare(b.id));
 }

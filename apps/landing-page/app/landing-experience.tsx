@@ -765,27 +765,32 @@ export function LandingExperience({
           </div>
           <div className="affiliate-panel" id="affiliates" data-reveal>
             <div className="affiliate-visual" aria-hidden="true">
-              <svg viewBox="0 0 400 300" fill="none">
-                <g className="affiliate-rings">
-                  {Array.from({ length: 20 }, (_, i) => (
-                    <ellipse
-                      key={i}
-                      cx="200"
-                      cy="150"
-                      rx={55 + i * 5}
-                      ry="100"
-                      transform={`rotate(${i * 9} 200 150)`}
-                      stroke="#9a8ad5"
-                      strokeWidth="1"
-                    />
-                  ))}
-                </g>
-              </svg>
-              <span>
-                <small>UP TO</small>
-                2<sup> ETH</sup>
-                <small>AFFILIATE POOL PER SOLD-OUT COLLECTION</small>
-              </span>
+              <div className="affiliate-art">
+                <svg viewBox="0 0 400 300" fill="none">
+                  <g className="affiliate-rings">
+                    {Array.from({ length: 20 }, (_, i) => (
+                      <ellipse
+                        key={i}
+                        cx="200"
+                        cy="150"
+                        rx={55 + i * 5}
+                        ry="100"
+                        transform={`rotate(${i * 9} 200 150)`}
+                        stroke="#9a8ad5"
+                        strokeWidth="1"
+                      />
+                    ))}
+                  </g>
+                </svg>
+                <div className="affiliate-value">
+                  <span className="affiliate-value-label">Up to</span>
+                  <span className="affiliate-amount">2 ETH</span>
+                </div>
+              </div>
+              <div className="affiliate-caption">
+                <span>Affiliate pool</span>
+                <small>per sold-out collection</small>
+              </div>
             </div>
             <div className="affiliate-copy">
               <p className="eyebrow">COMMISSIONS CALCULATED ONCHAIN</p>
@@ -902,6 +907,46 @@ export function LandingExperience({
           </div>
         </section>
 
+        <section className="refund-section" id="refunds" aria-labelledby="refund-title">
+          <div className="refund-layout wrap">
+            <div className="refund-copy">
+              <p className="eyebrow">
+                <span className="section-index">05 /</span> ONCHAIN REFUND RULES
+              </p>
+              <h2 id="refund-title">
+                Not sold out by the deadline?{" "}
+                <span className="muted-heading">Claim your mint-price refund.</span>
+              </h2>
+              <p className="refund-intro">
+                If a collection has not sold out when its onchain deadline is
+                reached, current NFT holders can claim the original mint price
+                directly from the contract.
+              </p>
+              <a className="ui-text-action" href={footerLinks.docs ? new URL("/docs/refunds", footerLinks.docs).href : "#questions"}>
+                Read the refund rules <Icon name="diagonal" />
+              </a>
+            </div>
+            <dl className="refund-rules">
+              <div>
+                <dt>A fixed deadline</dt>
+                <dd>The mint deadline is fixed in the contract at deployment and cannot be extended.</dd>
+              </div>
+              <div>
+                <dt>Funds reserved for refunds</dt>
+                <dd>The contract reserves the funds owed to outstanding refunds. The operator cannot withdraw those funds.</dd>
+              </div>
+              <div>
+                <dt>No operator approval</dt>
+                <dd>Refund eligibility begins automatically at the onchain deadline if the collection remains unsold. No operator or backend action is needed to enable it.</dd>
+              </div>
+            </dl>
+            <div className="refund-terms">
+              <p>You submit a claim transaction and pay gas. Claiming burns the NFT. The refund covers the original mint price; network fees and secondary-market price differences are not refunded.</p>
+              <p>Sold-out collections follow their draw and prize-claim rules.</p>
+            </div>
+          </div>
+        </section>
+
         <section
           className="faq-section wrap"
           id="questions"
@@ -910,7 +955,7 @@ export function LandingExperience({
         >
           <div>
             <p className="eyebrow">
-              <span className="section-index">05 /</span> INDEPENDENTLY VERIFIABLE
+              <span className="section-index">06 /</span> INDEPENDENTLY VERIFIABLE
             </p>
             <h2 id="faq-title">
               Inspect the code.

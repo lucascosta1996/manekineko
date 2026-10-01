@@ -11,7 +11,7 @@ import { connectionConfig, loadPrivateEnvironment, registryPins } from "./config
 import { ensure, RunnerStop } from "./store.ts";
 import { verifyXAccount, XApiError } from "./social.ts";
 
-export type PreparationArguments = { automationId: string; envFiles: string[]; execute: boolean; startAt?: string; actorId?: string; help: boolean };
+export type PreparationArguments = { automationId: string; envFiles: string[]; execute: boolean; startAt?: string; actorId?: string; help: boolean; reviewSeasonId?: string };
 export function parsePreparationArguments(args: string[]): PreparationArguments {
   const parsed: PreparationArguments = { automationId: "", envFiles: [], execute: false, help: false };
   const seen = new Set<string>();
@@ -111,6 +111,8 @@ export async function prepareSepoliaRun(pool: Pick<Pool, "connect">, args: Prepa
     ensure(identity?.database === config.databaseName && identity.role === "manekineko_staging_launch", "preparation_database_identity_mismatch");
     if (args.execute) await client.query("SELECT id FROM manekineko_launch_automations WHERE id=$1 FOR UPDATE", [args.automationId]);
     let saved = await dependencies.getLaunchAutomation(client, args.automationId);
+    ensure(!saved.supersededBy, "review_run_superseded");
+    ensure(!saved.reviewGroup || saved.reviewGroup.seasonId === args.reviewSeasonId, "review_script_required");
     const runtime = await dependencies.getSeasonRuntime(client, args.automationId);
     if (runtime.run) {
       ensure(!args.startAt, "existing_run_cannot_be_rescheduled");
@@ -148,7 +150,7 @@ export async function prepareSepoliaRun(pool: Pick<Pool, "connect">, args: Prepa
       saved = await dependencies.updateLaunchAutomation(client, actor, saved.id, { revision: saved.revision, plan });
       saved = await dependencies.prepareLaunchAutomation(client, actor, saved.id, saved.revision, now);
     }
-    const run = await dependencies.requestSeasonStartInTransaction(client, actor, saved.id, { revision: saved.revision, preparedHash: saved.contentHash, profileRevision: profile.revision });
+    const run = await dependencies.requestSeasonStartInTransaction(client, actor, saved.id, { revision: saved.revision, preparedHash: saved.contentHash, profileRevision: profile.revision }, args.reviewSeasonId);
     await client.query("COMMIT");
     return { mode: "queued_only", runId: run.id, status: run.status, ...report };
   } catch (error) { await client.query("ROLLBACK").catch(() => {}); throw error; }

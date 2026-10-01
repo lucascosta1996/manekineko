@@ -61,6 +61,8 @@
     "season:run": "node --import tsx -- scripts/season-runner/cli.ts",
     "season:run:sepolia": "node --import tsx -- scripts/season-runner/sepolia.ts",
     "season:prepare:sepolia": "node --import tsx -- scripts/season-runner/prepare-sepolia.ts",
+    "season:review:sepolia": "node --import tsx -- scripts/season-runner/review-season.ts",
+    "season:review:refund-factory": "node --import tsx -- scripts/season-runner/review-refund-factory.ts",
     "season:recover:airy-garden": "node --import tsx -- scripts/season-runner/recover-airy-garden.ts",
     "season:settle:airy-prizes": "node --import tsx -- scripts/season-runner/settle-airy-prizes.ts",
     "season:resume:airy-garden": "node scripts/season-runner/resume-airy-garden.mjs",

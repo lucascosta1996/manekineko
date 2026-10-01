@@ -1,0 +1,11 @@
+# Landing refund section — 2026-10-01
+
+The Landing page now explains the unsold-collection refund path after “How it works” and before the FAQ. The section describes the immutable onchain deadline, funds reserved for outstanding refunds, and eligibility without an operator/backend activation action. It distinguishes automatic eligibility from a holder-submitted claim transaction and states that claiming burns the NFT, requires gas, and returns the original mint price rather than a resale price. Sold-out collections follow their draw and prize-claim rules.
+
+The section uses existing typography, colors, spacing, borders and the shared text-action/icon contract. Desktop uses two columns; mobile stacks the copy and definition list. A link opens the configured Web app’s `/docs/refunds`, falling back to the local FAQ when no Web destination is configured. The content renders without an API request or reveal animation. No shared tokens, protocol code or transaction flow changed.
+
+Verification: Landing typecheck and production build passed, as did the isolated production fixture build and all ten visual source-policy tests. Focused desktop/mobile captures were reviewed independently: `test-results/refund-section-1440.png` and `test-results/refund-section-390.png`. The rules link points to the configured documentation route, receives keyboard focus, and neither viewport overflows. Nine full-page references were updated for the added section and FAQ numbering; the reference-generation run passed 15 checks with six planned secondary-engine viewport skips.
+
+The final strict Landing regression run passed **96 checks with 18 planned secondary-engine viewport skips and no failures**, with screenshot updates disabled: `UI_APP=landing npx playwright test landing.spec.ts routes.spec.ts resilience.spec.ts --grep 'Landing|landing / |landing breakpoint|landing coarse'`. It covers Chromium, Firefox and WebKit, route accessibility scans, supported viewport/breakpoint widths, enlarged text/spacing, coarse input, and existing announcement/newsletter/navigation recovery states. Log: `/tmp/landing-refund-strict.log`.
+
+Verification is local. No deployment, database write, wallet transaction or onchain operation was performed. Manual screen-reader use, physical devices and hosted acceptance are not established by these checks.

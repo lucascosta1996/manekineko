@@ -3,7 +3,7 @@ import test from "node:test";
 import { randomUUID } from "node:crypto";
 import { readFile, readdir } from "node:fs/promises";
 import pg from "pg";
-import { createLaunchAutomation, exportLaunchAutomation, prepareLaunchAutomation } from "../lib/launch-automation-store.ts";
+import { createLaunchAutomation, exportLaunchAutomation, prepareLaunchAutomation, getLaunchAutomation, listLaunchAutomations, updateLaunchAutomation } from "../lib/launch-automation-store.ts";
 import { getRuntimeWorkerProfile, getSeasonRuntime, requestSeasonControl, requestSeasonStart, saveRuntimeProfile } from "../lib/season-runtime-store.ts";
 import { runtimeArtifact } from "./season-runtime.fixture.ts";
 
@@ -84,6 +84,31 @@ test("runtime persistence, concurrency, immutable binding and network guards on 
     const oldPaused = await requestSeasonControl(pool, actor, prepared.id, { action: "pause", revision: monitoringResumed.revision });
     await assert.rejects(() => requestSeasonControl(pool!, actor, prepared.id, { action: "resume", revision: oldPaused.revision, profileRevision: 3 }), /superseded history/);
     await assert.rejects(() => pool!.query("UPDATE manekineko_launch_automations SET prepared_artifact=jsonb_set(prepared_artifact,'{contractVersion}','\"affiliate-v9\"') WHERE id=$1", [permanentPrepared.id]), /immutable/);
+    // One saved season, three immutable execution members, with old exports preserved.
+    const members: Awaited<ReturnType<typeof createLaunchAutomation>>[] = [];
+    for (let index=0;index<3;index++) {
+      const member = structuredClone(permanentPlan);
+      member.seasonId = `0x${"56".repeat(32)}`; member.name = "Grouped review";
+      member.steps = [member.steps[0]]; member.steps[0].id=randomUUID();
+      Object.assign(member.steps[0].payload.contract,{seasonId:member.seasonId,seasonName:member.name,name:`Review collection ${index+1}`});
+      members.push(await createLaunchAutomation(pool,actor,{plan:member}));
+    }
+    const group={seasonId:members[0].plan.seasonId,seasonName:members[0].plan.name,stages:members.map(m=>({automationId:m.id,collectionId:m.plan.steps[0].id,name:m.plan.steps[0].payload.contract.name,color:m.plan.steps[0].payload.contract.collectionColor}))};
+    const invalidGroup=structuredClone(group);invalidGroup.stages[2]=invalidGroup.stages[0];
+    await assert.rejects(()=>pool!.query("INSERT INTO manekineko_season_review_members(automation_id,review_group) VALUES($1,$2)",[members[0].id,invalidGroup]),/verified three-collection/);
+    for(const member of members) await pool.query("INSERT INTO manekineko_season_review_members(automation_id,review_group) VALUES($1,$2)",[member.id,group]);
+    const grouped=(await listLaunchAutomations(pool)).automations.filter(a=>members.some(m=>m.id===a.id));
+    assert.equal(grouped.length,1);assert.equal(grouped[0].collectionCount,3);assert.deepEqual(grouped[0].reviewGroup,group);
+    assert.deepEqual((await getLaunchAutomation(pool,members[2].id)).reviewGroup,group);
+    const changed=structuredClone(members[0].plan);changed.steps[0].payload.contract.name="Changed";
+    await assert.rejects(()=>updateLaunchAutomation(pool!,actor,members[0].id,{plan:changed,revision:1}),/identity is immutable/);
+    await assert.rejects(()=>pool!.query("DELETE FROM manekineko_season_review_members WHERE automation_id=$1",[members[0].id]),/immutable/);
+    await assert.rejects(()=>requestSeasonStart(pool!,actor,members[0].id,{revision:1,profileRevision:3,preparedHash:"a".repeat(64)}),/saved review script/);
+    await pool.query("INSERT INTO manekineko_season_review_superseded(automation_id,replacement_id) VALUES($1,$2)",[prepared.id,members[0].id]);
+    assert.equal((await getLaunchAutomation(pool,prepared.id)).supersededBy,members[0].id);
+    assert.deepEqual(await exportLaunchAutomation(pool,prepared.id),historicalExport);
+    await assert.rejects(()=>requestSeasonControl(pool!,actor,prepared.id,{action:"resume",revision:oldPaused.revision,profileRevision:3}),/replaced/);
+    assert.equal((await listLaunchAutomations(pool)).automations.find(a=>a.id===prepared.id)?.currentModel,false);
     await pool.query("UPDATE manekineko_launch_users SET disabled_at=now() WHERE id=$1", [actor.userId]);
     await assert.rejects(() => saveRuntimeProfile(pool!, actor, "11155111", { ...config, revision: 2 }), /inactive/);
   } finally {

@@ -3,6 +3,7 @@ import type { ChainSnapshot } from "./chain";
 import type { AffiliateNftSelection } from "./types";
 import { AffiliateError, enrollmentNftSelection } from "./policy.ts";
 import { AFFILIATE_ELIGIBILITY_ABI, eligibilityReason } from "./eligibility-abi.ts";
+import { trustedFactoryPin } from "../trusted-factories.ts";
 
 const GATE = new Interface(AFFILIATE_ELIGIBILITY_ABI);
 const same = (a: unknown, b: unknown) => typeof a === "string" && typeof b === "string" && a.toLowerCase() === b.toLowerCase();
@@ -22,7 +23,7 @@ export async function trustedAffiliateEligibility(snapshot: ChainSnapshot, env: 
   if (!same(configuredGate,gateAddress) || code === "0x" || keccak256(code).toLowerCase() !== codeHash || version[0] !== (record.contractVersion==="affiliate-v10"?"affiliate-eligibility-v5":record.contractVersion==="affiliate-v9"?"affiliate-eligibility-v4":v8?"affiliate-eligibility-v3":v7?"affiliate-eligibility-v2":"affiliate-eligibility-v1")) throw new AffiliateError("eligibility_untrusted", "The collection’s NFT eligibility verifier could not be verified.",503);
   const sequence = BigInt(info[2] as bigint), sourceOnly = info[4] as boolean;
   if (sequence > 0n && (!same(info[0],record.factoryAddress) || info[1] !== BigInt(record.roundId) || !same(info[3],snapshot.codeHash)
-    || !same(approvedHash[0],env[`AFFILIATE_TRUSTED_FACTORY_CODEHASH_${record.contractVersion==="affiliate-v10"?"V10":record.contractVersion==="affiliate-v9"?"V9":v8?"V8":v7?"V7":"V6"}_${record.chainId}`]))) throw new AffiliateError("eligibility_untrusted", "The collection’s canonical eligibility registration does not match this deployment.",503);
+    || !same(approvedHash[0],trustedFactoryPin(record.chainId,record.contractVersion,record.factoryAddress,env)?.factoryCodeHash))) throw new AffiliateError("eligibility_untrusted", "The collection’s canonical eligibility registration does not match this deployment.",503);
   const targetAddress = record.contractAddress;
   async function check(wallet: string, selection: AffiliateNftSelection): Promise<{eligible:boolean;reason:string|null}> {
     const normalized = enrollmentNftSelection(selection.sourceCollection,selection.sourceTokenId);

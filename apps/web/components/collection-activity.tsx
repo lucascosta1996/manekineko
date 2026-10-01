@@ -70,7 +70,7 @@ function useEnrollmentProgram(collection: CollectionPublic, enabled: boolean) {
   return state.id === collection.id ? state : { program: null, receivedAt: 0, unavailable: false };
 }
 
-export function AffiliateWindow({ program, initialNow, canLink = false }: { program: AffiliateProgram; initialNow?: number; canLink?: boolean }) {
+export function AffiliateWindow({ program, initialNow, canLink = false, countdownTarget }: { program: AffiliateProgram; initialNow?: number; canLink?: boolean; countdownTarget?: string | null }) {
   const now = useProtocolClock(initialNow);
   if (now === null || program.mode !== "live") return null;
   const closed = program.enrollmentStatus === "closed" || program.saleActivated || program.soldOut || program.refundable || enrollmentWindowClosed(program.contractVersion, program.saleStartAt, now / 1000);
@@ -79,8 +79,8 @@ export function AffiliateWindow({ program, initialNow, canLink = false }: { prog
   return <div className="affiliate-window">
     <div className="activity-counter"><span>{closed ? "Affiliate enrollment closed" : timing.state === "scheduled" ? "Affiliate enrollment scheduled" : program.availableSlots === 0 ? "Affiliate positions filled" : available ? "Affiliate enrollment open" : "Affiliate enrollment unavailable"}</span><strong>{closed ? `${program.enrolledSlots} / ${program.maxSlots}` : `${program.availableSlots} / ${program.maxSlots}`}</strong></div>
     <p>{closed ? "Enrolled positions" : "Positions remaining"}</p>
-    {!closed && timing.target && <ProtocolCountdown target={timing.target} label={timing.label} now={now} expiredLabel="Checking enrollment" />}
-    {!closed && program.saleStartAt && <ProtocolCountdown target={program.saleStartAt} label="Mint scheduled in" now={now} />}
+    {!closed && timing.target && Date.parse(timing.target) !== Date.parse(countdownTarget ?? "") && <ProtocolCountdown target={timing.target} label={timing.label} now={now} expiredLabel="Checking enrollment" />}
+    {!closed && program.saleStartAt && Date.parse(program.saleStartAt) !== Date.parse(timing.target ?? "") && Date.parse(program.saleStartAt) !== Date.parse(countdownTarget ?? "") && <ProtocolCountdown target={program.saleStartAt} label="Mint scheduled in" now={now} />}
     {canLink && <Link className="activity-link" href={`/mint/${program.collectionId}/affiliates`}>{available ? "Join the affiliate program" : "View affiliate rewards"}<span aria-hidden="true"><Icon name="diagonal" /></span></Link>}
   </div>;
 }
@@ -107,6 +107,6 @@ export function CollectionActivity({ collection, previous, initialNow, showEnrol
     <div className="activity-counter"><span>{refunded ? "Tickets refunded" : showAwards ? "Prizes claimed" : "Tickets minted"}</span><strong>{count.toLocaleString("en-US")} / {total.toLocaleString("en-US")}</strong></div>
     <progress value={count} max={Math.max(1, total)} aria-label={refunded ? "Refund progress" : showAwards ? "Prize claim progress" : "Mint progress"} />
     <small>{fresh ? "Observed" : "Last observed"} {new Date(collection.updatedAt).toUTCString()}{collection.observation ? ` · block ${collection.observation.blockNumber}` : ""}. {!collection.observation?.chainTimestamp && "Verified chain clock unavailable."}</small>
-    {checkEnrollment && (freshProgram ? <AffiliateWindow program={freshProgram} initialNow={now} canLink /> : <p className="activity-detail">{enrollment.unavailable || enrollment.program ? "Affiliate availability is temporarily unavailable. Checking again…" : "Checking affiliate positions…"}</p>)}
+    {checkEnrollment && (freshProgram ? <AffiliateWindow program={freshProgram} initialNow={now} canLink countdownTarget={fresh && chainNow !== null ? activity.target : null} /> : <p className="activity-detail">{enrollment.unavailable || enrollment.program ? "Affiliate availability is temporarily unavailable. Checking again…" : "Checking affiliate positions…"}</p>)}
   </div>;
 }

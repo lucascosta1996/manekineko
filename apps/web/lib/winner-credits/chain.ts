@@ -4,6 +4,7 @@ import { RpcReadReverted } from "../affiliates/rpc-read-transport.ts";
 import { WINNER_CREDIT_ABI } from "./abi.ts";
 import { creditAwardRank, registrySupportsCredit } from "./model.ts";
 import type { WinnerCredit, WinnerCreditSource, WinnerCreditTarget, WinnerCreditRedemption } from "./model.ts";
+import { trustedFactoryPin } from "../trusted-factories.ts";
 
 export const CREDIT_REGISTRY = new Interface(WINNER_CREDIT_ABI);
 const FACTORY = new Interface(["function rounds(uint256) view returns(address)"]);
@@ -113,8 +114,8 @@ export async function createCreditSnapshot(chainId: number, env: CreditEnv, rpc:
 
   async function verifiedRound(record: Pick<WinnerCreditSource, "factoryAddress" | "contractVersion" | "contractAddress" | "roundId">) {
     const suffix = record.contractVersion === "affiliate-v10" ? "V10" : record.contractVersion === "affiliate-v9" ? "V9" : record.contractVersion === "affiliate-v8" ? "V8" : record.contractVersion === "affiliate-v7" ? "V7" : record.contractVersion === "affiliate-v6" ? "V6" : "V5";
-    const factory = env[`AFFILIATE_TRUSTED_FACTORY_${suffix}_${chainId}`];
-    const expected = env[`AFFILIATE_TRUSTED_FACTORY_CODEHASH_${suffix}_${chainId}`];
+    const pin = trustedFactoryPin(chainId,record.contractVersion,record.factoryAddress,env);
+    const factory = pin?.factory, expected = pin?.factoryCodeHash;
     if (!address(factory) || !hash(expected) || !same(factory!, record.factoryAddress)) throw new Error("Winner credit factory is not approved.");
     const [factoryCode, roundCode, registered, version, algorithm, roundId] = await Promise.all([
       rpc("eth_getCode", [factory, blockTag]), rpc("eth_getCode", [record.contractAddress, blockTag]),

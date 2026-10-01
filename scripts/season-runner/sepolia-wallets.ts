@@ -8,6 +8,7 @@ import { ChainPendingError, createTransactionPipeline, transactionSpend, type Ch
 
 import { refundMintQuantity, type SepoliaScenario } from "./sepolia-scenarios.ts";
 import { ensure } from "./store.ts";
+import { assertCohortOutcome, cohortReferralId, enrollCohort } from "./sepolia-affiliate-cohort.ts";
 
 const AAD = Buffer.from("tincta:sepolia-rehearsal-wallets:v1:11155111");
 const WALLET_COUNT = 50;
@@ -80,6 +81,7 @@ export type ManualRehearsalReservation = {
 };
 export type SepoliaRehearsalOptions = {
   scenario?: SepoliaScenario;
+  admissionSigner?: Wallet;
   chainId: number; provider: Provider; operator: Wallet; wallets: Wallet[];
   /** Only explicitly supplied existing test wallets can donate; keys are never discovered from environment files. */
   donors?: Wallet[]; execute: boolean; state: SepoliaRehearsalState; saveState: (state: SepoliaRehearsalState) => Promise<void>;
@@ -102,6 +104,9 @@ const abi = [
   "function affiliateWallet(uint256) view returns(address)", "function affiliateMinimumReferrals() view returns(uint256)", "function affiliateReferredMints(uint256) view returns(uint256)", "function affiliateAccrued(uint256) view returns(uint256)", "function affiliateClaimed(uint256) view returns(uint256)", "function affiliateClaimable(uint256) view returns(uint256)", "function affiliateEqualShare() view returns(uint256)", "function affiliateQualifiedCount() view returns(uint256)", "function affiliatePoolAmount() view returns(uint256)",
   "function mintWithAffiliate(address,uint256,uint256) payable", "function claimAffiliateCommission(address)",
   "function affiliateIdOf(address) view returns(uint256)",
+  "function maxAffiliateSlots() view returns(uint256)", "function affiliateCount() view returns(uint256)", "function affiliatePoolBps() view returns(uint256)",
+  "function enrollmentSigner() view returns(address)", "function affiliateEligibility() view returns(address)",
+  "function enrollAffiliate(address,uint256,uint256,address,uint256,bytes32,uint256,bytes)",
   "event AffiliateReferralRecorded(uint256 indexed id,address indexed payer,address indexed recipient,uint256 firstTokenId,uint256 quantity)",
   "error ERC721NonexistentToken(uint256 tokenId)",
 ];
@@ -114,6 +119,9 @@ export async function runSepoliaRehearsalStep(options: SepoliaRehearsalOptions, 
   if (!/^[1-9]\d*$/.test(options.maxFeePerGasWei) || !/^[1-9]\d*$/.test(options.maxTotalSpendWei)) throw new Error("Explicit rehearsal gas and total-spending caps are required.");
   const confirmations = options.confirmations ?? 2, state = options.state;
   const scenario = options.scenario;
+  const cohort = scenario?.kind === "manual-affiliate-sellout" ? scenario.affiliateCohort : undefined;
+  const giftedManualAllocations = scenario?.kind === "manual-affiliate-sellout" && scenario.manualMintPlan === "one-referral-then-gifts";
+  const manualBuyerTarget = giftedManualAllocations ? 1n : 20n;
   ensure(!state.manual?.[roundAddress.toLowerCase()] || scenario?.kind === "manual-affiliate-sellout", "manual_reservations_require_original_scenario");
   if (scenario?.kind === "manual-affiliate-sellout") {
     ensure(!options.recycleOperatorFunds && !options.settlePrizesToOperator, "manual_rehearsal_requires_unrecycled_v10_sellout");
@@ -204,7 +212,11 @@ export async function runSepoliaRehearsalStep(options: SepoliaRehearsalOptions, 
   async function fundIfNeeded(wallet: Wallet, required: bigint, intentKey: string) {
     const balance = await options.provider.getBalance(wallet.address, block!.number);
     if (balance >= required) return false;
-    const missing = required - balance, key = `fund:${roundAddress.toLowerCase()}:${wallet.address}:${intentKey}`;
+    const missing = required - balance, baseKey = `fund:${roundAddress.toLowerCase()}:${wallet.address}:${intentKey}`;
+    // A later gas payment can create a new shortfall. Never replay the already
+    // confirmed initial funding intent and report it as a fresh top-up.
+    const confirmedTopUps = Object.values(state.journals).flatMap(j=>j.transactions).filter(t=>t.state==="confirmed" && (t.action===baseKey || t.action.startsWith(`${baseKey}:topup:`))).length;
+    const key = confirmedTopUps ? `${baseKey}:topup:${confirmedTopUps}` : baseKey;
     let intent = state.funding[key];
     if (!intent) {
       // Explicit old test donors and prize-rich managed wallets can recycle existing Sepolia ETH. Retain each managed wallet's remaining mint allocation and gas.
@@ -224,21 +236,29 @@ export async function runSepoliaRehearsalStep(options: SepoliaRehearsalOptions, 
     await canonical(); await send(donor, key, { to: intent.to, value: BigInt(intent.value) }); return true;
   }
   if (manual) {
-    // Funding never consumes a reserved wallet nonce. Bots wait for genuine
-    // enrollment and the two manual purchases; no bootstrap or signature bypass.
+    // Funding never consumes a reserved wallet nonce. The explicit gift plan
+    // needs only one human referral; its remaining allocations are paid by bots.
     for (const address of [manual.affiliate, manual.buyer]) {
       const primary = BigInt(await round.mintedPerWallet(address, at));
       ensure(primary <= 20n, "manual_wallet_allowance_mismatch");
-      if (await fundIfNeeded(walletByAddress.get(address)!, (20n - primary) * price + gasReserve, "manual-role")) return { action: "fund-manual-role", wallet: address };
+      const remainingPaid = giftedManualAllocations ? (address === manual.buyer && primary < manualBuyerTarget ? manualBuyerTarget - primary : 0n) : 20n - primary;
+      if (await fundIfNeeded(walletByAddress.get(address)!, remainingPaid * price + gasReserve, "manual-role")) return { action: "fund-manual-role", wallet: address };
     }
     const id = Number(await round.affiliateIdOf(manual.affiliate, at));
     if (!id) return { action: "manual-checkpoint", checkpoint: "awaiting-enrollment", affiliate: manual.affiliate };
     ensure(getAddress(await round.affiliateWallet(id, at)) === manual.affiliate && (!manual.affiliateId || manual.affiliateId === id), "manual_affiliate_enrollment_changed");
     manual.affiliateId = id;
+    if (cohort) {
+      ensure(cohort.slots.some(slot => slot.id === id && getAddress(slot.wallet) === manual!.affiliate), "manual_affiliate_must_use_reserved_cohort_slot");
+      const action = await enrollCohort({ chainId: options.chainId, cohort, round, provider: options.provider, block,
+        affiliate: manual.affiliate, wallets: options.wallets, admissionSigner: options.admissionSigner, canonical,
+        fund: wallet => fundIfNeeded(wallet, gasReserve, "cohort-enrollment"), send });
+      if (action) return action;
+    }
     if (manual.checkpoint === "awaiting-enrollment") { manual.checkpoint = "awaiting-manual-mints"; await options.saveState(state); }
     affiliate = walletByAddress.get(manual.affiliate);
     const buyerMints = BigInt(await round.mintedPerWallet(manual.buyer, at)), affiliateMints = BigInt(await round.mintedPerWallet(manual.affiliate, at));
-    if (buyerMints !== 20n || affiliateMints !== 20n) return { action: "manual-checkpoint", checkpoint: "awaiting-manual-mints", buyerRemaining: String(20n - buyerMints), affiliateRemaining: String(20n - affiliateMints) };
+    if (giftedManualAllocations ? buyerMints < manualBuyerTarget : buyerMints !== 20n || affiliateMints !== 20n) return { action: "manual-checkpoint", checkpoint: "awaiting-manual-mints", buyerRemaining: String(manualBuyerTarget - buyerMints), affiliateRemaining: giftedManualAllocations ? "0" : String(20n - affiliateMints) };
     if (!manual.referralReceipts) {
       const logs = await round.queryFilter(round.filters.AffiliateReferralRecorded(id, manual.buyer, manual.buyer), manual.startBlock, block.number);
       const receipts: NonNullable<ManualRehearsalReservation["referralReceipts"]> = [];
@@ -246,12 +266,38 @@ export async function runSepoliaRehearsalStep(options: SepoliaRehearsalOptions, 
         ensure("args" in log && (await options.provider.getBlock(log.blockNumber))?.hash === log.blockHash, "manual_referral_receipt_unverified");
         receipts.push({ transactionHash: log.transactionHash, logIndex: log.index, blockNumber: log.blockNumber, blockHash: log.blockHash, quantity: String(log.args.quantity) });
       }
-      ensure(receipts.reduce((sum, receipt) => sum + BigInt(receipt.quantity), 0n) === 20n, "manual_buyer_must_use_verified_affiliate_link");
+      ensure(receipts.reduce((sum, receipt) => sum + BigInt(receipt.quantity), 0n) === manualBuyerTarget, "manual_buyer_must_use_verified_affiliate_link");
       manual.referralReceipts = receipts; manual.checkpoint = "awaiting-draw"; await canonical(); await options.saveState(state);
     } else for (const receipt of manual.referralReceipts) ensure((await options.provider.getBlock(receipt.blockNumber))?.hash === receipt.blockHash, "manual_referral_receipt_reorganized");
+    if (giftedManualAllocations && minted < supply) {
+      for (const [recipient, primary] of [[manual.affiliate, affiliateMints], [manual.buyer, buyerMints]] as const) {
+        if (primary === 20n) continue;
+        ensure(primary < 20n && !refundable && await round.saleActivated(at) && BigInt(block.timestamp) < await round.mintDeadline(at), "manual_gift_mint_window_unavailable");
+        const payer = options.wallets.find(wallet => !reserved(wallet.address)); ensure(payer, "manual_gift_payer_missing");
+        const quantity = 20n - primary;
+        ensure(minted + quantity <= supply, "manual_gift_capacity_changed");
+        if (await fundIfNeeded(payer, quantity * price + gasReserve, `gift:${recipient}:${primary}`)) return {action:"fund-manual-gift",recipient};
+        await canonical();
+        await send(payer, `manual-gift:${roundAddress.toLowerCase()}:${recipient}:${primary}`, await round.mint.populateTransaction(recipient,quantity,{value:quantity*price}));
+        return {action:"mint-manual-gift",recipient,quantity:String(quantity)};
+      }
+    }
     if (minted === supply) {
       const [accrued, share, pool, qualified] = await Promise.all([round.affiliateAccrued(id, at), round.affiliateEqualShare(at), round.affiliatePoolAmount(at), round.affiliateQualifiedCount(at)]);
       ensure(accrued > 0n && accrued === share && accrued * qualified <= pool, "manual_affiliate_allocation_mismatch");
+      if (cohort) assertCohortOutcome(cohort, await Promise.all(cohort.slots.map(slot => round.affiliateReferredMints(slot.id, at))), qualified,
+        await Promise.all(cohort.slots.map(slot => round.affiliateAccrued(slot.id, at))), share);
+    }
+  }
+  if (cohort && minted === supply) {
+    for (const slot of cohort.slots) {
+      if (getAddress(slot.wallet) === manual!.affiliate) continue;
+      const amount = await round.affiliateClaimable(slot.id, at);
+      if (amount === 0n) continue;
+      const wallet = walletByAddress.get(getAddress(slot.wallet)); ensure(wallet, "cohort_wallet_missing");
+      if (await fundIfNeeded(wallet, gasReserve, "cohort-claim")) return { action: "fund-cohort-claim", affiliateId: slot.id };
+      await canonical(); await send(wallet, `cohort-claim:${roundAddress.toLowerCase()}:${slot.id}`, await round.claimAffiliateCommission.populateTransaction(wallet.address));
+      return { action: "claim-cohort-commission", affiliateId: slot.id };
     }
   }
   if (affiliate && scenario?.kind === "affiliate-sellout" && minted === supply) {
@@ -355,7 +401,7 @@ export async function runSepoliaRehearsalStep(options: SepoliaRehearsalOptions, 
     const quantity = scenario?.kind === "refund-3-30m" ? refundMintQuantity(minted, primaryMinted, walletIndex) : (supply - minted) < 20n - primaryMinted ? supply - minted : 20n - primaryMinted;
     if (quantity === 0n) continue;
     if (await fundIfNeeded(wallet, quantity * price + gasReserve, `mint:${primaryMinted}`)) return { action: "fund-mint", wallet: wallet.address };
-    const affiliateId = scenario?.kind === "affiliate-sellout" ? scenario.affiliateId : manual?.affiliateId;
+    const affiliateId = cohort ? cohortReferralId(cohort, wallet.address, walletIndex) : scenario?.kind === "affiliate-sellout" ? scenario.affiliateId : manual?.affiliateId;
     const referred = affiliateId && wallet.address !== affiliate?.address;
     const request = referred ? await round.mintWithAffiliate.populateTransaction(wallet.address, quantity, affiliateId, { value: quantity * price }) : await round.mint.populateTransaction(wallet.address, quantity, { value: quantity * price });
     await canonical(); await send(wallet, `mint:${roundAddress.toLowerCase()}:${primaryMinted}`, request);

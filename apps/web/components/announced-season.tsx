@@ -27,7 +27,7 @@ export function AnnouncedSeasonCard({ season }: { season: AnnouncedSeason }) {
   return <article className="season-card season-card-upcoming">
     <Link className="season-cover season-cover-link" href={href}><div className="season-cover-label"><span>{season.chainId === 1 ? "ETHEREUM" : "SEPOLIA"}</span><span>ANNOUNCED</span></div><SeasonColorStack colors={season.colors} /><SeasonColorBar colors={season.colors} /></Link>
     <div className="season-card-heading"><h3><Link href={href}>{season.seasonName}</Link></h3><span aria-hidden="true"><Icon name="diagonal" /></span></div>
-    <p>{season.collections.length} collections · Season announced</p>
+    <p>{season.colors.length} collections · Season announced</p>
     {collection && <AnnouncedActivity season={season} collection={collection} />}
     <Link className="season-card-foot" href={href}><span>View schedule and results</span><span aria-hidden="true"><Icon name="arrow" /></span></Link>
   </article>;

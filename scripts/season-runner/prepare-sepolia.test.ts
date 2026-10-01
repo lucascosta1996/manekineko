@@ -6,6 +6,7 @@ import { automationArtifactHash } from "../../apps/launch/lib/launch-automation-
 import type { AutomationArtifact, AutomationPlan } from "../../apps/launch/lib/launch-automation.ts";
 import type { RuntimeProfile, RuntimeRun } from "../../apps/launch/lib/season-runtime.ts";
 import { parsePreparationArguments, preparationEnvironment, preparationBudget, prepareSepoliaRun, runDayArtifact, workerCommandGuidance, type PreparationDependencies, type PreparationEnvironment } from "./prepare-sepolia.ts";
+import { reviewPreparationStartAt } from "./review-season-plan.ts";
 
 const owner = "0x3333333333333333333333333333333333333333";
 const now = new Date("2030-01-01T00:00:00Z");
@@ -29,6 +30,15 @@ function prepared(): { saved: AutomationPlan; artifact: AutomationArtifact } {
 }
 const profile: RuntimeProfile = { chainId: "11155111", revision: 1, enabled: true, handle: "tincta_test", expectedAccountId: "123", publicBaseUrl: "https://tincta.xyz", credentialsConfigured: true, updatedAt: now.toISOString() };
 const credentials = { apiKey: "fictional-key", apiKeySecret: "fictional-secret", accessToken: "fictional-token", accessTokenSecret: "fictional-token-secret" };
+test("30-minute review opening preserves 15-minute enrollment and the original mint duration",()=>{
+  const saved=draft();saved.plan.steps=saved.plan.steps.slice(0,1);saved.plan.steps[0].payload.operations.enrollmentWindowSeconds="900";
+  const duration=saved.plan.steps[0].payload.contract.mintDurationSeconds;
+  const artifact=runDayArtifact(saved,config(),now,reviewPreparationStartAt({mintOpeningDelaySeconds:1800},saved.status,now));
+  assert.equal(artifact.startAt,"2030-01-01T00:30:00Z");
+  assert.equal(artifact.steps[0].payload.operations.enrollmentWindowSeconds,"900");
+  assert.equal(artifact.steps[0].payload.contract.mintDurationSeconds,duration);
+  assert.equal(saved.plan.startAt,null);
+});
 function fixture(existing = false) {
   const preparedValue = prepared(); let saved = existing ? preparedValue.saved : draft();
   const run: RuntimeRun = { id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee", automationId: saved.id, automationRevision: preparedValue.saved.revision, preparedHash: preparedValue.saved.contentHash!, chainId: "11155111", profileRevision: 1,

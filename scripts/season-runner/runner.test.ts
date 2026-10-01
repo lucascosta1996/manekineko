@@ -539,3 +539,21 @@ test("urgent scheduling preserves signed activation deadlines and accepts only c
     assert.equal(broadcasts, 0); assert.equal(f.events.includes("advance"), false); assert.equal(f.journal.transactions[0].rawTransaction, rawTransaction);
   }
 });
+
+
+test("manual wallets are funded before enrollment announcements in routine and urgent opening paths", async () => {
+  for (const lead of [600,10]) {
+    const f=fixture(); f.artifact.steps=[f.artifact.steps[0]]; f.artifact.contractVersion="affiliate-v10"; f.state.firstThreadComplete=true;
+    f.artifact.steps[0].payload.contract.algorithmVersion="unique-rank-v6";
+    const item=f.state.collections![f.artifact.steps[0].id]; item.payload.contract.algorithmVersion="unique-rank-v6";
+    item.payload.contract.saleStartAt=String(f.now+lead); item.enrollmentAt=iso(f.now-100); delete item.readinessAt;
+    Object.assign(f.snapshot,{saleStartAt:String(f.now+lead),saleActivated:false,soldOut:false,revealed:false,readyForNextRound:false,randomnessRequested:false,randomnessReceived:false,totalMinted:"0",awards:[]});
+    f.options.wallets=Array.from({length:50},()=>new Wallet(Wallet.createRandom().privateKey));
+    f.options.scenario={kind:"manual-affiliate-sellout",chainId:11155111,collectionId:f.artifact.steps[0].id,maxFeePerGasWei:f.options.maxFeePerGasWei,maxTotalSpendWei:f.options.maxTotalSpendWei,affiliateWallet:f.options.wallets[0].address,buyerWallet:f.options.wallets[1].address,manualMintsPerWallet:20,manualMintPlan:"one-referral-then-gifts",expectedOutcome:"manual-prize-and-commission-claimed"};
+    f.dependencies.createV10ChainAdapter=f.dependencies.createV9ChainAdapter;
+    f.dependencies.runSepoliaRehearsalStep=(async()=>{f.events.push("fund-manual-role");return {action:"fund-manual-role"};}) as RunnerDependencies["runSepoliaRehearsalStep"];
+    f.dependencies.fetch=(async()=>{throw new Error("Enrollment must wait for both manual wallets");}) as typeof fetch;
+    const runner=await createSeasonRunner(f.store,{} as Pool,f.options,f.dependencies);await runner.tick();
+    assert(f.events.includes("fund-manual-role"));assert(!f.events.some(e=>e.includes("affiliate-enrollment-open")));assert(!f.events.includes("advance"));assert.equal(item.readinessAt,undefined);
+  }
+});
