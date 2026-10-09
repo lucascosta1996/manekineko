@@ -55,11 +55,13 @@ test("zero countdown never announces an unconfirmed live mint or refund", () => 
 });
 test("stale observations preserve scheduled intent without claiming readiness; paused workers stay paused", () => {
   const value = fixture();
-  assert.equal(activity(value, now + 180001).label, "Mint scheduled in");
-  assert.equal(activity(value, now + 180001).target, value.collections[0].saleStartAt);
+  assert.equal(activity(value, now + 180001).label, "Affiliate enrollment scheduled in");
+  assert.equal(activity(value, now + 180001).target, value.collections[0].enrollmentOpensAt);
   assert.match(activity(value, now + 180001).detail, /Readiness is unconfirmed/);
+  assert.equal(activity(value, Date.parse(value.collections[0].enrollmentOpensAt!)).label, "Mint scheduled in");
+  assert.doesNotMatch(activity(value, Date.parse(value.collections[0].enrollmentOpensAt!)).detail, /enrollment is open/);
   value.updatedAt = "2030-01-01T12:02:00Z";
-  assert.equal(activity(value).label, "Mint scheduled in");
+  assert.equal(activity(value).label, "Affiliate enrollment scheduled in");
   value.status = "paused";
   assert.equal(activity(value).label, "Season automation paused"); assert.equal(activity(value).target, null);
   value.status = "completed";

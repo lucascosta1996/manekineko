@@ -7,6 +7,8 @@ import { requireValidAutomationPayload } from "../../apps/launch/lib/launch-auto
 import { getLaunchAutomation, exportLaunchAutomation, updateLaunchAutomation, prepareLaunchAutomation } from "../../apps/launch/lib/launch-automation-store.ts";
 import { assertRuntimeArtifact, runtimeId, runtimeProfileInput } from "../../apps/launch/lib/season-runtime.ts";
 import { getSeasonRuntime, getRuntimeWorkerProfile, requestSeasonStartInTransaction } from "../../apps/launch/lib/season-runtime-store.ts";
+import { launchContractVersion } from "../../apps/launch/lib/launch-config.ts";
+import { seasonVersionPolicy } from "./version.ts";
 import { connectionConfig, loadPrivateEnvironment, registryPins } from "./config.ts";
 import { ensure, RunnerStop } from "./store.ts";
 import { verifyXAccount, XApiError } from "./social.ts";
@@ -37,7 +39,7 @@ export function parsePreparationArguments(args: string[]): PreparationArguments 
 }
 
 export function preparationEnvironment(env: NodeJS.ProcessEnv = process.env) {
-  const worker = connectionConfig(11155111, false, env), pins = registryPins(11155111, env, "affiliate-v10");
+  const worker = connectionConfig(11155111, false, env), pins = registryPins(11155111, env, seasonVersionPolicy(env.SEASON_REVIEW_CONTRACT_VERSION ?? "affiliate-v10").contractVersion);
   let launch: URL, workerDatabase: URL;
   try { launch = new URL(env.LAUNCH_DATABASE_URL ?? ""); workerDatabase = new URL(worker.databaseUrl); }
   catch { throw new Error("launch_database_url_required"); }
@@ -68,7 +70,7 @@ export function runDayArtifact(saved: AutomationPlan, config: PreparationEnviron
     plan.startAt = startAt ?? new Date(Math.ceil(now.getTime() / 1000 + enrollment + 3600) * 1000).toISOString().replace(".000Z", "Z");
   }
   const normalized = requireValidAutomationPayload(plan, now, { requireAffiliateEligibility: true, requireWinnerCredits: true, requireSeasonAppearance: true });
-  const artifact: AutomationArtifact = { schemaVersion: 1, kind: "launch-automation", contractVersion: "affiliate-v10", ...normalized };
+  const artifact: AutomationArtifact = { schemaVersion: 1, kind: "launch-automation", contractVersion: launchContractVersion(normalized.steps[0].payload), ...normalized };
   assertRuntimeArtifact(artifact, now);
   ensure(Date.parse(artifact.startAt!) - now.getTime() > (Number(artifact.steps[0].payload.operations.enrollmentWindowSeconds) + 600) * 1000, "prepared_season_needs_deployment_and_enrollment_lead");
   assertExecutionPolicy(artifact, config);
@@ -76,7 +78,7 @@ export function runDayArtifact(saved: AutomationPlan, config: PreparationEnviron
 }
 
 export function assertExecutionPolicy(artifact: AutomationArtifact, config: PreparationEnvironment) {
-  ensure(artifact.chainId === "11155111" && artifact.contractVersion === "affiliate-v10", "preparation_is_v10_sepolia_only");
+  ensure(artifact.chainId === "11155111" && (artifact.contractVersion === "affiliate-v10" || artifact.contractVersion === "affiliate-v11"), "preparation_is_v10_sepolia_only");
   ensure(!artifact.steps.some(step => step.payload.contract.sepoliaRehearsal) || artifact.steps.length === 1, "refund_scenario_requires_one_collection");
   for (const step of artifact.steps) {
     const { contract, operations } = step.payload;

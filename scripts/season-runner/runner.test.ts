@@ -557,3 +557,18 @@ test("manual wallets are funded before enrollment announcements in routine and u
     assert(f.events.includes("fund-manual-role"));assert(!f.events.some(e=>e.includes("affiliate-enrollment-open")));assert(!f.events.includes("advance"));assert.equal(item.readinessAt,undefined);
   }
 });
+
+test("V11 runner selects its adapter and indexer version while preserving a version-bound resume", async () => {
+  const f=fixture(); f.artifact.contractVersion="affiliate-v11";
+  for(const step of f.artifact.steps) Object.assign(step.payload.contract,{algorithmVersion:"unique-rank-v6",affiliatePayoutCapBps:"0",minAffiliateReferrals:"1"});
+  f.state.collections![f.artifact.steps[0].id].payload.contract.algorithmVersion="unique-rank-v6";
+  let calls=0, indexedVersion: string | undefined;
+  f.dependencies.createV9ChainAdapter=async()=>{throw new Error("must not use V9");};
+  f.dependencies.createV11ChainAdapter=(async()=>{calls++;return f.chain;}) as unknown as RunnerDependencies["createV11ChainAdapter"];
+  f.dependencies.indexSeasonFactory=(async(_pool,_provider,options)=>{indexedVersion=options.contractVersion;return {ok:true};}) as RunnerDependencies["indexSeasonFactory"];
+  const runner=await createSeasonRunner(f.store,{} as Pool,f.options,f.dependencies);
+  assert.equal(calls,1); assert.match(f.state.binding!,/affiliate-v11/);
+  await assert.rejects(runner.tick(),ChainPendingError); assert.equal(indexedVersion,"affiliate-v11");
+  f.artifact.contractVersion="affiliate-v9";
+  await assert.rejects(createSeasonRunner(f.store,{} as Pool,f.options,f.dependencies),/immutable_runtime_configuration_changed/);
+});

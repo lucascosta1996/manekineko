@@ -24,3 +24,9 @@ test("historical source imports use original version/algorithm pairs and cannot 
   assert(!supportedHistoricalSource("affiliate-v10","affiliate-v10","unique-rank-v6"));
   assert(!supportedHistoricalSource("affiliate-v9","affiliate-v9","unique-rank-v5"));
 });
+test("V11 requires Eligibility V6 and Credits V7 and preserves immutable V10 economics", () => {
+  const v11=seasonVersionPolicy('affiliate-v11'),v10=seasonVersionPolicy('affiliate-v10');
+  assert.equal(v11.componentVersion,'V11');assert.equal(v11.eligibilityVersion,'affiliate-eligibility-v6');assert.equal(v11.creditsVersion,'winner-credits-v7');assert.equal(v11.uncapped,true);assert.equal(v10.uncapped,false);
+  assert(supportedHistoricalSource('affiliate-v11','affiliate-v10','unique-rank-v6'));assert(!supportedHistoricalSource('affiliate-v11','affiliate-v10','unique-rank-v5'));
+  assert.throws(()=>registryPins(11155111,{AFFILIATE_ELIGIBILITY_V5_ADDRESS_11155111:'0x'+'1'.repeat(40),AFFILIATE_ELIGIBILITY_V5_CODEHASH_11155111:'0x'+'2'.repeat(64),WINNER_CREDITS_V6_ADDRESS_11155111:'0x'+'3'.repeat(40),WINNER_CREDITS_V6_CODEHASH_11155111:'0x'+'4'.repeat(64)},'affiliate-v11'),/v11_registry/);
+});

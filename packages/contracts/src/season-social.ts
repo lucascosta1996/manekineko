@@ -8,7 +8,7 @@ export type SocialWinner = { rank: number; tokenId: string; awardEth: string; ho
 export type SocialPayment = { rank: number; tokenId: string; awardEth: string; claimantWallet: string; recipientWallet: string; transactionHash: string; logIndex: number };
 export type SeasonSocialInput = {
   /** Omitted only for historical V9 callers. */
-  contractVersion?: "affiliate-v9" | "affiliate-v10";
+  contractVersion?: "affiliate-v9" | "affiliate-v10" | "affiliate-v11";
   event: SeasonSocialEvent;
   chainId: 1 | 11155111;
   season: SeasonSocialIdentity;
@@ -104,7 +104,7 @@ export function assertSocialText(value: string): string {
 }
 
 export function buildSeasonSocialMessage(input: SeasonSocialInput): SeasonSocialMessage {
-  if (input.contractVersion !== undefined && !["affiliate-v9", "affiliate-v10"].includes(input.contractVersion)) throw new Error("Unsupported social contract version");
+  if (input.contractVersion !== undefined && !["affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(input.contractVersion)) throw new Error("Unsupported social contract version");
   if (!SEASON_SOCIAL_EVENTS.includes(input.event)) throw new Error("Unknown social event");
   if (input.chainId !== 1 && input.chainId !== 11155111) throw new Error("Unsupported social network");
   socialTimestamp(input.now);
@@ -165,7 +165,7 @@ export function buildSeasonSocialMessage(input: SeasonSocialInput): SeasonSocial
       footer = `Deadline: ${socialDateText(input.deadline)}.`;
       post = `${title} is live.\n\n${count(c!.supply)} NFTs · ${c!.mintPriceEth} ETH each.\n${c!.winnerCount} prizes of ${c!.prizePerWinnerEth} ETH after sellout and the verified draw.\n\nDeadline: ${socialDateText(input.deadline)}.\nMint link in the thread.`;
       reply("mint", `Mint and read the collection terms:\n${url("collection")}`);
-      if (input.contractVersion === "affiliate-v10") reply("numbers", "Your NFT has permanent numbers and artwork from mint, generated in Solidity. One VRF draw after sellout assigns scores and prizes separately. Numbers do not predict a win.");
+      if ((input.contractVersion === "affiliate-v10" || input.contractVersion === "affiliate-v11")) reply("numbers", "Your NFT has permanent numbers and artwork from mint, generated in Solidity. One VRF draw after sellout assigns scores and prizes separately. Numbers do not predict a win.");
       reply("claims", "Winning NFT holders claim prizes after the verified draw. Qualified affiliates claim commissions after sellout. If the deadline expires unsold, NFT holders can claim mint-price refunds.");
       break;
     case "collection-sold-out":

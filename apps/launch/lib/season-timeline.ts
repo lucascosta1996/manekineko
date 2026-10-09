@@ -85,7 +85,7 @@ export function resolveTimedAutomationStep(plan: AutomationPayload, context: Aut
     const index = plan.steps.findIndex(step => step.id === context.stepId.toLowerCase());
     if (index < 0) invalid("The collection is not part of this prepared season.");
     const version = launchContractVersion(plan.steps[0].payload);
-    if (!["affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(version) || plan.steps.some(step => launchContractVersion(step.payload) !== version || step.payload.contract.chainId !== plan.chainId)) invalid("Fixed season timing requires matching V7–V10 collections on the reviewed network.");
+    if (!["affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(version) || plan.steps.some(step => launchContractVersion(step.payload) !== version || step.payload.contract.chainId !== plan.chainId)) invalid("Fixed season timing requires matching V7–V10 collections on the reviewed network.");
     const first = plan.steps[0].payload.operations;
     const seriesFields = ["factoryMode", "factoryAddress", "deployerAddress", "factoryOwnerAddress", "affiliateEligibilityAddress"] as const;
     if (plan.steps.some(step => seriesFields.some(field => step.payload.operations[field]?.toLowerCase() !== first[field]?.toLowerCase()))) invalid("The collection changed the reviewed factory or eligibility registry settings.");

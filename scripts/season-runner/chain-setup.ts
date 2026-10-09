@@ -22,6 +22,7 @@ const same = (a: unknown, b: unknown) => String(a).toLowerCase() === String(b).t
 
 /** One-time setup uses a SEPARATE persisted journal and signer lock; resume that same setup until it returns public pins. */
 export function setupV9Registries(options: V9RegistrySetupOptions) { return setupVersionedRegistries(options, "affiliate-v9"); }
+export function setupV11Registries(options: V9RegistrySetupOptions) { return setupVersionedRegistries(options, "affiliate-v11"); }
 export function setupV10Registries(options: V9RegistrySetupOptions) { return setupVersionedRegistries(options, "affiliate-v10"); }
 export async function setupVersionedRegistries(options: V9RegistrySetupOptions, version: SeasonContractVersion) {
   const policy = seasonVersionPolicy(version);
@@ -50,19 +51,19 @@ export async function setupVersionedRegistries(options: V9RegistrySetupOptions, 
       previous = getAddress(options.previousCredits.address);
       check(/^0x[0-9a-f]{64}$/i.test(options.previousCredits.codeHash) && same(keccak256(await provider.getCode(previous, block.number)), options.previousCredits.codeHash), "Prior winner-credit registry code hash differs from the reviewed pin.");
       const old = new Contract(previous, ["function WINNER_CREDITS_VERSION() view returns(string)", "function totalSponsorBalance() view returns(uint256)", "function owner() view returns(address)", "function legacyMerkleRoot() view returns(bytes32)"], provider);
-      check((policy.permanent ? ["winner-credits-v2", "winner-credits-v3", "winner-credits-v4", "winner-credits-v5"] : ["winner-credits-v2", "winner-credits-v3", "winner-credits-v4"]).includes(await old.WINNER_CREDITS_VERSION(at)), "Unsupported prior winner-credit registry.");
+      check((policy.uncapped ? ["winner-credits-v2", "winner-credits-v3", "winner-credits-v4", "winner-credits-v5", "winner-credits-v6"] : policy.permanent ? ["winner-credits-v2", "winner-credits-v3", "winner-credits-v4", "winner-credits-v5"] : ["winner-credits-v2", "winner-credits-v3", "winner-credits-v4"]).includes(await old.WINNER_CREDITS_VERSION(at)), "Unsupported prior winner-credit registry.");
       check(same(await old.owner(at), owner) && await old.totalSponsorBalance(at) === 0n, "Prior sponsorship targets must be retired and their operator sponsorship balance recovered before migration; this command never withdraws funds.");
       const oldRoot = await old.legacyMerkleRoot(at);
       check(!options.legacyMerkleRoot || same(options.legacyMerkleRoot, oldRoot), "Keep the previous canonical historical winner root.");
       root = oldRoot;
       // Retire the entire predecessor lineage, not only its most recent ledger.
-      let prior = previous, upperVersion = policy.permanent ? 6 : 5;
+      let prior = previous, upperVersion = policy.uncapped ? 7 : policy.permanent ? 6 : 5;
       const seen = new Set<string>();
       while (prior !== ZeroAddress) {
         check(!seen.has(prior.toLowerCase()), "Prior registry lineage contains a cycle."); seen.add(prior.toLowerCase());
         const probe = new Contract(prior, ["function WINNER_CREDITS_VERSION() view returns(string)"], provider);
         const marker = await probe.WINNER_CREDITS_VERSION(at);
-        const registryNumber = Number(/^winner-credits-v([2-5])$/.exec(marker)?.[1]);
+        const registryNumber = Number(/^winner-credits-v([2-6])$/.exec(marker)?.[1]);
         check(registryNumber >= 2 && registryNumber < upperVersion, "Prior registry lineage must descend through supported versions.");
         const name = registryNumber === 2 ? "ManekinekoWinnerCredits" : `ManekinekoWinnerCreditsV${registryNumber}`;
         const artifact = await readArtifact(name), code = await provider.getCode(prior, block.number);

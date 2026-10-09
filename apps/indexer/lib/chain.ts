@@ -32,8 +32,8 @@ const roundInterface = new Interface(roundAbi);
 const factoryInterface = new Interface(factoryAbi);
 const roundV6Interface = new Interface(roundV6Abi);
 const factoryV6Interface = new Interface(factoryV6Abi);
-const roundFor = (c: RegisteredCollection) => c.contractVersion === "affiliate-v10" ? roundV10Interface : c.contractVersion === "affiliate-v9" ? roundV9Interface : c.contractVersion === "affiliate-v8" ? roundV8Interface : c.contractVersion === 'affiliate-v7' ? roundV7Interface : c.contractVersion === 'affiliate-v6' ? roundV6Interface : roundInterface;
-const factoryFor = (c: RegisteredCollection) => c.contractVersion === "affiliate-v10" ? factoryV10Interface : c.contractVersion === "affiliate-v9" ? factoryV9Interface : c.contractVersion === "affiliate-v8" ? factoryV8Interface : c.contractVersion === 'affiliate-v7' ? factoryV7Interface : c.contractVersion === 'affiliate-v6' ? factoryV6Interface : factoryInterface;
+const roundFor = (c: RegisteredCollection) => (c.contractVersion === "affiliate-v10" || c.contractVersion === "affiliate-v11") ? roundV10Interface : c.contractVersion === "affiliate-v9" ? roundV9Interface : c.contractVersion === "affiliate-v8" ? roundV8Interface : c.contractVersion === 'affiliate-v7' ? roundV7Interface : c.contractVersion === 'affiliate-v6' ? roundV6Interface : roundInterface;
+const factoryFor = (c: RegisteredCollection) => (c.contractVersion === "affiliate-v10" || c.contractVersion === "affiliate-v11") ? factoryV10Interface : c.contractVersion === "affiliate-v9" ? factoryV9Interface : c.contractVersion === "affiliate-v8" ? factoryV8Interface : c.contractVersion === 'affiliate-v7' ? factoryV7Interface : c.contractVersion === 'affiliate-v6' ? factoryV6Interface : factoryInterface;
 const phases = ['pending_activation', 'minting', 'awaiting_request', 'awaiting_randomness', 'awaiting_finalization', 'awaiting_prize', 'complete', 'refundable'];
 const same = (a: unknown, b: unknown) => String(a).toLowerCase() === String(b).toLowerCase();
 const lower = (address: string) => getAddress(address).toLowerCase();
@@ -66,7 +66,7 @@ export function snapshotFromValues(values: Record<string, any>, collection: Regi
     randomnessState: values.randomnessReceived ? 'fulfilled' : values.randomnessRequested ? 'pending' : 'not_requested',
     randomnessRequestId: values.randomnessRequested ? String(values.requestId) : null,
     randomnessWord: values.randomnessReceived ? String(values.randomWord) : null,
-    prizePaid: values.prizePaid, prizeRecipient: values.prizePaid && !['affiliate-v7','affiliate-v8','affiliate-v9','affiliate-v10'].includes(collection.contractVersion) ? lower(values.prizeRecipient) : null,
+    prizePaid: values.prizePaid, prizeRecipient: values.prizePaid && !['affiliate-v7','affiliate-v8','affiliate-v9','affiliate-v10', "affiliate-v11"].includes(collection.contractVersion) ? lower(values.prizeRecipient) : null,
     prizePaidWei: String(values.prizePaidAmount), winningCombination: null,
   };
 }
@@ -75,13 +75,13 @@ export function assertCollectionVersion(collection: RegisteredCollection): void 
   ensure(collection.contractVersion === 'affiliate-v5' && collection.algorithmVersion === 'unique-rank-v2'
     || collection.contractVersion === 'affiliate-v6' && collection.algorithmVersion === 'unique-rank-v3'
     || collection.contractVersion === 'affiliate-v7' && collection.algorithmVersion === 'unique-rank-v4'
-    || collection.contractVersion === 'affiliate-v10' && collection.algorithmVersion === 'unique-rank-v6'
+    || (collection.contractVersion === "affiliate-v10" || collection.contractVersion === "affiliate-v11") && collection.algorithmVersion === 'unique-rank-v6'
     || (collection.contractVersion === "affiliate-v8" || collection.contractVersion === "affiliate-v9") && collection.algorithmVersion === 'unique-rank-v5', 'collection_trust_mismatch');
 }
 
 export function decodeEvent(log: Log, block: ChainBlock, version: RegisteredCollection['contractVersion'] = 'affiliate-v5'): ChainEvent {
   ensure(!log.removed && log.blockHash === block.hash && log.blockNumber === block.number, 'canonical_block_changed');
-  const parsed = (version === "affiliate-v10" ? roundV10Interface : version === "affiliate-v9" ? roundV9Interface : version === "affiliate-v8" ? roundV8Interface : version === 'affiliate-v7' ? roundV7Interface : version === 'affiliate-v6' ? roundV6Interface : roundInterface).parseLog(log);
+  const parsed = ((version === "affiliate-v10" || version === "affiliate-v11") ? roundV10Interface : version === "affiliate-v9" ? roundV9Interface : version === "affiliate-v8" ? roundV8Interface : version === 'affiliate-v7' ? roundV7Interface : version === 'affiliate-v6' ? roundV6Interface : roundInterface).parseLog(log);
   const args: Record<string, string | boolean> = {};
   parsed?.fragment.inputs.forEach((input, i) => { args[input.name || String(i)] = typeof parsed.args[i] === 'boolean' ? parsed.args[i] : String(parsed.args[i]); });
   return {
@@ -137,17 +137,17 @@ export class RpcChainReader implements ChainReader {
     const roundInterface = roundFor(c), factoryInterface = factoryFor(c);
     const names = ['roundId', 'name', 'symbol', 'maxSupply', 'mintPrice', 'mintDeadline', 'prizeBps', 'affiliatePoolBps', 'maxAffiliateSlots', 'enrollmentSigner', 'CONTRACT_VERSION', 'ALGORITHM_VERSION'];
     const expected = [c.roundId, c.name, c.symbol, c.maxSupply, c.mintPrice, c.mintDeadline, c.prizeBps, c.affiliatePoolBps, c.maxAffiliateSlots, c.enrollmentSigner, c.contractVersion, c.algorithmVersion];
-    if (c.contractVersion === 'affiliate-v6' || c.contractVersion === 'affiliate-v7' || (c.contractVersion === "affiliate-v8" || c.contractVersion === "affiliate-v9" || c.contractVersion === "affiliate-v10")) {
+    if (c.contractVersion === 'affiliate-v6' || c.contractVersion === 'affiliate-v7' || (c.contractVersion === "affiliate-v8" || c.contractVersion === "affiliate-v9" || (c.contractVersion === "affiliate-v10" || c.contractVersion === "affiliate-v11"))) {
       const appearance = normalizeSeasonAppearance(c);
       names.push('seasonId', 'seasonName', 'collectionColor', 'textColor');
       expected.push(appearance.seasonId, appearance.seasonName, appearance.collectionColor, appearance.textColor);
     }
-    if (['affiliate-v7','affiliate-v8','affiliate-v9','affiliate-v10'].includes(c.contractVersion)) {
-      names.push((c.contractVersion === "affiliate-v8" || c.contractVersion === "affiliate-v9" || c.contractVersion === "affiliate-v10") ? 'winnerCount' : 'secondPrizeBps', 'minAffiliateReferrals', 'affiliatePayoutCapBps', 'saleStartAt');
-      expected.push((c.contractVersion === "affiliate-v8" || c.contractVersion === "affiliate-v9" || c.contractVersion === "affiliate-v10") ? c.winnerCount! : c.secondPrizeBps!, c.minAffiliateReferrals!, c.affiliatePayoutCapBps!, c.saleStartAt!);
+    if (['affiliate-v7','affiliate-v8','affiliate-v9','affiliate-v10', "affiliate-v11"].includes(c.contractVersion)) {
+      names.push((c.contractVersion === "affiliate-v8" || c.contractVersion === "affiliate-v9" || (c.contractVersion === "affiliate-v10" || c.contractVersion === "affiliate-v11")) ? 'winnerCount' : 'secondPrizeBps', 'minAffiliateReferrals', 'affiliatePayoutCapBps', 'saleStartAt');
+      expected.push((c.contractVersion === "affiliate-v8" || c.contractVersion === "affiliate-v9" || (c.contractVersion === "affiliate-v10" || c.contractVersion === "affiliate-v11")) ? c.winnerCount! : c.secondPrizeBps!, c.minAffiliateReferrals!, c.affiliatePayoutCapBps!, c.saleStartAt!);
     }
-    if(c.contractVersion === "affiliate-v9" || c.contractVersion === "affiliate-v10") { names.push("MAX_MINTS_PER_WALLET"); expected.push("20"); }
-    if (c.contractVersion === 'affiliate-v10') {
+    if(c.contractVersion === "affiliate-v9" || (c.contractVersion === "affiliate-v10" || c.contractVersion === "affiliate-v11")) { names.push("MAX_MINTS_PER_WALLET"); expected.push("20"); }
+    if ((c.contractVersion === "affiliate-v10" || c.contractVersion === "affiliate-v11")) {
       names.push('combinationKey');
       expected.push(derivePermanentCombinationKey({ chainId: c.chainId, collectionAddress: c.address, roundId: c.roundId, seasonId: c.seasonId!, maxSupply: c.maxSupply }));
     }
@@ -202,7 +202,7 @@ export class RpcChainReader implements ChainReader {
     const fields = ['phase', 'totalMinted', 'totalMintRevenue', 'refundedCount', 'totalRefunded', 'randomnessRequested', 'randomnessReceived', 'requestId', 'randomWord', 'revealed', 'winningTokenId', 'highestScore', 'prizePaid', 'prizeRecipient', 'prizePaidAmount'];
     const values = Object.fromEntries(await Promise.all(fields.map(async field => [field, await this.read(c.address, roundInterface, field, [], block)])));
     const state = snapshotFromValues(values, c);
-    if (['affiliate-v7','affiliate-v8','affiliate-v9','affiliate-v10'].includes(c.contractVersion)) {
+    if (['affiliate-v7','affiliate-v8','affiliate-v9','affiliate-v10', "affiliate-v11"].includes(c.contractVersion)) {
       const soldOutAt = BigInt(await this.read(c.address, roundInterface, 'soldOutAt', [], block));
       state.soldOutAt = soldOutAt === 0n ? null : Number(soldOutAt);
       ensure(!state.soldOutAt || state.totalMinted === c.maxSupply && state.soldOutAt <= block.timestamp, 'sellout_accounting_mismatch');
@@ -221,10 +221,10 @@ export class RpcChainReader implements ChainReader {
             this.read(c.address, roundInterface, 'awardPaidAt', [rank], block),
           ]);
           const numbers = Array.from(combination[0], Number);
-          const decoded = c.contractVersion === 'affiliate-v10'
+          const decoded = (c.contractVersion === "affiliate-v10" || c.contractVersion === "affiliate-v11")
             ? { ...decodePermanentCombination(numbers, key), score: String(combination[2]) }
             : decodeScrambledCombination(numbers, key);
-          ensure(c.contractVersion !== 'affiliate-v10' || 'tokenId' in decoded && Number(decoded.tokenId) === tokenId, 'winner_accounting_mismatch');
+          ensure((c.contractVersion !== "affiliate-v10" && c.contractVersion !== "affiliate-v11") || 'tokenId' in decoded && Number(decoded.tokenId) === tokenId, 'winner_accounting_mismatch');
           ensure(tokenId >= 1 && tokenId <= c.maxSupply && decoded.score === String(c.maxSupply - rank + 1)
             && decoded.combinationCode === String(combination[1]) && decoded.score === String(combination[2])
             && amount === BigInt(state.totalMintRevenueWei) * BigInt(awardBps(c,rank)) / 10000n

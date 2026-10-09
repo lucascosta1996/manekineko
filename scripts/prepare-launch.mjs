@@ -23,7 +23,7 @@ try {
   }
   // Historical exports remain verifiable, but never silently invent appearance
   // when preparing the current versioned deployment inputs.
-  requireValidLaunchPayload({ contract: artifact.contract, operations: artifact.operations }, { requireSeasonAppearance: true, requireWinnerCredits: ["affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(artifact.contractVersion), requireAffiliateEligibility: ["affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(artifact.contractVersion) });
+  requireValidLaunchPayload({ contract: artifact.contract, operations: artifact.operations }, { requireSeasonAppearance: true, requireWinnerCredits: ["affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(artifact.contractVersion), requireAffiliateEligibility: ["affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(artifact.contractVersion) });
   const outputPath = resolve(options.get("--output"));
   // Exclusive directory creation makes repeat execution safe: existing output is never overwritten.
   await mkdir(outputPath, { mode: 0o700 });
@@ -32,7 +32,7 @@ try {
     try { await file.writeFile(JSON.stringify(value, null, 2) + "\n"); await file.sync(); }
     finally { await file.close(); }
   }
-  const version = artifact.contractVersion === "affiliate-v10" ? "V10" : artifact.contractVersion === "affiliate-v9" ? "V9" : artifact.contractVersion === "affiliate-v8" ? "V8" : artifact.contractVersion === "affiliate-v7" ? "V7" : artifact.contractVersion === "affiliate-v6" ? "V6" : artifact.contractVersion === "affiliate-v5" ? "V5" : "V4";
+  const version = artifact.contractVersion === "affiliate-v11" ? "V11" : artifact.contractVersion === "affiliate-v10" ? "V10" : artifact.contractVersion === "affiliate-v9" ? "V9" : artifact.contractVersion === "affiliate-v8" ? "V8" : artifact.contractVersion === "affiliate-v7" ? "V7" : artifact.contractVersion === "affiliate-v6" ? "V6" : artifact.contractVersion === "affiliate-v5" ? "V5" : "V4";
   const filename = `round-${version.toLowerCase()}.json`;
   const configPath = join(outputPath, filename);
   await writeJson(filename, artifact.contract);
@@ -55,8 +55,8 @@ try {
     await writeJson("affiliate-eligibility-plan.json", {
       schemaVersion: 1, configurationHash: options.get("--expected-hash"), chainId: artifact.contract.chainId,
       registryAddress: artifact.operations.affiliateEligibilityAddress,
-      ...(version === "V10" ? { registryVersion: "affiliate-eligibility-v5" } : version === "V9" ? { registryVersion: "affiliate-eligibility-v4" } : version === "V8" ? { registryVersion: "affiliate-eligibility-v3" } : version === "V7" ? { registryVersion: "affiliate-eligibility-v2" } : {}),
-      requiredBeforeEnrollment: true, policy: ["V7", "V8", "V9", "V10"].includes(version) ? "previous-revealed-funded-nft-after-first-collection" : "previous-completed-nft-after-first-collection",
+      ...(version === "V11" ? { registryVersion: "affiliate-eligibility-v6" } : version === "V10" ? { registryVersion: "affiliate-eligibility-v5" } : version === "V9" ? { registryVersion: "affiliate-eligibility-v4" } : version === "V8" ? { registryVersion: "affiliate-eligibility-v3" } : version === "V7" ? { registryVersion: "affiliate-eligibility-v2" } : {}),
+      requiredBeforeEnrollment: true, policy: ["V7", "V8", "V9", "V10", "V11"].includes(version) ? "previous-revealed-funded-nft-after-first-collection" : "previous-completed-nft-after-first-collection",
       operations: ["Verify the canonical eligibility registry and its global collection order.", "Approve this reviewed factory if needed, then register the deployed collection before enabling enrollment.", "Only canonical collection one has open enrollment. Later collections require an unused NFT from an earlier completed official collection."],
       prepareCommand: "node --import tsx scripts/affiliate-eligibility-operations.mjs collection --manifest <export.json> --expected-hash <trusted-hash> --factory <deployed-factory> --round <deployed-round> --output <new-plan.json>",
       note: "Unsigned operations only. A new factory never resets the canonical bootstrap exception.",
@@ -68,7 +68,7 @@ try {
       configurationHash: options.get("--expected-hash"),
       chainId: artifact.contract.chainId,
       registryAddress: artifact.operations.winnerCreditsAddress,
-      ...(version === "V10" ? { registryVersion: "winner-credits-v6" } : version === "V9" ? { registryVersion: "winner-credits-v5" } : version === "V8" ? { registryVersion: "winner-credits-v4" } : version === "V7" ? { registryVersion: "winner-credits-v3" } : {}),
+      ...(version === "V11" ? { registryVersion: "winner-credits-v7" } : version === "V10" ? { registryVersion: "winner-credits-v6" } : version === "V9" ? { registryVersion: "winner-credits-v5" } : version === "V8" ? { registryVersion: "winner-credits-v4" } : version === "V7" ? { registryVersion: "winner-credits-v3" } : {}),
       cumulativeSponsorshipBudgetWei: artifact.operations.winnerCreditSponsorshipWei,
       requiredBeforeSaleActivation: true,
       operations: ["Verify the canonical registry and reviewed factory runtime.", "Approve the factory if needed, then register the collection before sale activation.", "Fund the reviewed sponsorship budget, subtracting all prior funding to prevent duplicate deposits."],

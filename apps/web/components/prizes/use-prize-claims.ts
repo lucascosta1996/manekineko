@@ -55,7 +55,7 @@ export function usePrizeClaims(onConfirmed?: () => void) {
         }
         confirmedHash = recovered.hash!;
       } else {
-        const ranked = ["affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(target.contractVersion ?? "");
+        const ranked = ["affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(target.contractVersion ?? "");
         const request = await (ranked ? prepareRankedPrizeClaim : prepareLegacyPrizeClaim)(session, target, prize);
         receipt = await submitTransaction(session, target, "prize", request, journal => update({ journal, hash: journal.hash, phase: journal.hash ? "pending" : "wallet", message: journal.hash ? "Claim submitted. Waiting for its receipt…" : "Confirm in your wallet. Open your wallet app or extension to review this claim." }));
         confirmedHash = receipt.hash;

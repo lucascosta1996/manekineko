@@ -31,7 +31,7 @@ export const WINNER_CREDIT_SOURCES = `
     JOIN manekineko_collection_awards a ON a.collection_id = c.id AND a.claimed
     JOIN manekineko_collection_state s ON s.collection_id = c.id
     JOIN manekineko_indexer_checkpoints cp ON cp.collection_id = c.id
-    WHERE a.winning_holder = $1 AND a.paid_at IS NOT NULL AND a.rank BETWEEN 1 AND CASE WHEN c.contract_version IN ('affiliate-v8','affiliate-v9','affiliate-v10') THEN c.winner_count ELSE 2 END AND a.token_id > 0
+    WHERE a.winning_holder = $1 AND a.paid_at IS NOT NULL AND a.rank BETWEEN 1 AND CASE WHEN c.contract_version IN ('affiliate-v8','affiliate-v9','affiliate-v10','affiliate-v11') THEN c.winner_count ELSE 2 END AND a.token_id > 0
       AND d.status = 'deployed' AND d.contract_address ~ '^0x[0-9a-f]{40}$' AND d.factory_address ~ '^0x[0-9a-f]{40}$'
       AND d.contract_address <> '0x0000000000000000000000000000000000000000'
       AND d.factory_address <> '0x0000000000000000000000000000000000000000'

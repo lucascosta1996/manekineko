@@ -95,7 +95,7 @@ export function LaunchHeader({
         className="dashboard-brand"
         href={launchDestination("/dashboard", chainId)}
         onClick={navigate}
-        aria-label="Tincta home"
+        aria-label="Tincta Rewards home"
       >
         <LaunchBrand decorative />
         <span>Launch</span>

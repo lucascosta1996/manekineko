@@ -6,7 +6,7 @@ import { ensure } from "./store.ts";
 import { REVIEW_REUSE_POLICY } from "./review-fund-reuse.ts";
 
 export type ReviewStage = { number: 1 | 2 | 3; automationId?: string; plan: AutomationPayload; scenario: SepoliaScenario };
-export type ReviewSeason = { schemaVersion: 1 | 2; kind: "sepolia-three-run-review"; chainId: 11155111; fundReuse?: typeof REVIEW_REUSE_POLICY; mintOpeningDelaySeconds?: 1800; stages: ReviewStage[] };
+export type ReviewSeason = { schemaVersion: 1 | 2; kind: "sepolia-three-run-review"; chainId: 11155111; firstCollectionBootstrap?: true; cohortFromFirstCollection?: true; fundReuse?: typeof REVIEW_REUSE_POLICY; mintOpeningDelaySeconds?: 1800; stages: ReviewStage[] };
 
 /** Evaluate only after the previous stage's recovery and the funding checks.
  * Existing prepared openings, and older manifests without this policy, retain their schedule. */
@@ -51,6 +51,8 @@ export function parseReviewSeason(input: unknown): ReviewSeason {
   ensure([1,2].includes(value?.schemaVersion) && value.kind === "sepolia-three-run-review" && value.chainId === 11155111 && value.stages?.length === 3, "invalid_three_run_review");
   ensure(value.fundReuse===undefined||value.fundReuse===REVIEW_REUSE_POLICY,"invalid_review_fund_reuse_policy");
   ensure(value.mintOpeningDelaySeconds===undefined||value.mintOpeningDelaySeconds===1800,"invalid_review_opening_delay");
+  ensure(value.firstCollectionBootstrap===undefined||value.firstCollectionBootstrap===true,"invalid_review_bootstrap_policy");
+  ensure(value.cohortFromFirstCollection===undefined||value.cohortFromFirstCollection===true,"invalid_review_cohort_source_policy");
   const ids = new Set<string>(), seasons = new Set<string>();
   for (const [index, stage] of value.stages.entries()) {
     ensure(stage.number === index + 1 && stage.plan.chainId === "11155111" && stage.plan.steps.length === 1, "review_stage_order_mismatch");

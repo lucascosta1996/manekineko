@@ -23,6 +23,10 @@
   --ui-primary-pressed: #000000;
   --ui-danger-hover: #921f16;
   --ui-danger-pressed: #7a1a13;
+  --ui-brand-gap: 0.875rem;
+  --ui-brand-label-ink: #555555;
+  --ui-brand-label-border: #dddddd;
+  --ui-brand-label-padding-block: 0.125rem;
   --ui-radius: 0.1875rem;
   --ui-hero: clamp(1.875rem, 3.5vw, 2.5rem);
   --ui-page: clamp(1.75rem, 3vw, 2.25rem);

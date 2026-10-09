@@ -2,7 +2,7 @@ import type { CollectionPublic } from "./model.ts";
 
 /** Labels describe a verified contract snapshot, not an inferred winning outcome. */
 export function collectionProgress(collection: Pick<CollectionPublic, "phase" | "contractVersion" | "saleStartAt">, now = Date.now()): { label: string; detail: string } {
-  const ranked = (["affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(collection.contractVersion ?? ""));
+  const ranked = (["affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(collection.contractVersion ?? ""));
   if (collection.phase === "minting" && collection.saleStartAt && Date.parse(collection.saleStartAt) > now) {
     return { label: "Scheduled", detail: `Ticket sales open at ${collection.saleStartAt}. The contract enforces this fixed opening time.` };
   }

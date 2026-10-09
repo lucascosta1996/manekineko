@@ -21,7 +21,7 @@ export async function walletPrizes(walletValue:string,cursor:string|null):Promis
   if(cursor&&!/^[0-9a-f-]{36}$/i.test(cursor))throw new Error("Invalid cursor");
   const rows=(await database().query(`SELECT c.id,c.name FROM manekineko_collections c JOIN manekineko_deployments d ON d.collection_id=c.id
     JOIN manekineko_collection_state s ON s.collection_id=c.id WHERE d.status='deployed' AND s.block_number IS NOT NULL AND s.total_minted=c.max_supply
-    AND c.contract_version IN ('affiliate-v3','affiliate-v4','affiliate-v5','affiliate-v6','affiliate-v7','affiliate-v8','affiliate-v9','affiliate-v10')
+    AND c.contract_version IN ('affiliate-v3','affiliate-v4','affiliate-v5','affiliate-v6','affiliate-v7','affiliate-v8','affiliate-v9','affiliate-v10','affiliate-v11')
     AND ($1::bigint IS NULL OR c.chain_id=$1) AND ($2::uuid IS NULL OR c.id>$2) ORDER BY c.id LIMIT 6`,[configuredChainId(),cursor])).rows;
   const result:WalletPrizes={wallet,prizes:[],unavailable:[],nextCursor:rows.length>5?rows[4].id:null,checkedAt:new Date().toISOString()};
   // Sequential collections bound provider load; ranks share one canonical snapshot.
@@ -29,7 +29,7 @@ export async function walletPrizes(walletValue:string,cursor:string|null):Promis
     const record=await programRecord(row.id), snapshot=await trustedSnapshot(record);
     const call=async(name:string,args:unknown[]=[]) => (await snapshot.readContract(record.contractAddress!,reads,name,args))[0];
     if(!await call("revealed")){await snapshot.assertCanonical();continue;}
-    const ranked=["affiliate-v7","affiliate-v8","affiliate-v9","affiliate-v10"].includes(record.contractVersion);
+    const ranked=["affiliate-v7","affiliate-v8","affiliate-v9","affiliate-v10", "affiliate-v11"].includes(record.contractVersion);
     const count=ranked?(record.winnerCount??2):1;
     const finalized=Number(await call("finalizedAt")),delay=Number(await call("PRIZE_CLAIM_DELAY"));
     const payments=(await database().query(`SELECT arguments,transaction_hash,block_timestamp,log_index,block_hash FROM manekineko_chain_events

@@ -14,7 +14,7 @@ export interface ProgramRecord {
   mode: "demo" | "live"; maxSlots: number; enrollmentEnabled: boolean; enrollmentSigner: string | null;
   contractAddress: string | null; factoryAddress: string | null; deploymentStatus: string;
   mintPriceWei: string; maxSupply: number; algorithmVersion: string; mintDeadline: Date | null;
-  contractVersion:"affiliate-v3"|"affiliate-v4"|"affiliate-v5"|"affiliate-v6"|"affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10";collectionContractVersion:string;prizeBps:number;affiliateRatesBps:number[];affiliatePoolBps:number|null;
+  contractVersion:"affiliate-v3"|"affiliate-v4"|"affiliate-v5"|"affiliate-v6"|"affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10" | "affiliate-v11";collectionContractVersion:string;prizeBps:number;affiliateRatesBps:number[];affiliatePoolBps:number|null;
 }
 export async function programRecord(collectionId: string): Promise<ProgramRecord> {
   if (!isCollectionId(collectionId)) throw new AffiliateError("not_found", "Collection not found.", 404);
@@ -23,7 +23,7 @@ export async function programRecord(collectionId: string): Promise<ProgramRecord
   if (!result.rows[0]) throw new AffiliateError("not_found", "This collection does not have an affiliate program.", 404);
   const record = result.rows[0];
   if (!chainEnabled(record.chainId)) throw new AffiliateError("not_found", "This collection is not available on this network.", 404);
-  if ((record.contractVersion === "affiliate-v5" || (record.contractVersion === "affiliate-v6" || record.contractVersion === "affiliate-v7" || (record.contractVersion === "affiliate-v8" || record.contractVersion === "affiliate-v9" || record.contractVersion === "affiliate-v10")))) validateAffiliatePool(record.prizeBps, record.affiliatePoolBps, record.maxSlots, record.affiliateRatesBps);
+  if ((record.contractVersion === "affiliate-v5" || (record.contractVersion === "affiliate-v6" || record.contractVersion === "affiliate-v7" || (record.contractVersion === "affiliate-v8" || record.contractVersion === "affiliate-v9" || (record.contractVersion === "affiliate-v10" || record.contractVersion === "affiliate-v11"))))) validateAffiliatePool(record.prizeBps, record.affiliatePoolBps, record.maxSlots, record.affiliateRatesBps);
   else validateAffiliateRates(record.prizeBps, record.affiliateRatesBps, record.maxSlots);
   return result.rows[0];
 }
@@ -45,7 +45,7 @@ export async function rateLimit(collectionId: string, scope: "challenge_ip" | "c
   const result = await database().query(AFFILIATE_RATE_SQL, [collectionId, scope, hash, limit]);
   if (result.rowCount !== 1) throw new AffiliateError("rate_limited", "Too many enrollment attempts from this wallet or network. Please try again in ten minutes.", 429, 600);
 }
-export interface ChallengeRecord { id: string; collectionId: string; wallet: string; chainId: number; contractAddress: string; origin: string; nonce: string; ipDigest: string; expiresAt: Date; consumedAt: Date | null; contractVersion:"affiliate-v3"|"affiliate-v4"|"affiliate-v5"|"affiliate-v6"|"affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10";affiliateId:number|null;commissionBps:number|null;eligibilitySourceAddress:string|null;eligibilityTokenId:string|null }
+export interface ChallengeRecord { id: string; collectionId: string; wallet: string; chainId: number; contractAddress: string; origin: string; nonce: string; ipDigest: string; expiresAt: Date; consumedAt: Date | null; contractVersion:"affiliate-v3"|"affiliate-v4"|"affiliate-v5"|"affiliate-v6"|"affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10" | "affiliate-v11";affiliateId:number|null;commissionBps:number|null;eligibilitySourceAddress:string|null;eligibilityTokenId:string|null }
 export async function readChallenge(id: string, collectionId: string): Promise<ChallengeRecord> {
   if (!isCollectionId(id)) throw new AffiliateError("invalid_challenge", "Request a new enrollment challenge.");
   const result = await database().query<ChallengeRecord>(`SELECT id,collection_id AS "collectionId",wallet,chain_id::integer AS "chainId",contract_address AS "contractAddress",origin,nonce,ip_digest AS "ipDigest",expires_at AS "expiresAt",consumed_at AS "consumedAt",contract_version AS "contractVersion",affiliate_id AS "affiliateId",commission_bps AS "commissionBps",eligibility_source_address AS "eligibilitySourceAddress",eligibility_token_id::text AS "eligibilityTokenId"

@@ -4,7 +4,7 @@ export class WinnerCreditQueryError extends Error {}
 export interface WinnerCreditQuery { wallet: string; collectionId: string | null; page: number; pageSize: number }
 export interface WinnerCreditSource {
   collectionId: string; name: string; chainId: number; roundId: string;
-  contractAddress: string; factoryAddress: string; contractVersion: "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10";
+  contractAddress: string; factoryAddress: string; contractVersion: "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10" | "affiliate-v11";
   awardRank?: number;
   winningHolder: string; tokenId: string;
 }
@@ -24,7 +24,7 @@ export interface WinnerCreditRedemption {
   sourceRound: string; targetRound: string; tokenId: string; awardRank?: number; registryAddress?: string;
 }
 export interface WinnerCreditNetwork {
-  registryVersion?: "winner-credits-v2" | "winner-credits-v3" | "winner-credits-v4" | "winner-credits-v5" | "winner-credits-v6";
+  registryVersion?: "winner-credits-v2" | "winner-credits-v3" | "winner-credits-v4" | "winner-credits-v5" | "winner-credits-v6" | "winner-credits-v7";
   chainId: number; configured: boolean; registryAddress: string | null;
   runtimeCodeHash: string | null; verifiedBlock: string | null;
   lifetimeRedemption: WinnerCreditRedemption | null;
@@ -55,7 +55,7 @@ export function availableLifetimeRewards(credits: readonly WinnerCredit[]): numb
 /** Each winning NFT is a distinct source; multiple wins never create extra lifetime rewards. */
 export function creditAwardRank(credit: Pick<WinnerCreditSource, "contractVersion" | "awardRank">): number {
   const rank = credit.awardRank ?? 1;
-  if (!Number.isInteger(rank) || rank < 1 || rank > ((credit.contractVersion === "affiliate-v8" || credit.contractVersion === "affiliate-v9" || credit.contractVersion === "affiliate-v10") ? 10 : credit.contractVersion === "affiliate-v7" ? 2 : 1)) throw new Error("Invalid winner award rank.");
+  if (!Number.isInteger(rank) || rank < 1 || rank > ((credit.contractVersion === "affiliate-v8" || credit.contractVersion === "affiliate-v9" || (credit.contractVersion === "affiliate-v10" || credit.contractVersion === "affiliate-v11")) ? 10 : credit.contractVersion === "affiliate-v7" ? 2 : 1)) throw new Error("Invalid winner award rank.");
   return rank;
 }
 export function winnerCreditKey(credit: Pick<WinnerCreditSource, "chainId" | "contractAddress" | "contractVersion" | "awardRank">): string {
@@ -64,10 +64,11 @@ export function winnerCreditKey(credit: Pick<WinnerCreditSource, "chainId" | "co
 
 /** A registry may recognize earlier sources, but an older registry cannot issue newer award credits. */
 export function registrySupportsCredit(contractVersion: WinnerCreditSource["contractVersion"], registryVersion: string): boolean {
-  if (!["winner-credits-v2", "winner-credits-v3", "winner-credits-v4", "winner-credits-v5", "winner-credits-v6"].includes(registryVersion)) return false;
-  if (contractVersion === "affiliate-v10") return registryVersion === "winner-credits-v6";
-  if (contractVersion === "affiliate-v9") return ["winner-credits-v5", "winner-credits-v6"].includes(registryVersion);
-  if (contractVersion === "affiliate-v8") return ["winner-credits-v4", "winner-credits-v5", "winner-credits-v6"].includes(registryVersion);
+  if (!["winner-credits-v2", "winner-credits-v3", "winner-credits-v4", "winner-credits-v5", "winner-credits-v6", "winner-credits-v7"].includes(registryVersion)) return false;
+  if (contractVersion === "affiliate-v11") return registryVersion === "winner-credits-v7";
+  if (contractVersion === "affiliate-v10") return ["winner-credits-v6", "winner-credits-v7"].includes(registryVersion);
+  if (contractVersion === "affiliate-v9") return ["winner-credits-v5", "winner-credits-v6", "winner-credits-v7"].includes(registryVersion);
+  if (contractVersion === "affiliate-v8") return ["winner-credits-v4", "winner-credits-v5", "winner-credits-v6", "winner-credits-v7"].includes(registryVersion);
   if (contractVersion === "affiliate-v7") return registryVersion !== "winner-credits-v2";
   return true;
 }

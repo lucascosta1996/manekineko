@@ -7,7 +7,7 @@ import { verifiedReferralEvent, type ReferralActivity } from "./referral-activit
 
 export async function referralActivity(collectionId: string, walletValue: string): Promise<ReferralActivity> {
   const wallet = normalizedWallet(walletValue), record = await programRecord(collectionId);
-  if (!["affiliate-v5", "affiliate-v6", "affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(record.contractVersion)) throw new AffiliateError("activity_unavailable", "Referral receipt history is unavailable for this historical contract version.", 503);
+  if (!["affiliate-v5", "affiliate-v6", "affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(record.contractVersion)) throw new AffiliateError("activity_unavailable", "Referral receipt history is unavailable for this historical contract version.", 503);
   const snapshot = await trustedSnapshot(record);
   const affiliateId = Number(await snapshot.call("affiliateIdOf", [wallet]));
   const result: ReferralActivity = { wallet, chainId: record.chainId, collectionId, affiliateId: affiliateId || null, referredMints: 0, events: [], hasMore: false, observedAt: new Date(snapshot.blockTimestamp * 1000).toISOString(), blockNumber: snapshot.blockNumber };

@@ -28,7 +28,7 @@ export function seasonRuntimePreviews(saved: AutomationPlan, publicBaseUrl?: str
         const collectionUrl = `${base}/mint/${step.id}`;
         const sampleNow = event === "affiliate-opening-soon" ? enrollment - 3600000 : event === "affiliate-enrollment-open" ? enrollment : event === "collection-live" ? start : event === "refunds-available" || event === "season-complete" ? deadline + 60000 : start + 1000;
         const input: SeasonSocialInput = {
-          event, contractVersion: launchContractVersion(step.payload) === "affiliate-v10" ? "affiliate-v10" : "affiliate-v9", chainId: Number(plan.chainId) as 1 | 11155111, season,
+          event, contractVersion: launchContractVersion(step.payload) === "affiliate-v11" ? "affiliate-v11" : launchContractVersion(step.payload) === "affiliate-v10" ? "affiliate-v10" : "affiliate-v9", chainId: Number(plan.chainId) as 1 | 11155111, season,
           ...(!seasonEvent ? { collection: { id: step.id, number: index + 1, name: terms.name, color: colors[index], supply, mintPriceEth: formatEther(mintPrice), winnerCount: winners, prizePerWinnerEth: formatEther(prize) } } : {}),
           now: iso(sampleNow), enrollmentOpensAt: iso(enrollment), saleStartsAt: iso(start), deadline: iso(deadline),
           urls: { season: `${base}/seasons/${plan.chainId}/${plan.seasonId}`, collection: collectionUrl, affiliate: `${collectionUrl}/affiliates`, docs: `${base}/docs`, refund: collectionUrl, commissions: `${collectionUrl}/affiliates`, prizeClaim: collectionUrl },

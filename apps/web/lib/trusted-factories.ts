@@ -2,9 +2,9 @@ import { getAddress, ZeroAddress } from "ethers";
 
 export type TrustedFactory = { chainId: number; contractVersion: string; factory: string; factoryCodeHash: string };
 type Environment = Record<string, string | undefined>;
-const versions = [3, 4, 5, 6, 7, 8, 9, 10];
+const versions = [3, 4, 5, 6, 7, 8, 9, 10, 11];
 function checked(pin: TrustedFactory): TrustedFactory {
-  if (![1, 11155111].includes(pin.chainId) || !/^affiliate-v(?:[3-9]|10)$/.test(pin.contractVersion)
+  if (![1, 11155111].includes(pin.chainId) || !/^affiliate-v(?:[3-9]|10|11)$/.test(pin.contractVersion)
     || getAddress(pin.factory) === ZeroAddress || !/^0x[0-9a-f]{64}$/i.test(pin.factoryCodeHash)
     || /^0x0{64}$/i.test(pin.factoryCodeHash)) throw new Error("invalid_trusted_factory_configuration");
   return {...pin,factory:getAddress(pin.factory).toLowerCase(),factoryCodeHash:pin.factoryCodeHash.toLowerCase()};

@@ -9,7 +9,7 @@ export function verifyLaunchExport(input: unknown, expectedHash: string): Launch
   if (!input || typeof input !== "object" || Array.isArray(input)) throw new Error("A finalized launch export is required.");
   const raw = input as Record<string, unknown>;
   const keys = ["schemaVersion", "contractVersion", "contract", "operations", "contentHash"];
-  if (Object.keys(raw).length !== keys.length || Object.keys(raw).some(key => !keys.includes(key)) || raw.schemaVersion !== 1 || !["affiliate-v4", "affiliate-v5", "affiliate-v6", "affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(String(raw.contractVersion))) {
+  if (Object.keys(raw).length !== keys.length || Object.keys(raw).some(key => !keys.includes(key)) || raw.schemaVersion !== 1 || !["affiliate-v4", "affiliate-v5", "affiliate-v6", "affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(String(raw.contractVersion))) {
     throw new Error("Unsupported launch export schema or fields.");
   }
   const payload = requireValidLaunchPayload({ contract: raw.contract, operations: raw.operations }, {preserveHistoricalDuration:true});

@@ -102,7 +102,20 @@
     "./retired-round-owner-source": "./src/ManekinekoRetiredRoundOwner.source.json",
     "./lifecycle": "./src/lifecycle.ts",
     "./lifecycle.css": "./src/lifecycle.css",
-    "./mint-duration": "./src/mint-duration.ts"
+    "./mint-duration": "./src/mint-duration.ts",
+    "./round-v11": "./src/ManekinekoRoundV11.json",
+    "./round-v11-source": "./src/ManekinekoRoundV11.source.json",
+    "./factory-v11": "./src/ManekinekoFactoryV11.json",
+    "./factory-v11-source": "./src/ManekinekoFactoryV11.source.json",
+    "./renderer-v11": "./src/ManekinekoRendererV11.json",
+    "./renderer-v11-source": "./src/ManekinekoRendererV11.source.json",
+    "./round-deployer-v11": "./src/ManekinekoRoundDeployerV11.json",
+    "./round-deployer-v11-source": "./src/ManekinekoRoundDeployerV11.source.json",
+    "./affiliate-eligibility-v6": "./src/ManekinekoAffiliateEligibilityV6.json",
+    "./affiliate-eligibility-v6-source": "./src/ManekinekoAffiliateEligibilityV6.source.json",
+    "./winner-credits-v7": "./src/ManekinekoWinnerCreditsV7.json",
+    "./winner-credits-v7-source": "./src/ManekinekoWinnerCreditsV7.source.json",
+    "./v11-config": "./src/v11-config.ts"
   },
   "dependencies": {
     "ethers": "6.17.0"

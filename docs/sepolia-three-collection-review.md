@@ -1,6 +1,16 @@
 # Three-collection Sepolia workflow review
 
-**The replacement is ready for the user to start. The old run remains paused.** The replacement is one saved **Prism Review** season with three collections sharing season ID `0xd7510f0ac6ad86f76d7c7624c3f45b37f3d0712c18e991478ec28fdda10fa5f0`. It uses three separate execution artifacts/runs because a refunded V10 factory sequence cannot continue. Migration 030 and the replacement drafts are persisted; all 48 preexisting automation rows and frozen exports remained unchanged. No replacement collection has been queued or started.
+**Superseded by V11 on 2026-10-05:** use [the full affiliate pool review](full-affiliate-pool-v11.md) and `.private/review-season-v11/run.sh`. The prior season is archived and its launcher disabled. The remaining content is historical evidence.
+
+**Superseded on October 5:** use the [first-season replacement guide](sepolia-first-season-review-2026-10-05.md) and `.private/review-season-reset/run.sh`. The v3 live attempt below was paused and archived. Its first collection used the existing registry's sequence 5 and did not model first-ever no-NFT enrollment. This document retains the earlier setup evidence.
+
+**The replacement is ready for the user to start. The old run remains paused.** The replacement is one saved **Prism Review** season with three collections sharing season ID `0x88b228e3721786a5f654c508a439116de28a3fa2be2bd9b72b54acbed6f33f1a`. It uses three separate execution artifacts/runs because a refunded V10 factory sequence cannot continue. Migration 030 and the replacement drafts are persisted; the superseded automation rows and frozen exports remain unchanged. No replacement collection has been queued or started.
+
+**October 4 permission recovery:** the user queued v2 run `2bbd38d8-71e8-4fd6-9d90-78ee5162f336`, but `openRunStore` stopped with PostgreSQL `42501`: the restricted worker lacked `SELECT` on `manekineko_season_review_members`. The staging worker now has that single read grant and no membership write permission. Provisioning includes it, and the review wrapper exercises the exact worker lookup before freezing a schedule. The failed run had zero actions, zero public projections and empty state; both replacement factories still had zero rounds. Its 21:01:15 UTC opening expired, so it is paused and superseded by the v3 drafts below. Original artifacts, wallets, balances, factories, colors, economics and fund-reuse policy are retained. V3 has one fresh shared season identity and three fresh collection identities; it has not been queued or executed. The v2 manifest is now historical and rejects execution.
+
+V3 read-only preflight passed at Sepolia block **11845280** (`0x919ec7a46047838710f5fc8f6a823f00a8b98bf0101109e164388843d29e5f6f`): `readyToQueue: true`, 12.205380943253598874 ETH liquid against 11.1576 ETH required, and both manual wallets already at their targets. The verified X account remains `@luckyOne9619`. The preview opening was not saved; execution computes a fresh opening.
+
+Restricted-role provisioning and persistent-worker-store regression tests passed against disposable local PostgreSQL databases (3 tests); worker typecheck passed. The live restricted worker successfully opened the old run read-only after the grant. These checks do not constitute a successful real-wallet enrollment or mint.
 
 The old run `4fca383b-5550-4e90-aef0-8889d7b5320f` is persistently paused. Ruby Signal at `0xA16194c52d61cd530Ada23587cd8Be8d86Ee7BEb` had zero mints and zero enrolled affiliates at the September 30 audit. Its opening was missed, so its frozen clock is not reused. The old records are retained as superseded history; their command and resume controls are blocked.
 
@@ -16,11 +26,11 @@ All three retain 0.01 ETH tickets, six equal prizes, the 20-primary-mint recipie
 
 | Step | Automation ID | Collection ID |
 | --- | --- | --- |
-| 1 | `57743b50-9c7c-49b3-88b9-b532d580222d` | `16e4b567-8e01-45c6-bd50-4beedcf3e46f` |
-| 2 | `2c22e052-e935-4333-ada4-765223a82501` | `34311c80-25fe-47c4-8f68-65e838a4c05a` |
-| 3 | `3a41c084-6b06-471e-a72f-9a0f8d026256` | `ff238ac6-6c6f-4f27-ade5-27ab7e4fac03` |
+| 1 | `bdc8e074-3b7e-4c7a-9866-f58cf38364a7` | `de8a36f7-0a60-41db-b9c1-1c62ea4e0305` |
+| 2 | `98491cb6-230b-4855-8c34-67a71d3aa82f` | `8542a42b-2251-4e63-aff6-eb9ad09eca72` |
+| 3 | `b142adb2-0237-4720-bfbb-fc72f3cf5e50` | `af25b69e-fcc6-4427-ae30-534e2358c02e` |
 
-The current private manifest is `.private/review-season-v2/review.json`. Openings remain unset until each script starts. Launch displays a single season card and all three collections; changing the selected collection inspects its own draft/frozen artifact. The public season appears only after the script confirms its initial announcement. Subsequent runs append their results under the same season identity. The previous `.private/review-season/review.json` is audit history and rejects execution.
+The current private manifest is `.private/review-season-v3/review.json`. Openings remain unset until each script starts. Launch displays a single season card and all three collections; changing the selected collection inspects its own draft/frozen artifact. The public season appears only after the script confirms its initial announcement. Subsequent runs append their results under the same season identity. The previous `.private/review-season/review.json` is audit history and rejects execution.
 
 ## Wallet access and manual steps
 
@@ -53,7 +63,7 @@ The private manifest now enables `completed-stage-to-operator-v1`. Starting stag
 3. Return surplus ETH from the original rehearsal wallets to that operator, including the manual wallets **only after their claims are complete**. Each wallet that returns funds retains a 0.0125 ETH gas buffer at the configured 5 gwei ceiling, plus any unused transfer-gas allowance. Smaller balances are left in place; ordinary next-stage funding tops them up as needed. No NFT is transferred. External donor wallets are not swept.
 4. Recheck confirmed liquid balances before freezing the next stage's opening. Expected prizes, refunds and contract reserves are not treated as cash already received. An insufficient balance stops preparation; rerunning resumes the same recovery journal and does not return the same wallet's funds twice.
 
-Each handoff has its own encrypted `.private/review-season-v2/reuse-before-<next-collection-id>.enc` journal, a **15 ETH cumulative transfer-and-gas cap**, and the existing **5 gwei fee ceiling**. Each collection retains its separate **25 ETH** execution cap. Saved transaction bytes and canonical receipts are reconciled before another action. Keep these journals with the manifest and vault when resuming; an earlier stage cannot be restarted through the review wrapper after its handoff has begun.
+Each handoff has its own encrypted `.private/review-season-v3/reuse-before-<next-collection-id>.enc` journal, a **15 ETH cumulative transfer-and-gas cap**, and the existing **5 gwei fee ceiling**. Each collection retains its separate **25 ETH** execution cap. Saved transaction bytes and canonical receipts are reconciled before another action. Keep these journals with the manifest and vault when resuming; an earlier stage cannot be restarted through the review wrapper after its handoff has begun.
 
 During the collection, the existing manual-role protections remain active: the worker does not submit the human enrollment, referral purchase, commission claim or selected winner's prize claim. The recovery phase only moves already-settled ETH. There is no automatic recovery after stage 3, so its final review proceeds stay in their recipient wallets.
 
@@ -63,23 +73,23 @@ The local convenience launcher preserves the reviewed manifest, wallet vault and
 
 ```sh
 # Read-only check
-bash .private/review-season-v2/run.sh 1
+bash .private/review-season-v3/run.sh 1
 
 # Start the replacement first collection when ready
-bash .private/review-season-v2/run.sh 1 --execute
+bash .private/review-season-v3/run.sh 1 --execute
 ```
 
 Use stage 2 or 3 only after completing the previous stage. The equivalent full command below is read-only; its displayed opening is a preview and is not saved:
 
 ```sh
 npm run season:review:sepolia -- \
-  --manifest .private/review-season-v2/review.json \
+  --manifest .private/review-season-v3/review.json \
   --stage 1 \
   --wallet-vault .private/season-runner/sepolia-wallets.enc \
   --env-file .env.staging.local \
   --env-file .env.staging.wallets.local \
   --env-file .private/v10-setup-2026-09-25/worker.env \
-  --env-file .private/review-season-v2/review.env
+  --env-file .private/review-season-v3/review.env
 ```
 
 Add `--execute` to start stage 1. The same command with `--stage 2` or `--stage 3` checks the previous outcome, completes the authorized fund recovery, checks liquid funding, and only then freezes the next 30-minute opening. Stop the previous worker before starting the next stage. Do not use the old manifest or resume its missed opening.

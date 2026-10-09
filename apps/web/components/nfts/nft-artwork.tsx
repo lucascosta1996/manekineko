@@ -58,7 +58,7 @@ export function useArtworkVisibility() {
 export function NftArt({ item, data, error, retry, interactive = true }: { item: NftItem; data: NftArtworkResponse | null; error: boolean; retry: () => void; interactive?: boolean }) {
   const [failedImage, setFailedImage] = useState<string | null>(null);
   const imageFailed = !!data?.image && failedImage === data.image;
-  const portrait = (item.contractVersion === "affiliate-v8" || item.contractVersion === "affiliate-v9" || item.contractVersion === "affiliate-v10");
+  const portrait = (item.contractVersion === "affiliate-v8" || item.contractVersion === "affiliate-v9" || (item.contractVersion === "affiliate-v10" || item.contractVersion === "affiliate-v11"));
   if (data?.image && !imageFailed) return <img onError={() => setFailedImage(data.image)} src={data.image} width="640" height={portrait ? "800" : "640"} alt={`Ticket #${item.tokenId}${data.numbers ? ` · ${data.numbers.join(", ")}${data.score ? ` · score ${data.score}` : item.phase === "refundable" ? " · no draw" : " · draw pending"}` : item.phase === "refundable" ? " · refundable on-chain artwork" : " · sealed on-chain artwork"}`} decoding="async" />;
   return <div className="nft-art-placeholder" style={{ aspectRatio: portrait ? "4 / 5" : "1" }}>
     <span className="nft-art-symbol" aria-hidden="true"><Icon name="diamond" /></span>

@@ -18,7 +18,7 @@ export interface HistoryWinner {
 }
 
 export interface HistoryCollection {
-  contractVersion: "legacy" | "affiliate-v3" | "affiliate-v4" | "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10";
+  contractVersion: "legacy" | "affiliate-v3" | "affiliate-v4" | "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10" | "affiliate-v11";
   winnerCount?: number | null; secondPrizeBps?: number | null; awards?: CollectionAward[];
   prizeBps: number;
   affiliatePoolBps?: number | null;
@@ -186,13 +186,13 @@ export function calculateHistoryStats(records: readonly HistoryCollection[], inP
 
 /** The public archive includes only real outcomes and never counts a collection twice. */
 export function buildHistoryResponse(archive: readonly HistoryCollection[], deployed: readonly CollectionPublic[]): HistoryResponse {
-  const completedV7: HistoryCollection[] = deployed.filter(c=>["affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(c.contractVersion) && c.prizePaid && c.awards?.length===((c.contractVersion === "affiliate-v8" || c.contractVersion === "affiliate-v9" || c.contractVersion === "affiliate-v10") ? c.winnerCount : 2)).map(c=>{
+  const completedV7: HistoryCollection[] = deployed.filter(c=>["affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(c.contractVersion) && c.prizePaid && c.awards?.length===((c.contractVersion === "affiliate-v8" || c.contractVersion === "affiliate-v9" || (c.contractVersion === "affiliate-v10" || c.contractVersion === "affiliate-v11")) ? c.winnerCount : 2)).map(c=>{
     const first=c.awards![0];
     return {...c,seriesName:c.seasonName ?? c.name,status:"completed",openedAt:c.saleStartAt!,closedAt:c.awards!.map(a=>a.paidAt!).sort().at(-1)!,isMock:false,
       totalRefundedWei:"0",winner:{tokenId:first.tokenId,combination:first.numbers as [number,number,number,number],combinationCode:first.combinationCode,combinationKey:first.combinationKey,
         score:first.score,winningHolder:first.winningHolder!,prizeRecipient:first.recipient!,prizePaidWei:first.amountWei,paidAt:first.paidAt!}};
   });
-  const refundedV7: HistoryCollection[] = deployed.filter(c=>["affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(c.contractVersion) && c.phase==="refundable" && c.refundedAt
+  const refundedV7: HistoryCollection[] = deployed.filter(c=>["affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(c.contractVersion) && c.phase==="refundable" && c.refundedAt
     && c.totalMinted>0 && c.refundedCount===c.totalMinted && c.totalRefundedWei===c.totalMintRevenueWei).map(c=>({
       ...c,seriesName:c.seasonName ?? c.name,status:"refunded",openedAt:c.saleStartAt!,closedAt:c.refundedAt!,isMock:false,
       totalRefundedWei:c.totalRefundedWei!,winner:null,

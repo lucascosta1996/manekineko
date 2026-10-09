@@ -88,8 +88,8 @@ export async function reviewReuseStep(options: Options) {
   for(const [address,hash]of [[source.factory,source.factoryCodeHash],[source.round,source.roundCodeHash],[options.credits.address,options.credits.codeHash]])
     ensure(keccak256(await provider.getCode(address,block.number))===hash,"reuse_runtime_changed");
   ensure(getAddress(await factory.rounds(source.roundId,at))===getAddress(source.round)
-    && String(await round.roundId(at))===source.roundId && await round.CONTRACT_VERSION(at)==="affiliate-v10"
-    && await round.ALGORITHM_VERSION(at)==="unique-rank-v6" && await credits.WINNER_CREDITS_VERSION(at)==="winner-credits-v6","reuse_provenance_changed");
+    && String(await round.roundId(at))===source.roundId && (await round.CONTRACT_VERSION(at) === "affiliate-v10" || await round.CONTRACT_VERSION(at) === "affiliate-v11")
+    && await round.ALGORITHM_VERSION(at)==="unique-rank-v6" && await credits.WINNER_CREDITS_VERSION(at)===(await round.CONTRACT_VERSION(at)==="affiliate-v11"?"winner-credits-v7":"winner-credits-v6"),"reuse_provenance_changed");
   for(const contract of [factory,round,credits])ensure(getAddress(await contract.owner(at))===operator.address,"reuse_requires_original_owner");
   ensure(await provider.getCode(operator.address,block.number)==="0x","reuse_requires_plain_operator_wallet");
   const revealed=await round.revealed(at),refunded=await round.refundsAvailable(at);

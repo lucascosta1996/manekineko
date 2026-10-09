@@ -29,6 +29,7 @@ const knownCodes = new Map([
 export function dependencyErrorCode(error: unknown): string | undefined {
   if (!error || typeof error !== "object") return;
   const value = error as { message?: unknown; code?: unknown; error?: { code?: unknown }; info?: { error?: { code?: unknown } } };
+  if (typeof value.message === "string" && /^Winner-credit retirement: target 0x[0-9a-f]{40} can still mint; zero sponsorship does not retire it\.$/i.test(value.message)) return "previous_winner_credit_target_still_open";
   if (typeof value.message === "string" && knownMessages.has(value.message)) return knownMessages.get(value.message);
   if (typeof value.code === "string" && knownCodes.has(value.code)) return knownCodes.get(value.code);
   const rpcCode = value.error?.code ?? value.info?.error?.code;
@@ -65,7 +66,7 @@ export function safeErrorDiagnostic(error: unknown, depth = 0): Record<string, u
 export function publicErrorDiagnostic(value: unknown, depth = 0): Record<string, unknown> {
   if (!value || typeof value !== "object") return {};
   const input = value as Record<string, unknown>, result: Record<string, unknown> = {};
-  const codes = [...knownMessages.values(), ...knownCodes.values(), "rpc_rate_limited", "rpc_request_rejected_minus_32007", "rpc_request_rejected_minus_32005", "rpc_unknown_error_review_provider_and_saved_journal"];
+  const codes = [...knownMessages.values(), ...knownCodes.values(), "previous_winner_credit_target_still_open", "rpc_rate_limited", "rpc_request_rejected_minus_32007", "rpc_request_rejected_minus_32005", "rpc_unknown_error_review_provider_and_saved_journal"];
   if (typeof input.code === "string" && codes.includes(input.code)) result.code = input.code;
   if (typeof input.messageDigest === "string" && /^[a-f0-9]{64}$/.test(input.messageDigest)) result.messageDigest = input.messageDigest;
   if (typeof input.source === "string" && sourceFiles.some(file => input.source!.toString().startsWith(`${file}:`)) && /^[a-z-]+\.ts:\d+$/.test(input.source)) result.source = input.source;

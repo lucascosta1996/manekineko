@@ -39,7 +39,7 @@ const COLLECTION_QUERY = `
     COALESCE((SELECT jsonb_agg(jsonb_build_object('name',e.event_name,'transactionHash',e.transaction_hash,'at',e.block_timestamp) ORDER BY e.block_number,e.log_index)
       FROM manekineko_chain_events e WHERE e.collection_id=c.id AND e.block_number<=s.block_number AND e.event_name IN ('RandomnessRequested','RandomnessReceived','WinnerDetermined')), '[]'::jsonb) AS "drawEvents",
     COALESCE(s.refunded_count,0) AS "refundedCount",COALESCE(s.total_refunded_wei,0)::text AS "totalRefundedWei",
-    CASE WHEN c.contract_version IN ('affiliate-v7','affiliate-v8','affiliate-v9','affiliate-v10') AND s.phase='refundable' AND s.total_minted>0 AND s.refunded_count=s.total_minted
+    CASE WHEN c.contract_version IN ('affiliate-v7','affiliate-v8','affiliate-v9','affiliate-v10','affiliate-v11') AND s.phase='refundable' AND s.total_minted>0 AND s.refunded_count=s.total_minted
       THEN (SELECT max(e.block_timestamp)::text FROM manekineko_chain_events e WHERE e.collection_id=c.id AND e.event_name='Refunded') ELSE NULL END AS "refundedAt",
     COALESCE((SELECT SUM((e.arguments->>'amount')::numeric) FROM manekineko_chain_events e
       WHERE e.collection_id=c.id AND e.event_name='AffiliateCommissionClaimed'),0)::text AS "totalAffiliatePaidWei",

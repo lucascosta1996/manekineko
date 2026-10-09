@@ -27,7 +27,7 @@ export function RankedAwards({ collection, claim = false }: { collection: Collec
     // Restoring a durable intent must not request a wallet or submit a transaction.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [collection.id, collection.chainId, collection.contractAddress, collection.observation?.blockNumber]);
-  if (!["affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(collection.contractVersion) || !collection.awards?.length) return null;
+  if (!["affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(collection.contractVersion) || !collection.awards?.length) return null;
   async function target(): Promise<ContractTarget> {
     const response = await fetch(`/api/collections/${collection.id}/affiliates`, { cache: "no-store" });
     if (!response.ok) throw new Error("The collection deployment could not be verified. Try again shortly.");

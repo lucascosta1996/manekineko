@@ -157,3 +157,5 @@
  .affiliate-share-card { transition: none; }
  .affiliate-verification { transform: none; } }
 .affiliate-program-terms { padding-inline:var(--ui-card-padding); }
+
+.affiliate-referral-activity { margin-top: var(--ui-space-8); }

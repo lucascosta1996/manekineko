@@ -61,7 +61,7 @@ export function WebVisualFixture({ path = "/", state = "loaded" }: { path?: stri
     return <SiteShell section="docs" className="docs-shell"><div className="docs-layout"><DocsNavigation entries={docPages.map(docSearchEntry)} /><div className="docs-page"><DocsArticle page={page} /></div></div></SiteShell>;
   }
   if (path.endsWith("/contract")) return <ContractExperience collection={visualCollection} program={null} />;
-  const collection = state === "refundable" ? { ...visualCollection, phase: "refundable" as const, mintDeadline: "2026-09-27T00:00:00.000Z" } : state === "drawing" ? { ...visualCollection, totalMinted: 1000, totalMintRevenueWei: "10000000000000000000", phase: "awaiting_randomness" as const, randomnessState: "pending" as const, randomnessRequestId: "1" } : visualCollection;
+  const collection = state === "v11" ? { ...visualCollection, contractVersion:"affiliate-v11" as const, affiliatePayoutCapBps:0 } : state === "refundable" ? { ...visualCollection, phase: "refundable" as const, mintDeadline: "2026-09-27T00:00:00.000Z" } : state === "drawing" ? { ...visualCollection, totalMinted: 1000, totalMintRevenueWei: "10000000000000000000", phase: "awaiting_randomness" as const, randomnessState: "pending" as const, randomnessRequestId: "1" } : visualCollection;
   const section = path === "/history" ? "history" : path === "/prizes" ? "prizes" : path.startsWith("/nfts") || path === "/my-nfts" ? "nfts" : "seasons";
   let content;
   if (path === "/my-nfts") content = <NftGallery initialWallet={state === "wallet" || state === "empty" || state === "error" ? visualWallet : null} />;

@@ -95,9 +95,9 @@ export function MintExperience({
   const symbol = collection.nativeCurrency.symbol;
   const decimals = collection.nativeCurrency.decimals;
   const previewId = isDemo ? demo.minted || 1 : 1;
-  const permanent = collection.contractVersion === "affiliate-v10";
+  const permanent = (collection.contractVersion === "affiliate-v10" || collection.contractVersion === "affiliate-v11");
   const v2 = collection.algorithmVersion !== "feistel-v1";
-  const equalPrizes = (collection.contractVersion === "affiliate-v8" || collection.contractVersion === "affiliate-v9" || collection.contractVersion === "affiliate-v10");
+  const equalPrizes = (collection.contractVersion === "affiliate-v8" || collection.contractVersion === "affiliate-v9" || (collection.contractVersion === "affiliate-v10" || collection.contractVersion === "affiliate-v11"));
   const ranked = equalPrizes || collection.contractVersion === "affiliate-v7";
   const winners = equalPrizes ? collection.winnerCount! : 2;
   const v3 = collection.algorithmVersion === "unique-rank-v3" || ranked;

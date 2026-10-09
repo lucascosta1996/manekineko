@@ -1,12 +1,12 @@
 export type ChainBlock = { number: number; hash: string; timestamp: number };
 export type IndexerConfig = {
-  contractVersion: "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10";
+  contractVersion: "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10" | "affiliate-v11";
   databaseUrl: string; rpcUrl: string; chainId: number; factory: string; factoryCodeHash: string;
   confirmations: number; blockRange: number; maxBatches: number; maxCollections: number;
   timeBudgetMs: number; reconcileSeconds: number; leaseSeconds: number;
 };
 export type RegisteredCollection = {
-  contractVersion: "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10";
+  contractVersion: "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10" | "affiliate-v11";
   algorithmVersion: "unique-rank-v2" | "unique-rank-v3" | "unique-rank-v4" | "unique-rank-v5" | "unique-rank-v6";
   id: string; seriesId: string; chainId: number; roundId: string; name: string; symbol: string;
   seasonId?: string; seasonName?: string; collectionColor?: string; textColor?: string;

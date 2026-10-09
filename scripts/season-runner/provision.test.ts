@@ -36,6 +36,8 @@ test("runtime privileges expose only public schedules to Web and no authenticati
       await assert.rejects(() => client.query("SELECT encrypted_raw_transaction FROM manekineko_season_runtime_actions"), error => (error as { code?: string }).code === "42501");
       await client.query("RESET ROLE"); await client.query(`SET ROLE "${roles.workerRole}"`);
       await client.query("SELECT encrypted_credentials FROM manekineko_season_runtime_profiles");
+      await client.query("SELECT revision,status,prepared_artifact,content_hash,mock_catalog_order,(SELECT review_group FROM manekineko_season_review_members WHERE automation_id=$1) AS review_group FROM manekineko_launch_automations WHERE id=$1", [randomUUID()]);
+      await assert.rejects(() => client.query("DELETE FROM manekineko_season_review_members"), error => (error as { code?: string }).code === "42501");
       await client.query("SELECT * FROM manekineko_chain_events");
       await client.query("SELECT * FROM manekineko_collections FOR UPDATE");
       await client.query("SELECT * FROM manekineko_deployments FOR UPDATE");

@@ -26,7 +26,7 @@ export type AutomationPayload = {
 export type AutomationArtifact = {
   schemaVersion: 1;
   kind: "launch-automation";
-  contractVersion: "affiliate-v4" | "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10";
+  contractVersion: "affiliate-v4" | "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10" | "affiliate-v11";
 } & AutomationPayload;
 
 export type AutomationPlan = {
@@ -76,7 +76,7 @@ export class AutomationError extends LaunchConfigurationError {
 /** These observations must come from the future worker's confirmed chain index, not a browser request. */
 export type AutomationPreviousObservation = {
   /** Required by V6 before a resolved factory can be reused. */
-  contractVersion?: "affiliate-v4" | "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10";
+  contractVersion?: "affiliate-v4" | "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10" | "affiliate-v11";
   stepId: string;
   confirmed: boolean;
   soldOut: boolean;

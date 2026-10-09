@@ -11,11 +11,19 @@ test('mixed V8, V9 and V10 indexing retains independent exact factory/version/ha
   assert.equal(configs[0].chainId, 11155111); assert.equal(configs[1].chainId, 11155111);
 });
 test('mixed indexing fails closed on duplicate factories, missing pins, unsupported versions and cross-chain overrides', () => {
-  for (const pins of [[older, older], [{ ...current, factoryCodeHash: undefined }], [{ ...current, contractVersion: 'affiliate-v11' }], [{ ...current, chainId: 1 }], [], Array(9).fill(current)])
+  for (const pins of [[older, older], [{ ...current, factoryCodeHash: undefined }], [{ ...current, contractVersion: 'affiliate-v12' }], [{ ...current, chainId: 1 }], [], Array(9).fill(current)])
     assert.throws(() => readIndexerConfigs({ ...env, INDEXER_TRUSTED_FACTORIES_JSON: JSON.stringify(pins) }));
 });
 test('legacy single-factory configuration remains supported without fallback across versions', () => {
   const configs = readIndexerConfigs({ ...env, INDEXER_CONTRACT_VERSION: 'affiliate-v8', INDEXER_V8_TRUSTED_FACTORY: older.factory, INDEXER_V8_TRUSTED_FACTORY_CODEHASH: older.factoryCodeHash });
   assert.equal(configs.length, 1); assert.equal(configs[0].contractVersion, 'affiliate-v8');
   assert.throws(() => readIndexerConfigs({ ...env, INDEXER_CONTRACT_VERSION: 'affiliate-v9', INDEXER_V8_TRUSTED_FACTORY: older.factory, INDEXER_V8_TRUSTED_FACTORY_CODEHASH: older.factoryCodeHash }));
+});
+
+test('V11 indexing keeps independent sellout and refund factory pins alongside V10', () => {
+  const v11 = { ...current, contractVersion: 'affiliate-v11' };
+  const refund = { ...older, contractVersion: 'affiliate-v11' };
+  const configs = readIndexerConfigs({ ...env, INDEXER_TRUSTED_FACTORIES_JSON: JSON.stringify([permanent, v11, refund]) });
+  assert.deepEqual(configs.map(({ contractVersion, factory, factoryCodeHash }) => ({ contractVersion, factory, factoryCodeHash })), [permanent, v11, refund]);
+  assert.throws(() => readIndexerConfigs({ ...env, INDEXER_CONTRACT_VERSION: 'affiliate-v11', INDEXER_V10_TRUSTED_FACTORY: permanent.factory, INDEXER_V10_TRUSTED_FACTORY_CODEHASH: permanent.factoryCodeHash }));
 });

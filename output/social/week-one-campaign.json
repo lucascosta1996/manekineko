@@ -1,0 +1,90 @@
+{
+  "reference": "/Users/admin/Documents/workspace/manekineko/output/social/tincta-x-launch-v3-4k.png",
+  "method": "Built-in image generation, with 4096x4096 PNG exports if native generation is smaller.",
+  "days": [
+    {
+      "day": 2,
+      "slug": "how-it-works",
+      "copy": [
+        "Mint.",
+        "Sell out.",
+        "Draw.",
+        "Claim.",
+        "Draw after sellout. Winning holders claim directly."
+      ],
+      "layout": "Four large, beautifully aligned stacked stages. Discreet orange numbers 01, 02, 03, 04 beside the corresponding stage. Thin dividers make a clear sequence. The last copy sentence is a readable footer. Orange is used sparingly, not as large background blocks.",
+      "caption": "Mint activity moves the collection forward. Sellout unlocks the draw; after VRF fulfillment and draw finalization, winning NFT holders can claim directly from the contract. Draw requests and finalization are permissionless transactions. Claims require the holder's wallet action.",
+      "prompt": "Use case: ads-marketing. Edit the supplied approved Tincta poster into another image in the same official X account launch campaign. Output one finished square poster, preferably 4096 x 4096 or highest supported native square resolution. Preserve the compact lowercase drawn Tincta wordmark at the upper left (about 15% of canvas width), its letter geometry and natural proportions. White #FFFFFF canvas, near-black #111111 modern sans-serif typography, restrained #FF6600 accents. Match the reference's typography, margins and clear hierarchy. Clean editorial design with generous whitespace and precise alignment. Keep text readable on a phone, including qualifications. Do not overcrowd the poster. No photographic mockup, shadows, gradients, rounded app cards, coins, crypto rockets, badges, checkmarks implying audit, logos of other companies, domain names or handles. No Sepolia, testnet, preview or mock labels. Do not claim minting is currently live or add a date, countdown or mint CTA. Do not print the day number. Replace all previous promotional text with ONLY the exact copy specified for this image. Do not carry over the reference's 6 ETH or refund copy unless explicitly listed. Do not invent decorative thin-line artwork: any use of the existing orange ornament must preserve its clean smooth geometry and should be small and secondary.\nComposition: Four large, beautifully aligned stacked stages. Discreet orange numbers 01, 02, 03, 04 beside the corresponding stage. Thin dividers make a clear sequence. The last copy sentence is a readable footer. Orange is used sparingly, not as large background blocks.\nExact visible copy (preserve spelling and punctuation; line breaks can follow the specified hierarchy):\n\"Mint.\"\n\"Sell out.\"\n\"Draw.\"\n\"Claim.\"\n\"Draw after sellout. Winning holders claim directly.\""
+    },
+    {
+      "day": 3,
+      "slug": "refund-rights",
+      "copy": [
+        "Unsold at the deadline?",
+        "Claim the mint price back.",
+        "Current NFT holders can claim directly.",
+        "Refunded NFTs are burned. Gas is not refunded."
+      ],
+      "layout": "Two strong headline groups, with 'Claim the mint price back.' the dominant message. Use a small orange rule and the existing orange geometric ornament only as a quiet supporting detail. The two final sentences form an easily readable lower explanatory band separated by a fine line.",
+      "caption": "If a collection expires without selling out, its current NFT holders can claim the original mint price directly from the contract, without owner approval. Each refunded NFT is burned. The refund does not reimburse gas or a secondary-market purchase price. Sold-out collections do not qualify for this unsold refund.",
+      "prompt": "Use case: ads-marketing. Edit the supplied approved Tincta poster into another image in the same official X account launch campaign. Output one finished square poster, preferably 4096 x 4096 or highest supported native square resolution. Preserve the compact lowercase drawn Tincta wordmark at the upper left (about 15% of canvas width), its letter geometry and natural proportions. White #FFFFFF canvas, near-black #111111 modern sans-serif typography, restrained #FF6600 accents. Match the reference's typography, margins and clear hierarchy. Clean editorial design with generous whitespace and precise alignment. Keep text readable on a phone, including qualifications. Do not overcrowd the poster. No photographic mockup, shadows, gradients, rounded app cards, coins, crypto rockets, badges, checkmarks implying audit, logos of other companies, domain names or handles. No Sepolia, testnet, preview or mock labels. Do not claim minting is currently live or add a date, countdown or mint CTA. Do not print the day number. Replace all previous promotional text with ONLY the exact copy specified for this image. Do not carry over the reference's 6 ETH or refund copy unless explicitly listed. Do not invent decorative thin-line artwork: any use of the existing orange ornament must preserve its clean smooth geometry and should be small and secondary.\nComposition: Two strong headline groups, with 'Claim the mint price back.' the dominant message. Use a small orange rule and the existing orange geometric ornament only as a quiet supporting detail. The two final sentences form an easily readable lower explanatory band separated by a fine line.\nExact visible copy (preserve spelling and punctuation; line breaks can follow the specified hierarchy):\n\"Unsold at the deadline?\"\n\"Claim the mint price back.\"\n\"Current NFT holders can claim directly.\"\n\"Refunded NFTs are burned. Gas is not refunded.\""
+    },
+    {
+      "day": 4,
+      "slug": "six-prizes",
+      "copy": [
+        "6 winning NFTs.",
+        "1 ETH each.",
+        "Planned default per sold-out collection.",
+        "Final collection terms may vary."
+      ],
+      "layout": "Powerful headline '6 winning NFTs.' at the top of content area. Below it six equally sized precisely aligned outlined orange squares arranged in a 3 by 2 grid; put '1 ETH' inside EACH square, centered in near-black. The line '1 ETH each.' can be the supporting heading immediately above the grid. The final two sentences are the readable footer. No 3D tickets or embellished badges. The six repeated '1 ETH' labels are intentional additional exact text.",
+      "caption": "The planned default is 1,000 NFTs at 0.01 ETH, with six winning NFTs receiving 1 ETH each after sellout and draw finalization. Six winning NFTs can belong to fewer than six wallets. Minting does not guarantee a prize; review the final collection terms before participating.",
+      "prompt": "Use case: ads-marketing. Edit the supplied approved Tincta poster into another image in the same official X account launch campaign. Output one finished square poster, preferably 4096 x 4096 or highest supported native square resolution. Preserve the compact lowercase drawn Tincta wordmark at the upper left (about 15% of canvas width), its letter geometry and natural proportions. White #FFFFFF canvas, near-black #111111 modern sans-serif typography, restrained #FF6600 accents. Match the reference's typography, margins and clear hierarchy. Clean editorial design with generous whitespace and precise alignment. Keep text readable on a phone, including qualifications. Do not overcrowd the poster. No photographic mockup, shadows, gradients, rounded app cards, coins, crypto rockets, badges, checkmarks implying audit, logos of other companies, domain names or handles. No Sepolia, testnet, preview or mock labels. Do not claim minting is currently live or add a date, countdown or mint CTA. Do not print the day number. Replace all previous promotional text with ONLY the exact copy specified for this image. Do not carry over the reference's 6 ETH or refund copy unless explicitly listed. Do not invent decorative thin-line artwork: any use of the existing orange ornament must preserve its clean smooth geometry and should be small and secondary.\nComposition: Powerful headline '6 winning NFTs.' at the top of content area. Below it six equally sized precisely aligned outlined orange squares arranged in a 3 by 2 grid; put '1 ETH' inside EACH square, centered in near-black. The line '1 ETH each.' can be the supporting heading immediately above the grid. The final two sentences are the readable footer. No 3D tickets or embellished badges. The six repeated '1 ETH' labels are intentional additional exact text.\nExact visible copy (preserve spelling and punctuation; line breaks can follow the specified hierarchy):\n\"6 winning NFTs.\"\n\"1 ETH each.\"\n\"Planned default per sold-out collection.\"\n\"Final collection terms may vary.\""
+    },
+    {
+      "day": 5,
+      "slug": "direct-claims",
+      "copy": [
+        "Your prize.",
+        "Your claim.",
+        "No owner approval.",
+        "Winning NFT holders claim directly from the contract."
+      ],
+      "layout": "Oversized two-line headline 'Your prize.' and 'Your claim.' with strong typography. 'No owner approval.' below at a clear secondary size and a restrained orange underline. Keep the final explanatory sentence clearly readable in the footer. Optionally use a small unchanged orange reference ornament, but no shield or padlock, no fake contract screenshot and no flowchart.",
+      "caption": "Once the draw is finalized and a prize is available, the current holder of the winning NFT submits the claim directly to the contract. No team approval is required. This describes prize claims; it is not a claim that initial sale activation is owner-independent.",
+      "prompt": "Use case: ads-marketing. Edit the supplied approved Tincta poster into another image in the same official X account launch campaign. Output one finished square poster, preferably 4096 x 4096 or highest supported native square resolution. Preserve the compact lowercase drawn Tincta wordmark at the upper left (about 15% of canvas width), its letter geometry and natural proportions. White #FFFFFF canvas, near-black #111111 modern sans-serif typography, restrained #FF6600 accents. Match the reference's typography, margins and clear hierarchy. Clean editorial design with generous whitespace and precise alignment. Keep text readable on a phone, including qualifications. Do not overcrowd the poster. No photographic mockup, shadows, gradients, rounded app cards, coins, crypto rockets, badges, checkmarks implying audit, logos of other companies, domain names or handles. No Sepolia, testnet, preview or mock labels. Do not claim minting is currently live or add a date, countdown or mint CTA. Do not print the day number. Replace all previous promotional text with ONLY the exact copy specified for this image. Do not carry over the reference's 6 ETH or refund copy unless explicitly listed. Do not invent decorative thin-line artwork: any use of the existing orange ornament must preserve its clean smooth geometry and should be small and secondary.\nComposition: Oversized two-line headline 'Your prize.' and 'Your claim.' with strong typography. 'No owner approval.' below at a clear secondary size and a restrained orange underline. Keep the final explanatory sentence clearly readable in the footer. Optionally use a small unchanged orange reference ornament, but no shield or padlock, no fake contract screenshot and no flowchart.\nExact visible copy (preserve spelling and punctuation; line breaks can follow the specified hierarchy):\n\"Your prize.\"\n\"Your claim.\"\n\"No owner approval.\"\n\"Winning NFT holders claim directly from the contract.\""
+    },
+    {
+      "day": 6,
+      "slug": "read-the-rules",
+      "copy": [
+        "Check the rules.",
+        "Before you mint.",
+        "Mint price",
+        "Supply",
+        "Deadline",
+        "Prizes",
+        "Refunds"
+      ],
+      "layout": "Headline 'Check the rules.' then 'Before you mint.' at top. Five clean editorial checklist-style rows below, with discreet orange indices 01–05 and the exact labels Mint price, Supply, Deadline, Prizes, Refunds. Use thin horizontal rules, no green ticks or audit badges. Readable hierarchy and spacious alignment. No additional footer copy.",
+      "caption": "Before participating, review the exact collection's mint price, supply, deadline, prize allocation and refund conditions. Verify the network and contract address through the official project channels. Planned defaults are not a substitute for the deployed collection's actual terms.",
+      "prompt": "Use case: ads-marketing. Edit the supplied approved Tincta poster into another image in the same official X account launch campaign. Output one finished square poster, preferably 4096 x 4096 or highest supported native square resolution. Preserve the compact lowercase drawn Tincta wordmark at the upper left (about 15% of canvas width), its letter geometry and natural proportions. White #FFFFFF canvas, near-black #111111 modern sans-serif typography, restrained #FF6600 accents. Match the reference's typography, margins and clear hierarchy. Clean editorial design with generous whitespace and precise alignment. Keep text readable on a phone, including qualifications. Do not overcrowd the poster. No photographic mockup, shadows, gradients, rounded app cards, coins, crypto rockets, badges, checkmarks implying audit, logos of other companies, domain names or handles. No Sepolia, testnet, preview or mock labels. Do not claim minting is currently live or add a date, countdown or mint CTA. Do not print the day number. Replace all previous promotional text with ONLY the exact copy specified for this image. Do not carry over the reference's 6 ETH or refund copy unless explicitly listed. Do not invent decorative thin-line artwork: any use of the existing orange ornament must preserve its clean smooth geometry and should be small and secondary.\nComposition: Headline 'Check the rules.' then 'Before you mint.' at top. Five clean editorial checklist-style rows below, with discreet orange indices 01–05 and the exact labels Mint price, Supply, Deadline, Prizes, Refunds. Use thin horizontal rules, no green ticks or audit badges. Readable hierarchy and spacious alignment. No additional footer copy.\nExact visible copy (preserve spelling and punctuation; line breaks can follow the specified hierarchy):\n\"Check the rules.\"\n\"Before you mint.\"\n\"Mint price\"\n\"Supply\"\n\"Deadline\"\n\"Prizes\"\n\"Refunds\""
+    },
+    {
+      "day": 7,
+      "slug": "collector-questions",
+      "copy": [
+        "What would you verify",
+        "before minting?",
+        "The rules?",
+        "The contract?",
+        "The prize pool?",
+        "Tell us what you want explained next."
+      ],
+      "layout": "A clear, large two-line question at the top. Three readable short question lines below with orange typographic accents. Keep a generous white area between groups; the final invitation is a quiet footer. Could place one oversized orange question mark in the available right-side whitespace if it does not compete with the copy. No prizes or images of people, no engagement metrics, no giveaway cues.",
+      "caption": "What would you want to understand before minting a Tincta NFT: the draw, the refund conditions, the claim process, or something else? Tell us what needs a clearer explanation.",
+      "prompt": "Use case: ads-marketing. Edit the supplied approved Tincta poster into another image in the same official X account launch campaign. Output one finished square poster, preferably 4096 x 4096 or highest supported native square resolution. Preserve the compact lowercase drawn Tincta wordmark at the upper left (about 15% of canvas width), its letter geometry and natural proportions. White #FFFFFF canvas, near-black #111111 modern sans-serif typography, restrained #FF6600 accents. Match the reference's typography, margins and clear hierarchy. Clean editorial design with generous whitespace and precise alignment. Keep text readable on a phone, including qualifications. Do not overcrowd the poster. No photographic mockup, shadows, gradients, rounded app cards, coins, crypto rockets, badges, checkmarks implying audit, logos of other companies, domain names or handles. No Sepolia, testnet, preview or mock labels. Do not claim minting is currently live or add a date, countdown or mint CTA. Do not print the day number. Replace all previous promotional text with ONLY the exact copy specified for this image. Do not carry over the reference's 6 ETH or refund copy unless explicitly listed. Do not invent decorative thin-line artwork: any use of the existing orange ornament must preserve its clean smooth geometry and should be small and secondary.\nComposition: A clear, large two-line question at the top. Three readable short question lines below with orange typographic accents. Keep a generous white area between groups; the final invitation is a quiet footer. Could place one oversized orange question mark in the available right-side whitespace if it does not compete with the copy. No prizes or images of people, no engagement metrics, no giveaway cues.\nExact visible copy (preserve spelling and punctuation; line breaks can follow the specified hierarchy):\n\"What would you verify\"\n\"before minting?\"\n\"The rules?\"\n\"The contract?\"\n\"The prize pool?\"\n\"Tell us what you want explained next.\""
+    }
+  ]
+}

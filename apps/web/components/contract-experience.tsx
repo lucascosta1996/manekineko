@@ -1,4 +1,6 @@
 import { Icon } from "@manekineko/ui/icons";
+import v11Source from "@manekineko/contract-abi/round-v11-source";
+import eligibilityV6Source from "@manekineko/contract-abi/affiliate-eligibility-v6-source";
 import v10Source from "@manekineko/contract-abi/round-v10-source";
 import eligibilityV5Source from "@manekineko/contract-abi/affiliate-eligibility-v5-source";
 import v9Source from "@manekineko/contract-abi/round-v9-source";
@@ -21,20 +23,20 @@ import { contractSourceVersion, etherscanContractUrl } from "../lib/collections/
 
 import type { CollectionPublic } from "../lib/collections/model";
 import type { ProgramRecord } from "../lib/affiliates/repository";
-const sources = { V1: legacySource, V2: v2Source, V3: v3Source, V4: v4Source, V5: v5Source, V6: v6Source, V7: v7Source, V8: v8Source, V9: v9Source, V10: v10Source };
+const sources = { V1: legacySource, V2: v2Source, V3: v3Source, V4: v4Source, V5: v5Source, V6: v6Source, V7: v7Source, V8: v8Source, V9: v9Source, V10: v10Source, V11: v11Source };
 
 
 export function ContractExperience({ collection, program }: { collection: CollectionPublic; program: ProgramRecord | null }) {
-  const permanent = collection.contractVersion === "affiliate-v10";
+  const permanent = (collection.contractVersion === "affiliate-v10" || collection.contractVersion === "affiliate-v11");
   const v2 = collection.algorithmVersion !== "feistel-v1";
-  const v8 = (collection.contractVersion === "affiliate-v8" || collection.contractVersion === "affiliate-v9" || collection.contractVersion === "affiliate-v10");
+  const v8 = (collection.contractVersion === "affiliate-v8" || collection.contractVersion === "affiliate-v9" || (collection.contractVersion === "affiliate-v10" || collection.contractVersion === "affiliate-v11"));
   const v7 = v8 || collection.contractVersion === "affiliate-v7";
   const v3 = collection.algorithmVersion === "unique-rank-v3" || v7;
   const version = contractSourceVersion(collection);
   const explorerUrl = etherscanContractUrl(collection);
   const rankingName = v8 ? "MultiAwardRank" : v7 ? "AwardRank" : "UniqueRank";
-  const gateSource = permanent ? eligibilityV5Source : collection.contractVersion === "affiliate-v9" ? eligibilityV4Source : v8 ? eligibilityV3Source : v7 ? eligibilityV2Source : eligibilitySource;
-  const affiliateSource = program?.contractVersion === "affiliate-v10" ? v10Source : program?.contractVersion === "affiliate-v9" ? v9Source : program?.contractVersion === "affiliate-v8" ? v8Source : program?.contractVersion === "affiliate-v7" ? v7Source : program?.contractVersion === "affiliate-v6" ? v6Source : program?.contractVersion === "affiliate-v5" ? v5Source : program?.contractVersion === "affiliate-v4" ? v4Source : v3Source;
+  const gateSource = collection.contractVersion === "affiliate-v11" ? eligibilityV6Source : permanent ? eligibilityV5Source : collection.contractVersion === "affiliate-v9" ? eligibilityV4Source : v8 ? eligibilityV3Source : v7 ? eligibilityV2Source : eligibilitySource;
+  const affiliateSource = program?.contractVersion === "affiliate-v11" ? v11Source : program?.contractVersion === "affiliate-v10" ? v10Source : program?.contractVersion === "affiliate-v9" ? v9Source : program?.contractVersion === "affiliate-v8" ? v8Source : program?.contractVersion === "affiliate-v7" ? v7Source : program?.contractVersion === "affiliate-v6" ? v6Source : program?.contractVersion === "affiliate-v5" ? v5Source : program?.contractVersion === "affiliate-v4" ? v4Source : v3Source;
   const source = sources[version];
   const rendererSource = "rendererSource" in source ? source : affiliateSource;
   return (
@@ -52,7 +54,7 @@ export function ContractExperience({ collection, program }: { collection: Collec
         <p>{v7 ? "The contract protects unclaimed prizes and earned affiliate rewards. Eligible wallets claim directly to their chosen receiving address, without manual payout approval." : "This collection’s original contract determines its prizes, referral rewards and payment process. Review the version-specific rules below."}</p>
         <div className="source-deployment">
           <span className="source-version">{version} · {collection.networkName}</span>
-          <p>{permanent ? "This collection uses V10: permanent Solidity-generated numbers from mint, a separate post-sellout VRF draw, equal prizes and 20 cumulative primary mints per recipient wallet." : version === "V9"
+          <p>{collection.contractVersion === "affiliate-v11" ? "V11 shares the full affiliate budget equally at sellout among affiliates with at least one paid referral, without a referral-count payout cap. Permanent numbers, equal prizes and the 20-mint wallet limit remain unchanged." : permanent ? "This collection uses V10: permanent Solidity-generated numbers from mint, a separate post-sellout VRF draw, equal prizes and 20 cumulative primary mints per recipient wallet." : version === "V9"
             ? "This collection uses V9: equal prizes and a lifetime limit of 20 primary mints to each wallet in this collection. Paid, referral and sponsored mints share the same allowance; transferring NFTs does not reset it."
             : `This collection uses its original ${version} rules. The source and results below belong to this version; later architecture changes do not upgrade it.`}</p>
           {explorerUrl && <>
@@ -132,7 +134,7 @@ export function ContractExperience({ collection, program }: { collection: Collec
             Earned rewards become claimable at sellout; an unsold expiry voids pending rewards
             so holders can receive full mint-price refunds.
           </p>
-          {v7 && <p>Only affiliates with at least {program.minAffiliateReferrals} paid referrals qualify. The affiliate reward budget at sellout is up to {formatRewardAllocation(BigInt(program.mintPriceWei) * BigInt(program.maxSupply), program.affiliatePoolBps ?? 0)} ETH. Qualified affiliates earn equal rewards. The shared payout limit is {formatRewardAllocation(program.mintPriceWei, program.affiliatePayoutCapBps ?? 0)} ETH multiplied by the fewest paid referrals among qualified affiliates. Unfilled and unqualified positions receive nothing. The full budget is not guaranteed to be distributed; unallocated funds stay in a separate growth reserve.</p>}
+          {program.contractVersion === "affiliate-v11" ? <p>At sellout, the full affiliate budget is divided equally among affiliates with at least one paid referral. There is no referral-count payout cap. Empty positions and affiliates with no paid referrals receive nothing. Only the integer-division remainder, or the full pool when nobody qualifies, stays in the growth reserve.</p> : v7 && <p>Only affiliates with at least {program.minAffiliateReferrals} paid referrals qualify. The affiliate reward budget at sellout is up to {formatRewardAllocation(BigInt(program.mintPriceWei) * BigInt(program.maxSupply), program.affiliatePoolBps ?? 0)} ETH. Qualified affiliates earn equal rewards. The shared payout limit is {formatRewardAllocation(program.mintPriceWei, program.affiliatePayoutCapBps ?? 0)} ETH multiplied by the fewest paid referrals among qualified affiliates. Unfilled and unqualified positions receive nothing. The full budget is not guaranteed to be distributed; unallocated funds stay in a separate growth reserve.</p>}
           {(program.contractVersion === "affiliate-v5" || program.contractVersion === "affiliate-v6") && <p>The affiliate reward budget at sellout is up to {formatRewardAllocation(BigInt(program.mintPriceWei) * BigInt(program.maxSupply), program.affiliatePoolBps ?? 0)} ETH. At sellout, the contract allocates that pool proportionally to recorded referral sales. Unused positions earn zero; an unsold collection preserves full refunds. Enrollment signatures bind the exact position, pool terms, wallet and collection.</p>}
           {(program.contractVersion === "affiliate-v6" || v7) ? <>
             <p>After the first official collection on this network, enrollment also requires an NFT from any earlier completed official collection. {v7?"Ranked-prize sources qualify after sellout and reveal with all prizes protected; older sources follow their original completed and paid rules;":"Completed means sold out, revealed and paid its winner;"} the NFT itself does not have to be the winning ticket. Current-collection NFTs cannot qualify because enrollment closes before minting begins.</p>

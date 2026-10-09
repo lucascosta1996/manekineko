@@ -38,10 +38,8 @@ function fixture(){
   canonical:async()=>{if(!control.canonical)throw Error("reorg");},fund:async()=>false,send:async(wallet:Wallet,action:string,request:any)=>{calls.push({wallet:wallet.address,action,request});}};
  return{options,control,calls,iface,signer};
 }
-test("cohort enrollment waits for the human and signs one genuine NFT-bound bot permit with a stable intent",async()=>{
+test("cohort prepares bot slots without consuming the human slot and signs stable NFT-bound permits",async()=>{
  const f=fixture();f.control.manual=false;
- assert.equal((await enrollCohort(f.options))?.action,"manual-checkpoint");assert.equal(f.calls.length,0);
- f.control.manual=true;
  assert.equal((await enrollCohort(f.options))?.action,"enroll-cohort");assert.equal(f.calls.length,1);
  const call=f.iface.parseTransaction(f.calls[0].request)!;
  const [applicant,affiliateId,poolBps,sourceCollection,sourceTokenId,nonce,deadline,signature]=call.args;

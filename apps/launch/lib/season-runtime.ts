@@ -38,7 +38,7 @@ export function runtimeProfileInput(input: Record<string, unknown>) {
 }
 
 export function assertRuntimeArtifact(artifact: AutomationArtifact, now = new Date(), checkStart = true): void {
-  if (!["affiliate-v9", "affiliate-v10"].includes(artifact.contractVersion) || !artifact.seasonId || !artifact.timing || !artifact.steps.length || artifact.steps.some(step => launchContractVersion(step.payload) !== artifact.contractVersion || step.payload.contract.maxMintsPerWallet !== "20" || step.payload.contract.chainId !== artifact.chainId)) throw new AutomationError("runtime_version", "Season execution requires a prepared V9 or V10 season with consistent network and timing.", 422);
+  if (!["affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(artifact.contractVersion) || !artifact.seasonId || !artifact.timing || !artifact.steps.length || artifact.steps.some(step => launchContractVersion(step.payload) !== artifact.contractVersion || step.payload.contract.maxMintsPerWallet !== "20" || step.payload.contract.chainId !== artifact.chainId)) throw new AutomationError("runtime_version", "Season execution requires a prepared V9 or V10 season with consistent network and timing.", 422);
   if (checkStart && (!artifact.startAt || Date.parse(artifact.startAt) <= now.getTime())) throw new AutomationError("runtime_start", "The prepared first mint opening is already past. Prepare a fresh season with enough deployment and enrollment time.", 422);
   if (artifact.social?.enabled !== true) throw new AutomationError("runtime_social", "Enable X announcements in the season before preparing it for execution.", 422);
 }

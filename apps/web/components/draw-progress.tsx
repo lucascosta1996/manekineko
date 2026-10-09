@@ -31,7 +31,7 @@ export function DrawProgress({ collection }: { collection: CollectionPublic }) {
   return <section className="draw-progress" aria-label="Draw progress">
     <span className="lifecycle-badge" data-busy={fresh && stage.busy} role="status">{stage.label}</span>
     <p>Chainlink VRF supplies verifiable randomness for the draw. The contract then finalizes the winning tickets. Each winner claims their prize.</p>
-    <ol>{steps.map((label, i) => <li key={label} aria-current={i === position ? "step" : undefined}>{i <= position ? <Icon name="check" /> : <span aria-hidden="true">{i + 1}</span>}{label}</li>)}</ol>
+    <ol>{steps.map((label, i) => <li key={label} aria-current={i === position ? "step" : undefined}><span className="draw-step-marker" aria-hidden="true">{i <= position ? <Icon name="check" /> : "•"}</span><span>{label}</span></li>)}</ol>
     {collection.randomnessRequestId && <p>Request <code>{collection.randomnessRequestId}</code></p>}
     {collection.drawEvents?.map(event => <p key={event.name}><a href={`${collection.explorerUrl}/tx/${event.transactionHash}`} target="_blank" rel="noreferrer">{event.name} <Icon name="diagonal" /></a> · <time dateTime={event.at}>{new Date(event.at).toUTCString()}</time></p>)}
     <small>{fresh ? "Last indexed" : "Observation may be delayed"}: <time dateTime={collection.updatedAt}>{new Date(collection.updatedAt).toUTCString()}</time>. Unrecorded stages have no confirmed timestamp or ETA.</small>

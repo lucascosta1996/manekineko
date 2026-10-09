@@ -33,7 +33,7 @@ export async function readCollectionObservations(targets: CollectionObservationT
       while (next < targets.length) {
         const target = targets[next++];
         try {
-          if (Date.now() > deadline || !["affiliate-v9", "affiliate-v10"].includes(target.version)) throw Error();
+          if (Date.now() > deadline || !["affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(target.version)) throw Error();
           const address = getAddress(target.address);
           const call = async (name: string, args: unknown[] = []) => observationInterface.decodeFunctionResult(name, await rpc.send("eth_call", [{ to: address, data: observationInterface.encodeFunctionData(name, args) }, tag]))[0];
           const [version, roundId, phaseIndex, minted, circulating, supply, count, start, end, sold, paid, revealed, code] = await Promise.all([

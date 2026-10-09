@@ -3,7 +3,7 @@ import { LaunchBrand } from "../components/launch/brand";
 
 export default function NotFound() {
   return <main className="launch-login-shell launch-error-shell">
-    <div className="launch-login-brand"><a href="/dashboard" aria-label="Tincta home"><LaunchBrand decorative /></a><span className="launch-private-tag">Private workspace</span></div>
+    <div className="launch-login-brand"><a href="/dashboard" aria-label="Tincta Rewards home"><LaunchBrand decorative /></a><span className="launch-private-tag">Private workspace</span></div>
     <section className="launch-login-card launch-unavailable-card" aria-labelledby="not-found-title">
       <h1 id="not-found-title">Page not found.</h1>
       <p>This workspace page is unavailable. Open the dashboard to continue.</p>

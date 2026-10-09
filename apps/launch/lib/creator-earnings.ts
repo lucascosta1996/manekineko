@@ -30,8 +30,8 @@ export const earningsInterface = new Interface([
   "function growthReserveWithdrawn() view returns(uint256)",
   "event Withdrawn(address indexed recipient,uint256 amount)",
 ]);
-const supported = new Set(["affiliate-v3", "affiliate-v4", "affiliate-v5", "affiliate-v6", "affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10"]);
-const hasGrowth = new Set(["affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10"]);
+const supported = new Set(["affiliate-v3", "affiliate-v4", "affiliate-v5", "affiliate-v6", "affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"]);
+const hasGrowth = new Set(["affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"]);
 const unavailable = "Live balance unavailable. Refresh to retry; this collection is excluded from totals.";
 
 export function summarizeEarnings(rows: EarningsRow[]): EarningsReport["totals"] {

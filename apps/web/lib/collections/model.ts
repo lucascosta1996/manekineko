@@ -1,7 +1,7 @@
 import type { CollectionAward } from "./awards.ts";
 /** Public collection data. Wei and uint256 identifiers always cross JSON as strings. */
 export interface CollectionPublic {
-  contractVersion: "legacy" | "affiliate-v3" | "affiliate-v4" | "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10";
+  contractVersion: "legacy" | "affiliate-v3" | "affiliate-v4" | "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10" | "affiliate-v11";
   winnerCount?: number | null; secondPrizeBps?: number | null; minAffiliateReferrals?: number | null; affiliatePayoutCapBps?: number | null;
   saleStartAt?: string | null; soldOutAt?: string | null; revealedAt?: string | null;
   awards?: CollectionAward[]; allPrizesPaid?: boolean;

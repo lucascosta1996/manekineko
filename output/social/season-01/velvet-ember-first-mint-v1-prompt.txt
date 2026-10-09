@@ -1,0 +1,23 @@
+Use case: ads-marketing.
+Edit the supplied approved Tincta poster into the official Season 01 first NFT mint announcement. Deliver a single finished square graphic, highest available native square resolution, preferably 4096 x 4096.
+
+Reference roles:
+Image 1 is the existing approved campaign poster. Preserve its restrained editorial visual family: compact lowercase Tincta wordmark at upper left, white canvas, near-black bold modern sans-serif type, large reward amount, precise alignment, generous margins, readable footer.
+Image 2 is the real Velvet Ember geometric motif: exact #330000 deep-red background, white 16-layer four-petal cubic linework. Use this intact as the only artwork insert. Preserve its clean continuous curves and original proportions, no hand-drawn kinks, random crossings, broken curves or blurry linework. It contains no token or result labels.
+Image 3 is the canonical wordmark reference: preserve the path-drawn lowercase letter shapes and aspect ratio. Keep the logo compact, about 15% of the poster width, as in Image 1.
+
+Replace every existing promotional sentence from Image 1 with the exact announcement copy below. No orange: this announcement uses deep red #330000 as its only accent, with white and near-black #111111.
+Composition: small brand signature top-left; restrained uppercase season kicker below; strong large 'Velvet Ember' title with season name underneath. The middle features the largest text, '6 ETH', with 'in prizes' immediately below, and a clean rectangular #330000 artwork panel to its right containing the white supplied geometric motif. Under this main row, place the supply/mint-price line. Give the timing line 'Mint date to be announced' its own clear, prominent space. A fine horizontal rule separates the two readable footer lines. No gradients, glow, shadows, 3D mockups, rounded UI cards, coins, badges, Ethereum symbols, texture or extra ornaments. All copy stays outside the artwork panel.
+
+Exact visible text, preserving case, spelling, punctuation and values:
+'SEASON 01 · FIRST MINT'
+'Velvet Ember'
+'Crimson & Blood Orange'
+'6 ETH'
+'in prizes'
+'1,000 NFTs · 0.01 ETH each'
+'Mint date to be announced'
+'Six winning NFTs. 1 ETH each after sellout.'
+'Planned terms. Final collection terms may vary.'
+
+Do not add any other copy, URL, handle, date or countdown. No 'Mint is live', 'Mint now', Sepolia, testnet, TGE, score, revealed, token numbers, or claims of current live availability. This is a real official account announcement of the forthcoming first collection, with timing honestly unannounced. Make every word sharp and comfortably legible on a phone, including the footer. Deliver only the finished square poster.

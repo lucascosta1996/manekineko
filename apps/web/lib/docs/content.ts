@@ -196,14 +196,15 @@ export const docPages: DocPage[] = [
         { type: "paragraph", text: "A URL is a way to carry an affiliate ID to the mint page, not an entitlement to money by itself. Changing it cannot create an unregistered position or change the contract’s payout terms. Buyers should check the displayed referral before signing; sharing a link does not guarantee that a buyer keeps its attribution." },
       ] },
       { id: "how-the-pool-is-shared", title: "How the pool is shared", blocks: [
-        { type: "paragraph", text: "Only enrolled affiliates who reach the collection’s published minimum number of paid referred tickets qualify. At sellout, all qualified affiliates receive an equal allocation, subject to a common payout cap. Empty positions and enrolled affiliates below the minimum receive nothing." },
+        { type: "callout", title: "V11: the full pool is shared equally", text: "At sellout, every affiliate with at least one paid referral receives the full affiliate budget divided by the number of qualifying affiliates. There is no referral-count payout cap. With a 2 ETH pool, one qualifying affiliate receives 2 ETH; five receive 0.4 ETH each. Additional referrals do not increase an individual share. Affiliates with no paid referrals receive nothing. Equal integer shares can leave less than one wei per qualifying affiliate; if nobody qualifies, the full pool remains unallocated." },
+        { type: "paragraph", text: "For historical V7–V10 collections, only enrolled affiliates who reach the collection’s published minimum number of paid referred tickets qualify. At sellout, all qualified affiliates receive an equal allocation, subject to a common payout cap. Empty positions and enrolled affiliates below the minimum receive nothing." },
         { type: "table", columns: ["Step", "Calculation"], rows: [
           ["Pool", "The collection’s configured affiliate allocation from primary mint receipts."],
           ["Uncapped equal share", "The pool divided by the number of qualified affiliates."],
           ["Common cap", "The collection’s ETH limit per qualifying referral multiplied by the fewest paid referrals among qualified affiliates."],
           ["Each qualified affiliate’s payout", "The smaller of the uncapped equal share and the common cap."],
         ] },
-        { type: "paragraph", text: "If four affiliates qualify, each receives the same allocation. The common cap still applies, so qualification does not guarantee that the entire pool is distributed. Check the collection’s referral minimum and payout cap, then use your final claimable balance to see what you have earned." },
+        { type: "paragraph", text: "In those historical capped collections, if four affiliates qualify, each receives the same allocation. The common cap still applies, so qualification does not guarantee that the entire pool is distributed. Check the collection’s referral minimum and payout cap, then use your final claimable balance to see what you have earned." },
         { type: "paragraph", text: "The growth reserve is not an affiliate entitlement or automatically enforced future spending. After reveal, the owner can release it through a separate recorded withdrawal. Earlier collections may use proportional pools or individual referral rates instead of this qualified-equal model." },
       ] },
       { id: "withdraw-your-allocation", title: "Claim your affiliate rewards", blocks: [
@@ -284,7 +285,7 @@ export const docPages: DocPage[] = [
     sections: [
       { id: "network-and-contract", title: "Start with the network and address", blocks: [
         { type: "paragraph", text: "Open the contract details from the collection page and use its explorer link. Confirm the network and contract address before comparing balances, ownership or results. A token ID identifies an NFT only together with its contract and network." },
-        { type: "paragraph", text: "Read CONTRACT_VERSION and ALGORITHM_VERSION before interpreting the numbers. V10 reports affiliate-v10 and unique-rank-v6; V9 reports affiliate-v9 and unique-rank-v5. The version on the deployed contract is authoritative. Older collections intentionally expose different interfaces and rules. Source verification on an explorer lets you inspect the deployed code; it is not the same as an independent security audit." },
+        { type: "paragraph", text: "Read CONTRACT_VERSION and ALGORITHM_VERSION before interpreting the numbers. V11 reports affiliate-v11 and unique-rank-v6 and uses the full equal affiliate pool. V10 reports affiliate-v10 and unique-rank-v6; V9 reports affiliate-v9 and unique-rank-v5. The version on the deployed contract is authoritative. Older collections intentionally expose different interfaces and rules. Source verification on an explorer lets you inspect the deployed code; it is not the same as an independent security audit." },
       ] },
       { id: "useful-contract-reads", title: "Useful contract reads", blocks: [
         { type: "table", columns: ["What to check", "Contract read"], rows: [
@@ -331,7 +332,7 @@ export const docPages: DocPage[] = [
         { type: "callout", title: "Why does a collection show a different winner count?", text: "Six equal prizes is the default. The V10 design permits one to ten distinct winning NFTs, fixed before deployment and bounded by supply. Earlier collections retain their original award counts and terms." },
       ] },
       { id: "affiliates-and-balances", title: "Affiliates and balances", blocks: [
-        { type: "callout", title: "Does enrolling guarantee a reward?", text: "No. You must meet the collection’s paid-referral minimum, and it must sell out. Qualified affiliates then receive the equal allocation allowed by the pool and common cap." },
+        { type: "callout", title: "Does enrolling guarantee a reward?", text: "No. You must meet the collection’s paid-referral minimum, and it must sell out. In V11, affiliates with at least one paid referral share the full pool equally at sellout. Earlier collections retain their published minimum and payout cap." },
         { type: "callout", title: "Why is enrollment unavailable or not configured?", text: "The enrollment service or required network configuration may be unavailable, or the collection may no longer accept enrollment. This is different from an on-chain reward balance being zero. Existing earned claims follow the contract’s rules independently." },
         { type: "callout", title: "What does Refresh balances do?", text: "It rereads the displayed enrollment, referral and reward information. It does not spend gas, submit a claim or change your account’s entitlement." },
         { type: "callout", title: "Can I enroll using an NFT from the same collection?", text: "Not under the current holder-gated program. Enrollment closes at the scheduled mint opening, and eligibility normally requires an NFT from an earlier qualifying official collection." },
@@ -385,7 +386,7 @@ export const docPages: DocPage[] = [
           ["Affiliate position", "A collection-specific enrolled wallet and referral ID."],
           ["Attributed referral", "A paid mint that records an enrolled affiliate ID on-chain."],
           ["Qualification minimum", "The paid referred-ticket threshold an affiliate must reach to share the current pool."],
-          ["Common payout cap", "The shared maximum used to keep qualified affiliates’ final payments equal and within the configured referral-based limit."],
+          ["Historical common payout cap", "Used in V7–V10 only. The shared maximum used to keep qualified affiliates’ final payments equal and within the configured referral-based limit."],
           ["Growth reserve", "The separately tracked affiliate budget left unallocated after qualification, caps and rounding."],
           ["Indexer", "A service that reads chain events and updates the website’s database."],
           ["Explorer", "An external website for viewing addresses, contract code, transactions and events."],

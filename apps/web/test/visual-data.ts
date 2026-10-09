@@ -59,7 +59,7 @@ export function webVisualResponse(path: string, state = "loaded"): unknown {
   if (url.pathname === "/api/clock") return { now: visualNow };
   if (url.pathname === "/api/collections") return { collections: state === "empty" ? [] : [visualCollection] };
   if (url.pathname === `/api/collections/${visualCollection.id}`) return { collection: visualCollection };
-  if (url.pathname.endsWith("/affiliates")) return { program: visualProgram };
+  if (url.pathname.endsWith("/affiliates")) return { program: state === "v11" ? {...visualProgram,contractVersion:"affiliate-v11",affiliatePayoutCapBps:0} : visualProgram };
   if (url.pathname === "/api/seasons/schedules") return { seasons: [] };
   if (url.pathname === "/api/history") return { source: "postgres", isMock: false, collections: state === "empty" ? [] : [visualArchive], inProgress: [], stats: calculateHistoryStats(state === "empty" ? [] : [visualArchive]) };
   if (url.pathname === "/api/nfts") return { wallet: (url.searchParams.get("wallet") ?? visualWallet).toLowerCase(), page: Number(url.searchParams.get("page") ?? 1), pageSize: 12, view: url.searchParams.get("view") ?? "minted", status: url.searchParams.get("status") ?? "all", items: state === "empty" ? [] : [visualNft], total: state === "empty" ? 0 : 1, hasMore: false, stats: state === "empty" ? { minted: 0, held: 0, ongoing: 0, completed: 0 } : { minted: 1, held: 1, ongoing: 1, completed: 0 }, updatedAt: visualNow };

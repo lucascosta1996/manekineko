@@ -21,7 +21,7 @@ function verifyWinningCombination(c: RegisteredCollection, s: NonNullable<Commit
 export function collection(row: Record<string, any>): RegisteredCollection {
   return { contractVersion: row.contract_version, algorithmVersion: row.algorithm_version, id: row.id, seriesId: row.series_id, chainId: Number(row.chain_id), roundId: String(row.round_id), name: row.name, symbol: row.symbol,
     ...(row.season_id ? { seasonId: row.season_id, seasonName: row.season_name, collectionColor: row.collection_color, textColor: row.text_color } : {}),
-    ...(["affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(row.contract_version) ? { winnerCount: row.winner_count, secondPrizeBps: row.second_prize_bps, minAffiliateReferrals: row.min_affiliate_referrals, affiliatePayoutCapBps: row.affiliate_payout_cap_bps, saleStartAt: new Date(row.sale_start_at).getTime() / 1000 } : {}),
+    ...(["affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(row.contract_version) ? { winnerCount: row.winner_count, secondPrizeBps: row.second_prize_bps, minAffiliateReferrals: row.min_affiliate_referrals, affiliatePayoutCapBps: row.affiliate_payout_cap_bps, saleStartAt: new Date(row.sale_start_at).getTime() / 1000 } : {}),
     maxSupply: row.max_supply, mintPrice: String(row.mint_price_wei), prizeBps: row.prize_bps, affiliatePoolBps: row.affiliate_pool_bps,
     address: row.contract_address, factory: row.factory_address, deploymentTransaction: row.transaction_hash,
     deploymentBlock: Number(row.deployment_block), deployedAt: date(row.deployed_at), mintDeadline: new Date(row.mint_deadline).getTime() / 1000,
@@ -39,7 +39,7 @@ export class PostgresIndexerStore implements IndexerStore {
       LEFT JOIN manekineko_indexer_checkpoints i ON i.collection_id=c.id
       WHERE c.chain_id=$1 AND c.contract_version=$4 AND c.algorithm_version=$5
         AND d.status='deployed' AND d.factory_address=$2 AND p.mode='live' AND p.contract_version=c.contract_version
-      ORDER BY i.last_attempt_at ASC NULLS FIRST,c.created_at,c.id LIMIT $3`, [config.chainId, config.factory, config.maxCollections, config.contractVersion, config.contractVersion === "affiliate-v10" ? "unique-rank-v6" : (config.contractVersion === "affiliate-v8" || config.contractVersion === "affiliate-v9") ? "unique-rank-v5" : config.contractVersion === "affiliate-v7" ? "unique-rank-v4" : config.contractVersion === "affiliate-v6" ? "unique-rank-v3" : "unique-rank-v2"]);
+      ORDER BY i.last_attempt_at ASC NULLS FIRST,c.created_at,c.id LIMIT $3`, [config.chainId, config.factory, config.maxCollections, config.contractVersion, (config.contractVersion === "affiliate-v10" || config.contractVersion === "affiliate-v11") ? "unique-rank-v6" : (config.contractVersion === "affiliate-v8" || config.contractVersion === "affiliate-v9") ? "unique-rank-v5" : config.contractVersion === "affiliate-v7" ? "unique-rank-v4" : config.contractVersion === "affiliate-v6" ? "unique-rank-v3" : "unique-rank-v2"]);
     return result.rows.map(collection);
   }
   async acquire(c: RegisteredCollection, owner: string, leaseSeconds: number): Promise<Checkpoint | null> {
@@ -108,7 +108,7 @@ export class PostgresIndexerStore implements IndexerStore {
         let winner: Record<string, string> | null = null;
         let status: 'completed' | 'refunded' | null = null;
         let revealedAt: string | null = null;
-        if (['affiliate-v7','affiliate-v8','affiliate-v9','affiliate-v10'].includes(c.contractVersion)) {
+        if (['affiliate-v7','affiliate-v8','affiliate-v9','affiliate-v10', "affiliate-v11"].includes(c.contractVersion)) {
           const awards = s.awards ?? [];
           ensure(awards.length === (s.winningTokenId === null ? 0 : awardCount(c)), 'winner_accounting_mismatch');
           await client.query('DELETE FROM manekineko_collection_awards WHERE collection_id=$1', [c.id]);
@@ -154,7 +154,7 @@ export class PostgresIndexerStore implements IndexerStore {
         // Rebuild the terminal projection together with the source snapshot, so an orphan winner never remains visible.
         await client.query('DELETE FROM manekineko_history_winners WHERE collection_id=$1', [c.id]);
         await client.query('DELETE FROM manekineko_collection_history WHERE id=$1 AND NOT is_mock', [c.id]);
-        if (status && !["affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(c.contractVersion)) {
+        if (status && !["affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(c.contractVersion)) {
           await client.query(`INSERT INTO manekineko_collection_history(id,series_id,chain_id,round_id,name,symbol,max_supply,total_minted,mint_price_wei,total_refunded_wei,
             status,opened_at,closed_at,is_mock,algorithm_version,randomness_provider,contract_version,prize_bps,affiliate_pool_bps)
             VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,false,$16,'chainlink-vrf-v2.5',$17,$14,$15)`,

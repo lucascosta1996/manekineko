@@ -104,17 +104,17 @@ export function validateOnChainSvg(svg: string): void {
   if (roots !== 1 || stack.length || svg.slice(offset).trim()) fail();
 }
 
-export function decodeOnChainMetadata(tokenUri: unknown, contractVersion: "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10" = "affiliate-v5"): DecodedMetadata {
+export function decodeOnChainMetadata(tokenUri: unknown, contractVersion: "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10" | "affiliate-v11" = "affiliate-v5"): DecodedMetadata {
   try {
-    if (contractVersion !== "affiliate-v5" && contractVersion !== "affiliate-v6" && contractVersion !== "affiliate-v7" && (contractVersion !== "affiliate-v8" && contractVersion !== "affiliate-v9" && contractVersion !== "affiliate-v10")) return fail();
+    if (contractVersion !== "affiliate-v5" && contractVersion !== "affiliate-v6" && contractVersion !== "affiliate-v7" && (contractVersion !== "affiliate-v8" && contractVersion !== "affiliate-v9" && (contractVersion !== "affiliate-v10" && contractVersion !== "affiliate-v11"))) return fail();
     const data: unknown = JSON.parse(decodeDataUri(tokenUri, "data:application/json;base64,", 131072));
     if (!data || typeof data !== "object" || Array.isArray(data)) return fail();
     const item = data as Record<string, unknown>;
     if (typeof item.name !== "string" || !item.name.length || item.name.length > 256
       || typeof item.description !== "string" || item.description.length > 4096
-      || item.contract_version !== contractVersion || item.algorithm_version !== (contractVersion === "affiliate-v10" ? "unique-rank-v6" : (contractVersion === "affiliate-v8" || contractVersion === "affiliate-v9") ? "unique-rank-v5" : contractVersion === "affiliate-v7" ? "unique-rank-v4" : contractVersion === "affiliate-v6" ? "unique-rank-v3" : "unique-rank-v2")
+      || item.contract_version !== contractVersion || item.algorithm_version !== ((contractVersion === "affiliate-v10" || contractVersion === "affiliate-v11") ? "unique-rank-v6" : (contractVersion === "affiliate-v8" || contractVersion === "affiliate-v9") ? "unique-rank-v5" : contractVersion === "affiliate-v7" ? "unique-rank-v4" : contractVersion === "affiliate-v6" ? "unique-rank-v3" : "unique-rank-v2")
       || item.randomness_provider !== "chainlink-vrf-v2.5" || !Array.isArray(item.attributes) || item.attributes.length > 32) return fail();
-    if (contractVersion === "affiliate-v10" && (item.artwork_version !== "tincta-v3" || item.combination_generation !== "solidity-permutation-v1"
+    if ((contractVersion === "affiliate-v10" || contractVersion === "affiliate-v11") && (item.artwork_version !== "tincta-v3" || item.combination_generation !== "solidity-permutation-v1"
       || item.season_id === undefined || ["score", "status", "award_rank", "prize_amount_wei"].some(key => key in item))) return fail();
     validateOnChainSvg(decodeDataUri(item.image, "data:image/svg+xml;base64,", 65536));
     const names = new Set<string>();
@@ -128,7 +128,7 @@ export function decodeOnChainMetadata(tokenUri: unknown, contractVersion: "affil
     });
     let appearance: Partial<SeasonAppearance> = {};
     if (item.season_id !== undefined) {
-      if ((contractVersion !== "affiliate-v6" && contractVersion !== "affiliate-v7" && (contractVersion !== "affiliate-v8" && contractVersion !== "affiliate-v9" && contractVersion !== "affiliate-v10")) || typeof item.collection_name !== "string" || !item.collection_name.length
+      if ((contractVersion !== "affiliate-v6" && contractVersion !== "affiliate-v7" && (contractVersion !== "affiliate-v8" && contractVersion !== "affiliate-v9" && (contractVersion !== "affiliate-v10" && contractVersion !== "affiliate-v11"))) || typeof item.collection_name !== "string" || !item.collection_name.length
         || new TextEncoder().encode(item.collection_name).length > 80) return fail();
       appearance = normalizeSeasonAppearance({ seasonId: item.season_id, seasonName: item.season_name, collectionColor: item.collection_color, textColor: item.text_color });
       if (item.background_color !== appearance.collectionColor?.slice(1)) return fail();
@@ -138,9 +138,9 @@ export function decodeOnChainMetadata(tokenUri: unknown, contractVersion: "affil
 }
 
 /** Permanent identities are available from mint; final scores are independently verified chain state. */
-export function verifyMetadataNumbers(metadata: DecodedMetadata, revealed: boolean, combination: readonly unknown[] | null, maxSupply: number, options: { contractVersion: "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10"; decodedScore?: bigint } = { contractVersion: "affiliate-v5" }): Pick<NftMetadata, "numbers" | "score"> {
+export function verifyMetadataNumbers(metadata: DecodedMetadata, revealed: boolean, combination: readonly unknown[] | null, maxSupply: number, options: { contractVersion: "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10" | "affiliate-v11"; decodedScore?: bigint } = { contractVersion: "affiliate-v5" }): Pick<NftMetadata, "numbers" | "score"> {
   const attrs = new Map(metadata.attributes.map(value => [value.trait_type, value.value]));
-  if (!revealed && options.contractVersion !== "affiliate-v10") {
+  if (!revealed && (options.contractVersion !== "affiliate-v10" && options.contractVersion !== "affiliate-v11")) {
     if (combination !== null || attrs.size !== 1 || !["Sealed", "Refundable"].includes(String(attrs.get("Status")))) return fail();
     return { numbers: null, score: null };
   }
@@ -150,7 +150,7 @@ export function verifyMetadataNumbers(metadata: DecodedMetadata, revealed: boole
     || typeof combination[1] !== "bigint" || typeof combination[2] !== "bigint") return fail();
   const numbers = raw.map(Number) as [number, number, number, number];
   const code = (numbers[0] - 1) * 4096 + (numbers[1] - 1) * 256 + (numbers[2] - 1) * 16 + numbers[3] - 1;
-  if (options.contractVersion === "affiliate-v10") {
+  if ((options.contractVersion === "affiliate-v10" || options.contractVersion === "affiliate-v11")) {
     if (BigInt(code) !== combination[1] || attrs.size !== 5
       || ["A", "B", "C", "D"].some((key, index) => attrs.get(key) !== numbers[index])
       || attrs.get("Combination code") !== code) return fail();

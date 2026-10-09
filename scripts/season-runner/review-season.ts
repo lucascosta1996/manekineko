@@ -1,3 +1,6 @@
+import { createVersionedChainAdapter } from "./chain.ts";
+import { launchContractVersion } from "../../apps/launch/lib/launch-config.ts";
+import { seasonVersionPolicy } from "./version.ts";
 import { resolve, dirname } from "node:path";
 import { pathToFileURL } from "node:url";
 import { spawn } from "node:child_process";
@@ -17,6 +20,7 @@ import { encryptRuntimeSecret, decryptRuntimeSecret } from "../../apps/launch/li
 import { ensureSepoliaWallets, donorWallets } from "./sepolia-wallets.ts";
 import { ChainPendingError, type ChainJournal } from "./chain-transactions.ts";
 import { REVIEW_REUSE_POLICY, REVIEW_REUSE_CAP_WEI, reviewReuseStep, type ReviewReuseState } from "./review-fund-reuse.ts";
+import { resolveFirstReviewCohort } from "./review-bootstrap.ts";
 import { reviewFundingCheck, readReviewRpc } from "./review-funding.ts";
 
 export function reviewArguments(args: string[]) {
@@ -38,6 +42,8 @@ async function main() {
   const config=preparationEnvironment(),pool=new pg.Pool({connectionString:config.launchDatabaseUrl,max:2,connectionTimeoutMillis:10000});
   const workerPool=new pg.Pool({connectionString:config.databaseUrl,max:1,connectionTimeoutMillis:10000}),provider=new JsonRpcProvider(config.rpcUrl,undefined,{cacheTimeout:-1});
   try {
+    // Exercise the worker's restricted read before freezing a run-day opening.
+    await workerPool.query("SELECT revision,status,prepared_artifact,content_hash,mock_catalog_order,(SELECT review_group FROM manekineko_season_review_members WHERE automation_id=$1) AS review_group FROM manekineko_launch_automations WHERE id=$1", [stage.automationId]);
     ensure((await readReviewRpc(()=>provider.getNetwork())).chainId===11155111n,"review_rpc_is_not_sepolia");
     ensure(stage.automationId,"review_draft_not_saved");
     if(args.execute)for(const later of review.stages.slice(args.stage)){
@@ -47,6 +53,7 @@ async function main() {
       ensure(!runtime.run&&!await readPrivateFile(reusePath,true),"review_stage_already_handed_off");
     }
     const saved=await getLaunchAutomation(pool,stage.automationId);
+    ensure(!saved.supersededBy,"review_run_superseded");
     if(review.schemaVersion===2){
       ensure(isDeepStrictEqual(saved.reviewGroup, {seasonId:stage.plan.seasonId, seasonName:stage.plan.name, stages:review.stages.map(s=>({automationId:s.automationId,collectionId:s.plan.steps[0].id,name:s.plan.steps[0].payload.contract.name,color:s.plan.steps[0].payload.contract.collectionColor}))}), "review_group_not_saved");
     }else ensure(!args.execute,"legacy_review_superseded_use_grouped_manifest");
@@ -60,7 +67,31 @@ async function main() {
     const factory=getAddress(payload.operations.factoryAddress), head=await readReviewRpc(()=>provider.getBlock("latest")), block=head&&await readReviewRpc(()=>provider.getBlock(head.number-config.confirmations+1));
     ensure(head&&block?.hash&&Math.abs(Date.now()/1000-head.timestamp)<180,"review_requires_fresh_chain");
     const codeHash=keccak256(await readReviewRpc(()=>provider.getCode(factory,block.number)));
-    ensure(trustedFactoryPin(11155111,"affiliate-v10",factory)?.factoryCodeHash===codeHash,"review_web_factory_configuration_not_ready");
+    ensure(trustedFactoryPin(11155111,seasonVersionPolicy(process.env.SEASON_REVIEW_CONTRACT_VERSION ?? "affiliate-v10").contractVersion,factory)?.factoryCodeHash===codeHash,"review_web_factory_configuration_not_ready");
+    // Verify registry lineage before assigning a mint opening or queuing a run.
+    // A still-open prior destination must not strand a frozen 30-minute schedule.
+    if (launchContractVersion(payload) === "affiliate-v11") {
+      const adapter=await createVersionedChainAdapter({...config,chainId:11155111,execute:false,privateKey:undefined,saveJournal:async()=>{}},"affiliate-v11");
+      try { await adapter.preflight(); } finally { adapter.destroy(); }
+    }
+    if(review.firstCollectionBootstrap && args.stage===1){
+      const registry=new Contract(config.eligibility.address,["function collectionCount() view returns(uint256)","function collections(address) view returns(address,uint256,uint256,bytes32,bool)"],provider);
+      const runtime=await getSeasonRuntime(pool,stage.automationId);
+      if(!runtime.run)ensure(await registry.collectionCount({blockTag:block.number})===0n,"review_requires_unused_bootstrap_registry");
+      else {const first=await openRunStore(workerPool,runtime.run.id,11155111,false);try{const round=first.state.collections?.[stage.scenario.collectionId]?.deployment?.round;if(round)ensure((await registry.collections(round,{blockTag:block.number}))[2]===1n,"review_first_collection_not_bootstrap");}finally{await first.close();}}
+    }
+    if(review.cohortFromFirstCollection && args.stage===3){
+      const firstRuntime=await getSeasonRuntime(pool,review.stages[0].automationId!);ensure(firstRuntime.run,"first_review_collection_not_started");
+      const first=await openRunStore(workerPool,firstRuntime.run.id,11155111,false);
+      try{const deployment=first.state.collections?.[review.stages[0].scenario.collectionId]?.deployment;
+        ensure(deployment&&stage.scenario.kind==="manual-affiliate-sellout"&&stage.scenario.affiliateCohort,"first_review_cohort_source_missing");
+        const cohort=await resolveFirstReviewCohort(provider,deployment,stage.scenario.affiliateCohort,{number:block.number,hash:block.hash});
+        const existing=await getSeasonRuntime(pool,stage.automationId);
+        ensure(!existing.run||isDeepStrictEqual(cohort,stage.scenario.affiliateCohort),"prepared_review_cohort_changed");
+        stage.scenario.affiliateCohort=cohort;
+        if(args.execute&&!existing.run)await writePrivateFile(args.manifest,JSON.stringify(review,null,2));
+      }finally{await first.close();}
+    }
     if(args.stage===2)ensure(factory.toLowerCase()!==review.stages[0].plan.steps[0].payload.operations.factoryAddress.toLowerCase(),"refund_requires_dedicated_factory");
     if(args.stage>1){
       const previous=review.stages[args.stage-2];ensure(previous.automationId,"previous_review_draft_missing");
@@ -81,7 +112,7 @@ async function main() {
           const targetRuntime=await getSeasonRuntime(pool,stage.automationId);
           ensure(!targetRuntime.run||reuseState.completed,"reuse_must_finish_before_next_run");
           const wallets=await ensureSepoliaWallets({chainId:11155111,path:args.vault,masterKey:Buffer.from(process.env.SEASON_RUNNER_MASTER_KEY??"","base64").toString("hex"),create:false});
-          const sourceFactory=item.deployment.factory,sourcePin=trustedFactoryPin(11155111,"affiliate-v10",sourceFactory);
+          const sourceFactory=item.deployment.factory,sourcePin=trustedFactoryPin(11155111,stage.plan.steps[0].payload.contract.affiliatePayoutCapBps === "0" ? "affiliate-v11" : "affiliate-v10",sourceFactory);
           ensure(sourcePin,"reuse_previous_factory_not_trusted");
           const source={runId:runtime.run.id,preparedHash:store.row.prepared_hash,nextCollectionId:stage.scenario.collectionId,
             round,roundId:String(item.deployment.roundId),roundCodeHash:item.deployment.roundCodeHash,factory:sourceFactory,factoryCodeHash:sourcePin.factoryCodeHash,
@@ -108,13 +139,14 @@ async function main() {
     // An existing run already spent its initial capital and keeps its frozen clock.
     if(review.fundReuse===REVIEW_REUSE_POLICY && !(await getSeasonRuntime(pool,stage.automationId)).run){
       const wallets=await ensureSepoliaWallets({chainId:11155111,path:args.vault,masterKey:Buffer.from(process.env.SEASON_RUNNER_MASTER_KEY??"","base64").toString("hex"),create:false});
-      const funding=await reviewFundingCheck(provider,stage,[config.owner,...donorWallets().map(w=>w.address),...wallets.map(w=>w.address)],config.confirmations);
+      const funding=await reviewFundingCheck(provider,stage,[config.owner,...donorWallets().map(w=>w.address),...wallets.map(w=>w.address),...(stage.scenario.kind==="manual-affiliate-sellout"?[stage.scenario.affiliateWallet,stage.scenario.buyerWallet]:[])],config.confirmations);
       process.stdout.write(`${JSON.stringify({stage:args.stage,funding})}\n`);
       ensure(funding.fundingPass,"review_funding_insufficient_before_new_opening");
     }
     const startAt=reviewPreparationStartAt(review,saved.status);
     const result=await prepareSepoliaRun(pool,{automationId:stage.automationId,envFiles:args.envFiles,execute:args.execute,help:false,reviewSeasonId:stage.plan.seasonId,...(startAt?{startAt}:{})},config);
     process.stdout.write(`${JSON.stringify({stage:args.stage,...result,...("collections" in result?{executionCollections:result.collections,collections:review.stages.length}:{}),seasonId:stage.plan.seasonId,collectionName:payload.contract.name,fundReuse:review.fundReuse??"disabled",
+      ...(review.firstCollectionBootstrap?{firstCollectionEligibility:"bootstrap-no-prior-nft"}:{}),
       ...(review.mintOpeningDelaySeconds?{mintOpeningDelaySeconds:review.mintOpeningDelaySeconds,enrollmentWindowSeconds:Number(payload.operations.enrollmentWindowSeconds)}:{}),
       ...(review.fundReuse?{reuseTiming:"After prior claims/refunds and before preparing the next opening",reuseTransferCapWei:REVIEW_REUSE_CAP_WEI}:{})},null,2)}\n`);
     if(!args.execute)return;

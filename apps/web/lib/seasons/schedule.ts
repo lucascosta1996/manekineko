@@ -71,8 +71,8 @@ export function announcedCollectionActivity(season: AnnouncedSeason, collection:
   if (season.status === "paused" || season.status === "failed") return { label: "Season automation paused", target: null, detail: "New launch events are paused. Existing on-chain mint and claim terms remain in effect." };
   if (season.status === "completed") return { label: "Worker finished", target: null, detail: "Explore each collection’s verified results and remaining claims. Worker completion is separate from prize payment." };
   if (!observationFresh(collection.observedAt ?? season.updatedAt, now)) return {
-    label: collection.saleStartAt && Date.parse(collection.saleStartAt) > now ? "Mint scheduled in" : "Checking season status",
-    target: collection.saleStartAt && Date.parse(collection.saleStartAt) > now ? collection.saleStartAt : null,
+    label: collection.enrollmentOpensAt && Date.parse(collection.enrollmentOpensAt) > now ? "Affiliate enrollment scheduled in" : collection.saleStartAt && Date.parse(collection.saleStartAt) > now ? "Mint scheduled in" : "Checking season status",
+    target: collection.enrollmentOpensAt && Date.parse(collection.enrollmentOpensAt) > now ? collection.enrollmentOpensAt : collection.saleStartAt && Date.parse(collection.saleStartAt) > now ? collection.saleStartAt : null,
     detail: "The announced schedule remains visible. Readiness is unconfirmed until a fresh observation; reaching zero does not open minting.",
   };
   if (["refundable","sold_out","revealed"].includes(collection.status)) return { label: collection.status === "refundable" ? "Refunds available" : collection.status === "sold_out" ? "Sold out · draw pending" : "Draw verified", target: null, detail: "View the collection for current blockchain state and available actions." };

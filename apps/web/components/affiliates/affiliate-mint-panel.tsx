@@ -18,8 +18,10 @@ import { scheduledMintRecheckDelay } from "../../lib/affiliates/scheduled-mint";
 import { AffiliateWindow } from "../collection-activity";
 import { WalletOpenAction } from "./wallet-open-action";
 import { WalletAccountPicker } from "./wallet-account-picker";
+import { checkMintBalance } from "../../lib/affiliates/mint-balance";
 
 export function AffiliateMintPanel({ collection, referralQuery, onReferralBlocked, onLiveContractVerified, children }: { collection: CollectionPublic; referralQuery: ReferralQuery; onReferralBlocked: (blocked: boolean) => void; onLiveContractVerified: (verified: boolean) => void; children: ReactNode }) {
+  const feedback = useRef<HTMLDivElement>(null);
   const [program, setProgram] = useState<AffiliateProgram | null>(null);
   const [referral, setReferral] = useState<AffiliateReferral | null>(null);
   const [referralError, setReferralError] = useState("");
@@ -29,7 +31,10 @@ export function AffiliateMintPanel({ collection, referralQuery, onReferralBlocke
   const [choosingAccount, setChoosingAccount] = useState(false);
   const [receiptHash, setReceiptHash] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessageValue] = useState("");
+  const [messageError, setMessageError] = useState(false);
+  function setMessage(value: string, error = false) { setMessageValue(value); setMessageError(error); }
+  useEffect(() => { if (message) feedback.current?.scrollIntoView({ block: "nearest", behavior: "instant" }); }, [message]);
   const [journal, setJournal] = useState<TransactionJournal | null>(null);
   const [recoveryHash, setRecoveryHash] = useState("");
   const [refresh, setRefresh] = useState(0);
@@ -41,7 +46,7 @@ export function AffiliateMintPanel({ collection, referralQuery, onReferralBlocke
   const hasReferral = referralQuery.affiliate !== undefined || referralQuery.collection !== undefined;
   const live = program?.mode === "live" && !!program.contractAddress;
   const remaining = program ? program.maxSupply - program.totalMinted : 0;
-  const capped = (program?.contractVersion === "affiliate-v9" || program?.contractVersion === "affiliate-v10");
+  const capped = (program?.contractVersion === "affiliate-v9" || (program?.contractVersion === "affiliate-v10" || program?.contractVersion === "affiliate-v11"));
   const walletRemaining = wallet && allowance?.wallet === wallet.address && allowance.contract === program?.contractAddress ? allowance.remaining : null;
   const maxQuantity = Math.min(collection.maxMintBatch, 20, remaining, capped && wallet ? walletRemaining ?? 0 : 20);
   const validQuantity = Number.isSafeInteger(quantity) && quantity > 0 && quantity <= maxQuantity;
@@ -93,7 +98,7 @@ export function AffiliateMintPanel({ collection, referralQuery, onReferralBlocke
   useEffect(() => {
     if (!program || program.mode !== "live" || !program.contractAddress) return;
     try { setJournal(readTransaction({ chainId: program.chainId, contractAddress: program.contractAddress }, "mint")); }
-    catch (cause) { setMessage(walletError(cause)); setReferralError("The previous transaction record needs attention before minting."); }
+    catch (cause) { setMessage(walletError(cause), true); setReferralError("The previous transaction record needs attention before minting."); }
   }, [program?.mode, program?.chainId, program?.contractAddress]);
   useEffect(() => {
     if (!wallet) return;
@@ -122,13 +127,14 @@ export function AffiliateMintPanel({ collection, referralQuery, onReferralBlocke
   async function run(work: () => Promise<void>) {
     if (inFlight.current) return;
     inFlight.current = true; setBusy(true); setMessage("");
-    try { await work(); } catch (cause) { setMessage(walletError(cause)); }
+    try { await work(); } catch (cause) { setMessage(walletError(cause), true); }
     finally { setBusy(false); inFlight.current = false; }
   }
   async function mint() {
     await run(async () => {
       if (!program?.readiness.canMint || !target || !wallet || !validQuantity || journal || loading || referralError || (hasReferral && !referral) || selfReferral) throw new Error("Check the collection, wallet and referral details before minting.");
       const contract = await verifiedRound(wallet, target);
+      checkMintBalance(await wallet.provider.getBalance(wallet.address, "pending"), total, target.chainId);
       if (capped && BigInt(quantity) > await contract.remainingMints(wallet.address)) throw new Error("This collection allows 20 primary mints per wallet in total. Refresh your remaining allowance before minting.");
       if (referral) {
         if (referral.mode !== "live" || !referral.mintReady || referral.contractVersion !== target.contractVersion || referral.prizeBps !== target.prizeBps || referral.chainId !== target.chainId || referral.contractAddress.toLowerCase() !== target.contractAddress.toLowerCase()) throw new Error("The referral is not valid for this live collection.");
@@ -143,7 +149,7 @@ export function AffiliateMintPanel({ collection, referralQuery, onReferralBlocke
       setReceiptHash(receipt.hash);
       setJournal(null); setMessage(`${quantity === 1 ? "Your ticket was" : "Your tickets were"} minted on-chain. Your wallet holds the NFT${quantity === 1 ? "" : "s"}.`); if (referral) setMessage(`Mint confirmed. ${quantity} ticket(s) were attributed to affiliate ${referral.affiliateWallet}. Commission follows the collection qualification and sellout rules.`); setRefresh((value) => value + 1);
     });
-    if (target) { try { setJournal(readTransaction(target, "mint")); } catch (cause) { setMessage(walletError(cause)); } }
+    if (target) { try { setJournal(readTransaction(target, "mint")); } catch (cause) { setMessage(walletError(cause), true); } }
   }
   async function reconcile() {
     await run(async () => {
@@ -156,21 +162,21 @@ export function AffiliateMintPanel({ collection, referralQuery, onReferralBlocke
   return <>
     {program?.mode === "live" && !program.saleActivated && !program.soldOut && !program.refundable && <AffiliateWindow program={program} canLink />}
     {hasReferral && <div className={`mint-referral-note ${referralError ? "mint-referral-error" : ""}`} role="status" aria-live="polite">
-      {loading ? <p>Verifying this collection’s referral…</p> : referralError ? <><strong>We could not verify this referral.</strong><p>{referralError}</p><Link className="ui-text-action ui-text-action-standalone" href={`/mint/${collection.id}`}>Open collection without a referral <Icon name="arrow" /></Link></> : referral && <><strong>{referral.mode === "demo" ? "Example referral" : "Verified affiliate"} · Position #{referral.affiliateId}</strong><p>{(["affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(referral.contractVersion ?? "")) ? <>This mint counts toward the affiliate rewards of <span title={referral.affiliateWallet}>{shortWallet(referral.affiliateWallet)}</span>. Only qualifying affiliates share equally at sellout, subject to the published payout cap.</> : (referral.contractVersion === "affiliate-v5" || referral.contractVersion === "affiliate-v6") ? <>This purchase counts toward <span title={referral.affiliateWallet}>{shortWallet(referral.affiliateWallet)}</span>’s share of the collection affiliate pool. Their payout depends on all referred sales and becomes final at sellout.</> : <>{formatRewardAllocation(collection.mintPriceWei, referral.commissionBps)} ETH per paid ticket is allocated to <span title={referral.affiliateWallet}>{shortWallet(referral.affiliateWallet)}</span>.</>} This is included in the price and does not reduce the collection’s configured prize.</p><code>{referral.affiliateWallet}</code>{referral.mode === "demo" && <p>This is a demo link. No payment or affiliate reward is generated.</p>}{selfReferral && <p>You cannot refer your own registered wallet. <Link className="ui-text-action ui-text-action-standalone" href={`/mint/${collection.id}`}>Buy without a referral <Icon name="arrow" /></Link></p>}</>}
+      {loading ? <p>Verifying this collection’s referral…</p> : referralError ? <><strong>We could not verify this referral.</strong><p>{referralError}</p><Link className="ui-text-action ui-text-action-standalone" href={`/mint/${collection.id}`}>Open collection without a referral <Icon name="arrow" /></Link></> : referral && <><strong>{referral.mode === "demo" ? "Example referral" : "Verified affiliate"} · Position #{referral.affiliateId}</strong><p>{(["affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(referral.contractVersion ?? "")) ? <>This mint counts toward the affiliate rewards of <span title={referral.affiliateWallet}>{shortWallet(referral.affiliateWallet)}</span>. {referral.contractVersion === "affiliate-v11" ? "At sellout, affiliates with at least one paid referral share the full affiliate budget equally, with no referral-count payout cap." : "Only qualifying affiliates share equally at sellout, subject to the published payout cap."}</> : (referral.contractVersion === "affiliate-v5" || referral.contractVersion === "affiliate-v6") ? <>This purchase counts toward <span title={referral.affiliateWallet}>{shortWallet(referral.affiliateWallet)}</span>’s share of the collection affiliate pool. Their payout depends on all referred sales and becomes final at sellout.</> : <>{formatRewardAllocation(collection.mintPriceWei, referral.commissionBps)} ETH per paid ticket is allocated to <span title={referral.affiliateWallet}>{shortWallet(referral.affiliateWallet)}</span>.</>} This is included in the price and does not reduce the collection’s configured prize.</p><code>{referral.affiliateWallet}</code>{referral.mode === "demo" && <p>This is a demo link. No payment or affiliate reward is generated.</p>}{selfReferral && <p>You cannot refer your own registered wallet. <Link className="ui-text-action ui-text-action-standalone" href={`/mint/${collection.id}`}>Buy without a referral <Icon name="arrow" /></Link></p>}</>}
     </div>}
     {live ? <form noValidate className="mint-form" onSubmit={(event) => { event.preventDefault(); void mint(); }}>
       <div className="quantity-row"><label htmlFor="live-ticket-quantity">Your tickets<span>{!capped && <>Up to {collection.maxMintBatch} per mint · </>}{Math.max(0, remaining)} remaining</span></label><div className="quantity-control"><IconButton variant="secondary" type="button" aria-label="Decrease ticket quantity" disabled={busy || quantity <= 1} onClick={() => setQuantity(Math.max(1, quantity - 1))}><Icon name="minus" /></IconButton><input className="ui-input" id="live-ticket-quantity" aria-invalid={!validQuantity && maxQuantity > 0} aria-describedby={!validQuantity && maxQuantity > 0 ? "live-quantity-error" : undefined} type="number" inputMode="numeric" min={1} max={Math.max(1, maxQuantity)} step={1} value={Number.isFinite(quantity) ? quantity : ""} onChange={(event) => setQuantity(event.target.value === "" ? 0 : Number(event.target.value))} disabled={busy || remaining <= 0} /><IconButton variant="secondary" type="button" aria-label="Increase ticket quantity" disabled={busy || quantity >= maxQuantity} onClick={() => setQuantity(Math.min(maxQuantity, quantity + 1))}><Icon name="plus" /></IconButton></div></div>
       {!validQuantity && maxQuantity > 0 && <p id="live-quantity-error" className="ui-field-error" role="alert">Choose 1–{maxQuantity} tickets.</p>}
       <div className="total-row"><span>Mint total</span><strong>{formatWei(total)} ETH</strong></div>
       {capped && <div className="mint-allowance"><details className="ui-disclosure"><summary>Up to 20 mints per wallet.<Icon name="chevron" className="ui-disclosure-icon" /></summary><p>Paid, referral and sponsored tickets share this allowance. Transfers and refunds do not reset it.</p></details>{wallet && <p> {allowanceError || (walletRemaining === null ? "Checking your allowance…" : `${walletRemaining} of 20 mints remaining for this wallet.`)} <TextAction busy={busy} type="button" disabled={busy} onClick={() => setRefresh(value => value + 1)}>Refresh allowance</TextAction></p>}</div>}
-      {referral && <div className="mint-referral-total"><span>{(referral.contractVersion === "affiliate-v5" || (referral.contractVersion === "affiliate-v6" || referral.contractVersion === "affiliate-v7" || (referral.contractVersion === "affiliate-v8" || referral.contractVersion === "affiliate-v9" || referral.contractVersion === "affiliate-v10"))) ? "Included affiliate funding" : "Included affiliate reward"}</span><strong>{formatWei((total * BigInt(referral.commissionBps)) / 10_000n)} ETH</strong></div>}
+      {referral && <div className="mint-referral-total"><span>{(referral.contractVersion === "affiliate-v5" || (referral.contractVersion === "affiliate-v6" || referral.contractVersion === "affiliate-v7" || (referral.contractVersion === "affiliate-v8" || referral.contractVersion === "affiliate-v9" || (referral.contractVersion === "affiliate-v10" || referral.contractVersion === "affiliate-v11")))) ? "Included affiliate funding" : "Included affiliate reward"}</span><strong>{formatWei((total * BigInt(referral.commissionBps)) / 10_000n)} ETH</strong></div>}
       {wallet && <p className="mint-wallet-label">{wallet.providerName ?? "Connected wallet"} · Minting to <strong title={wallet.address}>{shortWallet(wallet.address)}</strong> · {collection.networkName} <TextAction busy={busy} type="button"  disabled={busy} onClick={()=>{setWallet(null);setChoosingAccount(true);}}>Switch wallet or account</TextAction></p>}
       {choosingAccount && <WalletAccountPicker chainId={program.chainId} purpose="mint" onConnected={next=>{setWallet(next);setChoosingAccount(false);setMessage("Wallet connected. Review the mint and referral before confirming.");}} onCancel={()=>setChoosingAccount(false)}/>}
       {!wallet ? <Button reserveLabels={["Connect wallet to mint", "Connecting…", "Check your wallet…", "Wallet mint limit reached", "Choose a valid ticket quantity"]} busy={busy} icon={<Icon name="diagonal" />} iconPosition="end" variant="primary" type="button" className="mint-button" disabled={busy || loading || !!referralError || !program.readiness.canMint} onClick={() => setChoosingAccount(true)}><span>{busy ? "Connecting…" : !program.readiness.canMint ? mintClosedLabel : "Connect wallet to mint"}</span></Button> : <Button reserveLabels={["Connect wallet to mint", "Connecting…", "Check your wallet…", "Wallet mint limit reached", "Choose a valid ticket quantity"]} busy={busy} icon={<Icon name="diagonal" />} iconPosition="end" variant="primary" className="mint-button" type="submit" disabled={busy || loading || !validQuantity || !program.readiness.canMint || !!journal || !!referralError || selfReferral || (hasReferral && !referral)}><span>{busy ? "Check your wallet…" : !program.readiness.canMint ? mintClosedLabel : remaining <= 0 ? "Collection sold out" : capped && walletRemaining === 0 ? "Wallet mint limit reached" : !validQuantity ? "Choose a valid ticket quantity" : `Mint ${quantity === 1 ? "ticket" : `${quantity} tickets`}`}</span></Button>}
       <p className="transaction-note">{program.readiness.canMint ? "Ethereum transaction · network fee is additional." : mintClosedReason}</p>
       {referralError && <div className="mint-referral-note" role="alert">{!hasReferral && <p>{referralError}</p>}<TextAction busy={busy} type="button"  disabled={busy || loading} onClick={() => setRefresh((value) => value + 1)}>Check availability again</TextAction></div>}
       {journal && <div className="mint-referral-note"><strong>Check the previous mint before continuing.</strong><p>{journal.hash || "The wallet submission result is unknown. Check your wallet activity."}</p>{journal.hash && <a className="ui-text-action ui-text-action-standalone" target="_blank" rel="noreferrer" href={`${program.chainId === 1 ? "https://etherscan.io" : "https://sepolia.etherscan.io"}/tx/${journal.hash}`}>View transaction <Icon name="diagonal" /></a>}<div className="mint-recovery"><label htmlFor="mint-recovery-hash">Transaction hash from your wallet</label><input className="ui-input" id="mint-recovery-hash" value={recoveryHash} onChange={(event) => setRecoveryHash(event.target.value)} placeholder="0x…" autoComplete="off" spellCheck={false} disabled={busy} /><p>The wallet, collection, action, amount and nonce must match the original mint.</p></div><TextAction busy={busy} type="button"  onClick={() => void reconcile()} disabled={busy || !wallet}>Check receipt</TextAction></div>}
-      <div className="mint-feedback" role="status" aria-live="polite">{message && <p>{message}</p>}{busy&&journal&&!journal.hash&&<WalletOpenAction provider={wallet?.injected}/>} {receiptHash&&<a href={`${program.chainId===1?"https://etherscan.io":"https://sepolia.etherscan.io"}/tx/${receiptHash}`} target="_blank" rel="noreferrer">View mint receipt</a>}</div>
+      <div ref={feedback} className="mint-feedback" data-status={messageError ? "error" : undefined} role={messageError ? "alert" : "status"} aria-live={messageError ? "assertive" : "polite"} aria-atomic="true">{message && <p>{message}</p>}{busy&&journal&&!journal.hash&&<WalletOpenAction provider={wallet?.injected}/>} {receiptHash&&<a href={`${program.chainId===1?"https://etherscan.io":"https://sepolia.etherscan.io"}/tx/${receiptHash}`} target="_blank" rel="noreferrer">View mint receipt</a>}</div>
     </form> : collection.mode === "live" ? <div className="mint-form">
       <Button variant="primary" className="mint-button" type="button" disabled><span>{collection.phase === "pending_activation" ? progress.label : loading ? "Checking mint availability…" : "Minting unavailable"}</span></Button>
       <p className="transaction-note">{progress.detail}</p>

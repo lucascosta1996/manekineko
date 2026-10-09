@@ -132,6 +132,13 @@ test("persistent run store preserves locks, encrypted recovery, outbox metadata 
     assert.equal(completed.status, "completed"); assert.equal(completed.desired_state, "paused"); assert.equal(completed.last_error, "late_claim_monitor_paused");
     const completedProjection = (await pool.query("SELECT payload,updated_at FROM manekineko_season_runtime_public WHERE run_id=$1", [run.id])).rows[0];
     assert.equal(completedProjection.payload.status, "completed"); assert.equal(completedProjection.updated_at.toISOString(), observedAt);
+    await store.close(); store = undefined;
+    await pool.query("INSERT INTO manekineko_sepolia_app_archive(entity_type,entity_id) VALUES('run',$1),('automation',$2)", [run.id, run.automationId]);
+    assert.equal((await worker.query("SELECT id FROM manekineko_season_runtime_runs WHERE id=$1", [run.id])).rowCount, 0);
+    assert.equal((await worker.query("SELECT payload FROM manekineko_season_runtime_public WHERE run_id=$1", [run.id])).rowCount, 0);
+    assert.equal((await pool.query("SELECT id FROM manekineko_season_runtime_runs WHERE id=$1", [run.id])).rowCount, 1);
+    assert.equal((await worker.query("SELECT id FROM manekineko_season_runtime_runs WHERE id=$1", [otherRun.id])).rowCount, 1);
+    await assert.rejects(() => worker.query("DELETE FROM manekineko_sepolia_app_archive"), (e: any) => e.code === "42501");
   } finally {
     await store?.close(); await worker?.end(); await pool?.end();
     if (created) await admin.query(`DROP DATABASE ${databaseName}`);

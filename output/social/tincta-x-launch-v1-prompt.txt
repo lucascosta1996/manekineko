@@ -1,0 +1,22 @@
+Use case: ads-marketing.
+Edit and expand the supplied Tincta wordmark image into one polished square 2048 x 2048 official X/Twitter account introduction poster. Image 1 is the canonical brand wordmark to preserve exactly, including its distinctive drawn lowercase geometry and proportions. Image 2 is a supporting insert: existing orange Tincta artwork; use only a clean crop of its central four-petal geometric linework as a small supporting visual, preserving its exact linework and orange #FF6600. Do not reproduce the artwork's season, collection or token labels. This is a finished public brand campaign image, not a browser screenshot or mockup.
+
+Art direction: restrained, exceptionally well typeset Swiss editorial campaign. Pure white background, near-black #111111 typography, authentic #FF6600 artwork accent. Strong aligned grid, generous whitespace and generous outer margins, sharp vector-like edges. No gradients, shadows, rounded UI cards, 3D effects, coins, Ethereum diamonds, gold, rockets, trust badges, financial charts, ornamental stickers, watermarks, or extra copy.
+
+Composition: small canonical Tincta wordmark at top left with ample clear space. Under it, a strong two-line headline. The middle is dominated by the enormous number and currency '6 ETH', with 'Up to' immediately above and 'in prizes per collection.' immediately below so the words form a single offer. Put the orange geometric-art crop beside the reward amount, much smaller than the amount, without interfering with the typography. Below, the direct-claim statement. At the bottom, a thin quiet rule and a clearly readable two-line qualification. Typography is clean modern sans-serif, confident but calm, with careful optical spacing. The promise and qualification must be legible on a phone. Do not use tiny disclaimer text.
+
+Render exactly these texts, with these roles, verbatim:
+Top headline:
+'100% onchain reward'
+'and refund rules.'
+Main reward group:
+'Up to'
+'6 ETH'
+'in prizes per collection.'
+Lower statement:
+'Claim directly. No owner approval.'
+Footer:
+'Planned prize pool at sellout.'
+'Mint-price refunds if unsold at the deadline.'
+
+Do not add Sepolia, testnet, test ETH, mock, prelaunch or preview labels. Do not add a mint CTA, launch date, website URL, account handle or claim that Mainnet minting is currently live. The poster introduces the official brand and its planned rules. All promotional typography must be outside the orange artwork crop. Preserve the actual supplied wordmark, not a font approximation. Deliver only the finished square graphic.

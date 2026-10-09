@@ -1,10 +1,11 @@
 import type { CollectionPublic } from "./model.ts";
 
-export type SourceVersion = "V1" | "V2" | "V3" | "V4" | "V5" | "V6" | "V7" | "V8" | "V9" | "V10";
+export type SourceVersion = "V1" | "V2" | "V3" | "V4" | "V5" | "V6" | "V7" | "V8" | "V9" | "V10" | "V11";
 
 /** The deployed collection, never an affiliate preview, selects its source. */
 export function contractSourceVersion(collection: Pick<CollectionPublic, "contractVersion" | "algorithmVersion">): SourceVersion {
   switch (collection.contractVersion) {
+    case "affiliate-v11": return "V11";
     case "affiliate-v10": return "V10";
     case "affiliate-v9": return "V9";
     case "affiliate-v8": return "V8";

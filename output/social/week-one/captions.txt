@@ -1,0 +1,51 @@
+Tincta — X account launch, Days 2–7
+Suggested captions. These are drafts for manual posting; no posts have been published.
+
+DAY 2 — how-it-works
+Image: day-02-how-it-works-4k.png
+
+Mint. Sell out. Draw. Claim.
+
+Sellout unlocks the draw. After VRF fulfillment and finalization, winning NFT holders can claim directly from the contract. Draw progression needs transactions; claims need the holder’s wallet action.
+
+
+DAY 3 — refund-rights
+Image: day-03-refund-rights-4k.png
+
+Unsold at the deadline? Current NFT holders can claim the original mint price directly, without owner approval.
+
+Refunded NFTs are burned. Gas and secondary-market purchase prices are not refunded. This refund applies only to collections that expire unsold.
+
+
+DAY 4 — six-prizes
+Image: day-04-six-prizes-4k.png
+
+Planned default: 1,000 NFTs at 0.01 ETH. After sellout and the draw, six winning NFTs receive 1 ETH each.
+
+One wallet may hold multiple winners. Minting does not guarantee a prize. Review the final collection terms before participating.
+
+
+DAY 5 — direct-claims
+Image: day-05-direct-claims-4k.png
+
+Your prize. Your claim.
+
+Once the draw is finalized, the current winning NFT holder claims directly from the contract. No owner approval is required for the claim.
+
+The holder submits a wallet transaction.
+
+
+DAY 6 — read-the-rules
+Image: day-06-read-the-rules-4k.png
+
+Before minting, check the collection’s mint price, supply, deadline, prize allocation and refund conditions.
+
+Verify the network and contract address through official project channels. Read the actual collection terms; planned defaults may vary.
+
+
+DAY 7 — collector-questions
+Image: day-07-collector-questions-4k.png
+
+What would you want to understand before minting a Tincta NFT: the draw, refund conditions, claim process, or something else?
+
+Tell us what needs a clearer explanation.

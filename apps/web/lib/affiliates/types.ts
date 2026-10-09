@@ -33,7 +33,7 @@ export interface AffiliateProgram {
   collectionName: string;
   chainId: number;
   contractAddress: string | null;
-  contractVersion: "affiliate-v3" | "affiliate-v4" | "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10";
+  contractVersion: "affiliate-v3" | "affiliate-v4" | "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10" | "affiliate-v11";
   mode: "demo" | "live";
   source: "postgres-demo" | "ethereum";
   maxSlots: number;
@@ -76,7 +76,7 @@ export interface AffiliateReferral {
   commissionBps: number;
   prizeBps: number;
   affiliatePoolBps?: number | null;
-  contractVersion: "affiliate-v3" | "affiliate-v4" | "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10";
+  contractVersion: "affiliate-v3" | "affiliate-v4" | "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10" | "affiliate-v11";
   mode: "demo" | "live";
   mintReady: boolean;
 }
@@ -87,7 +87,7 @@ export interface AuthenticationTypedData {
   message: { applicant: string; collectionId: string; origin: string; nonce: string; deadline: string; affiliateId?: number; commissionBps?: number; poolBps?: number; sourceCollection?: string; sourceTokenId?: string };
 }
 export interface AffiliateChallenge {
-  contractVersion: "affiliate-v3" | "affiliate-v4" | "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10";
+  contractVersion: "affiliate-v3" | "affiliate-v4" | "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10" | "affiliate-v11";
   affiliateId?: number;
   commissionBps?: number;
   sourceCollection?: string;
@@ -99,7 +99,7 @@ export interface AffiliateChallenge {
   turnstileCData: string;
 }
 export interface AffiliatePermit {
-  contractVersion: "affiliate-v3" | "affiliate-v4" | "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10";
+  contractVersion: "affiliate-v3" | "affiliate-v4" | "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10" | "affiliate-v11";
   affiliateId?: number;
   commissionBps?: number;
   sourceCollection?: string;

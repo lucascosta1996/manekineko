@@ -56,7 +56,12 @@
     "v10:preflight:mainnet": "hardhat run scripts/deploy-v10.ts --network mainnetReadOnly",
     "v10:deploy:local": "hardhat run scripts/deploy-v10.ts --network localhost",
     "v10:deploy:sepolia": "hardhat run scripts/deploy-v10.ts --network sepolia",
-    "v10:deploy:mainnet": "hardhat run scripts/deploy-v10.ts --network mainnet"
+    "v10:deploy:mainnet": "hardhat run scripts/deploy-v10.ts --network mainnet",
+    "v11:preflight:sepolia": "hardhat run scripts/deploy-v11.ts --network sepoliaReadOnly",
+    "v11:preflight:mainnet": "hardhat run scripts/deploy-v11.ts --network mainnetReadOnly",
+    "v11:deploy:local": "hardhat run scripts/deploy-v11.ts --network localhost",
+    "v11:deploy:sepolia": "hardhat run scripts/deploy-v11.ts --network sepolia",
+    "v11:deploy:mainnet": "hardhat run scripts/deploy-v11.ts --network mainnet"
   },
   "dependencies": {
     "@openzeppelin/contracts": "5.6.1",

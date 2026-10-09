@@ -12,10 +12,10 @@ export function readIndexerConfig(env: Record<string, string | undefined> = proc
   const databaseUrl = env.DATABASE_URL ?? '';
   const rpcUrl = env.INDEXER_RPC_URL ?? '';
   const contractVersion = env.INDEXER_CONTRACT_VERSION ?? 'affiliate-v5';
-  ensure(contractVersion === 'affiliate-v5' || contractVersion === 'affiliate-v6' || contractVersion === 'affiliate-v7' || (contractVersion === "affiliate-v8" || contractVersion === "affiliate-v9" || contractVersion === "affiliate-v10"), 'unsupported_contract_version');
+  ensure(contractVersion === 'affiliate-v5' || contractVersion === 'affiliate-v6' || contractVersion === 'affiliate-v7' || (contractVersion === "affiliate-v8" || contractVersion === "affiliate-v9" || (contractVersion === "affiliate-v10" || contractVersion === "affiliate-v11")), 'unsupported_contract_version');
   // V6 trust is independent: a V5 address/code hash must never be inherited.
-  const factory = getAddress((contractVersion === "affiliate-v10" ? env.INDEXER_V10_TRUSTED_FACTORY : contractVersion === "affiliate-v9" ? env.INDEXER_V9_TRUSTED_FACTORY : contractVersion === "affiliate-v8" ? env.INDEXER_V8_TRUSTED_FACTORY : contractVersion === 'affiliate-v7' ? env.INDEXER_V7_TRUSTED_FACTORY : contractVersion === 'affiliate-v6' ? env.INDEXER_V6_TRUSTED_FACTORY : env.INDEXER_TRUSTED_FACTORY) ?? '').toLowerCase();
-  const factoryCodeHash = ((contractVersion === "affiliate-v10" ? env.INDEXER_V10_TRUSTED_FACTORY_CODEHASH : contractVersion === "affiliate-v9" ? env.INDEXER_V9_TRUSTED_FACTORY_CODEHASH : contractVersion === "affiliate-v8" ? env.INDEXER_V8_TRUSTED_FACTORY_CODEHASH : contractVersion === 'affiliate-v7' ? env.INDEXER_V7_TRUSTED_FACTORY_CODEHASH : contractVersion === 'affiliate-v6' ? env.INDEXER_V6_TRUSTED_FACTORY_CODEHASH : env.INDEXER_TRUSTED_FACTORY_CODEHASH) ?? '').toLowerCase();
+  const factory = getAddress((contractVersion === "affiliate-v11" ? env.INDEXER_V11_TRUSTED_FACTORY : contractVersion === "affiliate-v10" ? env.INDEXER_V10_TRUSTED_FACTORY : contractVersion === "affiliate-v9" ? env.INDEXER_V9_TRUSTED_FACTORY : contractVersion === "affiliate-v8" ? env.INDEXER_V8_TRUSTED_FACTORY : contractVersion === 'affiliate-v7' ? env.INDEXER_V7_TRUSTED_FACTORY : contractVersion === 'affiliate-v6' ? env.INDEXER_V6_TRUSTED_FACTORY : env.INDEXER_TRUSTED_FACTORY) ?? '').toLowerCase();
+  const factoryCodeHash = ((contractVersion === "affiliate-v11" ? env.INDEXER_V11_TRUSTED_FACTORY_CODEHASH : contractVersion === "affiliate-v10" ? env.INDEXER_V10_TRUSTED_FACTORY_CODEHASH : contractVersion === "affiliate-v9" ? env.INDEXER_V9_TRUSTED_FACTORY_CODEHASH : contractVersion === "affiliate-v8" ? env.INDEXER_V8_TRUSTED_FACTORY_CODEHASH : contractVersion === 'affiliate-v7' ? env.INDEXER_V7_TRUSTED_FACTORY_CODEHASH : contractVersion === 'affiliate-v6' ? env.INDEXER_V6_TRUSTED_FACTORY_CODEHASH : env.INDEXER_TRUSTED_FACTORY_CODEHASH) ?? '').toLowerCase();
   ensure(/^postgres(ql)?:\/\//.test(databaseUrl) && /^https:\/\//.test(rpcUrl)
     && /^0x[0-9a-f]{64}$/.test(factoryCodeHash) && factory !== `0x${'0'.repeat(40)}`, 'invalid_configuration');
   return {
@@ -41,7 +41,7 @@ export function readIndexerConfigs(env: Record<string, string | undefined> = pro
     ensure(pin !== null && typeof pin === 'object' && !Array.isArray(pin), 'invalid_configuration');
     const entry = pin as Record<string, unknown>;
     ensure(Object.keys(entry).every(key => ['contractVersion', 'factory', 'factoryCodeHash'].includes(key))
-      && typeof entry.contractVersion === 'string' && /^affiliate-v(?:[5-9]|10)$/.test(entry.contractVersion)
+      && typeof entry.contractVersion === 'string' && /^affiliate-v(?:[5-9]|10|11)$/.test(entry.contractVersion)
       && typeof entry.factory === 'string' && typeof entry.factoryCodeHash === 'string', 'invalid_configuration');
     const prefix = entry.contractVersion === 'affiliate-v5' ? 'INDEXER_TRUSTED_FACTORY' : `INDEXER_V${entry.contractVersion.slice("affiliate-v".length)}_TRUSTED_FACTORY`;
     const config = readIndexerConfig({ ...env, INDEXER_CONTRACT_VERSION: entry.contractVersion, [prefix]: entry.factory, [`${prefix}_CODEHASH`]: entry.factoryCodeHash });

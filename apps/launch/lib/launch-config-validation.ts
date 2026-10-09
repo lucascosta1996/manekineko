@@ -1,6 +1,7 @@
 import { assertEditableMintDuration } from "@manekineko/contract-abi/mint-duration";
 import { getAddress, ZeroAddress } from "ethers";
 import { parseV5Config } from "@manekineko/contract-abi/v5-config";
+import { parseV11Config } from "@manekineko/contract-abi/v11-config";
 import { parseV10Config } from "@manekineko/contract-abi/v10-config";
 import { parseV9Config } from "@manekineko/contract-abi/v9-config";
 import { parseV8Config } from "@manekineko/contract-abi/v8-config";
@@ -114,7 +115,7 @@ export function validateLaunchPayload(input: unknown, options: LaunchValidationO
         // be read and exported, but preparation requires the new appearance.
         const { algorithmVersion: _, ...legacyTerms } = payload.contract;
         parsed = parseV5Config(legacyTerms, BigInt(payload.contract.chainId), 0n);
-      } else parsed = (isV10 ? parseV10Config : payload.contract.maxMintsPerWallet === "20" ? parseV9Config : isV8 ? parseV8Config : isV7 ? parseV7Config : isV6 ? parseV6Config : payload.contract.affiliatePoolBps === undefined ? parseV4Config : parseV5Config)((isScheduled && options.resolveSeasonStartAt && payload.contract.saleStartAt === "0") ? { ...payload.contract, saleStartAt: "900" } : payload.contract, BigInt(payload.contract.chainId), 0n);
+      } else parsed = (isV10 && payload.contract.affiliatePayoutCapBps === "0" ? parseV11Config : isV10 ? parseV10Config : payload.contract.maxMintsPerWallet === "20" ? parseV9Config : isV8 ? parseV8Config : isV7 ? parseV7Config : isV6 ? parseV6Config : payload.contract.affiliatePoolBps === undefined ? parseV4Config : parseV5Config)((isScheduled && options.resolveSeasonStartAt && payload.contract.saleStartAt === "0") ? { ...payload.contract, saleStartAt: "900" } : payload.contract, BigInt(payload.contract.chainId), 0n);
     }
     catch (error) { issues.push(error instanceof Error ? error.message : "Invalid contract configuration."); }
   }

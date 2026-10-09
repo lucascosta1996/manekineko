@@ -12,7 +12,7 @@ const TRUSTED_COLLECTIONS = `
     LEFT JOIN manekineko_history_winners w ON w.collection_id = c.id
     WHERE ((c.contract_version = 'affiliate-v5' AND c.algorithm_version = 'unique-rank-v2')
         OR (c.contract_version = 'affiliate-v6' AND c.algorithm_version = 'unique-rank-v3')
-        OR (c.contract_version = 'affiliate-v7' AND c.algorithm_version = 'unique-rank-v4') OR (c.contract_version IN ('affiliate-v8','affiliate-v9') AND c.algorithm_version = 'unique-rank-v5') OR (c.contract_version='affiliate-v10' AND c.algorithm_version='unique-rank-v6'))
+        OR (c.contract_version = 'affiliate-v7' AND c.algorithm_version = 'unique-rank-v4') OR (c.contract_version IN ('affiliate-v8','affiliate-v9') AND c.algorithm_version = 'unique-rank-v5') OR (c.contract_version IN ('affiliate-v10','affiliate-v11') AND c.algorithm_version='unique-rank-v6'))
       AND d.status = 'deployed' AND d.contract_address IS NOT NULL
       AND cp.trust_fingerprint IS NOT NULL AND cp.block_number >= s.block_number
       AND (cp.block_number <> s.block_number OR cp.block_hash = s.block_hash)
@@ -45,7 +45,7 @@ const TOKEN_PROJECTION = `
       (c.winning_token_id IS NOT NULL) AS revealed,
       COALESCE(award.token_id IS NOT NULL OR c.winning_token_id = candidate.token_id, false) AS "winningToken",
       award.rank AS "awardRank",award.amount_wei::text AS "awardAmountWei",
-      CASE WHEN c.contract_version IN ('affiliate-v7','affiliate-v8','affiliate-v9','affiliate-v10') THEN COALESCE(award.claimed,false) ELSE c.prize_paid END AS "prizePaid",
+      CASE WHEN c.contract_version IN ('affiliate-v7','affiliate-v8','affiliate-v9','affiliate-v10','affiliate-v11') THEN COALESCE(award.claimed,false) ELSE c.prize_paid END AS "prizePaid",
       COALESCE(award.winning_holder,c.winning_holder) AS "winningHolder", COALESCE(award.recipient,c.prize_recipient) AS "prizeRecipient",
       c.block_number::text AS "confirmedBlock", c.block_hash AS "blockHash",
       c.factory_address AS "factoryAddress", c.max_supply AS "maxSupply",

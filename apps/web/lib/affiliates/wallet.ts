@@ -15,7 +15,7 @@ export interface WalletProvider extends Eip1193Provider {
   removeListener?: (event: string, listener: (...args: unknown[]) => void) => void;
 }
 export interface WalletSession { address: string; chainId: number; providerName?: string; provider: BrowserProvider; injected: WalletProvider; signer: JsonRpcSigner }
-export interface ContractTarget { chainId: number; contractAddress: string; winnerCount?: number; secondPrizeBps?: number; minAffiliateReferrals?: number; affiliatePayoutCapBps?: number; contractVersion?: "affiliate-v3" | "affiliate-v4" | "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10"; mintPriceWei?: string; maxSupply?: number; maxAffiliateSlots?: number; runtimeCodeHash?: string; prizeBps?: number; affiliatePoolBps?: number | null; affiliateRatesBps?: readonly number[]; affiliateId?: number; commissionBps?: number }
+export interface ContractTarget { chainId: number; contractAddress: string; winnerCount?: number; secondPrizeBps?: number; minAffiliateReferrals?: number; affiliatePayoutCapBps?: number; contractVersion?: "affiliate-v3" | "affiliate-v4" | "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10" | "affiliate-v11"; mintPriceWei?: string; maxSupply?: number; maxAffiliateSlots?: number; runtimeCodeHash?: string; prizeBps?: number; affiliatePoolBps?: number | null; affiliateRatesBps?: readonly number[]; affiliateId?: number; commissionBps?: number }
 export interface TransactionJournal { action: "enroll" | "claim" | "mint" | "prize"; wallet: string; chainId: number; contractAddress: string; hash: string | null; startedAt: string; data: string; valueWei: string; nonce: number }
 
 const invalidatedWallets = new WeakSet<WalletSession>();
@@ -118,7 +118,7 @@ export async function verifiedRound(session: WalletSession, target: ContractTarg
   const code = await session.provider.getCode(getAddress(target.contractAddress));
   if (code === "0x") throw new Error("No collection contract exists at the expected address.");
   if (target.runtimeCodeHash && keccak256(code).toLowerCase() !== target.runtimeCodeHash.toLowerCase()) throw new Error("The collection bytecode does not match the verified deployment.");
-  const contract = new Contract(target.contractAddress, target.contractVersion === "affiliate-v10" ? roundV10Abi : target.contractVersion === "affiliate-v9" ? roundV9Abi : target.contractVersion === "affiliate-v8" ? roundV8Abi : target.contractVersion === "affiliate-v7" ? roundV7Abi : target.contractVersion === "affiliate-v6" ? roundV6Abi : target.contractVersion === "affiliate-v5" ? roundV5Abi : target.contractVersion === "affiliate-v4" ? roundV4Abi : roundV3Abi, session.signer);
+  const contract = new Contract(target.contractAddress, (target.contractVersion === "affiliate-v10" || target.contractVersion === "affiliate-v11") ? roundV10Abi : target.contractVersion === "affiliate-v9" ? roundV9Abi : target.contractVersion === "affiliate-v8" ? roundV8Abi : target.contractVersion === "affiliate-v7" ? roundV7Abi : target.contractVersion === "affiliate-v6" ? roundV6Abi : target.contractVersion === "affiliate-v5" ? roundV5Abi : target.contractVersion === "affiliate-v4" ? roundV4Abi : roundV3Abi, session.signer);
   await verifyRoundTerms(contract, target);
   await assertWallet(session);
   return contract;
@@ -132,16 +132,16 @@ export async function verifyRoundTerms(contract: Contract, target: ContractTarge
   ]);
   const mismatch = () => new Error("The collection terms do not match this page. Refresh and review the terms before continuing.");
   if (version !== expectedVersion || (target.mintPriceWei !== undefined && price !== BigInt(target.mintPriceWei)) || (target.maxSupply !== undefined && supply !== BigInt(target.maxSupply)) || (target.maxAffiliateSlots !== undefined && slots !== BigInt(target.maxAffiliateSlots))) throw mismatch();
-  if ((expectedVersion === "affiliate-v9" || expectedVersion === "affiliate-v10") && await contract.MAX_MINTS_PER_WALLET() !== 20n) throw mismatch();
+  if ((expectedVersion === "affiliate-v9" || (expectedVersion === "affiliate-v10" || expectedVersion === "affiliate-v11")) && await contract.MAX_MINTS_PER_WALLET() !== 20n) throw mismatch();
   if (expectedVersion === "affiliate-v3") {
     const [rate, prize] = await Promise.all([contract.AFFILIATE_BPS(), contract.PRIZE_BPS()]);
     if (rate !== 100n || prize !== 5000n || (target.prizeBps !== undefined && prize !== BigInt(target.prizeBps)) || target.affiliateRatesBps?.some((value) => BigInt(value) !== rate) || (target.commissionBps !== undefined && rate !== BigInt(target.commissionBps))) throw mismatch();
     return;
   }
-  if (expectedVersion === "affiliate-v5" || (expectedVersion === "affiliate-v6" || expectedVersion === "affiliate-v7" || (expectedVersion === "affiliate-v8" || expectedVersion === "affiliate-v9" || expectedVersion === "affiliate-v10"))) {
-    if ((expectedVersion === "affiliate-v6" || expectedVersion === "affiliate-v7" || (expectedVersion === "affiliate-v8" || expectedVersion === "affiliate-v9" || expectedVersion === "affiliate-v10")) && await contract.ALGORITHM_VERSION() !== (expectedVersion === "affiliate-v10" ? "unique-rank-v6" : (expectedVersion === "affiliate-v8" || expectedVersion === "affiliate-v9") ? "unique-rank-v5" : expectedVersion === "affiliate-v7" ? "unique-rank-v4" : "unique-rank-v3")) throw mismatch();
-    if (expectedVersion === "affiliate-v7" || (expectedVersion === "affiliate-v8" || expectedVersion === "affiliate-v9" || expectedVersion === "affiliate-v10")) {
-      for (const field of [(expectedVersion === "affiliate-v8" || expectedVersion === "affiliate-v9" || expectedVersion === "affiliate-v10") ? "winnerCount" : "secondPrizeBps", "minAffiliateReferrals", "affiliatePayoutCapBps"] as const) {
+  if (expectedVersion === "affiliate-v5" || (expectedVersion === "affiliate-v6" || expectedVersion === "affiliate-v7" || (expectedVersion === "affiliate-v8" || expectedVersion === "affiliate-v9" || (expectedVersion === "affiliate-v10" || expectedVersion === "affiliate-v11")))) {
+    if ((expectedVersion === "affiliate-v6" || expectedVersion === "affiliate-v7" || (expectedVersion === "affiliate-v8" || expectedVersion === "affiliate-v9" || (expectedVersion === "affiliate-v10" || expectedVersion === "affiliate-v11"))) && await contract.ALGORITHM_VERSION() !== ((expectedVersion === "affiliate-v10" || expectedVersion === "affiliate-v11") ? "unique-rank-v6" : (expectedVersion === "affiliate-v8" || expectedVersion === "affiliate-v9") ? "unique-rank-v5" : expectedVersion === "affiliate-v7" ? "unique-rank-v4" : "unique-rank-v3")) throw mismatch();
+    if (expectedVersion === "affiliate-v7" || (expectedVersion === "affiliate-v8" || expectedVersion === "affiliate-v9" || (expectedVersion === "affiliate-v10" || expectedVersion === "affiliate-v11"))) {
+      for (const field of [(expectedVersion === "affiliate-v8" || expectedVersion === "affiliate-v9" || (expectedVersion === "affiliate-v10" || expectedVersion === "affiliate-v11")) ? "winnerCount" : "secondPrizeBps", "minAffiliateReferrals", "affiliatePayoutCapBps"] as const) {
         if (target[field] !== undefined && await contract[field]() !== BigInt(target[field]!)) throw mismatch();
       }
     }
@@ -242,6 +242,10 @@ export async function recoverTransaction(session: WalletSession, target: Contrac
 export function walletError(error: unknown): string {
   const detail = error as { code?: string | number; message?: unknown } | null;
   const code = detail?.code;
+  // Some RPCs wrap insufficient balance failures in CALL_EXCEPTION or UNKNOWN_ERROR.
+  const rpc = error as { info?: { error?: { message?: unknown } }; error?: { message?: unknown }; shortMessage?: unknown } | null;
+  const reasons = [detail?.message, rpc?.shortMessage, rpc?.info?.error?.message, rpc?.error?.message];
+  if (code === "INSUFFICIENT_FUNDS" || reasons.some(value => typeof value === "string" && /insufficient funds|insufficient balance|funds for gas/i.test(value))) return "Insufficient ETH for the payment and network fee. Add funds on this network or switch wallets, then try again.";
   if (code === "ACTION_REJECTED" || code === 4001) return "The wallet request was declined. Nothing else will be sent automatically.";
   if (code === -32002) return "A wallet request is already waiting. Open your wallet and complete or cancel it before trying again.";
   if (code === 4100) return "This site no longer has permission to use that account. Connect your wallet and authorize the account again.";

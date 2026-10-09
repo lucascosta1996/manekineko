@@ -6,7 +6,7 @@ import { getRuntimeWorkerProfile } from "../../apps/launch/lib/season-runtime-st
 import { resolveTimedAutomationStep, seasonActivationDecision } from "../../apps/launch/lib/season-timeline.ts";
 import { catalogSeasonOrder } from "../../apps/launch/lib/season-catalog-order.ts";
 import { assertSocialText, buildSeasonSocialMessage, socialDateText, socialPublicUrl, type SeasonSocialEvent, type SeasonSocialInput, type SocialPayment } from "../../packages/contracts/src/season-social.ts";
-import { createV9ChainAdapter, createV10ChainAdapter, type V9ChainOptions, type ChainDeployment, type ChainSnapshot } from "./chain.ts";
+import { createV9ChainAdapter, createV10ChainAdapter, createV11ChainAdapter, type V9ChainOptions, type ChainDeployment, type ChainSnapshot } from "./chain.ts";
 import { ChainPendingError, createTransactionPipeline, transactionSpend, type ChainJournal } from "./chain-transactions.ts";
 import type { SepoliaScenario } from "./sepolia-scenarios.ts";
 import type { runSepoliaRehearsalStep, SepoliaRehearsalState } from "./sepolia-wallets.ts";
@@ -24,7 +24,7 @@ type PreparedCollection = { payload: LaunchPayload; enrollmentAt: string; announ
 export type SeasonState = { version?: 1; binding?: string; journal?: ChainJournal; factory?: { factory: string; factoryCodeHash: string }; collections?: Record<string, PreparedCollection>;
   announcedAt?: string; firstThreadComplete?: boolean; observedAt?: string; completed?: boolean; rehearsal?: SepoliaRehearsalState; walletAddresses?: string[]; rehearsalCursor?: number; rehearsalDone?: string[]; airyRecovery?: AppliedAiryRecovery };
 export type RunnerOptions = Omit<V9ChainOptions, "journal" | "saveJournal" | "sponsorshipFundingWei"> & { databaseUrl: string; scenario?: SepoliaScenario; admissionSigner?: Wallet; wallets?: Wallet[]; donors?: Wallet[]; recycleSepoliaFunds?: boolean; contractVersion?: SeasonContractVersion };
-const defaultDependencies = { getRuntimeWorkerProfile, createV9ChainAdapter, createV10ChainAdapter, verifyXAccount, deliverMessage, indexSeasonFactory, registerVerifiedCollection,
+const defaultDependencies = { getRuntimeWorkerProfile, createV9ChainAdapter, createV10ChainAdapter, createV11ChainAdapter, verifyXAccount, deliverMessage, indexSeasonFactory, registerVerifiedCollection,
   createTransactionPipeline, runSepoliaRehearsalStep: undefined as typeof runSepoliaRehearsalStep | undefined,
   resolveTimedAutomationStep, seasonActivationDecision, fetch: globalThis.fetch, now: Date.now };
 export type RunnerDependencies = typeof defaultDependencies;
@@ -33,7 +33,7 @@ export function scheduleBinding(options: RunnerOptions, accountId: string, publi
   return JSON.stringify({ chainId: options.chainId, owner: getAddress(options.owner), eligibility: options.eligibility, credits: options.credits, accountId, publicBaseUrl,
     maxFeePerGasWei: options.maxFeePerGasWei, maxTotalSpendWei: options.maxTotalSpendWei, confirmations: options.confirmations ?? (options.chainId === 1 ? 12 : 2),
     historicalSources: options.historicalSources ?? [],
-    ...(options.contractVersion === "affiliate-v10" ? { contractVersion: options.contractVersion } : {}),
+    ...((options.contractVersion === "affiliate-v10" || options.contractVersion === "affiliate-v11") ? { contractVersion: options.contractVersion } : {}),
     ...(options.scenario ? { scenario: options.scenario } : {}),
     wallets: options.wallets?.map(wallet => wallet.address) ?? [], donors: options.donors?.map(wallet => wallet.address) ?? [], recycleSepoliaFunds: options.recycleSepoliaFunds === true });
 }
@@ -71,6 +71,7 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
     ensure(options.wallets && options.scenario.chainId === 11155111 && options.scenario.maxTotalSpendWei === options.maxTotalSpendWei && options.scenario.maxFeePerGasWei === options.maxFeePerGasWei, "scenario_spending_policy_mismatch");
     ensure(artifact.steps.length === 1 && artifact.steps[0].id === options.scenario.collectionId, "scenario_requires_one_bound_collection");
     ensure((options.scenario.kind === "refund-3-30m") === (first.contract.sepoliaRehearsal === "refund-3-30m"), "scenario_terms_mismatch");
+    if (options.scenario.kind === "manual-affiliate-sellout" && options.scenario.manualReferralOnly) ensure(policy.uncapped, "single_referral_review_requires_v11");
     if (options.scenario.kind === "manual-affiliate-sellout") ensure(policy.permanent && first.contract.mintDurationSeconds === "86400" && !options.recycleSepoliaFunds, "manual_rehearsal_requires_unrecycled_24_hour_v10");
   }
   ensure(!artifact.steps.some(step => step.payload.contract.sepoliaRehearsal) || options.scenario?.kind === "refund-3-30m", "refund_scenario_manifest_required");
@@ -105,7 +106,7 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
         OR manekineko_season_runtime_actions.tx_hash IS DISTINCT FROM excluded.tx_hash
         OR manekineko_season_runtime_actions.result IS DISTINCT FROM excluded.result`, [store.row.id, JSON.stringify(actions)]);
   }
-  const chain = await (policy.permanent ? dependencies.createV10ChainAdapter : dependencies.createV9ChainAdapter)({ ...options, sponsorshipFundingWei: first.operations.winnerCreditSponsorshipWei,
+  const chain = await (policy.uncapped ? dependencies.createV11ChainAdapter : policy.permanent ? dependencies.createV10ChainAdapter : dependencies.createV9ChainAdapter)({ ...options, sponsorshipFundingWei: first.operations.winnerCreditSponsorshipWei,
     journal: state.journal, saveJournal: async journal => { state.journal = journal; if (state.rehearsal) state.rehearsal.journals[owner] = journal; await save(); } });
   state.journal = chain.journal;
   if (state.rehearsal) state.rehearsal.journals[owner] = chain.journal;
@@ -496,7 +497,12 @@ export async function createSeasonRunner(store: RunStore, pool: Pool, options: R
       await rehearsal(item);
     }
     return { mode: state.completed ? "completed" : "running", runId: store.row.id, deployed: Object.values(state.collections!).filter(item => item.deployment).length, claimsMonitored: state.completed === true,
-      ...(state.rehearsal?.manual ? {manualReview: Object.entries(state.rehearsal.manual).map(([round,reservation])=>({round,...reservation}))} : {}) };
+      ...(state.rehearsal?.manual ? {manualReview: Object.entries(state.rehearsal.manual).map(([round,reservation])=>({round,...reservation,
+        enrollmentUrl:`${base}/mint/${reservation.collectionId}/affiliates`,
+        nextAction:reservation.checkpoint==="awaiting-enrollment" ? `Enroll ${reservation.affiliate} through the app before the fixed mint opening.`
+          : reservation.checkpoint==="awaiting-manual-mints" ? options.scenario?.kind === "manual-affiliate-sellout" && options.scenario.manualMintPlan === "one-referral-then-gifts" ? `Use ${reservation.buyer} to mint one ticket through the enrolled affiliate's referral link.` : "Complete the reserved manual mint allocations using the affiliate referral link."
+          : reservation.checkpoint==="awaiting-manual-claims" ? "Claim the reserved winner prize and affiliate commission through the app." : "Wait for the confirmed outcome.",
+      }))} : {}) };
   }
   async function manualFundingPending(item: PreparedCollection, snapshot: ChainSnapshot) {
     if (options.scenario?.kind !== "manual-affiliate-sellout" || snapshot.saleActivated || snapshot.refundsAvailable) return false;

@@ -2,6 +2,10 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { safeError } from "./worker-cli.ts";
 import { safeErrorDiagnostic } from "./dependency-error.ts";
+
+test("prior mintable destinations have a clear fixed migration diagnostic", () => {
+  assert.equal(safeError(new Error(`Winner-credit retirement: target 0x${"ab".repeat(20)} can still mint; zero sponsorship does not retire it.`)), "previous_winner_credit_target_still_open");
+});
 import { publicLogReport } from "./logging.ts";
 
 test("pause reasons distinguish fixed guard failures and transport errors", () => {

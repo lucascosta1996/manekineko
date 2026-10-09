@@ -312,3 +312,9 @@ Before changing a token, inspect every consumer, update the spec and component s
 An exception record must identify: requirement, exact component/route/state, reason, alternative behavior, accessibility impact, verification, owner and removal/review trigger. Existing vendor/OS boundaries above are recognized limitations; ordinary local styling convenience is not an exception. No blanket “legacy app” exemption. User-approved design changes update the normative spec; routine implementation decisions within it do not require repeated permission.
 
 Completion language must distinguish source checks, local browser evidence, authenticated views, connected-wallet behavior, hosted deployment and real chain verification. Do not claim “flawless,” “fully accessible,” “all devices verified” or “pipeline enforced” without the corresponding evidence.
+
+## Tincta Rewards subproject lockup · 2026-10-09
+
+The approved quiet label identifies the current application as **Tincta Rewards**, a subproject of Tincta. In Landing and Web headers/footers and Launch branding, wrap the unchanged canonical wordmark in `RewardsBrand` from `@manekineko/ui/rewards-brand`. This approved subproject descriptor is the exception to the prohibition on adding a second name beside the logo; never recreate or alter the parent wordmark.
+
+Use the shared 14 px gap and title-case “Rewards” label: system sans, 13 px/20 px, weight 500, 0.01em tracking, 2 px vertical / 8 px horizontal padding, 3 px corners, #fafafa surface, #ddd border and #555 text. Dimensions scale in rem. Retain existing desktop/mobile/footer wordmark sizes. The label is not a button. Home links are named “Tincta Rewards home”; standalone lockups are named “Tincta Rewards”. Parent-brand assets, favicons and artwork signatures remain Tincta. A separate parent-brand landing page is future work.

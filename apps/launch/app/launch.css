@@ -900,6 +900,8 @@
 }
 .launch-login-brand {
   display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-space-3);
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--line);

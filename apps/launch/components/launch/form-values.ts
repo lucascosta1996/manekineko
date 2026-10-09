@@ -138,7 +138,7 @@ export function qualifiedAffiliateExample(form: LaunchForm, qualified = Number(f
     if (referrals < minimum || referrals * BigInt(qualified) > BigInt(c.maxSupply)) return null;
     const pool = BigInt(c.mintPriceWei) * BigInt(c.maxSupply) * BigInt(c.affiliatePoolBps!) / 10000n;
     const equal = pool / BigInt(qualified), cap = BigInt(c.mintPriceWei) * referrals * BigInt(c.affiliatePayoutCapBps!) / 10000n;
-    const each = equal < cap ? equal : cap;
+    const each = c.algorithmVersion === "unique-rank-v6" && c.affiliatePayoutCapBps === "0" && minimum === 1n ? equal : equal < cap ? equal : cap;
     return { each: fromScaled(each.toString(), 18), distributed: fromScaled((each * BigInt(qualified)).toString(), 18), growthReserve: fromScaled((pool - each * BigInt(qualified)).toString(), 18) };
   } catch { return null; }
 }

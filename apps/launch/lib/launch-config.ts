@@ -56,7 +56,7 @@ export type LaunchPayload = {
 
 export type LaunchArtifact = {
   schemaVersion: 1;
-  contractVersion: "affiliate-v4" | "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10";
+  contractVersion: "affiliate-v4" | "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10" | "affiliate-v11";
 } & LaunchPayload;
 
 export type LaunchConfiguration = {
@@ -88,7 +88,7 @@ export class LaunchConfigurationError extends Error {
 }
 
 export function launchContractVersion(payload: LaunchPayload): LaunchArtifact["contractVersion"] {
-  if (payload.contract.algorithmVersion === "unique-rank-v6") return "affiliate-v10";
+  if (payload.contract.algorithmVersion === "unique-rank-v6") return payload.contract.affiliatePayoutCapBps === "0" ? "affiliate-v11" : "affiliate-v10";
   if (payload.contract.algorithmVersion === "unique-rank-v5") return payload.contract.maxMintsPerWallet === "20" ? "affiliate-v9" : "affiliate-v8";
   if (payload.contract.algorithmVersion === "unique-rank-v4") return "affiliate-v7";
   if (payload.contract.algorithmVersion === "unique-rank-v3") return "affiliate-v6";

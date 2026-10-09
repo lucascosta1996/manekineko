@@ -45,6 +45,7 @@ export async function grantRuntimeRoles(pool: Pool, roles: RuntimeRoles): Promis
     await client.query(`GRANT SELECT,UPDATE(payload) ON public.manekineko_season_runtime_public TO ${launch}`);
     await client.query(`GRANT USAGE ON SEQUENCE public.manekineko_season_runtime_events_id_seq TO ${launch},${worker}`);
     await client.query(`GRANT SELECT ON public.manekineko_launch_automations,public.manekineko_season_runtime_profiles TO ${worker}`);
+    await client.query(`GRANT SELECT ON public.manekineko_season_review_members TO ${worker}`);
     await client.query(`GRANT SELECT,UPDATE ON public.manekineko_season_runtime_runs TO ${worker}`);
     await client.query(`GRANT SELECT,INSERT,UPDATE ON public.manekineko_season_runtime_actions,public.manekineko_season_runtime_public TO ${worker}`);
     await client.query(`GRANT SELECT,INSERT ON public.manekineko_season_runtime_events TO ${worker}`);

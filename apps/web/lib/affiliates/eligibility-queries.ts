@@ -12,8 +12,8 @@ export const AFFILIATE_NFT_CANDIDATES_QUERY = `WITH sources AS (
     AND d.contract_address<>'0x0000000000000000000000000000000000000000'
     AND ((c.contract_version='affiliate-v5' AND c.algorithm_version='unique-rank-v2')
       OR (c.contract_version='affiliate-v6' AND c.algorithm_version='unique-rank-v3')
-      OR (c.contract_version='affiliate-v7' AND c.algorithm_version='unique-rank-v4') OR (c.contract_version IN ('affiliate-v8','affiliate-v9') AND c.algorithm_version='unique-rank-v5') OR (c.contract_version='affiliate-v10' AND c.algorithm_version='unique-rank-v6'))
-    AND ((s.phase='complete' AND s.prize_paid) OR (c.contract_version IN ('affiliate-v7','affiliate-v8','affiliate-v9','affiliate-v10') AND s.phase='awaiting_prize')) AND cp.trust_fingerprint IS NOT NULL
+      OR (c.contract_version='affiliate-v7' AND c.algorithm_version='unique-rank-v4') OR (c.contract_version IN ('affiliate-v8','affiliate-v9') AND c.algorithm_version='unique-rank-v5') OR (c.contract_version IN ('affiliate-v10','affiliate-v11') AND c.algorithm_version='unique-rank-v6'))
+    AND ((s.phase='complete' AND s.prize_paid) OR (c.contract_version IN ('affiliate-v7','affiliate-v8','affiliate-v9','affiliate-v10','affiliate-v11') AND s.phase='awaiting_prize')) AND cp.trust_fingerprint IS NOT NULL
     AND cp.block_number>=s.block_number AND (cp.block_number<>s.block_number OR cp.block_hash=s.block_hash)
 ), candidates AS (
   SELECT DISTINCT c.id,c.name,c.contract_address,c.block_number,e.arguments->>'tokenId' AS token_id

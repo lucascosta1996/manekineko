@@ -2,7 +2,7 @@
 import { assertWallet, verifiedRound, type ContractTarget, type WalletSession } from '../affiliates/wallet.ts';
 import type { CollectionAward } from '../collections/awards.ts';
 export async function prepareRankedPrizeClaim(session: WalletSession, target: ContractTarget, award: Pick<CollectionAward,'rank'|'tokenId'|'amountWei'>) {
-  if(!["affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(target.contractVersion ?? "") || !Number.isInteger(award.rank) || award.rank<1 || award.rank>((target.contractVersion === "affiliate-v8" || target.contractVersion === "affiliate-v9" || target.contractVersion === "affiliate-v10") ? target.winnerCount ?? 0 : 2) || !target.runtimeCodeHash) throw new Error('This ranked prize is not verified.');
+  if(!["affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(target.contractVersion ?? "") || !Number.isInteger(award.rank) || award.rank<1 || award.rank>((target.contractVersion === "affiliate-v8" || target.contractVersion === "affiliate-v9" || (target.contractVersion === "affiliate-v10" || target.contractVersion === "affiliate-v11")) ? target.winnerCount ?? 0 : 2) || !target.runtimeCodeHash) throw new Error('This ranked prize is not verified.');
   const contract = await verifiedRound(session,target);
   if (!await contract.revealed()) throw new Error("The draw is still pending. Prizes become claimable after verified results are available.");
   const [token,paid,amount]=await Promise.all([contract.winningTokenIds(award.rank),contract.prizeClaimed(award.rank),contract.prizeAmountForRank(award.rank)]);

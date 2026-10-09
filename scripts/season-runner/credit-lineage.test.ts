@@ -10,7 +10,7 @@ const abi = [
   "function collections(address) view returns(address factory,uint256 roundId,uint256 sequence,uint256 registeredAt,bytes32 codeHash,bool rewardsOnly)",
   "event CollectionRegistered(address indexed round,address indexed factory,uint256 roundId,uint256 sequence,uint256 registeredAt,bool rewardsOnly)",
 ];
-const iface = new Interface(abi), factory = `0x${"77".repeat(20)}`, target = `0x${"88".repeat(20)}`;
+const iface = new Interface(abi), factory = `0x${"99".repeat(20)}`, target = `0x${"88".repeat(20)}`;
 const factoryCode = "0x60776000", targetCode = "0x60886000", root = `0x${"aa".repeat(32)}`;
 const factoryInterface = new Interface(["function rounds(uint256) view returns(address)"]);
 const targetInterface = new Interface(["function cancelled() view returns(bool)", "function mintDeadline() view returns(uint256)", "function totalMinted() view returns(uint256)", "function maxSupply() view returns(uint256)"]);
@@ -18,7 +18,7 @@ const address = (version: number) => `0x${String(version).repeat(40)}`;
 const code = (version: number) => `0x600${version}6000`;
 const hash = (number: number) => `0x${BigInt(number + 1).toString(16).padStart(64, "0")}`;
 type Ledger = { version: number; root: string; previous: string; code: string; balance: bigint; activeTarget: boolean };
-function fixture(versions = [6, 5, 4, 3, 2]) {
+function fixture(versions = [6, 5, 4, 3, 2], currentVersion: 6 | 7 = 6) {
   const ledgers = new Map<string, Ledger>(versions.map((version, index) => [address(version), { version, root, previous: versions[index + 1] ? address(versions[index + 1]) : ZeroAddress, code: code(version), balance: 0n, activeTarget: false }]));
   const state = { block: { number: 100, hash: hash(100), timestamp: 2_000_000 }, fork: false, calls: 0, scans: 0, loaded: [] as string[], blocks: 0, reorgAfter: Infinity };
   const provider = {
@@ -58,12 +58,12 @@ function fixture(versions = [6, 5, 4, 3, 2]) {
       return targetInterface.encodeFunctionResult(method, [{ cancelled: false, mintDeadline: 3_000_000n, totalMinted: 0n, maxSupply: 1000n }[method]]);
     },
   };
-  const verify = createV10CreditLineageVerifier(provider as unknown as Provider, address(6), async name => {
+  const verify = createV10CreditLineageVerifier(provider as unknown as Provider, address(currentVersion), async name => {
     state.loaded.push(name);
-    const version = name === "ManekinekoWinnerCredits" ? 2 : Number(/V([3-5])$/.exec(name)?.[1]);
-    assert(version >= 2 && version <= 5);
+    const version = name === "ManekinekoWinnerCredits" ? 2 : Number(/V([3-6])$/.exec(name)?.[1]);
+    assert(version >= 2 && version < currentVersion);
     return { abi, deployedBytecode: code(version) };
-  });
+  }, currentVersion);
   return { verify, state, ledgers, provider };
 }
 
@@ -156,4 +156,14 @@ test("concurrent predecessor checks must all finish and a delayed failure never 
   const calls = f.state.calls;
   await f.verify(f.state.block);
   assert(f.state.calls > calls, "A failed parallel check must not leave a same-block approval");
+});
+
+test("V11 validates the V6 predecessor and blocks its still-mintable targets", async () => {
+  const f = fixture([7, 6, 5, 4, 3, 2], 7);
+  await f.verify(f.state.block);
+  assert.equal(f.state.loaded[0], "ManekinekoWinnerCreditsV6");
+  assert.equal(f.state.scans, 5);
+  f.ledgers.get(address(6))!.activeTarget = true;
+  f.state.block = { number: 101, hash: hash(101), timestamp: 2_000_012 };
+  await assert.rejects(() => f.verify(f.state.block), /can still mint; zero sponsorship does not retire/);
 });

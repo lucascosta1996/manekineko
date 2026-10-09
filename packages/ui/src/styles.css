@@ -1,5 +1,9 @@
 @import "./tokens.css";
 
+.ui-rewards-brand { display: inline-flex; align-items: center; gap: var(--ui-brand-gap); flex: none; white-space: nowrap; vertical-align: middle; }
+.ui-rewards-brand > svg { flex: none; }
+.ui-rewards-label { box-sizing: border-box; display: inline-block; padding: var(--ui-brand-label-padding-block) var(--ui-space-2); border: 1px solid var(--ui-brand-label-border); border-radius: var(--ui-radius); background: var(--ui-surface); color: var(--ui-brand-label-ink); font: 500 var(--ui-label)/var(--ui-control-line) var(--ui-font-sans); letter-spacing: 0.01em; }
+
 /* Component ownership: apps compose these contracts; they do not override them. */
 html { color-scheme: light; }
 body { font-family: var(--ui-font-sans); font-size: var(--ui-body); line-height: var(--ui-body-line); color: var(--ui-ink); }

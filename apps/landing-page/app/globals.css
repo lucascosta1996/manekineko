@@ -104,7 +104,8 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 .section-footnote { font-size: var(--ui-caption); line-height: 1.5; color: var(--ui-muted); margin-block: var(--ui-space-6) 0; }
 .gallery-controls { display: flex; flex-wrap: wrap; max-width: 100%; align-items: center; gap: var(--ui-space-2); margin-top: var(--ui-space-6); }
 .gallery-controls > .mono { margin-right: auto; }
-.art-gallery { display: flex; gap: var(--ui-space-6); overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; padding: var(--ui-space-3) max(2.5rem, calc((100vw - 75rem) / 2)) var(--ui-space-8); }
+.art-gallery { display: flex; gap: var(--ui-space-6); overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; padding: var(--ui-space-3) max(2.5rem, calc((100vw - 75rem) / 2)) var(--ui-space-8); }
+.art-gallery::-webkit-scrollbar { display: none; }
 .nft-card { flex: 0 0 min(27vw,22rem); min-width: 0; margin: 0; scroll-snap-align: center; }
 .nft-image-wrap { aspect-ratio: 4 / 5; background: var(--card-color); border-radius: var(--ui-radius); overflow: hidden; }
 .nft-image-wrap img { width: 100%; height: auto; }

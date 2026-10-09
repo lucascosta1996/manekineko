@@ -25,7 +25,7 @@ export type RpcRead = (method: string, params: unknown[]) => Promise<any>;
 export type CreditEnv = Record<string, string | undefined>;
 export interface CreditTargetRecord {
   collectionId: string; name: string; chainId: number; roundId: string; contractAddress: string;
-  factoryAddress: string; contractVersion: "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10"; mintPriceWei: string;
+  factoryAddress: string; contractVersion: "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10" | "affiliate-v11"; mintPriceWei: string;
 }
 const same = (a: string, b: string) => a.toLowerCase() === b.toLowerCase();
 const address = (value: string | undefined) => !!value && /^0x[0-9a-f]{40}$/i.test(value) && !same(value, ZeroAddress);
@@ -52,7 +52,7 @@ export async function createCreditSnapshot(chainId: number, env: CreditEnv, rpc:
   const code = await rpc("eth_getCode", [config.address, blockTag]);
   if (code === "0x" || keccak256(code) !== config.hash) throw new Error("Winner credit deployment could not be verified.");
   const registryVersion = String((await registry("WINNER_CREDITS_VERSION"))[0]);
-  if (!["winner-credits-v2", "winner-credits-v3", "winner-credits-v4", "winner-credits-v5", "winner-credits-v6"].includes(registryVersion)) throw new Error("Winner credit deployment could not be verified.");
+  if (!["winner-credits-v2", "winner-credits-v3", "winner-credits-v4", "winner-credits-v5", "winner-credits-v6", "winner-credits-v7"].includes(registryVersion)) throw new Error("Winner credit deployment could not be verified.");
   const lineage = [{ address: config.address, version: registryVersion }];
   while (lineage.at(-1)!.version !== "winner-credits-v2") {
     const parent = lineage.at(-1)!;
@@ -60,10 +60,10 @@ export async function createCreditSnapshot(chainId: number, env: CreditEnv, rpc:
     if (same(previous, ZeroAddress)) break;
     const pin = lineage.length === 1 ? "PREVIOUS" : lineage.length === 2 ? "ANCESTOR" : `ANCESTOR_${lineage.length - 1}`;
     const expectedAddress = env[`WINNER_CREDITS_${pin}_ADDRESS_${chainId}`], expectedHash = env[`WINNER_CREDITS_${pin}_CODEHASH_${chainId}`];
-    if (lineage.length >= 5 || lineage.some(item => same(item.address, previous)) || !address(expectedAddress) || !hash(expectedHash) || !same(previous, expectedAddress!)) throw new Error("Previous winner credit registry is not independently pinned.");
+    if (lineage.length >= 6 || lineage.some(item => same(item.address, previous)) || !address(expectedAddress) || !hash(expectedHash) || !same(previous, expectedAddress!)) throw new Error("Previous winner credit registry is not independently pinned.");
     const priorCode = await rpc("eth_getCode", [previous, blockTag]);
     const priorVersion = String((await call(previous, CREDIT_REGISTRY, "WINNER_CREDITS_VERSION"))[0]);
-    const allowed = parent.version === "winner-credits-v6" ? ["winner-credits-v2", "winner-credits-v3", "winner-credits-v4", "winner-credits-v5"] : parent.version === "winner-credits-v5" ? ["winner-credits-v2", "winner-credits-v3", "winner-credits-v4"] : parent.version === "winner-credits-v4" ? ["winner-credits-v2", "winner-credits-v3"] : ["winner-credits-v2"];
+    const allowed = parent.version === "winner-credits-v7" ? ["winner-credits-v2", "winner-credits-v3", "winner-credits-v4", "winner-credits-v5", "winner-credits-v6"] : parent.version === "winner-credits-v6" ? ["winner-credits-v2", "winner-credits-v3", "winner-credits-v4", "winner-credits-v5"] : parent.version === "winner-credits-v5" ? ["winner-credits-v2", "winner-credits-v3", "winner-credits-v4"] : parent.version === "winner-credits-v4" ? ["winner-credits-v2", "winner-credits-v3"] : ["winner-credits-v2"];
     if (priorCode === "0x" || !same(keccak256(priorCode), expectedHash!) || !allowed.includes(priorVersion)) throw new Error("Previous winner credit deployment could not be verified.");
     lineage.push({ address: previous, version: priorVersion });
   }
@@ -71,7 +71,7 @@ export async function createCreditSnapshot(chainId: number, env: CreditEnv, rpc:
     ? (await call(at, CREDIT_REGISTRY, "creditsForAward", [source, rank]))[0]
     : await call(at, CREDIT_REGISTRY, "credits", [source]);
   const legacyRoot = String((await registry("legacyMerkleRoot"))[0]);
-  if (registryVersion === "winner-credits-v6") {
+  if (registryVersion === "winner-credits-v6" || registryVersion === "winner-credits-v7") {
     for (const ancestor of lineage.slice(1)) {
       const [root, sponsor] = await Promise.all([
         call(ancestor.address, CREDIT_REGISTRY, "legacyMerkleRoot"),
@@ -94,7 +94,7 @@ export async function createCreditSnapshot(chainId: number, env: CreditEnv, rpc:
           redeemedSource = source; registryAddress = entry.address;
           if (entry.version !== "winner-credits-v2") {
             rank = Number((await call(entry.address, CREDIT_REGISTRY, "redeemedAwardRank", [wallet]))[0]);
-            if (!Number.isInteger(rank) || rank < 1 || rank > (["winner-credits-v4", "winner-credits-v5", "winner-credits-v6"].includes(entry.version) ? 10 : 2)) throw new Error("Lifetime winner award rank is invalid.");
+            if (!Number.isInteger(rank) || rank < 1 || rank > (["winner-credits-v4", "winner-credits-v5", "winner-credits-v6", "winner-credits-v7"].includes(entry.version) ? 10 : 2)) throw new Error("Lifetime winner award rank is invalid.");
           }
           break;
         }
@@ -113,7 +113,7 @@ export async function createCreditSnapshot(chainId: number, env: CreditEnv, rpc:
   }
 
   async function verifiedRound(record: Pick<WinnerCreditSource, "factoryAddress" | "contractVersion" | "contractAddress" | "roundId">) {
-    const suffix = record.contractVersion === "affiliate-v10" ? "V10" : record.contractVersion === "affiliate-v9" ? "V9" : record.contractVersion === "affiliate-v8" ? "V8" : record.contractVersion === "affiliate-v7" ? "V7" : record.contractVersion === "affiliate-v6" ? "V6" : "V5";
+    const suffix = record.contractVersion === "affiliate-v11" ? "V11" : record.contractVersion === "affiliate-v10" ? "V10" : record.contractVersion === "affiliate-v9" ? "V9" : record.contractVersion === "affiliate-v8" ? "V8" : record.contractVersion === "affiliate-v7" ? "V7" : record.contractVersion === "affiliate-v6" ? "V6" : "V5";
     const pin = trustedFactoryPin(chainId,record.contractVersion,record.factoryAddress,env);
     const factory = pin?.factory, expected = pin?.factoryCodeHash;
     if (!address(factory) || !hash(expected) || !same(factory!, record.factoryAddress)) throw new Error("Winner credit factory is not approved.");
@@ -123,7 +123,7 @@ export async function createCreditSnapshot(chainId: number, env: CreditEnv, rpc:
       round(record.contractAddress, "ALGORITHM_VERSION"), round(record.contractAddress, "roundId"),
     ]);
     if (factoryCode === "0x" || roundCode === "0x" || !same(keccak256(factoryCode), expected!) || !same(registered[0], record.contractAddress)
-      || version !== record.contractVersion || algorithm !== (suffix === "V10" ? "unique-rank-v6" : (suffix === "V8" || suffix === "V9") ? "unique-rank-v5" : suffix === "V7" ? "unique-rank-v4" : suffix === "V6" ? "unique-rank-v3" : "unique-rank-v2") || roundId !== BigInt(record.roundId)) throw new Error("Winner credit collection provenance mismatch.");
+      || version !== record.contractVersion || algorithm !== ((suffix === "V10" || suffix === "V11") ? "unique-rank-v6" : (suffix === "V8" || suffix === "V9") ? "unique-rank-v5" : suffix === "V7" ? "unique-rank-v4" : suffix === "V6" ? "unique-rank-v3" : "unique-rank-v2") || roundId !== BigInt(record.roundId)) throw new Error("Winner credit collection provenance mismatch.");
     return { codeHash: keccak256(roundCode), factoryHash: expected! };
   }
   async function registration(record: Pick<WinnerCreditSource, "factoryAddress" | "contractVersion" | "contractAddress" | "roundId">, verified: { codeHash: string; factoryHash: string }) {
@@ -150,7 +150,7 @@ export async function createCreditSnapshot(chainId: number, env: CreditEnv, rpc:
       if (sameLifetimeAward && !used) throw new Error("Lifetime reward source has no recorded redemption.");
       return { ...result, reason: used ? "Used for this wallet’s one lifetime sponsored ticket." : "This wallet has already used its lifetime sponsored ticket. Additional wins do not earn another." };
     }
-    if (!supportsAward) return { ...result, reason: `This win requires the ${source.contractVersion === "affiliate-v10" ? "V6" : source.contractVersion === "affiliate-v9" ? "V5" : source.contractVersion === "affiliate-v8" ? "V4" : "V3"} winner reward registry, which is not enabled yet.` };
+    if (!supportsAward) return { ...result, reason: `This win requires the ${source.contractVersion === "affiliate-v11" ? "V7" : source.contractVersion === "affiliate-v10" ? "V6" : source.contractVersion === "affiliate-v9" ? "V5" : source.contractVersion === "affiliate-v8" ? "V4" : "V3"} winner reward registry, which is not enabled yet.` };
     if (source.contractVersion === "affiliate-v5") {
       const chain = manifest.chains.find((item) => item.chainId === chainId);
       const entry = chain?.entries.find((item) => same(item.sourceRound, source.contractAddress));
@@ -161,7 +161,7 @@ export async function createCreditSnapshot(chainId: number, env: CreditEnv, rpc:
       if (issued && (stored.sourceSequence !== 0n || stored.earnedAt !== BigInt(entry.paidAt))) throw new Error("Historical credit evidence does not match its registry.");
     } else {
       const info = await registration(source, verified);
-      const ranked = ["affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(source.contractVersion);
+      const ranked = ["affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(source.contractVersion);
       const [paid, holder, finalizedAt, tokenId] = await Promise.all(ranked
         ? [round(source.contractAddress, "prizeClaimed", [rank]), round(source.contractAddress, "awardHolder", [rank]), round(source.contractAddress, "finalizedAt"), round(source.contractAddress, "winningTokenIds", [rank])]
         : [round(source.contractAddress, "prizePaid"), round(source.contractAddress, "winningHolder"), round(source.contractAddress, "prizePaidAt"), round(source.contractAddress, "winningTokenId")]);
@@ -182,21 +182,21 @@ export async function createCreditSnapshot(chainId: number, env: CreditEnv, rpc:
   async function target(record: CreditTargetRecord): Promise<WinnerCreditTarget> {
     if (record.chainId !== chainId) throw new Error("Target credit network mismatch.");
     const verified = await verifiedRound(record);
-    const scheduledStart = ["affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(record.contractVersion) ? await round(record.contractAddress, "saleStartAt") : 0n;
+    const scheduledStart = ["affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(record.contractVersion) ? await round(record.contractAddress, "saleStartAt") : 0n;
     const [info, price, active, cancelled, deadline, minted, supply, balance] = await Promise.all([
       registration(record, verified), round(record.contractAddress, "mintPrice"), round(record.contractAddress, "saleActivated"),
       round(record.contractAddress, "cancelled"), round(record.contractAddress, "mintDeadline"), round(record.contractAddress, "totalMinted"),
       round(record.contractAddress, "maxSupply"), registry("sponsorBalance", [record.contractAddress]),
     ]);
     if (price !== BigInt(record.mintPriceWei) || minted > supply || supply > 65536n) throw new Error("Sponsored mint terms could not be verified.");
-    const reason = !registrySupportsCredit(record.contractVersion, registryVersion) ? `This collection requires the ${record.contractVersion === "affiliate-v10" ? "V6" : record.contractVersion === "affiliate-v9" ? "V5" : record.contractVersion === "affiliate-v8" ? "V4" : "V3"} winner reward registry.` : !info || info.rewardsOnly ? "This collection does not accept winner credits." : cancelled || timestamp >= deadline ? "This collection is closed." : !active || timestamp < scheduledStart ? "Ticket sales have not opened yet." : minted >= supply ? "This collection is sold out." : balance[0] < price ? "The operator needs to fund more sponsored tickets." : null;
+    const reason = !registrySupportsCredit(record.contractVersion, registryVersion) ? `This collection requires the ${record.contractVersion === "affiliate-v11" ? "V7" : record.contractVersion === "affiliate-v10" ? "V6" : record.contractVersion === "affiliate-v9" ? "V5" : record.contractVersion === "affiliate-v8" ? "V4" : "V3"} winner reward registry.` : !info || info.rewardsOnly ? "This collection does not accept winner credits." : cancelled || timestamp >= deadline ? "This collection is closed." : !active || timestamp < scheduledStart ? "Ticket sales have not opened yet." : minted >= supply ? "This collection is sold out." : balance[0] < price ? "The operator needs to fund more sponsored tickets." : null;
     return { contractVersion: record.contractVersion, collectionId: record.collectionId, contractAddress: record.contractAddress, chainId, name: record.name, mintPriceWei: price.toString(), ready: reason === null, reason, remaining: Number(supply - minted), sponsorBalanceWei: balance[0].toString() };
   }
   async function forTarget(item: WinnerCredit, destination: WinnerCreditTarget, wallet: string): Promise<WinnerCredit> {
     if (!item.available) return item;
     if (!destination.ready) return { ...item, available: false, reason: destination.reason };
-    if ((destination.contractVersion === "affiliate-v9" || destination.contractVersion === "affiliate-v10") && await round(destination.contractAddress, "remainingMints", [wallet]) === 0n) return { ...item, available: false, reason: "This wallet has already used its 20 mints in this collection. Choose a future collection." };
-    const ranked = ["affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(item.contractVersion);
+    if ((destination.contractVersion === "affiliate-v9" || (destination.contractVersion === "affiliate-v10" || destination.contractVersion === "affiliate-v11")) && await round(destination.contractAddress, "remainingMints", [wallet]) === 0n) return { ...item, available: false, reason: "This wallet has already used its 20 mints in this collection. Choose a future collection." };
+    const ranked = ["affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(item.contractVersion);
     const name = ranked ? item.claimed ? "redeemAward" : "claimAndRedeemAward" : item.claimed ? "redeem" : item.legacy ? "redeemLegacy" : "claimAndRedeem";
     const args = ranked ? [item.contractAddress, creditAwardRank(item), destination.contractAddress] : item.legacy && !item.claimed ? [item.legacyWin, item.proof, destination.contractAddress] : [item.contractAddress, destination.contractAddress];
     try { await rpc("eth_call", [{ from: wallet, to: config.address, data: CREDIT_REGISTRY.encodeFunctionData(name, args) }, blockTag]); }
@@ -207,5 +207,5 @@ export async function createCreditSnapshot(chainId: number, env: CreditEnv, rpc:
     return item;
   }
   async function assertCanonical() { if ((await rpc("eth_getBlockByNumber", [block.number, false])).hash !== block.hash) throw new Error("Ethereum changed while verifying winner credits."); }
-  return { config, registryVersion: registryVersion as "winner-credits-v2" | "winner-credits-v3" | "winner-credits-v4" | "winner-credits-v5" | "winner-credits-v6", blockNumber: BigInt(block.number).toString(), credit, target, forTarget, walletRedemption, assertCanonical };
+  return { config, registryVersion: registryVersion as "winner-credits-v2" | "winner-credits-v3" | "winner-credits-v4" | "winner-credits-v5" | "winner-credits-v6" | "winner-credits-v7", blockNumber: BigInt(block.number).toString(), credit, target, forTarget, walletRedemption, assertCanonical };
 }

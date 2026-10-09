@@ -3,16 +3,16 @@ import { decodeScrambledCombination } from '@manekineko/contract-abi/scrambled-r
 import { ensure, type AwardSnapshot, type RegisteredCollection } from './types.ts';
 
 export type AwardEvent = { arguments: Record<string, string>; transaction_hash: string; block_timestamp: Date | string };
-export function awardCount(c: RegisteredCollection): number { return (c.contractVersion === "affiliate-v8" || c.contractVersion === "affiliate-v9" || c.contractVersion === "affiliate-v10") ? c.winnerCount! : c.contractVersion === 'affiliate-v7' ? 2 : 1; }
-export function awardBps(c: RegisteredCollection, rank: number): number { return (c.contractVersion === "affiliate-v8" || c.contractVersion === "affiliate-v9" || c.contractVersion === "affiliate-v10") ? c.prizeBps / c.winnerCount! : rank === 1 ? c.prizeBps - c.secondPrizeBps! : c.secondPrizeBps!; }
+export function awardCount(c: RegisteredCollection): number { return (c.contractVersion === "affiliate-v8" || c.contractVersion === "affiliate-v9" || (c.contractVersion === "affiliate-v10" || c.contractVersion === "affiliate-v11")) ? c.winnerCount! : c.contractVersion === 'affiliate-v7' ? 2 : 1; }
+export function awardBps(c: RegisteredCollection, rank: number): number { return (c.contractVersion === "affiliate-v8" || c.contractVersion === "affiliate-v9" || (c.contractVersion === "affiliate-v10" || c.contractVersion === "affiliate-v11")) ? c.prizeBps / c.winnerCount! : rank === 1 ? c.prizeBps - c.secondPrizeBps! : c.secondPrizeBps!; }
 /** Verify exact events and independently decode each rank before publishing any prize claim. */
 export function verifyAward(c: RegisteredCollection, award: AwardSnapshot, determined: AwardEvent[], claimed: AwardEvent[]) {
-  const decoded = c.contractVersion === 'affiliate-v10'
+  const decoded = (c.contractVersion === "affiliate-v10" || c.contractVersion === "affiliate-v11")
     ? { ...decodePermanentCombination(award.numbers, award.key), score: award.score }
     : decodeScrambledCombination(award.numbers, award.key);
-  ensure(c.contractVersion !== 'affiliate-v10' || 'tokenId' in decoded && Number(decoded.tokenId) === award.tokenId, 'winner_accounting_mismatch');
+  ensure((c.contractVersion !== "affiliate-v10" && c.contractVersion !== "affiliate-v11") || 'tokenId' in decoded && Number(decoded.tokenId) === award.tokenId, 'winner_accounting_mismatch');
   const bps = awardBps(c,award.rank), count = awardCount(c);
-  ensure(['affiliate-v7','affiliate-v8','affiliate-v9','affiliate-v10'].includes(c.contractVersion) && Number.isInteger(count) && count>=1 && count<=10
+  ensure(['affiliate-v7','affiliate-v8','affiliate-v9','affiliate-v10', "affiliate-v11"].includes(c.contractVersion) && Number.isInteger(count) && count>=1 && count<=10
     && Number.isInteger(bps) && bps>0 && Number.isInteger(award.rank) && award.rank>=1 && award.rank<=count
     && award.tokenId >= 1 && award.tokenId <= c.maxSupply && award.score === String(c.maxSupply - award.rank + 1)
     && decoded.score === award.score && decoded.combinationCode === award.code

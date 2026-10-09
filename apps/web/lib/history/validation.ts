@@ -21,15 +21,15 @@ function text(value: string, maxBytes: number, field: string): void {
 /** Reject contradictory database snapshots before they reach the page or API. */
 export function validateHistoryCollection(record: HistoryCollection): HistoryCollection {
   ensure(["feistel-v1", "unique-rank-v2", "unique-rank-v3", "unique-rank-v4", "unique-rank-v5", "unique-rank-v6"].includes(record.algorithmVersion), "algorithmVersion");
-  if ((record.contractVersion === "affiliate-v5" || record.contractVersion === "affiliate-v6" || record.contractVersion === "affiliate-v7" || (record.contractVersion === "affiliate-v8" || record.contractVersion === "affiliate-v9" || record.contractVersion === "affiliate-v10"))) ensure(Number.isInteger(record.affiliatePoolBps) && record.affiliatePoolBps! >= 0 && record.affiliatePoolBps! + record.prizeBps <= 10000, "affiliate pool");
+  if ((record.contractVersion === "affiliate-v5" || record.contractVersion === "affiliate-v6" || record.contractVersion === "affiliate-v7" || (record.contractVersion === "affiliate-v8" || record.contractVersion === "affiliate-v9" || (record.contractVersion === "affiliate-v10" || record.contractVersion === "affiliate-v11")))) ensure(Number.isInteger(record.affiliatePoolBps) && record.affiliatePoolBps! >= 0 && record.affiliatePoolBps! + record.prizeBps <= 10000, "affiliate pool");
   const v2 = record.algorithmVersion !== "feistel-v1";
-  ensure((record.contractVersion === "affiliate-v10") === (record.algorithmVersion === "unique-rank-v6"), "V10 contract / algorithm version");
+  ensure(((record.contractVersion === "affiliate-v10" || record.contractVersion === "affiliate-v11")) === (record.algorithmVersion === "unique-rank-v6"), "V10 contract / algorithm version");
   ensure((record.contractVersion === "affiliate-v6") === (record.algorithmVersion === "unique-rank-v3"), "contract / algorithm version");
   ensure(((record.contractVersion === "affiliate-v8" || record.contractVersion === "affiliate-v9")) === (record.algorithmVersion === "unique-rank-v5"), "V8 version");
   ensure((record.contractVersion === "affiliate-v7") === (record.algorithmVersion === "unique-rank-v4"), "V7 version");
-  ensure(["legacy","affiliate-v3","affiliate-v4","affiliate-v5","affiliate-v6","affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(record.contractVersion), "contractVersion");
+  ensure(["legacy","affiliate-v3","affiliate-v4","affiliate-v5","affiliate-v6","affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(record.contractVersion), "contractVersion");
   ensure(Number.isInteger(record.prizeBps)&&record.prizeBps>=0&&record.prizeBps<=10000, "prizeBps");
-  ensure(["affiliate-v4","affiliate-v5","affiliate-v6","affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(record.contractVersion)?v2:record.prizeBps===5000, "financial terms");
+  ensure(["affiliate-v4","affiliate-v5","affiliate-v6","affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(record.contractVersion)?v2:record.prizeBps===5000, "financial terms");
   ensure(record.randomnessProvider === (v2 ? "chainlink-vrf-v2.5" : "future-blockhash"), "randomnessProvider");
   if (v2) ensure([1, 11155111].includes(record.chainId) && record.nativeCurrency.symbol === "ETH" && record.nativeCurrency.decimals === 18, "Ethereum network");
   ensure(isCollectionId(record.id), "id");
@@ -47,7 +47,7 @@ export function validateHistoryCollection(record: HistoryCollection): HistoryCol
   if (record.totalAffiliatePaidWei !== undefined) ensure(uint256(record.totalAffiliatePaidWei, "totalAffiliatePaidWei") <= uint256(record.totalMintRevenueWei, "totalMintRevenueWei"), "affiliate payments");
   const price = uint256(record.mintPriceWei, "mintPriceWei");
   ensure(price >= 2n && price % 2n === 0n && price * BigInt(record.maxSupply) <= UINT256_MAX, "mintPriceWei");
-  if(["affiliate-v4","affiliate-v5","affiliate-v6","affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(record.contractVersion)) ensure(price%10000n===0n,"V4 mintPriceWei");
+  if(["affiliate-v4","affiliate-v5","affiliate-v6","affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(record.contractVersion)) ensure(price%10000n===0n,"V4 mintPriceWei");
   if(record.contractVersion==="affiliate-v3") ensure(v2&&price%100n===0n,"V3 financial terms");
   const revenue = uint256(record.totalMintRevenueWei, "totalMintRevenueWei");
   ensure(revenue === price * BigInt(record.totalMinted), "totalMintRevenueWei");
@@ -79,8 +79,8 @@ export function validateHistoryCollection(record: HistoryCollection): HistoryCol
   ensure(typeof winner.winningHolder === "string" && /^0x[0-9a-fA-F]{40}$/.test(winner.winningHolder) && !/^0x0{40}$/i.test(winner.winningHolder), "winner.winningHolder");
   ensure(typeof winner.prizeRecipient === "string" && /^0x[0-9a-fA-F]{40}$/.test(winner.prizeRecipient) && !/^0x0{40}$/i.test(winner.prizeRecipient), "winner.prizeRecipient");
   if (!v2) ensure(winner.winningHolder.toLowerCase() === winner.prizeRecipient.toLowerCase(), "V1 holder / recipient");
-  ensure(uint256(winner.prizePaidWei, "winner.prizePaidWei") === revenue*BigInt((record.contractVersion === "affiliate-v8" || record.contractVersion === "affiliate-v9" || record.contractVersion === "affiliate-v10") ? record.prizeBps/record.winnerCount! : record.prizeBps-(record.secondPrizeBps ?? 0))/10000n, "winner.prizePaidWei");
-  if(record.contractVersion==="affiliate-v7" || (record.contractVersion === "affiliate-v8" || record.contractVersion === "affiliate-v9" || record.contractVersion === "affiliate-v10")) {
+  ensure(uint256(winner.prizePaidWei, "winner.prizePaidWei") === revenue*BigInt((record.contractVersion === "affiliate-v8" || record.contractVersion === "affiliate-v9" || (record.contractVersion === "affiliate-v10" || record.contractVersion === "affiliate-v11")) ? record.prizeBps/record.winnerCount! : record.prizeBps-(record.secondPrizeBps ?? 0))/10000n, "winner.prizePaidWei");
+  if(record.contractVersion==="affiliate-v7" || (record.contractVersion === "affiliate-v8" || record.contractVersion === "affiliate-v9" || (record.contractVersion === "affiliate-v10" || record.contractVersion === "affiliate-v11"))) {
     if(record.contractVersion==="affiliate-v7") ensure(Number.isInteger(record.secondPrizeBps)&&record.secondPrizeBps!>0&&record.secondPrizeBps!<record.prizeBps,"second prize");
     validateAwards(record.awards ?? [],record.maxSupply,record.totalMintRevenueWei,record.prizeBps,record.secondPrizeBps,record.winnerCount,record.algorithmVersion);
     ensure(record.awards!.every(a=>a.claimed),"all prizes paid");

@@ -5,7 +5,7 @@ export type NftStatus = "all" | "ongoing" | "completed" | "refundable";
 
 /** Public, confirmed NFT provenance. Token IDs remain strings at the JSON boundary. */
 export interface NftItem {
-  contractVersion: "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10";
+  contractVersion: "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10" | "affiliate-v11";
   algorithmVersion: "unique-rank-v2" | "unique-rank-v3" | "unique-rank-v4" | "unique-rank-v5" | "unique-rank-v6";
   collectionId: string;
   name: string;

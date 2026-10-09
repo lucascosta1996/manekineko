@@ -1902,6 +1902,9 @@ img {
   letter-spacing: 0}.prize-hub nav{display:flex;gap:1rem;margin-top:2rem}
 
 .prize-hub>p{max-width:64ch;margin:1rem 0;color:var(--muted);font-size: var(--ui-body);line-height: 1.6;font-weight: 400;letter-spacing: 0}.results-prize-summary{padding:1.25rem 0;margin-top:1.4rem;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size: var(--ui-body);line-height: 1.6;font-weight: 400;letter-spacing: 0}.draw-progress>p{margin:1rem 0;font-size: var(--ui-body);line-height: 1.6;font-weight: 400;letter-spacing: 0}.draw-progress ol{list-style:none;padding:0;margin:1.5rem 0}
+.draw-progress li { display: flex; align-items: baseline; gap: var(--ui-space-2); }
+.draw-step-marker { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 1.125rem; width: 1.125rem; }
+.draw-step-marker svg { width: 1.125rem; height: 1.125rem; align-self: center; }
 
 /* Page composition; control geometry belongs to the shared package. */
 .mint-allowance {
@@ -1956,6 +1959,7 @@ img {
 .nft-wallet-options, .affiliate-wallet-options { display: grid; gap: .75rem; }
 .nft-wallet-picker-error, .affiliate-wallet-picker-error { color: var(--ui-danger); }
 .mint-feedback[data-status="error"], .mint-referral-error { color: var(--ui-danger); background: var(--ui-danger-bg); }
+.mint-feedback[data-status="error"] p { color: var(--ui-danger); background: var(--ui-danger-bg); border: 1px solid var(--ui-danger); }
 @media (max-width: 760px) {
   .mint-header { min-height: 4rem; gap: .75rem; flex-wrap: wrap; }
   .mint-header .brand .tincta-wordmark { width: 5.5rem; }

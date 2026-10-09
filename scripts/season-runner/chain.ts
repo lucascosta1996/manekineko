@@ -47,6 +47,7 @@ const serial = (value: Record<string, unknown>): Record<string, string> => Objec
 
 /** All public writes are explicit, versioned, locally signed and resumable. This adapter never mints or claims anyone's funds. */
 export function createV9ChainAdapter(options: V9ChainOptions) { return createVersionedChainAdapter(options, "affiliate-v9"); }
+export function createV11ChainAdapter(options: V9ChainOptions) { return createVersionedChainAdapter(options, "affiliate-v11"); }
 export function createV10ChainAdapter(options: V9ChainOptions) { return createVersionedChainAdapter(options, "affiliate-v10"); }
 export async function createVersionedChainAdapter(options: V9ChainOptions, version: SeasonContractVersion) {
   const policy = seasonVersionPolicy(version);
@@ -86,7 +87,7 @@ export async function createVersionedChainAdapter(options: V9ChainOptions, versi
   }
   const contract = (name: string, address: string) => new Contract(getAddress(address), artifacts[name].abi, provider);
   const eligibility = contract("Eligibility", options.eligibility.address), credits = contract("Credits", options.credits.address);
-  const verifyCreditLineage = policy.permanent ? createV10CreditLineageVerifier(provider, options.credits.address, loadArtifact) : undefined;
+  const verifyCreditLineage = policy.permanent ? createV10CreditLineageVerifier(provider, options.credits.address, loadArtifact, policy.uncapped ? 7 : 6) : undefined;
 
   async function queueVerification(name: string, address: string, args: unknown[]) {
     const artifact = artifacts[name];

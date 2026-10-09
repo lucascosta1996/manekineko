@@ -1,6 +1,6 @@
 /** Public wording follows the deployed version; never infer the first-collection exception from roundId. */
 export function affiliateEnrollmentCopy(version: string | undefined, policy?: "bootstrap" | "nft_holder") {
-  if (version !== "affiliate-v6" && !["affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(version ?? "")) return {
+  if (version !== "affiliate-v6" && !["affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(version ?? "")) return {
     summary: "This collection keeps its original enrollment terms. NFT holder eligibility applies to new collections using the updated rules.",
     join: "This earlier collection does not require an NFT to enroll. Connect your wallet and complete the automated checks while positions are available. Enrollment closes when minting opens.",
     teaser: "View this collection’s terms and the NFT holder rules for future programs.",

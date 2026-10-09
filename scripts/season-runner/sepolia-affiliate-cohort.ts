@@ -15,6 +15,7 @@ export async function enrollCohort(options: {
   ensure(await round.maxAffiliateSlots(at) === 10n && await round.affiliateMinimumReferrals(at) === 1n, "cohort_requires_ten_slots_one_referral");
   const target = getAddress(String(round.target)), affiliate = getAddress(options.affiliate);
   const poolBps = await round.affiliatePoolBps(at), opening = await round.saleStartAt(at);
+  let missingHuman: number | undefined;
   for (const slot of cohort.slots) {
     const expected = getAddress(slot.wallet), actual = getAddress(await round.affiliateWallet(slot.id, at));
     ensure(actual === ZeroAddress || actual === expected, "cohort_slot_taken_by_another_wallet");
@@ -22,7 +23,7 @@ export async function enrollCohort(options: {
     ensure(cohort.successfulIds.includes(slot.id) || referrals === 0n, "cohort_unsuccessful_slot_received_referral");
     if (actual === expected) continue;
     ensure(BigInt(block.timestamp) < opening, "cohort_enrollment_window_expired");
-    if (expected === affiliate) return { action: "manual-checkpoint", checkpoint: "awaiting-enrollment", affiliateId: slot.id };
+    if (expected === affiliate) { missingHuman = slot.id; continue; }
     const wallet = options.wallets.find(wallet => wallet.address === expected);
     ensure(wallet && options.admissionSigner && getAddress(await round.enrollmentSigner(at)) === options.admissionSigner.address, "cohort_requires_bound_admission_signer_and_vault_wallet");
     ensure(keccak256(await options.provider.getCode(cohort.sourceCollection, block.number)) === cohort.sourceCodeHash, "cohort_source_runtime_changed");
@@ -39,6 +40,7 @@ export async function enrollCohort(options: {
     await options.send(wallet, `cohort-enroll:${target.toLowerCase()}:${slot.id}`, request);
     return { action: "enroll-cohort", affiliateId: slot.id };
   }
+  if (missingHuman !== undefined) return { action: "manual-checkpoint", checkpoint: "awaiting-enrollment", affiliateId: missingHuman };
   ensure(await round.affiliateCount(at) === 10n, "cohort_occupancy_mismatch");
   return null;
 }

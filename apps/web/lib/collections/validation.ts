@@ -29,25 +29,25 @@ export function validateCollection(
       && (o.chainTimestamp === null || Number.isFinite(Date.parse(o.chainTimestamp))), "observation time");
   }
   if ([collection.seasonId, collection.seasonName, collection.collectionColor, collection.textColor].some(value => value != null)) {
-    ensure(["affiliate-v6","affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(collection.contractVersion), "season contract version");
+    ensure(["affiliate-v6","affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(collection.contractVersion), "season contract version");
     normalizeSeasonAppearance(collection);
   }
   ensure(["feistel-v1", "unique-rank-v2", "unique-rank-v3", "unique-rank-v4", "unique-rank-v5", "unique-rank-v6"].includes(collection.algorithmVersion), "algorithmVersion");
-  ensure(["legacy","affiliate-v3","affiliate-v4","affiliate-v5","affiliate-v6","affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(collection.contractVersion), "contractVersion");
-  if ((collection.contractVersion === "affiliate-v5" || collection.contractVersion === "affiliate-v6" || collection.contractVersion === "affiliate-v7" || (collection.contractVersion === "affiliate-v8" || collection.contractVersion === "affiliate-v9" || collection.contractVersion === "affiliate-v10"))) ensure(Number.isInteger(collection.affiliatePoolBps) && collection.affiliatePoolBps! >= 0 && collection.affiliatePoolBps! + collection.prizeBps <= 10000, "affiliate pool");
-  if (collection.contractVersion === "affiliate-v10") normalizeSeasonAppearance(collection);
+  ensure(["legacy","affiliate-v3","affiliate-v4","affiliate-v5","affiliate-v6","affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(collection.contractVersion), "contractVersion");
+  if ((collection.contractVersion === "affiliate-v5" || collection.contractVersion === "affiliate-v6" || collection.contractVersion === "affiliate-v7" || (collection.contractVersion === "affiliate-v8" || collection.contractVersion === "affiliate-v9" || (collection.contractVersion === "affiliate-v10" || collection.contractVersion === "affiliate-v11")))) ensure(Number.isInteger(collection.affiliatePoolBps) && collection.affiliatePoolBps! >= 0 && collection.affiliatePoolBps! + collection.prizeBps <= 10000, "affiliate pool");
+  if ((collection.contractVersion === "affiliate-v10" || collection.contractVersion === "affiliate-v11")) normalizeSeasonAppearance(collection);
   const v2 = collection.algorithmVersion !== "feistel-v1";
-  ensure((collection.contractVersion === "affiliate-v10") === (collection.algorithmVersion === "unique-rank-v6"), "V10 contract / algorithm version");
+  ensure(((collection.contractVersion === "affiliate-v10" || collection.contractVersion === "affiliate-v11")) === (collection.algorithmVersion === "unique-rank-v6"), "V10 contract / algorithm version");
   ensure((collection.contractVersion === "affiliate-v6") === (collection.algorithmVersion === "unique-rank-v3"), "contract / algorithm version");
   ensure((collection.contractVersion === "affiliate-v7") === (collection.algorithmVersion === "unique-rank-v4"), "V7 contract / algorithm version");
   ensure(((collection.contractVersion === "affiliate-v8" || collection.contractVersion === "affiliate-v9")) === (collection.algorithmVersion === "unique-rank-v5"), "V8 contract / algorithm version");
-  if (collection.contractVersion === "affiliate-v7" || (collection.contractVersion === "affiliate-v8" || collection.contractVersion === "affiliate-v9" || collection.contractVersion === "affiliate-v10")) {
-    const count=(collection.contractVersion === "affiliate-v8" || collection.contractVersion === "affiliate-v9" || collection.contractVersion === "affiliate-v10") ? collection.winnerCount! : 2;
-    if((collection.contractVersion === "affiliate-v8" || collection.contractVersion === "affiliate-v9" || collection.contractVersion === "affiliate-v10")) ensure(Number.isInteger(count) && count>=1 && count<=10 && count<=collection.maxSupply
+  if (collection.contractVersion === "affiliate-v7" || (collection.contractVersion === "affiliate-v8" || collection.contractVersion === "affiliate-v9" || (collection.contractVersion === "affiliate-v10" || collection.contractVersion === "affiliate-v11"))) {
+    const count=(collection.contractVersion === "affiliate-v8" || collection.contractVersion === "affiliate-v9" || (collection.contractVersion === "affiliate-v10" || collection.contractVersion === "affiliate-v11")) ? collection.winnerCount! : 2;
+    if((collection.contractVersion === "affiliate-v8" || collection.contractVersion === "affiliate-v9" || (collection.contractVersion === "affiliate-v10" || collection.contractVersion === "affiliate-v11"))) ensure(Number.isInteger(count) && count>=1 && count<=10 && count<=collection.maxSupply
       && collection.secondPrizeBps==null && collection.prizeBps>0 && collection.prizeBps%count===0,"equal prize count");
     else ensure(collection.winnerCount==null && Number.isInteger(collection.secondPrizeBps) && collection.secondPrizeBps! > 0 && collection.secondPrizeBps! < collection.prizeBps, "second prize");
     ensure(Number.isInteger(collection.minAffiliateReferrals) && collection.minAffiliateReferrals! >= 1 && collection.minAffiliateReferrals! <= collection.maxSupply, "referral minimum");
-    ensure(Number.isInteger(collection.affiliatePayoutCapBps) && collection.affiliatePayoutCapBps! >= 1 && collection.affiliatePayoutCapBps! <= 10000, "affiliate cap");
+    ensure(Number.isInteger(collection.affiliatePayoutCapBps) && (collection.contractVersion === "affiliate-v11" ? collection.affiliatePayoutCapBps === 0 && collection.minAffiliateReferrals === 1 : collection.affiliatePayoutCapBps! >= 1 && collection.affiliatePayoutCapBps! <= 10000), "affiliate cap");
     ensure(typeof collection.saleStartAt === "string" && Number.isFinite(Date.parse(collection.saleStartAt)), "sale start");
     const determined = ["awaiting_prize","complete"].includes(collection.phase ?? "");
     ensure(Array.isArray(collection.awards) && collection.awards.length === (determined ? count : 0), "award count");
@@ -142,7 +142,7 @@ export function validateCollection(
   ensure(
     collection.maxMintBatch === 20 &&
       Number.isInteger(collection.prizeBps) && collection.prizeBps>=0 && collection.prizeBps<=10000 &&
-      (["affiliate-v4","affiliate-v5","affiliate-v6","affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(collection.contractVersion) ? v2 && price%10000n===0n : collection.prizeBps===5000) &&
+      (["affiliate-v4","affiliate-v5","affiliate-v6","affiliate-v7","affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(collection.contractVersion) ? v2 && price%10000n===0n : collection.prizeBps===5000) &&
       (collection.contractVersion!=="affiliate-v3" || v2 && price%100n===0n) &&
       collection.scoreFormula === scoreFormulaFor(collection.algorithmVersion),
     "contract constants"

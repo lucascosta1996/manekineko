@@ -13,7 +13,8 @@ const script = fileURLToPath(new URL("./prepare-launch.mjs", import.meta.url));
 function finalized(version) {
   const payload = runtimeArtifact().steps[0].payload;
   payload.contract.saleStartAt = "2000000000";
-  payload.contract.algorithmVersion = version === "affiliate-v10" ? "unique-rank-v6" : "unique-rank-v5";
+  payload.contract.algorithmVersion = ["affiliate-v10", "affiliate-v11"].includes(version) ? "unique-rank-v6" : "unique-rank-v5";
+  if (version === "affiliate-v11") { payload.contract.affiliatePayoutCapBps = "0"; payload.contract.minAffiliateReferrals = "1"; }
   const validated = validateLaunchPayload(payload, { requireSeasonAppearance: true, requireWinnerCredits: true, requireAffiliateEligibility: true });
   assert.equal(validated.valid, true, validated.issues.join("; "));
   const artifact = { schemaVersion: 1, contractVersion: version, ...validated.payload };
@@ -84,4 +85,15 @@ test("offline preparation refuses to overwrite an existing reviewed output direc
   const retry = prepare(directory, artifact);
   assert.notEqual(retry.result.status, 0);
   assert.equal(readFileSync(join(prepared.output, "deployment-plan.json"), "utf8"), before);
+}));
+
+test("V11 preparation freezes uncapped terms and selects Eligibility V6 and Winner Credits V7", () => isolated(directory => {
+  const artifact = finalized("affiliate-v11"), {result,json} = prepare(directory,artifact);
+  assert.equal(result.status,0,result.stderr);
+  assert.deepEqual(json("round-v11.json"),artifact.contract);
+  assert.equal(json("round-v11.json").affiliatePayoutCapBps,"0");
+  assert.equal(json("round-v11.json").minAffiliateReferrals,"1");
+  assert.equal(json("affiliate-eligibility-plan.json").registryVersion,"affiliate-eligibility-v6");
+  assert.equal(json("winner-credit-plan.json").registryVersion,"winner-credits-v7");
+  assert.equal(json("deployment-plan.json").preflightEnvironment.V11_BROADCAST,"0");
 }));

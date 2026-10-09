@@ -17,7 +17,7 @@ const v6Compiler = { ...reviewedCompiler, settings: { ...reviewedCompiler.settin
 const compilerProfile = {
   compilers: [reviewedCompiler],
   overrides: Object.fromEntries(["Factory", "Round", "Renderer", "RoundDeployer"].flatMap(component =>
-    [6, 7, 8, 9, 10].map(version => [`contracts/Manekineko${component}V${version}.sol`, v6Compiler]))),
+    [6, 7, 8, 9, 10, 11].map(version => [`contracts/Manekineko${component}V${version}.sol`, v6Compiler]))),
 };
 
 export default defineConfig({

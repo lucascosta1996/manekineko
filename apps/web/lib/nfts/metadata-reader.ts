@@ -26,9 +26,9 @@ const hash = (value: unknown): value is string => typeof value === "string" && /
 const code = (value: unknown): value is string => typeof value === "string" && /^0x(?:[0-9a-f]{2})+$/i.test(value) && value.length <= 100002;
 
 /** Each reader is scoped to one configured chain and an independently pinned versioned factory. */
-export function createNftMetadataReader(rpc: MetadataRpc, settings: { chainId: number; factoryAddress: string; factoryCodeHash: string; contractVersion?: "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10" }) {
+export function createNftMetadataReader(rpc: MetadataRpc, settings: { chainId: number; factoryAddress: string; factoryCodeHash: string; contractVersion?: "affiliate-v5" | "affiliate-v6" | "affiliate-v7" | "affiliate-v8" | "affiliate-v9" | "affiliate-v10" | "affiliate-v11" }) {
   const contractVersion = settings.contractVersion ?? "affiliate-v5";
-  const algorithmVersion = contractVersion === "affiliate-v10" ? "unique-rank-v6" : (contractVersion === "affiliate-v8" || contractVersion === "affiliate-v9") ? "unique-rank-v5" : contractVersion === "affiliate-v7" ? "unique-rank-v4" : contractVersion === "affiliate-v6" ? "unique-rank-v3" : "unique-rank-v2";
+  const algorithmVersion = (contractVersion === "affiliate-v10" || contractVersion === "affiliate-v11") ? "unique-rank-v6" : (contractVersion === "affiliate-v8" || contractVersion === "affiliate-v9") ? "unique-rank-v5" : contractVersion === "affiliate-v7" ? "unique-rank-v4" : contractVersion === "affiliate-v6" ? "unique-rank-v3" : "unique-rank-v2";
   type Trusted = { version: string; algorithm: string; roundId: bigint; supply: bigint; minted: bigint; revealed: boolean };
   const trustCache = new Map<string, { expires: number; value: Promise<Trusted> }>();
   async function canonical(record: MetadataRecord) {
@@ -40,7 +40,7 @@ export function createNftMetadataReader(rpc: MetadataRpc, settings: { chainId: n
     try {
       if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(record.collectionId)
         || ![1, 11155111].includes(record.chainId) || record.chainId !== settings.chainId
-        || !["affiliate-v5", "affiliate-v6", "affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10"].includes(contractVersion)
+        || !["affiliate-v5", "affiliate-v6", "affiliate-v7", "affiliate-v8", "affiliate-v9", "affiliate-v10", "affiliate-v11"].includes(contractVersion)
         || record.contractVersion !== contractVersion || record.algorithmVersion !== algorithmVersion
         || !address(record.contractAddress) || !address(record.factoryAddress) || !address(settings.factoryAddress)
         || record.factoryAddress.toLowerCase() !== settings.factoryAddress.toLowerCase() || !hash(settings.factoryCodeHash)
@@ -92,17 +92,17 @@ export function createNftMetadataReader(rpc: MetadataRpc, settings: { chainId: n
       const [owner, uri, combination] = await Promise.all([
         call(record.contractAddress, round, "ownerOf", [record.tokenId]),
         call(record.contractAddress, round, "tokenURI", [record.tokenId]),
-        (record.revealed || contractVersion === "affiliate-v10") ? call(record.contractAddress, round, "combination", [record.tokenId]) : Promise.resolve(null),
+        (record.revealed || (contractVersion === "affiliate-v10" || contractVersion === "affiliate-v11")) ? call(record.contractAddress, round, "combination", [record.tokenId]) : Promise.resolve(null),
       ]);
       if (String(owner[0]).toLowerCase() !== record.ownerWallet!.toLowerCase()) fail();
       const metadata = decodeOnChainMetadata(uri[0], contractVersion);
       if (record.seasonId && (metadata.seasonId !== record.seasonId || metadata.seasonName !== record.seasonName
         || metadata.collectionColor !== record.collectionColor || metadata.textColor !== record.textColor)) fail();
-      if (contractVersion === "affiliate-v10" && combination
+      if ((contractVersion === "affiliate-v10" || contractVersion === "affiliate-v11") && combination
         && (await call(record.contractAddress, round, "tokenIdForCombination", [combination[0]]))[0] !== BigInt(record.tokenId)) fail();
-      const decodedScore = (contractVersion === "affiliate-v6" || contractVersion === "affiliate-v7" || (contractVersion === "affiliate-v8" || contractVersion === "affiliate-v9" || contractVersion === "affiliate-v10")) && combination && record.revealed
+      const decodedScore = (contractVersion === "affiliate-v6" || contractVersion === "affiliate-v7" || (contractVersion === "affiliate-v8" || contractVersion === "affiliate-v9" || (contractVersion === "affiliate-v10" || contractVersion === "affiliate-v11"))) && combination && record.revealed
         ? (await call(record.contractAddress, round, "scoreCombination", [combination[0]]))[0] as bigint : undefined;
-      if (contractVersion === "affiliate-v10" && record.revealed
+      if ((contractVersion === "affiliate-v10" || contractVersion === "affiliate-v11") && record.revealed
         && (await call(record.contractAddress, round, "score", [record.tokenId]))[0] !== decodedScore) fail();
       const numbers = verifyMetadataNumbers(metadata, record.revealed, combination, record.maxSupply, { contractVersion, decodedScore });
       await canonical(record);

@@ -36,3 +36,9 @@ Local verification on 2026-09-23 UTC:
 - Launch authentication succeeded and the workspace shell rendered, but season data displayed “Launch access is temporarily unavailable.” This review establishes its branding and shell layout, not working season-data access.
 
 This is local implementation and browser evidence. No hosted deployment, database or chain change was performed for the logo update.
+
+## Tincta Rewards subproject lockup · 2026-10-09
+
+The approved quiet label identifies the current application as **Tincta Rewards**, a subproject of Tincta. In Landing and Web headers/footers and Launch branding, wrap the unchanged canonical wordmark in `RewardsBrand` from `@manekineko/ui/rewards-brand`. This approved subproject descriptor is the exception to the prohibition on adding a second name beside the logo; never recreate or alter the parent wordmark.
+
+Use the shared 14 px gap and title-case “Rewards” label: system sans, 13 px/20 px, weight 500, 0.01em tracking, 2 px vertical / 8 px horizontal padding, 3 px corners, #fafafa surface, #ddd border and #555 text. Dimensions scale in rem. Retain existing desktop/mobile/footer wordmark sizes. The label is not a button. Home links are named “Tincta Rewards home”; standalone lockups are named “Tincta Rewards”. Parent-brand assets, favicons and artwork signatures remain Tincta. A separate parent-brand landing page is future work.

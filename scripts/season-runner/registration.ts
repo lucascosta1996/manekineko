@@ -32,7 +32,7 @@ export function seasonFactorySeriesId(chainId: 1 | 11155111, factory: string): s
 export async function registerVerifiedCollection(pool: pg.Pool, stepId: string, deployment: ChainDeployment, payload: LaunchPayload, chainId: 1 | 11155111, createdTimestamp: number) {
   check(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(stepId), "A stable collection step UUID is required");
   check(chainId === 1 || chainId === 11155111, "Unsupported collection network");
-  const policy = seasonVersionPolicy(payload.contract.algorithmVersion === "unique-rank-v6" ? "affiliate-v10" : "affiliate-v9");
+  const policy = seasonVersionPolicy(payload.contract.algorithmVersion === "unique-rank-v6" ? payload.contract.affiliatePayoutCapBps === "0" ? "affiliate-v11" : "affiliate-v10" : "affiliate-v9");
   check(payload.contract.chainId === String(chainId) && payload.contract.algorithmVersion === policy.algorithmVersion && payload.contract.maxMintsPerWallet === "20", "Only same-network frozen V9/V10 terms may be registered");
   check(Number.isSafeInteger(deployment.deploymentBlock) && deployment.deploymentBlock > 0 && /^0x[0-9a-fA-F]{64}$/.test(deployment.deploymentBlockHash) && /^0x[0-9a-fA-F]{64}$/.test(deployment.deploymentTransactionHash), "Verified canonical deployment evidence is required");
   for (const hash of [deployment.factoryCodeHash, deployment.roundCodeHash]) check(/^0x[0-9a-fA-F]{64}$/.test(hash), "Verified runtime hashes are required");

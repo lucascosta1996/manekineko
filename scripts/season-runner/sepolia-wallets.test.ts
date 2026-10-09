@@ -69,7 +69,7 @@ function manualFixture() {
   const provider = f.options.provider as any, original = provider.call;
   provider.call = async (request: { data: string }) => {
     const call = iface.parseTransaction(request)!;
-    const values: Record<string, unknown> = { saleStartAt: 0n, mintDeadline: 86400n, affiliateIdOf: control.enrolled ? 1n : 0n, affiliateWallet: f.wallets[0].address,
+    const values: Record<string, unknown> = { saleStartAt: 200n, mintDeadline: 86600n, affiliateIdOf: control.enrolled ? 1n : 0n, affiliateWallet: f.wallets[0].address,
       affiliateAccrued: 1000n, affiliateEqualShare: 1000n, affiliateQualifiedCount: 1n, affiliatePoolAmount: 2000n, affiliateClaimed: control.commissionPaid ? 1000n : 0n,
       awardCount: 1n, prizeClaimed: control.paid, winningTokenIds: 42n, ownerOf: f.wallets[control.transferred ? 3 : 2].address,
       revealed: control.revealed, totalMinted: control.revealed ? 1000n : control.manualMints ? 40n : 0n,
@@ -278,4 +278,101 @@ test("a later manual-wallet gas shortfall creates a new funding intent instead o
  await assert.rejects(runSepoliaRehearsalStep(f.options,f.round),ChainPendingError);
  assert.equal(f.writes.length,2);const topup=Transaction.from(f.writes[1]);assert.equal(topup.to,recipient.address);assert.equal(topup.value,1000n);
  assert(f.state.journals[f.operator.address].transactions.some(t=>t.action===`${base}:topup:1`));
+});
+
+test("manual enrollment missed at the fixed opening stops instead of waiting or funding", async () => {
+  const f = manualFixture();
+  const provider = f.options.provider as any, original = provider.getBlock;
+  provider.getBlock = async (tag: unknown) => ({ ...await original(tag), timestamp: 200 });
+  await assert.rejects(runSepoliaRehearsalStep(f.options, f.round), /manual_affiliate_enrollment_deadline_missed/);
+  assert.equal(f.writes.length, 0);
+});
+
+test("an explicitly external affiliate is funded without its key and never signs a rehearsal action", async () => {
+  const f = manualFixture(), external = Wallet.createRandom().address;
+  Object.assign(f.options.scenario, { affiliateWallet: external, externalAffiliate: true, manualMintPlan: "one-referral-then-gifts" });
+  const provider = f.options.provider as any, original = provider.getBalance;
+  provider.getBalance = async (address: string) => address === external ? 0n : original(address);
+  await assert.rejects(runSepoliaRehearsalStep(f.options, f.round), ChainPendingError);
+  const transfer = Transaction.from(f.writes[0]);
+  assert.equal(transfer.to, external); assert.equal(transfer.from, f.operator.address);
+  assert.equal(f.state.journals[external], undefined);
+});
+
+test("an explicitly external buyer needs no key and only the operator funds it", async () => {
+  const f = manualFixture(), external = Wallet.createRandom().address;
+  Object.assign(f.options.scenario, { buyerWallet: external, externalBuyer: true, manualMintPlan: "one-referral-then-gifts" });
+  const provider = f.options.provider as any, original = provider.getBalance;
+  provider.getBalance = async (address: string) => address === external ? 0n : original(address);
+  await assert.rejects(runSepoliaRehearsalStep(f.options, f.round), ChainPendingError);
+  const transfer = Transaction.from(f.writes[0]);
+  assert.equal(transfer.to, external); assert.equal(transfer.from, f.operator.address);
+  assert.equal(f.state.journals[external], undefined);
+});
+
+test("fragmented funding resumes with a second donor without spending reserved manual funds", async () => {
+ const f=manualFixture(),recipient=f.wallets[0],donor=new Wallet(Wallet.createRandom().privateKey),reserve=250_000_000n;
+ const provider=f.options.provider as any,receipts=new Map<string,any>();
+ const balances=new Map([[recipient.address,0n],[f.wallets[1].address,10n**20n],[f.operator.address,reserve+150_000_000n],[donor.address,reserve+120_000_000n]]);
+ const options={...f.options,donors:[donor]};
+ provider.getBalance=async(a:string)=>balances.get(a)??reserve+200_000n;
+ provider.getTransactionReceipt=async(h:string)=>receipts.get(h)??null;
+ provider.getTransactionCount=async()=>0;
+ await assert.rejects(runSepoliaRehearsalStep(options,f.round),ChainPendingError);
+ const first=Transaction.from(f.writes[0]);assert.equal(first.from,f.operator.address);assert.equal(first.value,150_000_000n);
+ receipts.set(first.hash!,{hash:first.hash,status:1,from:first.from,to:first.to,blockNumber:100,blockHash:`0x${"ab".repeat(32)}`,gasUsed:100000n,gasPrice:22n});
+ balances.set(recipient.address,first.value);balances.set(f.operator.address,reserve-2_200_000n);
+ assert.equal((await runSepoliaRehearsalStep(options,f.round)).action,'reconciled');
+ await assert.rejects(runSepoliaRehearsalStep(options,f.round),ChainPendingError);
+ const second=Transaction.from(f.writes[1]);assert.equal(second.from,donor.address);assert.equal(second.to,recipient.address);assert.equal(second.value,100_200_000n);
+ assert.equal(f.state.journals[f.wallets[1].address],undefined);
+});
+
+test("V11 single-referral scenario uses direct purchases for every automated mint", async () => {
+  const f=manualFixture(),options={...f.options,scenario:{...f.options.scenario,manualMintPlan:"one-referral-then-gifts" as const,manualReferralOnly:true as const}};
+  await runSepoliaRehearsalStep(options,f.round);
+  f.control.enrolled=true;f.control.wrongReferral=true; // Fixture emits exactly one genuine buyer referral.
+  const provider=options.provider as any,original=provider.call,receipts=new Map<string,any>();
+  let affiliateMints=0n,buyerMints=1n;
+  provider.call=async(request:any)=>{const call=f.iface.parseTransaction(request)!;
+    if(call.name==="mintedPerWallet")return f.iface.encodeFunctionResult(call.name,[call.args[0]===f.wallets[0].address?affiliateMints:call.args[0]===f.wallets[1].address?buyerMints:0n]);
+    if(call.name==="totalMinted")return f.iface.encodeFunctionResult(call.name,[affiliateMints+buyerMints]);
+    return original(request);
+  };
+  provider.getTransactionReceipt=async(hash:string)=>receipts.get(hash)??null;
+  provider.getTransactionCount=async()=>receipts.size;
+  for(const [recipient,quantity] of [[f.wallets[0].address,20n],[f.wallets[1].address,19n]] as const){
+    await assert.rejects(runSepoliaRehearsalStep(options,f.round),ChainPendingError);
+    const tx=Transaction.from(f.writes.at(-1)!),call=f.iface.parseTransaction(tx)!;
+    assert.equal(tx.from,f.wallets[2].address);assert.equal(call.name,"mint");assert.equal(call.args[0],recipient);assert.equal(call.args[1],quantity);
+    assert.equal(tx.value,quantity*10000n);
+    receipts.set(tx.hash!,{hash:tx.hash,status:1,from:tx.from,to:tx.to,blockNumber:100,blockHash:`0x${"ab".repeat(32)}`,gasUsed:100000n,gasPrice:22n});
+    if(recipient===f.wallets[0].address)affiliateMints=20n;else buyerMints=20n;
+    assert.equal((await runSepoliaRehearsalStep(options,f.round)).action,"reconciled");
+  }
+  assert.equal(f.state.manual![f.round].referralReceipts?.[0].quantity,"1");
+  await assert.rejects(runSepoliaRehearsalStep(options,f.round),ChainPendingError);
+  const normal=f.iface.parseTransaction(Transaction.from(f.writes.at(-1)!))!;
+  assert.equal(normal.name,"mint");assert.equal(normal.args[0],f.wallets[2].address);assert.equal(normal.args[1],20n);
+  assert.equal(f.state.journals[f.wallets[0].address],undefined);assert.equal(f.state.journals[f.wallets[1].address],undefined);
+});
+
+
+test("V11 review requires the whole pool for exactly one paid referral before accepting sellout", async () => {
+  const f=manualFixture(),options={...f.options,scenario:{...f.options.scenario,manualMintPlan:"one-referral-then-gifts" as const,manualReferralOnly:true as const}};
+  const provider=options.provider as any,original=provider.call;
+  const iface=new Interface([...f.iface.fragments,"function affiliateReferredMints(uint256) view returns(uint256)"]);
+  let share=1000n,referrals=1n;
+  provider.call=async(request:any)=>{const call=iface.parseTransaction(request)!;
+    const values:Record<string,unknown>={CONTRACT_VERSION:"affiliate-v11",affiliateAccrued:share,affiliateEqualShare:share,affiliateReferredMints:referrals};
+    return call.name in values?iface.encodeFunctionResult(call.name,[values[call.name]]):original(request);
+  };
+  await runSepoliaRehearsalStep(options,f.round);
+  Object.assign(f.control,{enrolled:true,manualMints:true,revealed:true,wrongReferral:true});
+  await assert.rejects(runSepoliaRehearsalStep(options,f.round),/v11_full_affiliate_pool_not_allocated/);
+  share=2000n;referrals=2n;
+  await assert.rejects(runSepoliaRehearsalStep(options,f.round),/v11_one_referral_must_receive_full_pool/);
+  referrals=1n;
+  assert.equal((await runSepoliaRehearsalStep(options,f.round)).action,"manual-checkpoint");
+  assert.equal(f.writes.length,0);
 });

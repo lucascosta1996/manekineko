@@ -12,7 +12,7 @@ import { getRuntimeWorkerProfile } from "../../apps/launch/lib/season-runtime-st
 import { encryptRuntimeSecret, decryptRuntimeSecret } from "../../apps/launch/lib/season-runtime-crypto.ts";
 import { assertLogPathSeparate, openWorkerLog } from "./logging.ts";
 
-import { createV9ChainAdapter, createV10ChainAdapter } from "./chain.ts";
+import { createV9ChainAdapter, createV10ChainAdapter, createV11ChainAdapter } from "./chain.ts";
 import { retryVerification } from "./explorer-verification.ts";
 import type { SeasonState } from "./runner.ts";
 import { seasonVersionPolicy } from "./version.ts";
@@ -61,7 +61,7 @@ async function main(args: ReturnType<typeof parseArguments>, report: (value: unk
       const input = JSON.parse((await readPrivateFile(String(args["setup-config"])))!);
       ensure(input.chainId === chainId && input.owner && Object.keys(input).every(key => ["chainId", "owner", "previousCredits", "historicalSources", "freshNetwork", "legacyMerkleRoot", "contractVersion"].includes(key)), "invalid_registry_setup_configuration");
       const setupPolicy = seasonVersionPolicy(input.contractVersion ?? "affiliate-v9");
-      const owner = getAddress(input.owner), context = `registry-setup:${chainId}:${owner}${setupPolicy.permanent ? ":affiliate-v10" : ""}`;
+      const owner = getAddress(input.owner), context = `registry-setup:${chainId}:${owner}${setupPolicy.permanent ? `:${setupPolicy.contractVersion}` : ""}`;
       const client = await pool.connect(); let failed = false; client.on("error", () => { failed = true; });
       try {
         ensure((await client.query("SELECT pg_try_advisory_lock(hashtextextended($1,0)) AS locked", [`tincta-season-chain:${chainId}`])).rows[0].locked, "another_worker_owns_this_network");
@@ -90,7 +90,7 @@ async function main(args: ReturnType<typeof parseArguments>, report: (value: unk
         ensure(!execute || store.row.desired_state === "paused", "pause_run_before_verification_maintenance");
         const state = store.state as SeasonState;
         ensure(state.journal && state.collections, "verification_deployment_journal_required");
-        const adapter = await (store.artifact.contractVersion === "affiliate-v10" ? createV10ChainAdapter : createV9ChainAdapter)({ ...config, ...registryPins(chainId,process.env,seasonVersionPolicy(store.artifact.contractVersion).contractVersion), chainId, execute,
+        const adapter = await (store.artifact.contractVersion === "affiliate-v11" ? createV11ChainAdapter : store.artifact.contractVersion === "affiliate-v10" ? createV10ChainAdapter : createV9ChainAdapter)({ ...config, ...registryPins(chainId,process.env,seasonVersionPolicy(store.artifact.contractVersion).contractVersion), chainId, execute,
           owner: store.artifact.steps[0].payload.contract.initialOwner, journal: state.journal, saveJournal: async journal => { state.journal=journal; if (state.rehearsal) state.rehearsal.journals[getAddress(journal.from)]=journal; await store.save(state); } });
         try {
           for (const item of Object.values(state.collections)) if(item.deployment) await adapter.queueExistingVerification(item.deployment);

@@ -1,4 +1,5 @@
 "use client";
+import { RewardsBrand } from "@manekineko/ui/rewards-brand";
 import { Button, IconButton, LinkButton } from "@manekineko/ui/button";
 import { PublicFooter } from "@manekineko/ui/footer";
 import type { PublicLinks } from "@manekineko/ui/links";
@@ -17,9 +18,9 @@ function Brand({ footer = false }: { footer?: boolean }) {
     <a
       className={`brand${footer ? " brand-footer" : ""}`}
       href="#top"
-      aria-label="Tincta home"
+      aria-label="Tincta Rewards home"
     >
-      <TinctaWordmark className="brand-wordmark" title="" />
+      <RewardsBrand decorative><TinctaWordmark className="brand-wordmark" title="" /></RewardsBrand>
     </a>
   );
 }
@@ -1006,7 +1007,7 @@ export function LandingExperience({
         </section>
       </main>
       <PublicFooter
-        brand={<TinctaWordmark title="" className="ui-footer-wordmark" />}
+        brand={<RewardsBrand><TinctaWordmark title="" className="ui-footer-wordmark" /></RewardsBrand>}
         links={footerLinks}
         legal={<>Launch preview. Rewards shown use planned default terms and require sellout. Prizes and affiliate earnings are not guaranteed. Review each collection’s final terms.</>}
       />

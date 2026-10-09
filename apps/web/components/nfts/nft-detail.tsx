@@ -16,7 +16,7 @@ export function NftDetail({ item }: { item: NftItem }) {
   const { data, error, retry } = useNftMetadata(item, true, true);
   const nft = data?.nft ?? item;
   const links = nftLinks(nft.chainId, nft.contractAddress, nft.tokenId);
-  const permanent = nft.contractVersion === "affiliate-v10";
+  const permanent = (nft.contractVersion === "affiliate-v10" || nft.contractVersion === "affiliate-v11");
   const scrambled = nft.algorithmVersion === "unique-rank-v3" || nft.algorithmVersion === "unique-rank-v4" || nft.algorithmVersion === "unique-rank-v5";
   const [copied, setCopied] = useState("");
   const explorer = nft.chainId === 1 ? "https://etherscan.io" : "https://sepolia.etherscan.io";
