@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { prepare, ready, urls } from './fixtures';
-for (const [app, routes] of Object.entries({landing:['/'],web:['/docs','/my-nfts'],launch:['/login','/dashboard','/loading','/error','/not-found']})) {
+for (const [app, routes] of Object.entries({landing:['/rewards'],web:['/docs','/my-nfts'],launch:['/login','/dashboard','/loading','/error','/not-found']})) {
  for(const width of [320,390,768,1440]) for(const route of routes) {
   test(`${app} ${route} ${width}`,async({page})=>{
    await page.setViewportSize({width,height:900});await prepare(page);await page.goto(urls[app as keyof typeof urls]+route);await ready(page);

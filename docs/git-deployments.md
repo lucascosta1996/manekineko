@@ -29,3 +29,18 @@ Newsletter migration 028 and the restricted staging newsletter login were applie
 Vercel's production target here serves **Sepolia staging**. Pushing source does not apply database migrations, deploy blockchain contracts, activate the persistent season worker, start seasons or send X posts. Those operations remain separate and require their existing reviewed workflows. See [the architecture handoff](architecture.md), [staging release](staging-v10-release.md) and [Sepolia mocks](sepolia-mock-seasons.md).
 
 Direct CLI deployment remains available for deliberate recovery, but normal application releases should come from `main` so the deployed source has a traceable Git commit.
+
+## Public parent landing project · 2026-10-21
+
+The separate Vercel project [`tincta`](https://vercel.com/pro-5deee0e3/tincta) is connected to this repository's `main` branch, rooted at `apps/landing-page`, with Node 22, `cd ../.. && npm ci`, `npm run build`, and shared source access. Production is public. Its domains are `tincta.xyz` and `www.tincta.xyz`; `www` redirects to the apex with HTTP 308. Both domains were verified, and Vercel reported their existing external DNS configuration valid without a DNS change.
+
+The two Landing projects use build-time routing settings:
+
+| Project | Settings | Behavior |
+| --- | --- | --- |
+| `tincta` | `LANDING_SITE_ROLE=studio`, `NEXT_PUBLIC_LANDING_URL=https://tincta.xyz`, `REWARDS_PUBLIC_URL=https://rewards.tincta.xyz` | Parent Tincta page at `/`; `/rewards` redirects to the existing Rewards domain. No newsletter database or application credentials are copied into this project. |
+| `manekineko-staging-landing` | `LANDING_SITE_ROLE=rewards`, `NEXT_PUBLIC_LANDING_URL=https://tincta.xyz` | Rewrites `/` to the Rewards page, preserving `rewards.tincta.xyz` and the stable Vercel alias. Its existing newsletter and Web configuration stay with this project. The Website footer link returns to the parent domain. |
+
+With `LANDING_SITE_ROLE` unset, local development keeps the parent page at `/` and Rewards at `/rewards`. Routing changes require a new build. The parent page has no live collection or newsletter dependency. The historical protection description above records the September setup; the Rewards project was already public when inspected on October 21.
+
+The public parent project is an additional deployment target for `main`. It does not configure or activate Mainnet contracts, migrations, seasons, workers, or social delivery. Vercel build readiness, domain/HTTPS checks, browser acceptance, and GitHub CI results must still be verified independently for each release.

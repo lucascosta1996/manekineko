@@ -8,7 +8,7 @@ import { visualCollection } from '../../apps/web/test/visual-data';
 test.describe.configure({ mode: 'parallel' });
 const web = ['/seasons', `/seasons/11155111/${visualCollection.seasonId}`, `/mint/${visualCollection.id}`, `/mint/${visualCollection.id}/affiliates`, `/mint/${visualCollection.id}/contract`, '/history','/my-nfts',`/nfts/${visualCollection.id}/1`,'/prizes','/docs',...docPages.filter(p=>p.slug!=='overview').map(p=>`/docs/${p.slug}`),'/visual/loading','/visual/error','/visual/not-found', '/visual/docs/loading', '/visual/docs/error', '/visual/docs/not-found', '/visual/mint/error', '/visual/mint/not-found', '/visual/seasons/error', '/visual/seasons/not-found', '/visual/history/error', '/visual/nft/error', '/visual/nft/not-found'];
 const launch = ['/login','/dashboard','/activity','/settings','/seasons','/launch','/active-collection','/upcoming-collection','/earnings','/error','/loading','/not-found'];
-for (const [app, routes] of Object.entries({ landing: ['/', '/visual/error', '/visual/not-found'], web, launch })) {
+for (const [app, routes] of Object.entries({ landing: ['/', '/rewards', '/visual/error', '/visual/not-found'], web, launch })) {
  for (const route of routes) {
   for (const [width,height] of widths) {
    test(`${app} ${route} ${width}`, async ({ page, browserName }) => {

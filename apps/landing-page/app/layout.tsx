@@ -5,9 +5,9 @@ import "./globals.css";
 import "./compact.css";
 
 export const metadata: Metadata = {
-  title: "Tincta — Autonomous rewards. Verifiable onchain.",
+  title: "Tincta — Defined by code. Shaped by participation.",
   description:
-    "Prizes and affiliate commissions controlled by smart contracts. Explore planned ETH rewards, onchain rules, and direct claims. Join the Tincta launch list.",
+    "Tincta is a research and publishing studio exploring programmable markets, digital collections, and participant-driven outcomes.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

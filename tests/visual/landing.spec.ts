@@ -4,7 +4,7 @@ import { prepare, ready, urls, collection, metrics } from './fixtures';
 
 test.use({ trace: 'on', video: 'on' });
 test('Landing announcement follows the received palette and tolerates older responses', async ({page}) => {
- await prepare(page);await page.goto(urls.landing);
+ await prepare(page);await page.goto(`${urls.landing}/rewards`);
  const bar=page.getByRole('region',{name:'Collection status',exact:true});
  await expect(bar).toHaveAttribute('data-phase','ready');
  const first=await bar.evaluate(el=>getComputedStyle(el).backgroundImage);
@@ -35,7 +35,7 @@ test.describe('Landing asynchronous production states', () => {
    });
    let release!: () => void; const held = new Promise<void>(resolve=>release=resolve); let requests=0;
    await page.route('**/api/live-collection', async route=>{requests++;await held;await route.fulfill({json:{collection}});});
-   await page.goto(urls.landing);
+   await page.goto(`${urls.landing}/rewards`);
    await expect.poll(()=>requests).toBe(1);
    await expect(page.locator('.site')).toHaveClass(/motion-paused/);
    const announcement=page.getByRole('region',{name:'Collection status',exact:true});
@@ -70,7 +70,7 @@ test.describe('Landing asynchronous production states', () => {
    await expect(page).toHaveScreenshot(`hero-loaded-${width}.png`);
   });
   test(`empty and failed retry retain truthful state ${width}`, async ({ page }) => {
-   await page.setViewportSize({width,height:844});await prepare(page,'empty'); await page.goto(urls.landing);
+   await page.setViewportSize({width,height:844});await prepare(page,'empty'); await page.goto(`${urls.landing}/rewards`);
    await expect(page.locator('.collection-announcement')).toHaveAttribute('data-phase','empty');
    await expect(page.locator('.collection-announcement').getByRole('button')).toHaveCount(0);
    let response: 'failure'|'hold'|'success' = 'failure'; let requests=0;let release!:()=>void;
@@ -100,7 +100,7 @@ test.describe('Landing asynchronous production states', () => {
    await page.setViewportSize({width,height:844});await prepare(page);
    const scheduled={...collection,name:'Future study',status:'scheduled',label:'Mint scheduled',target:new Date(Date.parse(collection.serverNow)+2000).toISOString(),remainingSupply:null};
    await page.route('**/api/live-collection',route=>route.fulfill({json:{collection:scheduled}}));
-   await page.goto(urls.landing);
+   await page.goto(`${urls.landing}/rewards`);
    const announcement=page.getByRole('region',{name:'Collection status',exact:true});
    await expect(announcement).toHaveAttribute('data-phase','ready');
    await expect(announcement.getByRole('link',{name:'Future study',exact:true})).toBeVisible();
@@ -116,7 +116,7 @@ test.describe('Landing asynchronous production states', () => {
    await page.setViewportSize({width,height:844});await prepare(page);
    const closing={...collection,target:new Date(Date.parse(collection.serverNow)+2000).toISOString()};
    await page.route('**/api/live-collection',route=>route.fulfill({json:{collection:closing}}));
-   await page.goto(urls.landing);
+   await page.goto(`${urls.landing}/rewards`);
    const announcement=page.getByRole('region',{name:'Collection status',exact:true});
    await expect(announcement).toHaveAttribute('data-phase','ready');
    await expect(announcement.locator('.lifecycle-badge')).toHaveText('Mint open');
@@ -133,7 +133,7 @@ test.describe('Landing asynchronous production states', () => {
    await page.setViewportSize({width,height:844});await prepare(page);
    const name='A very long collection name for a future geometric color study';
    await page.route('**/api/live-collection',route=>route.fulfill({json:{collection:{...collection,name}}}));
-   await page.goto(urls.landing);await ready(page);
+   await page.goto(`${urls.landing}/rewards`);await ready(page);
    const announcement=page.getByRole('region',{name:'Collection status',exact:true});
    await expect(announcement).toHaveAttribute('data-phase','ready');
    await expect(announcement.getByRole('link',{name,exact:true})).toBeVisible();
@@ -151,7 +151,7 @@ test.describe('Landing asynchronous production states', () => {
     await page.setViewportSize({width,height:844});await prepare(page);
     let release!:()=>void;const pending=new Promise<void>(resolve=>release=resolve);
     await page.route('**/api/live-collection',async route=>{await pending;await route.fulfill({json:{collection}});});
-    await page.goto(urls.landing);
+    await page.goto(`${urls.landing}/rewards`);
     const announcement=page.getByRole('region',{name:'Collection status',exact:true});
     await expect(announcement).toHaveAttribute('data-phase','pending');
     await expect(page.locator('.site')).toHaveClass(/motion-paused/);
@@ -171,7 +171,7 @@ test.describe('Landing asynchronous production states', () => {
   }
  });
  test('malformed, timeout, offline and reconnection', async ({page})=>{
-  await prepare(page);await page.route('**/api/live-collection',route=>route.fulfill({json:{surprise:true}}));await page.goto(urls.landing);
+  await prepare(page);await page.route('**/api/live-collection',route=>route.fulfill({json:{surprise:true}}));await page.goto(`${urls.landing}/rewards`);
   await expect(page.locator('.collection-announcement')).toHaveAttribute('data-phase','error');
   await page.route('**/api/live-collection',()=>new Promise(()=>{}));
   await page.getByRole('button',{name:'Refresh',exact:true}).click();await page.clock.runFor(12001);
@@ -182,7 +182,7 @@ test.describe('Landing asynchronous production states', () => {
   await expect(page.locator('.collection-announcement')).toHaveAttribute('data-phase','ready');
  });
  test('newsletter inline validation, duplicate guard, stable geometry and retained draft',async({page})=>{
-  await prepare(page);await page.goto(urls.landing);await ready(page);
+  await prepare(page);await page.goto(`${urls.landing}/rewards`);await ready(page);
   const form=page.getByRole('form',{name:'Launch notifications'}), email=page.getByRole('textbox',{name:'Email address'}), button=form.getByRole('button');
   let count=0; let release!:()=>void;const held=new Promise<void>(resolve=>release=resolve);
   await page.route('**/api/newsletter',async route=>{count++;await held;await route.fulfill({status:503,json:{error:'Unavailable'}});});
@@ -199,7 +199,7 @@ test.describe('Landing asynchronous production states', () => {
  });
  test('mobile navigation, FAQ, missing image and support dialog',async({page})=>{
   await prepare(page);await page.setViewportSize({width:390,height:568});
-  await page.route('**/artwork/*.svg',r=>r.abort());await page.goto(urls.landing);await ready(page);
+  await page.route('**/artwork/*.svg',r=>r.abort());await page.goto(`${urls.landing}/rewards`);await ready(page);
   await page.getByRole('button',{name:'Open navigation'}).click();await page.keyboard.press('Escape');await expect(page.getByRole('button',{name:'Open navigation'})).toBeFocused();
   await page.getByText('How can I verify the contract?',{exact:true}).click();await expect(page.locator('details[open]')).toHaveCount(1);
   await expect(page.locator('.artwork-fallback')).toHaveCount(6);
@@ -213,7 +213,7 @@ test('Landing hidden/visible recovery keeps one background request', async ({pag
  await prepare(page); let requests=0, held=false; let release!:()=>void;
  const pending=new Promise<void>(resolve=>release=resolve);
  await page.route('**/api/live-collection',async route=>{requests++;if(held)await pending;await route.fulfill({json:{collection}});});
- await page.goto(urls.landing);await expect(page.locator('.collection-announcement')).toHaveAttribute('data-phase','ready');
+ await page.goto(`${urls.landing}/rewards`);await expect(page.locator('.collection-announcement')).toHaveAttribute('data-phase','ready');
  await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));});
  await page.clock.runFor(60000);expect(requests).toBe(1);
  held=true;
@@ -226,7 +226,7 @@ test('Landing hidden/visible recovery keeps one background request', async ({pag
 });
 
 test('Landing late response cannot restore fresh availability while offline', async ({page}) => {
- await prepare(page);await page.goto(urls.landing);await expect(page.locator('.collection-announcement')).toHaveAttribute('data-phase','ready');
+ await prepare(page);await page.goto(`${urls.landing}/rewards`);await expect(page.locator('.collection-announcement')).toHaveAttribute('data-phase','ready');
  let release!:()=>void;const pending=new Promise<void>(resolve=>release=resolve);let requests=0;
  await page.route('**/api/live-collection',async route=>{requests++;await pending;await route.fulfill({json:{collection}});});
  await page.clock.runFor(20000);await expect.poll(()=>requests).toBe(1);
@@ -240,7 +240,7 @@ test('Landing late response cannot restore fresh availability while offline', as
 });
 
 test('Landing device motion preference controls artwork and palette cycling', async ({page}) => {
- await page.emulateMedia({reducedMotion:'no-preference'});await prepare(page);await page.goto(urls.landing);await ready(page);
+ await page.emulateMedia({reducedMotion:'no-preference'});await prepare(page);await page.goto(`${urls.landing}/rewards`);await ready(page);
  const animation=page.locator('.sculpture-orbit');
  await expect(animation).toHaveCSS('animation-play-state','running');
  await expect(page.getByRole('button',{name:/^(Pause|Play) (animations|motion)$/})).toHaveCount(0);
@@ -259,7 +259,7 @@ test('Landing device motion preference controls artwork and palette cycling', as
 });
 
 test('Landing recovery focuses the empty status without stealing moved focus', async ({page}) => {
- await prepare(page,'error');await page.goto(urls.landing);
+ await prepare(page,'error');await page.goto(`${urls.landing}/rewards`);
  const region=page.getByRole('region',{name:'Collection status',exact:true});
  await expect(region).toHaveAttribute('data-phase','error');
  await page.route('**/api/live-collection',route=>route.fulfill({json:{collection:null}}));

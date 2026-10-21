@@ -153,7 +153,7 @@ Do not mask controls, text, statuses, artwork or footers to make tests pass. Fre
 
 The live collection region now sits in the announcement bar above the navbar; the regression scenario retains its hero name because announcement geometry must keep the hero CTA stable. Existing coverage is in `tests/visual/landing.spec.ts`; run it for the current revision before claiming a pass.
 
-1. Open the production-rendered Landing route with a cold page cache and intercept `/api/live-collection` before navigation.
+1. Open the production-rendered Rewards Landing route (`/rewards`) with a cold page cache and intercept `/api/live-collection` before navigation.
 2. Hold the initial response until explicitly released. Inspect the first styled paint, pre-response DOM and pending region. Capture representative early and slow frames, including roughly 0.5, 3 and 10 seconds. A trace/video must cover transitions between snapshots; the timestamps alone cannot prove that no flash occurred.
 3. Assert no Refresh/Retry action in initial pending, no error wording, no raw/native control appearance, and no main-heading/CTA replacement. Measure the reserved region and hero CTA position.
 4. Release a valid published collection fixture. Verify truthful name/state/observation information and the expected CTA hierarchy. Record any layout movement; pending and loaded status-slot geometry should avoid displacing the primary CTA.

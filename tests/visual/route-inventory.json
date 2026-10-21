@@ -2,7 +2,8 @@
   "standard": "docs/design/visual-identity.md v1.0",
   "landing": {
     "routes": [
-      "/"
+      "/",
+      "/rewards"
     ],
     "boundaries": [
       "error",
