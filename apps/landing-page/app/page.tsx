@@ -6,13 +6,13 @@ import { ResearchArt } from "../components/research-art";
 import "./studio.css";
 
 const principles = [
-  ["01", "Programmable incentives", "How can participation create economic rights through explicit, inspectable rules?"],
-  ["02", "Verifiable commitments", "How can contracts preserve the promises a project makes to its participants?"],
-  ["03", "Participant-driven outcomes", "How can individual decisions shape the trajectory of a shared collection?"],
+  ["01", "Immutable by design", "The governing contract is fixed when published. Its code cannot be edited afterward, including by its creators."],
+  ["02", "Open to inspection", "Published onchain, the rules can be inspected independently before anyone chooses to participate."],
+  ["03", "Shaped by participation", "People shape outcomes through the actions and decision rights established in the contract."],
 ];
 const concepts = [
-  { name: "Morph", kind: "morph" as const, focus: "Adaptive collections", headline: "A collection shaped by the people who move it.", description: "Exploring digital collections that translate participant activity into changes in form, composition, and progression.", question: "How can ownership patterns, transfers, and collective milestones influence a collection’s evolution—while distinguishing sustained participation from artificial activity?" },
-  { name: "Assembly", kind: "assembly" as const, focus: "Collective publishing", headline: "Ownership becomes a role in what comes next.", description: "Exploring how collections can coordinate creative decisions, allocate shared resources, and publish new work through participant governance.", question: "How can a collection become a lasting publishing community—with clear decision rights, limits on concentrated influence, and commitments that remain enforceable after a vote?" },
+  { name: "Morph", kind: "morph" as const, focus: "Adaptive collections", headline: "A collection shaped by the people who move it.", description: "Exploring collections that evolve through participant activity, with the rules of that evolution fixed in immutable code.", question: "How can ownership patterns, transfers, and collective milestones influence a collection’s evolution under fixed rules that distinguish sustained participation from artificial activity?" },
+  { name: "Assembly", kind: "assembly" as const, focus: "Collective publishing", headline: "Ownership becomes a role in what comes next.", description: "Exploring collective publishing where immutable contracts define how participants make decisions, allocate resources, and publish new work.", question: "How can participants govern a shared publishing practice within fixed decision rights and limits that even its creators cannot override?" },
 ];
 
 export default function LandingPage() {
@@ -29,42 +29,38 @@ export default function LandingPage() {
         </header>
         <main id="main">
           <section className="studio-hero" aria-labelledby="studio-title">
-            <div>
+            <div className="studio-hero-copy">
               <p className="studio-eyebrow">Research &amp; onchain publishing</p>
-              <h1 id="studio-title"><span>Defined by code.</span><span>Shaped by participation.</span></h1>
-              <p className="studio-intro">Tincta is a research and publishing studio exploring programmable markets—where smart contracts establish the rules, and participants shape how digital collections unfold.</p>
+              <h1 id="studio-title"><span>Defined 100% onchain.</span>{" "}<span>Shaped by participation.</span></h1>
+              <p className="studio-intro">We build open systems where immutable code sets the rules—and participation creates what comes next.</p>
               <LinkButton href="#projects" icon={<Icon name="arrow" />}>Explore our projects</LinkButton>
             </div>
-            <figure className="studio-art">
-              <ResearchArt kind="rewards" />
-              <figcaption><span>Rewards / Open</span><span>Opening → discovery</span></figcaption>
-            </figure>
           </section>
           <section className="studio-section" id="research" aria-labelledby="research-title">
             <div className="studio-thesis">
-              <div><p className="studio-eyebrow">01 / Our thesis</p><h2 id="research-title">A collection is more than what it contains.</h2></div>
+              <div><p className="studio-eyebrow">01 / Our thesis</p><h2 id="research-title">Rules that cannot be rewritten.</h2></div>
               <div className="studio-copy">
-                <p>Its trajectory emerges from the rules that govern it—and the people who choose to participate. We explore how those rules can become transparent, executable systems.</p>
-                <p>Our research sits between mechanism design and collective behavior: how individual decisions produce shared outcomes, and how smart contracts can reduce dependence on discretionary intervention.</p>
+                <p>We publish immutable contracts so participants can inspect the rules before they act. Once deployed, that code cannot be edited by us or anyone else.</p>
+                <p>Participants shape outcomes through actions the contract already allows. Our research asks what becomes possible when shared activity rests on rules that remain fixed.</p>
               </div>
             </div>
             <div className="studio-principles">{principles.map(([number, title, copy]) => <article className="studio-principle" key={number}><p className="studio-eyebrow">{number}</p><h3>{title}</h3><p>{copy}</p></article>)}</div>
           </section>
           <section className="studio-section" id="projects" aria-labelledby="projects-title">
-            <div className="studio-section-heading"><div><p className="studio-eyebrow">02 / Projects</p><h2 id="projects-title">Research, put into practice.</h2></div><p>Each project explores a different relationship between code, ownership, and participation.</p></div>
+            <div className="studio-section-heading"><div><p className="studio-eyebrow">02 / Projects</p><h2 id="projects-title">Immutable rules. Open possibilities.</h2></div><p>Each project explores what people can create, coordinate, and claim through rules fixed at publication.</p></div>
             <article className="studio-feature">
               <figure className="studio-art studio-project-art"><ResearchArt kind="rewards" /></figure>
               <div>
                 <div className="studio-project-name">Tincta Rewards</div>
-                <h3>Participation with defined economic rights.</h3>
-                <p>Tincta Rewards explores collection-based incentives, with smart contracts defining prize claims, affiliate rewards, and refund conditions.</p>
+                <h3>Rewards governed by immutable terms.</h3>
+                <p>Each Rewards collection fixes its mint terms, prize allocation, affiliate rules, and refund conditions at deployment. Claims follow those published rules.</p>
                 <LinkButton href="/rewards" variant="secondary" icon={<Icon name="arrow" />}>Explore Tincta Rewards</LinkButton>
-                <div className="studio-feature-meta"><span>Collection-based incentives</span><span>Contract-defined rules</span></div>
+                <div className="studio-feature-meta"><span>Terms fixed at deployment</span><span>Direct contract claims</span></div>
               </div>
             </article>
           </section>
           <section className="studio-section" id="upcoming" aria-labelledby="upcoming-title">
-            <div className="studio-section-heading"><div><p className="studio-eyebrow">03 / Upcoming projects</p><h2 id="upcoming-title">New questions.<br />Future projects.</h2></div><p>Our next research directions explore how collections evolve—and what their participants create together.</p></div>
+            <div className="studio-section-heading"><div><p className="studio-eyebrow">03 / Upcoming projects</p><h2 id="upcoming-title">Changing outcomes.<br />Lasting rules.</h2></div><p>We’re exploring how collections can evolve and communities can create together within rules fixed at publication.</p></div>
             <div className="studio-upcoming">{concepts.map(project => <article className="studio-concept" key={project.name}>
               <figure className="studio-art studio-project-art"><ResearchArt kind={project.kind} /></figure>
               <div className="studio-concept-heading"><h3>Tincta {project.name}</h3><span className="studio-concept-status">Research concept</span></div>
@@ -74,13 +70,13 @@ export default function LandingPage() {
             </article>)}</div>
             <p className="studio-roadmap-note">Morph and Assembly are proposed research directions. Their scope and release timing are not yet established.</p>
           </section>
-          <section className="studio-section studio-closing" aria-labelledby="closing-title"><div><p className="studio-eyebrow">Toward greater autonomy</p><h2 id="closing-title">We design the conditions.<br />Participation shapes the outcome.</h2></div><LinkButton href="/rewards" icon={<Icon name="arrow" />}>Discover Tincta Rewards</LinkButton></section>
+          <section className="studio-section studio-closing" aria-labelledby="closing-title"><div><p className="studio-eyebrow">Built to remain</p><h2 id="closing-title">The rules stay fixed.<br />The possibilities unfold.</h2></div><LinkButton href="/rewards" icon={<Icon name="arrow" />}>Discover Tincta Rewards</LinkButton></section>
         </main>
         <footer className="studio-footer">
-          <div><a className="studio-brand" href="/" aria-label="Tincta home"><TinctaWordmark className="studio-wordmark" title="" /></a><p className="studio-footer-description">Research, development,<br />and onchain publishing.</p></div>
+          <div><a className="studio-brand" href="/" aria-label="Tincta home"><TinctaWordmark className="studio-wordmark" title="" /></a><p className="studio-footer-description">Research and publishing<br />for immutable onchain systems.</p></div>
           <nav aria-label="Explore Tincta"><strong className="ui-footer-heading">Explore</strong><a className="ui-footer-link" href="#research">Our research</a><a className="ui-footer-link" href="/rewards">Tincta Rewards<Icon name="arrow" size="footer" /></a><a className="ui-footer-link" href="#upcoming">Upcoming projects</a></nav>
           <nav aria-label="Tincta information"><strong className="ui-footer-heading">Tincta</strong><a className="ui-footer-link" href="#top">Back to top<Icon name="up" size="footer" /></a>{links.contact && <a className="ui-footer-link" href={links.contact}>Contact<Icon name="diagonal" size="footer" /></a>}{links.social && <a className="ui-footer-link" href={links.social}>X<Icon name="diagonal" size="footer" /></a>}</nav>
-          <div className="studio-footer-legal"><span>© {new Date().getFullYear()} Tincta</span><span>Defined by code. Shaped by participation.</span></div>
+          <div className="studio-footer-legal"><span>© {new Date().getFullYear()} Tincta</span><span>Defined 100% onchain. Shaped by participation.</span></div>
         </footer>
       </div>
     </div>

@@ -5,9 +5,9 @@ for (const [width, height] of widths) {
  test(`Tincta parent page ${width}`, async ({page,browserName},info) => {
   test.skip(browserName !== 'chromium' && ![390,1440].includes(width));
   await page.setViewportSize({width,height});await prepare(page);await page.goto(urls.landing);await ready(page);
-  await expect(page.getByRole('heading',{level:1})).toHaveText('Defined by code.Shaped by participation.');
+  await expect(page.getByRole('heading',{level:1})).toHaveText('Defined 100% onchain. Shaped by participation.');
   await expect(page.locator('.studio-header .ui-rewards-label')).toHaveCount(0);
-  await expect(page.locator('.studio-hero [data-tincta-artwork="open"]')).toHaveCount(1);
+  await expect(page.locator('.studio-hero [data-tincta-artwork="open"]')).toHaveCount(0);
   await expect(page.locator('.studio-feature [data-tincta-artwork="open"]')).toHaveCount(1);
   await expect(page.getByText('Research concept',{exact:true})).toHaveCount(2);
   await expect(page.locator('.collection-announcement')).toHaveCount(0);
