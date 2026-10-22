@@ -1,0 +1,38 @@
+[
+  {
+    "id": "a",
+    "slug": "drift",
+    "name": "Drift",
+    "family": "Morph",
+    "palette": "green",
+    "description": "The square gradually rounds and travels off-center. A drifting aperture gives the familiar contour field a different balance.",
+    "rule": "32 frames · moving center · 2-unit strokes"
+  },
+  {
+    "id": "b",
+    "slug": "counterturn",
+    "name": "Counterturn",
+    "family": "Morph",
+    "palette": "green",
+    "description": "The frames rotate forward, then reverse as they contract. This creates a denser folded edge around a quiet rounded opening.",
+    "rule": "32 frames · reversing rotation · 2-unit strokes"
+  },
+  {
+    "id": "c",
+    "slug": "confluence",
+    "name": "Confluence",
+    "family": "Assembly",
+    "palette": "blue",
+    "description": "Quarter-circle tiles form two solid circular groups and two open ones. Positive and negative shapes balance across the same precise grid.",
+    "rule": "4 × 4 grid · quarter circles · 6-unit gutters"
+  },
+  {
+    "id": "d",
+    "slug": "relay",
+    "name": "Relay",
+    "family": "Assembly",
+    "palette": "blue",
+    "description": "Convex and concave tiles pass a curve through the grid. Alternating solid and open cells create a more directional composition.",
+    "rule": "4 × 4 grid · convex/concave pairs · 6-unit gutters"
+  }
+]

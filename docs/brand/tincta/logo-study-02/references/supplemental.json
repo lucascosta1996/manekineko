@@ -1,0 +1,124 @@
+[
+  {
+    "key": "bybit",
+    "url": "https://www.bybit.com/press",
+    "error": "page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://www.bybit.com/press"
+  },
+  {
+    "key": "mastercard",
+    "url": "https://www.mastercard.com/brandcenter/us/en/home..html",
+    "title": "Access Denied",
+    "links": []
+  },
+  {
+    "key": "morpho",
+    "url": "https://brand.morpho.org",
+    "title": "Morpho Brand Guidelines",
+    "links": [
+      {
+        "text": "Logos",
+        "href": "https://brand.morpho.org/#logos"
+      },
+      {
+        "text": "Download all Brand Assets",
+        "href": "https://cdn.morpho.org/assets/brand-kit/morpho-brand-kit.zip"
+      },
+      {
+        "text": "Download Morpho Logos",
+        "href": "https://cdn.morpho.org/assets/brand-kit/morpho-logo.zip"
+      },
+      {
+        "text": "Download Morpho Logos",
+        "href": "https://cdn.morpho.org/assets/brand-kit/morpho-logo.zip"
+      },
+      {
+        "text": "Download Token Icon",
+        "href": "https://cdn.morpho.org/assets/brand-kit/morpho-token-icon.zip"
+      },
+      {
+        "text": "Download Token Icon",
+        "href": "https://cdn.morpho.org/assets/brand-kit/morpho-token-icon.zip"
+      },
+      {
+        "text": "Download the Shape (mp4 + png)",
+        "href": "https://cdn.morpho.org/assets/brand-kit/morpho-abstract-shape.zip"
+      },
+      {
+        "text": "Download the Shape (mp4 + png)",
+        "href": "https://cdn.morpho.org/assets/brand-kit/morpho-abstract-shape.zip"
+      },
+      {
+        "text": "Download Wallpapers",
+        "href": "https://cdn.morpho.org/assets/brand-kit/morpho-wallpapers.zip"
+      },
+      {
+        "text": "Download Wallpapers",
+        "href": "https://cdn.morpho.org/assets/brand-kit/morpho-wallpapers.zip"
+      }
+    ]
+  },
+  {
+    "key": "curve",
+    "url": "https://www.curve.finance",
+    "title": "Curve.finance",
+    "links": []
+  },
+  {
+    "key": "coinbase",
+    "url": "https://cds.coinbase.com/components/media/LogoWordMark/",
+    "title": "LogoWordMark | Coinbase Design System",
+    "links": [
+      {
+        "text": "Coinbase Design System Logo",
+        "href": "https://cds.coinbase.com/"
+      },
+      {
+        "text": "Coinbase Design System Logo",
+        "href": "https://cds.coinbase.com/"
+      },
+      {
+        "text": "LogoMark",
+        "href": "https://cds.coinbase.com/components/media/LogoMark/"
+      },
+      {
+        "text": "LogoWordMark",
+        "href": "https://cds.coinbase.com/components/media/LogoWordMark/"
+      },
+      {
+        "text": "SubBrandLogoMark",
+        "href": "https://cds.coinbase.com/components/media/SubBrandLogoMark/"
+      },
+      {
+        "text": "SubBrandLogoWordMark",
+        "href": "https://cds.coinbase.com/components/media/SubBrandLogoWordMark/"
+      },
+      {
+        "text": "LogoMark",
+        "href": "https://cds.coinbase.com/components/media/LogoMark/"
+      },
+      {
+        "text": "SubBrandLogoMark",
+        "href": "https://cds.coinbase.com/components/media/SubBrandLogoMark/"
+      },
+      {
+        "text": "SubBrandLogoWordMark",
+        "href": "https://cds.coinbase.com/components/media/SubBrandLogoWordMark/"
+      },
+      {
+        "text": "PreviousLogoMark",
+        "href": "https://cds.coinbase.com/components/media/LogoMark/"
+      }
+    ]
+  },
+  {
+    "key": "balancer",
+    "url": "https://balancer.fi",
+    "title": "Balancer—AMMs made easy",
+    "links": [
+      {
+        "text": "Brand assets",
+        "href": "https://github.com/balancer/brand-assets"
+      }
+    ]
+  }
+]

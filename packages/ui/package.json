@@ -16,6 +16,7 @@
     "./dialog": "./src/dialog.tsx",
     "./footer": "./src/footer.tsx",
     "./rewards-brand": "./src/rewards-brand.tsx",
+    "./rewards-artwork": "./src/rewards-artwork.tsx",
     "./links": "./src/links.ts",
     "./styles.css": "./src/styles.css"
   },

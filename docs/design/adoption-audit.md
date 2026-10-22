@@ -23,7 +23,7 @@ Local automation does not establish remote CI enforcement, live auth/wallet beha
 
 ## Existing foundations
 
-- Approved Tincta direction 06 has canonical [geometry](../brand/tincta/identity/geometry.json), generated app assets and a [parity command](../../scripts/generate-tincta-brand.mjs).
+- Approved Tincta C / Ligature (2026-10-21) has canonical [geometry](../brand/tincta/identity/geometry.json), generated app assets and a [parity command](../../scripts/generate-tincta-brand.mjs).
 - [The UI package](../../packages/ui/package.json) exports icons, select, dialog primitives, footer, links and styles. It currently has no typed shared Button/LinkButton/IconButton family.
 - [Shared styles](../../packages/ui/src/styles.css) already define near-black ink, muted text, a neutral surface, 3 px corners, 15 px body text, 14 px controls and compact headings.
 - [Shared icons](../../packages/ui/src/icons.tsx) use Lucide, 18 px geometry and 1.6 stroke; [Select](../../packages/ui/src/select.tsx) and [Dialog](../../packages/ui/src/dialog.tsx) use Radix primitives.
@@ -78,3 +78,11 @@ Each step includes its applicable accessibility and regression checks; do not de
 The initial documentation task delivered the standard, reusable prompt, acceptance pipeline, source audit and links from agent/documentation entry points. That initial task did not fix the reported Refresh control, migrate buttons/footers, create a browser CI job or certify the apps. The implementation follow-up above supersedes those source gaps. Those distinctions must remain explicit in future handoffs.
 
 Documentation validation: relative file links and source anchors were checked; independent reviews checked numeric contracts, scope and verification claims; proposed text/status/control color pairs were checked mathematically against their specified contrast thresholds; diff/whitespace checks passed. These are document checks, not browser accessibility or UI acceptance. App builds, browser scenarios and hosted operations were not run for this documentation-only change.
+
+## Ligature identity update · 2026-10-21
+
+The user selected study 02 C / Ligature. All three apps, browser/Apple icons and generated Mainnet X image signatures now derive from the updated canonical master. The approved Rewards descriptor remains shared. See [the scoped acceptance record](../brand/tincta/identity/ligature-verification.md), including the unrelated stale-status browser assertions and local/hosted evidence boundary.
+
+## Open artwork update · 2026-10-22
+
+The user selected study 06 C / Open for Rewards artwork. Landing heroes/project art, the shared Rewards lockup, Web wallet artwork and Mainnet social-image signatures now use one generated vector master. Parent Ligature branding and browser icons remain intact. PFP exports and local verification are recorded in [the Open asset guide](../brand/tincta/rewards-open/README.md).

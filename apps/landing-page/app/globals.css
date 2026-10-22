@@ -31,7 +31,7 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 .collection-announcement-detail { font-variant-numeric: tabular-nums; }
 .header { min-height: 3.5rem; padding-block: var(--ui-space-2); display: flex; align-items: center; justify-content: space-between; gap: var(--ui-space-6); flex-wrap: wrap; position: relative; z-index: var(--ui-z-shell); }
 .brand { display: inline-flex; align-items: center; flex-shrink: 0; min-height: 2.75rem; padding-block: var(--ui-space-3); }
-.brand-wordmark { width: 6rem; height: auto; aspect-ratio: 45 / 14; }
+.brand-wordmark { width: 6rem; height: auto; aspect-ratio: 3947 / 780; }
 .desktop-nav { display: flex; align-items: center; gap: var(--ui-space-6); font-size: var(--ui-control); }
 .desktop-nav a { display: inline-flex; align-items: center; min-height: 2.75rem; }
 .desktop-nav a:hover { text-decoration: underline; text-underline-offset: .25rem; }
@@ -45,10 +45,7 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 .hero-copy .hero-description { font-size: var(--ui-hero); line-height: 1.12; letter-spacing: -.035em; font-weight: 500; color: var(--ui-ink); text-wrap: balance; }
 .hero-actions { display: flex; align-items: center; }
 .hero-art { position: relative; min-width: 0; width: 100%; max-width: 35rem; margin-left: auto; }
-.color-sculpture { width: 100%; height: auto; }
-.sculpture-orbit { transform-origin: 350px 326px; animation: sculpture-turn 85s linear infinite; }
-.sculpture-core { transform-origin: 350px 326px; animation: sculpture-breathe 9s ease-in-out infinite alternate; }
-.sculpture-orbit ellipse, .sculpture-core ellipse { transition: stroke 2.8s ease; }
+.rewards-hero-artwork { width: 100%; height: auto; aspect-ratio: 1; }
 .reward-rail { display: grid; grid-template-columns: 1fr 1.14fr .9fr; border-block: 1px solid var(--ui-line); padding-block: var(--ui-space-8); gap: var(--ui-space-8); }
 .reward-metric, .reward-context { min-width: 0; }
 .affiliate-metric, .reward-context { border-left: 1px solid var(--ui-line); padding-left: var(--ui-space-8); }
@@ -133,7 +130,8 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 .affiliate-art { display: grid; place-items: center; width: 100%; max-width: 30rem; }
 .affiliate-art > svg, .affiliate-value { grid-area: 1 / 1; }
 .affiliate-art > svg { width: 100%; height: auto; aspect-ratio: 4 / 3; }
-.affiliate-rings { transform-origin: 200px 150px; animation: sculpture-turn 95s linear infinite reverse; }
+.affiliate-rings { transform-origin: 200px 150px; animation: affiliate-turn 95s linear infinite reverse; }
+@keyframes affiliate-turn { to { transform: rotate(360deg); } }
 .affiliate-value { position: relative; display: grid; place-content: center; gap: var(--ui-space-2); width: min(100%, calc(var(--ui-hero) * 4)); aspect-ratio: 1; padding: var(--ui-space-4); border-radius: 50%; background: var(--ui-surface); text-align: center; }
 .affiliate-value-label { font-size: var(--ui-label); line-height: 1.538462; color: var(--ui-muted); }
 .affiliate-amount { font-size: var(--ui-hero); letter-spacing: -.035em; line-height: 1.12; font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -175,10 +173,7 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 .closing-content .eyebrow { justify-content: center; }
 .closing-content h2 { margin-bottom: var(--ui-space-8); }
 .closing-note { display: block; margin-top: var(--ui-space-4); color: var(--ui-muted); font-size: var(--ui-caption); line-height: 1.5; }
-@keyframes sculpture-turn { to { transform: rotate(360deg); } }
-@keyframes sculpture-breathe { to { transform: scale(.94); } }
-.motion-paused .sculpture-orbit, .motion-paused .sculpture-core, .motion-paused .affiliate-rings { animation-play-state: paused; }
-.motion-paused .sculpture-orbit ellipse, .motion-paused .sculpture-core ellipse { transition: none; }
+.motion-paused .affiliate-rings { animation-play-state: paused; }
 @media (max-width: 959px) {
   .wrap { padding-inline: var(--ui-space-6); }
   .site > .ui-footer { width: calc(100% - 3rem); }
@@ -234,6 +229,5 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .sculpture-orbit, .sculpture-core, .affiliate-rings { animation: none; }
-  .sculpture-orbit ellipse, .sculpture-core ellipse { transition: none; }
+  .affiliate-rings { animation: none; }
 }

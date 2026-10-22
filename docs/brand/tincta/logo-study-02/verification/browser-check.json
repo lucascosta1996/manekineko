@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-21",
+  "scope": "Standalone design study only",
+  "browser": "145.0.7632.6",
+  "platform": "darwin",
+  "viewports": [
+    {
+      "width": 320,
+      "overflow": false,
+      "brokenImages": []
+    },
+    {
+      "width": 390,
+      "overflow": false,
+      "brokenImages": []
+    },
+    {
+      "width": 768,
+      "overflow": false,
+      "brokenImages": []
+    },
+    {
+      "width": 1280,
+      "overflow": false,
+      "brokenImages": []
+    },
+    {
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": []
+    }
+  ],
+  "interactions": [
+    {
+      "direction": "a",
+      "label": "A / Aperture — white on black / Rewards",
+      "dark": true,
+      "rewards": true
+    },
+    {
+      "direction": "b",
+      "label": "B / Fold — white on black / Rewards",
+      "dark": true,
+      "rewards": true
+    },
+    {
+      "direction": "c",
+      "label": "C / Ligature — white on black / Rewards",
+      "dark": true,
+      "rewards": true
+    }
+  ],
+  "errors": [],
+  "adjustedGlyphPixels": 16,
+  "inspectButton": "Selection, scrolling and focus passed",
+  "keyboard": "Native select typeahead and Tab passed",
+  "axeLight": [],
+  "axeDark": [],
+  "openMatrixRows": 30,
+  "textSpacingOverflow": false,
+  "result": "pass"
+}

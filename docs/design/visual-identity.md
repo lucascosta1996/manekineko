@@ -59,10 +59,11 @@ A staged migration may keep a legacy class adapter temporarily. It must delegate
 
 ## 4. Identity assets and artwork
 
-The approved logo is **06 — Drawn signature**. Follow the [canonical identity guide](../brand/tincta/identity/README.md).
+The approved logo is **C — Ligature**, selected on 2026-10-21. Follow the [canonical identity guide](../brand/tincta/identity/README.md).
 
-- Use the generated path-drawn wordmark, its `270 × 84` view box and natural aspect ratio. Never recreate it as text, stretch it, add a period, add a second name, or revive an older mark in app chrome.
-- Use the compact lowercase `t` only in established small brand and favicon roles. Preserve canonical favicon geometry and its dark tile.
+- Use the generated uppercase outlined wordmark, its `3947 × 780` view box and natural aspect ratio. Never recreate it as text, stretch it, add a period, add a second name, or revive an older mark in app chrome.
+- Use the compact `TC` ligature only in established small brand and favicon roles. Preserve canonical favicon geometry and its dark tile.
+- Rewards artwork is **Open**, approved 2026-10-22. Use its [canonical vector master](../brand/tincta/rewards-open/README.md) through the shared `RewardsArtwork` component. The Rewards lockup places a 32 px Open symbol before the Ligature wordmark with 12 px clear space, retaining the existing 14 px gap to the quiet Rewards label. Parent chrome and browser icons retain Ligature. Open keeps its fixed warm palette and orientation; it does not cycle through collection colors.
 - Header wordmark width: 96 px on desktop, 88 px in the mobile shell. Footer: 88 px. Height is automatic. Reserve at least 12 px clear space around the visible wordmark, within a larger accessible link target.
 - Static brand assets retain their canonical ink `#111111`; UI text uses the ink token below. Inline wordmarks inherit the intended surface foreground. This is a documented brand-asset distinction, not an invitation to add more grays.
 - A home link has the accessible name “Tincta home”; a decorative SVG inside it does not repeat that name.

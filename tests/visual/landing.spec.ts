@@ -239,23 +239,20 @@ test('Landing late response cannot restore fresh availability while offline', as
  await expect(page.locator('.collection-announcement')).toHaveAttribute('data-phase','ready');
 });
 
-test('Landing device motion preference controls artwork and palette cycling', async ({page}) => {
+test('Landing keeps the approved Open artwork stable across motion preferences', async ({page}) => {
  await page.emulateMedia({reducedMotion:'no-preference'});await prepare(page);await page.goto(`${urls.landing}/rewards`);await ready(page);
- const animation=page.locator('.sculpture-orbit');
- await expect(animation).toHaveCSS('animation-play-state','running');
- await expect(page.getByRole('button',{name:/^(Pause|Play) (animations|motion)$/})).toHaveCount(0);
+ const artwork=page.locator('.hero-art [data-tincta-artwork="open"]');
+ await expect(artwork).toHaveCount(1);
+ const original=await artwork.innerHTML();
+ await expect(artwork).toHaveCSS('animation-name','none');
+ await page.clock.runFor(7000);expect(await artwork.innerHTML()).toBe(original);
  await page.emulateMedia({reducedMotion:'reduce'});
  await expect(page.locator('.site')).toHaveClass(/motion-paused/);
- await expect(animation).toHaveCSS('animation-play-state','paused');
- const color=await page.locator('.sculpture-orbit ellipse').first().getAttribute('stroke');
- await page.clock.runFor(7000);expect(await page.locator('.sculpture-orbit ellipse').first().getAttribute('stroke')).toBe(color);
+ await expect(page.locator('.affiliate-rings')).toHaveCSS('animation-name','none');
+ await page.clock.runFor(7000);expect(await artwork.innerHTML()).toBe(original);
  await page.emulateMedia({reducedMotion:'no-preference'});
  await expect(page.locator('.site')).not.toHaveClass(/motion-paused/);
- await expect(animation).toHaveCSS('animation-play-state','running');
- await page.clock.runFor(6500);expect(await page.locator('.sculpture-orbit ellipse').first().getAttribute('stroke')).not.toBe(color);
- await page.emulateMedia({reducedMotion:'reduce'});
- await expect(animation).toHaveCSS('animation-name','none');
- await expect(page.locator('.site')).toHaveClass(/motion-paused/);
+ await expect(page.locator('.affiliate-rings')).toHaveCSS('animation-play-state','running');
 });
 
 test('Landing recovery focuses the empty status without stealing moved focus', async ({page}) => {

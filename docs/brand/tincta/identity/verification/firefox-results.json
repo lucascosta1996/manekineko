@@ -1,0 +1,12 @@
+{
+  "stats": {
+    "startTime": "2026-10-21T06:54:09.862Z",
+    "duration": 268285.65400000004,
+    "expected": 188,
+    "skipped": 159,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "project": "firefox",
+  "note": "188 passed; 159 intentionally skipped secondary-engine matrix widths. Includes all 32 brand checks. The two known unrelated stale-status cases were excluded explicitly; system proxy disabled for isolated loopback fixtures."
+}

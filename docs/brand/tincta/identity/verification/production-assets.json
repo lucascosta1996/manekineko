@@ -1,0 +1,175 @@
+{
+  "date": "2026-10-21",
+  "scope": "Local production builds; external/API/write requests blocked. Launch login only, no authentication or live data checks.",
+  "browser": "145.0.7632.6",
+  "applications": [
+    {
+      "app": "landing-page",
+      "route": "/",
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "http://127.0.0.1:4321/favicon.ico?favicon.2f7q468yjxfj9.ico",
+          "type": "image/x-icon",
+          "sizes": "48x48"
+        },
+        {
+          "rel": "icon",
+          "href": "http://127.0.0.1:4321/icon.svg?icon.1cnzq5ump4s1v.svg",
+          "type": "image/svg+xml",
+          "sizes": "any"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "http://127.0.0.1:4321/apple-icon.png?apple-icon.3sbkf2139e88r.png",
+          "type": "image/png",
+          "sizes": "180x180"
+        }
+      ],
+      "files": [
+        {
+          "name": "icon.svg",
+          "bytes": 538,
+          "sha256": "14216d2243cab40cba55c7ba2590e5a5e8e9462cd550afa1ab0e151bb2df76b7"
+        },
+        {
+          "name": "favicon.ico",
+          "bytes": 1918,
+          "sha256": "92631e0b3162f913050e16b4cb06342eaa6c016d02355f79501ac0f1c9258239",
+          "sizes": [
+            16,
+            32,
+            48
+          ]
+        },
+        {
+          "name": "apple-icon.png",
+          "bytes": 3499,
+          "sha256": "c3efd52f6dc54e6a9e72872665ffda0ee49665983f401bada89e30c35ed46e34",
+          "size": [
+            180,
+            180
+          ]
+        }
+      ],
+      "viewports": [
+        320,
+        390,
+        1440
+      ],
+      "horizontalOverflow": false
+    },
+    {
+      "app": "web",
+      "route": "/docs",
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "http://127.0.0.1:4322/favicon.ico?favicon.2f7q468yjxfj9.ico",
+          "type": "image/x-icon",
+          "sizes": "48x48"
+        },
+        {
+          "rel": "icon",
+          "href": "http://127.0.0.1:4322/icon.svg?icon.1cnzq5ump4s1v.svg",
+          "type": "image/svg+xml",
+          "sizes": "any"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "http://127.0.0.1:4322/apple-icon.png?apple-icon.3sbkf2139e88r.png",
+          "type": "image/png",
+          "sizes": "180x180"
+        }
+      ],
+      "files": [
+        {
+          "name": "icon.svg",
+          "bytes": 538,
+          "sha256": "14216d2243cab40cba55c7ba2590e5a5e8e9462cd550afa1ab0e151bb2df76b7"
+        },
+        {
+          "name": "favicon.ico",
+          "bytes": 1918,
+          "sha256": "92631e0b3162f913050e16b4cb06342eaa6c016d02355f79501ac0f1c9258239",
+          "sizes": [
+            16,
+            32,
+            48
+          ]
+        },
+        {
+          "name": "apple-icon.png",
+          "bytes": 3499,
+          "sha256": "c3efd52f6dc54e6a9e72872665ffda0ee49665983f401bada89e30c35ed46e34",
+          "size": [
+            180,
+            180
+          ]
+        }
+      ],
+      "viewports": [
+        320,
+        390,
+        1440
+      ],
+      "horizontalOverflow": false
+    },
+    {
+      "app": "launch",
+      "route": "/login",
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "http://127.0.0.1:4323/favicon.ico?favicon.2f7q468yjxfj9.ico",
+          "type": "image/x-icon",
+          "sizes": "48x48"
+        },
+        {
+          "rel": "icon",
+          "href": "http://127.0.0.1:4323/icon.svg?icon.1cnzq5ump4s1v.svg",
+          "type": "image/svg+xml",
+          "sizes": "any"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "http://127.0.0.1:4323/apple-icon.png?apple-icon.3sbkf2139e88r.png",
+          "type": "image/png",
+          "sizes": "180x180"
+        }
+      ],
+      "files": [
+        {
+          "name": "icon.svg",
+          "bytes": 538,
+          "sha256": "14216d2243cab40cba55c7ba2590e5a5e8e9462cd550afa1ab0e151bb2df76b7"
+        },
+        {
+          "name": "favicon.ico",
+          "bytes": 1918,
+          "sha256": "92631e0b3162f913050e16b4cb06342eaa6c016d02355f79501ac0f1c9258239",
+          "sizes": [
+            16,
+            32,
+            48
+          ]
+        },
+        {
+          "name": "apple-icon.png",
+          "bytes": 3499,
+          "sha256": "c3efd52f6dc54e6a9e72872665ffda0ee49665983f401bada89e30c35ed46e34",
+          "size": [
+            180,
+            180
+          ]
+        }
+      ],
+      "viewports": [
+        320,
+        390,
+        1440
+      ],
+      "horizontalOverflow": false
+    }
+  ]
+}

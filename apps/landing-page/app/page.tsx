@@ -36,8 +36,8 @@ export default function LandingPage() {
               <LinkButton href="#projects" icon={<Icon name="arrow" />}>Explore our projects</LinkButton>
             </div>
             <figure className="studio-art">
-              <ResearchArt kind="field" />
-              <figcaption><span>Study 01 / Emergence</span><span>Rules → possibilities</span></figcaption>
+              <ResearchArt kind="rewards" />
+              <figcaption><span>Rewards / Open</span><span>Opening → discovery</span></figcaption>
             </figure>
           </section>
           <section className="studio-section" id="research" aria-labelledby="research-title">

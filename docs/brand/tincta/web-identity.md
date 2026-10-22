@@ -8,7 +8,7 @@ Applied to `apps/web` only. Public branding is Tincta; internal package names, t
 
 - White canvas, near-black typography, neutral gray supporting text and hairline borders.
 - Native system sans for readable editorial headings; monospace for IDs and technical labels. No remote font request.
-- The approved direction 06 path-drawn lowercase Tincta wordmark and compact lowercase t for favicon and wallet/brand moments. The [shared identity source](identity/README.md) also generates the matching Launch and Landing assets.
+- The approved C / Ligature uppercase Tincta wordmark and compact TC monogram for favicon and wallet/brand moments. The [shared identity source](identity/README.md) also generates the matching Launch and Landing assets.
 - Collection colors remain data-driven accents. Existing NFT images are rendered from their actual contract, including older Manekineko editions.
 - Catalog artwork has quiet neutral framing; mint details, history, affiliate tools, NFT gallery and NFT provenance share the same typography and spacing.
 - Keyboard focus, reduced-motion support, disabled states and narrow-screen layouts remain supported.

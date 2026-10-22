@@ -1,0 +1,20 @@
+{
+  "name": "Tincta Rewards / Open",
+  "approved": "2026-10-22",
+  "reference": "../artwork-study-06/sketches/c-open.png",
+  "description": "Vector reconstruction of the selected Open sketch. The unequal wings, broad lower fold and separate two-face center preserve the approved silhouette. Solid palette colors replace raster shading.",
+  "viewBox": "0 0 1254 1254",
+  "pfpTransform": "translate(87.78 87.78) scale(.86)",
+  "faces": [
+    { "name": "left-upper", "fill": "#FF6600", "d": "M98 370 710 128 287 412Z" },
+    { "name": "left-return", "fill": "#330000", "d": "M287 412 710 128 394 546Z" },
+    { "name": "left-front", "fill": "#FF0000", "d": "M98 370 287 412 409 763 329 872Z" },
+    { "name": "left-inner", "fill": "#FF6600", "d": "M287 412 583 841 409 763Z" },
+    { "name": "right-return", "fill": "#330000", "d": "M882 488 1155 284 808 778Z" },
+    { "name": "right-front", "fill": "#FF6600", "d": "M1155 284 1094 723 706 894 808 778Z" },
+    { "name": "lower-return", "fill": "#330000", "d": "M706 894 1094 723 757 1126 779 928Z" },
+    { "name": "lower-front", "fill": "#FF3300", "d": "M329 872 409 763 779 928 757 1126Z" },
+    { "name": "center-left", "fill": "#FF6600", "d": "M509 584 644 529 608 772Z" },
+    { "name": "center-right", "fill": "#FF0000", "d": "M644 529 770 630 714 725 608 772Z" }
+  ]
+}

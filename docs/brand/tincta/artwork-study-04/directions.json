@@ -1,0 +1,29 @@
+[
+  {
+    "id": "a",
+    "name": "Essential",
+    "slug": "essential",
+    "tag": "Upright",
+    "alt": "Three broad vermilion and orange folded planes with dark return faces, arranged in an upright zigzag.",
+    "description": "Three broad folds preserve the original upright gesture. Smaller facets give way to larger faces and clearer white seams.",
+    "assessment": "Closest to the original Foldscape, with a lighter, simpler structure."
+  },
+  {
+    "id": "b",
+    "name": "Compact",
+    "slug": "compact",
+    "tag": "Concentrated",
+    "alt": "A compact group of red and orange angular planes with dark return faces and a diagonal white cleft.",
+    "description": "The folded planes gather around one diagonal white cleft. Shorter projections and broader faces create a firmer center.",
+    "assessment": "My strongest PFP candidate: the planes hold together as one compact shape."
+  },
+  {
+    "id": "c",
+    "name": "Open",
+    "slug": "open",
+    "tag": "Reduced",
+    "alt": "Two folded planes, one orange and one vermilion, with dark return faces and an open diagonal gap.",
+    "description": "Two folds answer each other across an open gap. Four broad colored faces carry the movement with very little internal detail.",
+    "assessment": "The most minimal option. The gap and relative scale of the folds are the key refinement choices."
+  }
+]

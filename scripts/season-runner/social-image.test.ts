@@ -5,6 +5,7 @@ import { sha256, toUtf8Bytes } from "ethers";
 import sharp from "sharp";
 import { buildSeasonSocialMessage, SEASON_SOCIAL_EVENTS, socialTextWeight, assertSocialText, type SeasonSocialInput } from "../../packages/contracts/src/season-social.ts";
 import { renderSeasonSocialSvg, renderSeasonSocialImage } from "./social-image.ts";
+import { TINCTA_SOCIAL_LOCKUP_SVG } from "../../packages/contracts/src/tincta-brand.ts";
 
 const fixture: SeasonSocialInput = {
   event: "collection-live", chainId: 11155111,
@@ -50,6 +51,18 @@ test("same input renders the same image and previews visibly mark their evidence
   const a = await renderSeasonSocialImage(message), b = await renderSeasonSocialImage(message);
   assert.equal(a.sha256, b.sha256); assert.deepEqual(a.png, b.png);
   assert.match(renderSeasonSocialSvg(message, { preview: true }), /DESIGN PREVIEW/);
+});
+test("all production event images use the outlined Ligature while Sepolia stays explicitly neutral", async () => {
+  for (const event of SEASON_SOCIAL_EVENTS) {
+    const input = forEvent(event);
+    const mainnet = renderSeasonSocialSvg(buildSeasonSocialMessage({ ...input, chainId: 1 }));
+    assert.ok(mainnet.includes(TINCTA_SOCIAL_LOCKUP_SVG), `${event} uses the canonical lockup`);
+    assert.doesNotMatch(mainnet, />Tincta<\/text>/);
+    const testnet = renderSeasonSocialSvg(buildSeasonSocialMessage(input));
+    assert.ok(!testnet.includes(TINCTA_SOCIAL_LOCKUP_SVG));
+    assert.match(testnet, /Sepolia collections/);
+    assert.match(testnet, /SEPOLIA TEST · TEST ETH/);
+  }
 });
 test("copy separates sellout, verified winners and confirmed claim receipts", () => {
   const pending = buildSeasonSocialMessage({ ...forEvent("collection-sold-out"), drawVerified: false });

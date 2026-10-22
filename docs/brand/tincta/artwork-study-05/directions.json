@@ -1,0 +1,24 @@
+[
+  {
+    "id": "a",
+    "name": "Unfold",
+    "slug": "unfold",
+    "tag": "Discovery",
+    "alt": "Angular colored planes open around a smaller central faceted shape.",
+    "cue": "Opening → discovery",
+    "description": "An enclosing form opens to reveal a vivid center. The folds now perform an action: revealing something valuable.",
+    "connection": "Collecting carries a possibility that is resolved by the draw. This is a metaphor for anticipation and revealing the result, not an NFT changing its permanent artwork.",
+    "assessment": "More interpretive. Some viewers may see a crystal or a crest before they see a prize; the focal shape and opening need testing."
+  },
+  {
+    "id": "b",
+    "name": "Award",
+    "slug": "award",
+    "tag": "Recognition",
+    "alt": "A faceted polygonal upper form with two tapered folded ends beneath it.",
+    "cue": "Award ribbon → winning",
+    "description": "The upper medallion and two short ribbon ends establish a recognizable award silhouette. Folded facets give that familiar cue its own treatment.",
+    "connection": "Rewards is centered on prizes and the winning holder’s right to claim. Recognition and winning are the primary associations; the artwork does not encode the contract rules.",
+    "assessment": "The clearest reward cue in this round. Its next challenge is a more distinctive outline and cleaner seams, without losing the award reading."
+  }
+]

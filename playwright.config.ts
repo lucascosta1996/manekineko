@@ -14,7 +14,9 @@ export default defineConfig({
   use: { serviceWorkers: 'block', locale: 'en-US', timezoneId: 'UTC', deviceScaleFactor: 1, colorScheme: 'light', contextOptions: { reducedMotion: 'reduce' }, screenshot: 'only-on-failure', trace: 'retain-on-failure', video: 'retain-on-failure' },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },
-    { name: 'firefox', use: { ...devices['Desktop Firefox'], viewport: { width: 1440, height: 900 } } },
+    // These isolated fixtures use loopback only. Ignore the host's system proxy,
+    // which can reject Firefox's localhost requests before any app code runs.
+    { name: 'firefox', use: { ...devices['Desktop Firefox'], viewport: { width: 1440, height: 900 }, launchOptions: { firefoxUserPrefs: { 'network.proxy.type': 0 } } } },
     { name: 'webkit', use: { ...devices['Desktop Safari'], viewport: { width: 1440, height: 900 } } },
   ],
   webServer: ['landing','web','launch'].filter(app => !process.env.UI_APP || app === process.env.UI_APP).map((app) => ({

@@ -1,0 +1,285 @@
+{
+  "date": "2026-10-21",
+  "scope": "A purposive cross-category sample: 26 crypto identities, three corporate benchmarks and Tumblr. This is not an exhaustive census or a market-share ranking.",
+  "method": "Official brand guidance, current official sites and browser captures. Observations are design interpretation. Source-access limits are recorded rather than treated as visual verification.",
+  "references": [
+    {
+      "name": "Coinbase",
+      "category": "CEX",
+      "family": "Reduced geometry / lowercase",
+      "url": "https://www.coinbase.com/press",
+      "additional": "https://cds.coinbase.com/components/media/LogoWordMark/",
+      "observation": "A restrained lowercase wordmark and separate compact mark; the press kit insists on consistent, unaltered use.",
+      "lesson": "Separate wordmark and symbol roles; do not borrow the C/circle vocabulary.",
+      "evidence": "Press text and live Design System wordmark; press page browser challenge."
+    },
+    {
+      "name": "Binance",
+      "category": "CEX",
+      "family": "Modular geometry",
+      "url": "https://www.binance.com/en-GB/press",
+      "additional": "https://www.binance.com/en",
+      "observation": "A compact diamond arrangement paired with uppercase lettering and a strong yellow signature.",
+      "lesson": "Recognizable silhouette and repetition; avoid nested diamonds.",
+      "evidence": "Official site capture and press source."
+    },
+    {
+      "name": "Kraken",
+      "category": "CEX",
+      "family": "Abstract character",
+      "url": "https://www.kraken.com",
+      "additional": "https://www.kraken.com/press/kraken-images",
+      "observation": "An arch-like creature symbol accompanies lowercase lettering; the symbol carries personality without a detailed illustration.",
+      "lesson": "A simple character can scale; do not borrow the arch or tentacle rhythm.",
+      "evidence": "Official site capture."
+    },
+    {
+      "name": "OKX",
+      "category": "CEX",
+      "family": "Modular typography",
+      "url": "https://www.okx.com",
+      "observation": "A high-contrast block-grid wordmark makes geometry part of the name itself.",
+      "lesson": "A consistent construction rule is memorable; avoid checkerboards and pixel crosses.",
+      "evidence": "Official site capture."
+    },
+    {
+      "name": "Gemini",
+      "category": "CEX",
+      "family": "Interlocking geometry",
+      "url": "https://www.gemini.com",
+      "observation": "Interlocking loop geometry accompanies a compact uppercase wordmark in the current header.",
+      "lesson": "Controlled geometry can feel financial; interlocking rings are already heavily occupied.",
+      "evidence": "Official site capture."
+    },
+    {
+      "name": "Crypto.com",
+      "category": "CEX",
+      "family": "Emblem",
+      "url": "https://crypto.com",
+      "observation": "A compact geometric crest and a restrained wordmark support a broad product family.",
+      "lesson": "Consistency across products; avoid a hexagonal badge or animal crest.",
+      "evidence": "Official site capture."
+    },
+    {
+      "name": "Bybit",
+      "category": "CEX",
+      "family": "Typography / extracted initial",
+      "url": "https://www.bybit.com/press",
+      "observation": "An October 2026 official announcement describes turning the orange I from the Bybit wordmark into a standalone brand mark and repeated-line visual system.",
+      "lesson": "A letter can support a full identity system, but extracting Tincta\u2019s t again would preserve the present resemblance concern.",
+      "evidence": "Official press announcement and brand-assets source; local browser capture blocked by HTTP/2 error.",
+      "additional": "https://www.bybit.com/en/press/post/bybit-unveils-make-your-move-as-new-global-brand-campaign-for-the-new-financial-platform-bb81b32d32e08542c5b"
+    },
+    {
+      "name": "Bitget",
+      "category": "CEX",
+      "family": "Directional geometry",
+      "url": "https://www.bitget.com",
+      "observation": "Opposing directional forms and a compact wordmark use cyan as a recognizable accent.",
+      "lesson": "A sharp two-part silhouette can be economical; avoid paired exchange arrows.",
+      "evidence": "Official site capture."
+    },
+    {
+      "name": "Uniswap",
+      "category": "DEX",
+      "family": "Character / mascot",
+      "url": "https://about.uniswap.org",
+      "observation": "The unicorn symbol remains a recognizable sign in the official Labs header; the page links official brand assets.",
+      "lesson": "Own a specific silhouette; a mascot would shift Tincta away from the requested restraint.",
+      "evidence": "Official Labs site capture and brand-kit section; not a conflation of Labs and Protocol marks."
+    },
+    {
+      "name": "PancakeSwap",
+      "category": "DEX",
+      "family": "Character / mascot",
+      "url": "https://pancakeswap.finance",
+      "observation": "A bunny mark and friendly lettering give the trading interface an approachable character.",
+      "lesson": "Warmth can be expressed structurally; Tincta does not need a new character mascot.",
+      "evidence": "Official site capture."
+    },
+    {
+      "name": "Sushi",
+      "category": "DEX",
+      "family": "Illustrative object",
+      "url": "https://www.sushi.com",
+      "observation": "The small sushi illustration carries the memorable cue beside simple lettering.",
+      "lesson": "An identifiable object can do the work; avoid food, gaming and novelty cues for this brief.",
+      "evidence": "Official site capture."
+    },
+    {
+      "name": "1inch",
+      "category": "DEX / aggregator",
+      "family": "Typography-led",
+      "url": "https://1inch.com",
+      "observation": "The current homepage header leads with a compact 1inch wordmark. Older unicorn imagery should not be substituted for this observation.",
+      "lesson": "Audit the live identity instead of assuming a familiar historic symbol is still primary.",
+      "evidence": "Official current homepage capture."
+    },
+    {
+      "name": "Curve",
+      "category": "DEX",
+      "family": "Reference pending visual refresh",
+      "url": "https://www.curve.finance",
+      "additional": "https://cdn.jsdelivr.net/gh/curvefi/curve-assets/branding/logo.png",
+      "observation": "The official page references its logo in the Curve asset repository; the animated browser capture remained blank/faded.",
+      "lesson": "Exclude Curve from silhouette comparisons until its source asset is inspected.",
+      "evidence": "Official page and asset link; current visual capture incomplete."
+    },
+    {
+      "name": "Balancer",
+      "category": "DEX",
+      "family": "Stacked forms",
+      "url": "https://balancer.fi",
+      "observation": "Stacked elliptical forms create a compact symbol, repeated as larger sculptural forms on the site.",
+      "lesson": "A simple mark can generate a wider visual system; avoid stacked pebble/disc motifs.",
+      "evidence": "Official site capture after a second load."
+    },
+    {
+      "name": "Jupiter",
+      "category": "DEX / aggregator",
+      "family": "Orbital / banded",
+      "url": "https://jup.ag",
+      "observation": "A small banded planet-like symbol appears in the current interface alongside restrained typography.",
+      "lesson": "Distinct contour rhythm matters more than elaborate detail; avoid a striped planet.",
+      "evidence": "Official site capture."
+    },
+    {
+      "name": "Raydium",
+      "category": "DEX",
+      "family": "Angular monogram",
+      "url": "https://raydium.io",
+      "observation": "The interface uses an angular geometric emblem with a letter-like center and a multicolor outline.",
+      "lesson": "A monogram can be technical; avoid hexagon framing and depending on gradients.",
+      "evidence": "Official header visible in the site capture; trading disclaimer not accepted."
+    },
+    {
+      "name": "dYdX",
+      "category": "Derivatives DEX",
+      "family": "Typography-led",
+      "url": "https://www.dydx.xyz",
+      "observation": "Mixed-case lettering and an emphatic X make the name itself the main identifier.",
+      "lesson": "Distinctive character relationships can replace a separate emblem.",
+      "evidence": "Official site capture."
+    },
+    {
+      "name": "Hyperliquid",
+      "category": "Trading ecosystem",
+      "family": "Organic abstraction",
+      "url": "https://hyperfoundation.org",
+      "observation": "The Foundation landing reveal uses a minimal, fluid two-lobed form in mint against dark green.",
+      "lesson": "Reduction need not mean straight lines; avoid a symmetric liquid/hourglass silhouette.",
+      "evidence": "Official Foundation loading/reveal capture; not a completed trading-interface audit."
+    },
+    {
+      "name": "Aave",
+      "category": "DeFi lending",
+      "family": "Geometric character",
+      "url": "https://aave.com/brand",
+      "observation": "A simplified ghost supports a closely related rounded lowercase wordmark. The brand page explicitly distinguishes logo, wordmark and logomark.",
+      "lesson": "Make the symbol and lettering share a vocabulary; retain one-color integrity.",
+      "evidence": "Official brand page and rendered primary logo."
+    },
+    {
+      "name": "Morpho",
+      "category": "DeFi lending",
+      "family": "Abstract nature",
+      "url": "https://brand.morpho.org",
+      "observation": "The official guide connects a butterfly-derived symbol with FK Grotesk typography and an institutional design system.",
+      "lesson": "An abstract symbol can have a specific origin; avoid butterfly/wings or the same blue institutional package.",
+      "evidence": "Official guidelines and browser capture."
+    },
+    {
+      "name": "Compound",
+      "category": "DeFi lending",
+      "family": "Stacked geometry",
+      "url": "https://www.compound.xyz",
+      "additional": "https://compound.finance",
+      "observation": "The current site uses a small stacked geometric symbol beside a quiet wordmark. The legacy domain now redirects.",
+      "lesson": "Simple geometry scales; verify current domains and assets before making comparisons.",
+      "evidence": "Official current site capture and redirect confirmation."
+    },
+    {
+      "name": "Lido",
+      "category": "Staking",
+      "family": "Figurative geometry",
+      "url": "https://lido.fi",
+      "observation": "A small droplet-like symbol and spaced uppercase name sit apart from the large Ethereum artwork on the page.",
+      "lesson": "Do not confuse product/network artwork with the parent logo; avoid a drop/diamond hybrid.",
+      "evidence": "Official header capture."
+    },
+    {
+      "name": "Sky",
+      "category": "Stablecoins",
+      "family": "Radial abstraction",
+      "url": "https://sky.money",
+      "observation": "A compact radial symbol accompanies the short Sky name within a purple-led system.",
+      "lesson": "Simple names need distinctive silhouettes; avoid another generic radial sparkle.",
+      "evidence": "Official site capture."
+    },
+    {
+      "name": "Ethena",
+      "category": "Stablecoins",
+      "family": "Circular monogram",
+      "url": "https://ethena.fi",
+      "observation": "The interface uses a restrained circular letter-like emblem and dark, institutional presentation.",
+      "lesson": "Monochrome restraint supports finance; avoid a circular E/coin enclosure.",
+      "evidence": "Official site capture."
+    },
+    {
+      "name": "Pendle",
+      "category": "Yield",
+      "family": "Abstract geometry / spaced type",
+      "url": "https://www.pendle.finance/brand-guide/",
+      "observation": "The identity pairs a compact abstract symbol with spaced lettering. The guide separates logo type (Kyrial), app type (Inter) and media type (Poppins).",
+      "lesson": "The logo can have its own lettering without changing the entire UI font.",
+      "evidence": "Official site capture and brand guide."
+    },
+    {
+      "name": "Chainlink",
+      "category": "Infrastructure",
+      "family": "Reduced geometry",
+      "url": "https://chain.link/brand-assets",
+      "observation": "A hollow hexagon is paired with a plain wordmark; official assets document spacing and color use.",
+      "lesson": "Consistency can make very simple geometry recognizable; a hexagon would put Tincta in occupied territory.",
+      "evidence": "Official brand page and rendered mark."
+    },
+    {
+      "name": "Stripe",
+      "category": "Corporate benchmark",
+      "family": "Typography-led",
+      "url": "https://stripe.com",
+      "observation": "The compact lowercase wordmark is the stable identifier within a much more expressive surrounding visual system.",
+      "lesson": "Keep the mark simple and let artwork carry color. Avoid imitating Stripe\u2019s cuts or slant.",
+      "evidence": "Official current site capture."
+    },
+    {
+      "name": "Mastercard",
+      "category": "Corporate benchmark",
+      "family": "Reduced geometry",
+      "url": "https://www.mastercard.com/content/brandcenter/us/en/faq.html",
+      "additional": "https://www.mastercard.us/content/brandcenter/standard-mastercard/en/download-artwork.html",
+      "observation": "Official guidance distinguishes the standalone symbol from the wordmark-bearing brand mark. Browser access was denied in this environment.",
+      "lesson": "Symbol-only use is a separate identity role, not merely a cropped wordmark.",
+      "evidence": "Official indexed brand guidance; local visual capture incomplete."
+    },
+    {
+      "name": "IBM",
+      "category": "Corporate benchmark",
+      "family": "Constructed typography",
+      "url": "https://www.ibm.com/design/language/ibm-logos/8-bar/",
+      "observation": "The guide documents different optical treatment for positive and reversed artwork, including bar weight and internal points.",
+      "lesson": "Refinement includes optical masters, clear space and reproducibility, not only a clever idea.",
+      "evidence": "Official design guidance and browser capture."
+    },
+    {
+      "name": "Tumblr",
+      "category": "Resemblance control",
+      "family": "Typographic initial",
+      "url": "https://www.tumblr.com",
+      "additional": "https://help.tumblr.com/knowledge-base/trademark-guidelines/",
+      "observation": "Tumblr\u2019s wordmark uses a serif lowercase t. Tincta\u2019s current glyph is sans, but the dominant upright, crossbar and right-turning foot create a similar first reading.",
+      "lesson": "Change the compact silhouette, not just the corner radius, color or font weight.",
+      "evidence": "Official site capture plus local canonical Tincta geometry; resemblance is a design judgment."
+    }
+  ]
+}

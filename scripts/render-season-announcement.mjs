@@ -5,6 +5,7 @@ import { sha256, toUtf8Bytes } from "ethers";
 import sharp from "sharp";
 import { buildTinctaLinework } from "../packages/contracts/src/tincta-motifs.ts";
 import { contrastTextColor } from "../packages/contracts/src/season-appearance.ts";
+import { TINCTA_SOCIAL_LOCKUP_SVG } from "../packages/contracts/src/tincta-brand.ts";
 
 // Local artwork draft only. No network, publication, or protocol event handling.
 // node --import tsx scripts/render-season-announcement.mjs [season] [output-directory]
@@ -63,7 +64,7 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${
   <defs>${season.collections.map((_, index) => `<clipPath id="band-${index}"><rect x="${field.x + index * bandWidth}" y="${field.y}" width="${bandWidth}" height="${field.height}"/></clipPath>`).join("")}</defs>
   <style>text { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; } .mono { font-family: "SFMono-Regular", "SF Mono", "Menlo", "Liberation Mono", monospace; }</style>
   <rect width="1600" height="900" fill="#FFFFFF"/>
-  <text x="48" y="88" fill="#111111" font-size="49" font-weight="600" letter-spacing="-3">Tincta</text>
+  ${TINCTA_SOCIAL_LOCKUP_SVG}
   <text x="1552" y="82" text-anchor="end" fill="#111111" class="mono" font-size="20" letter-spacing="2">UPCOMING SEASON</text>
   ${bands}
   <text x="48" y="847" fill="#111111" font-size="24" letter-spacing="-0.5">Color, collected.</text>

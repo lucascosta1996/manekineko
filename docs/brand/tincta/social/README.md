@@ -1,7 +1,8 @@
 # Tincta social artwork and copy
 
 The **upcoming season** design was approved in the design conversation.
-Its original Season 01 PNG/SVG remain unchanged. Seven matching event images
+The Season 01 PNG/SVG and seven matching event images now use the approved
+2026-10-22 Open artwork alongside the Ligature wordmark. The original layout is retained. The event images
 extend that layout, using **Crimson & Blood Orange / Velvet Ember** for review.
 The new dates, terms, totals and links are fictional sample data, visibly
 identified on each image. The refund image illustrates an alternative unsold
@@ -9,6 +10,14 @@ outcome; it does not describe a later state of the sold-out example.
 
 Open [the review gallery](index.html) for every full-size image, post and thread,
 or [the contact sheet](contact-sheet.png) to compare the set.
+
+For new Rewards campaigns, supply the approved [Open artwork
+PNG](../rewards-open/tincta-rewards-open-transparent-1024.png) alongside the
+[Ligature wordmark PNG](../identity/tincta-wordmark.png). Parent-brand campaigns
+may use the [TC lockup PNG](../identity/tincta-lockup.png). Preserve
+the exact outlines and aspect ratio; do not use the old lowercase signatures in
+historical `output/social` posters or their provenance prompts as logo masters.
+Reversed white references and editable SVGs are in [the identity folder](../identity/README.md).
 
 | Template | Main image copy |
 | --- | --- |
@@ -42,9 +51,10 @@ the season recap uses the season's first-color motif. Text fitting is measured
 with the same local renderer as the PNG export, and foregrounds adapt to the
 palette. The first season teaser does not need dates or collection terms.
 
-Regenerate the seven event images, gallery, copy and contact sheet:
+Regenerate the teaser first, then the seven event images, gallery, copy and contact sheet:
 
 ```sh
+node --import tsx scripts/render-season-announcement.mjs 1
 node --import tsx scripts/render-social-templates.mjs
 ```
 
@@ -69,9 +79,10 @@ node --import tsx scripts/render-season-announcement.mjs 1
 
 For that original script, the optional second argument sets the output
 directory. The new renderer reuses an existing upcoming-season image if one is
-available; it does not overwrite that approved artifact. Both scripts read
+available; rerun the teaser first after a brand update. Both scripts read
 the catalog without modifying it and use local `tsx` and `sharp` dependencies.
-The SVG uses local system fonts; the PNG freezes the reviewed rendering.
+The SVG uses canonical Ligature paths for its logo and local system fonts for
+editorial copy; the PNG freezes the reviewed rendering.
 Match the rendering environment when exporting future images to keep
 typography consistent.
 

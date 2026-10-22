@@ -1,6 +1,7 @@
 import { buildTinctaLinework } from "./tincta-motifs.ts";
 import { contrastTextColor } from "./season-appearance.ts";
 import type { SeasonSocialMessage } from "./season-social.ts";
+import { TINCTA_SOCIAL_LOCKUP_SVG } from "./tincta-brand.ts";
 
 const xml = (value: string) => value.replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" })[char]!);
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -50,7 +51,7 @@ export function renderSeasonSocialSvg(message: SeasonSocialMessage, options: { p
     <title id="title">${xml(`${brand} — ${message.header} — Season ${pad(season.number)}`)}</title><desc id="description">${xml(`${options.preview ? "Design preview. " : ""}${message.alt}`)}</desc>
     <defs>${bands.map(band => `<clipPath id="band-${band.index}"><rect x="${band.x}" y="132" width="${band.width}" height="640"/></clipPath>`).join("")}</defs>
     ${css}<rect width="1600" height="900" fill="#FFFFFF"/>
-    <text x="48" y="88" fill="#111111" font-size="38" font-weight="600" letter-spacing="-1.5">${xml(brand)}</text>
+    ${message.chainId === 11155111 ? `<text x="48" y="88" fill="#111111" font-size="38" font-weight="600" letter-spacing="-1.5">${xml(brand)}</text>` : TINCTA_SOCIAL_LOCKUP_SVG}
     <text x="1552" y="82" text-anchor="end" fill="#111111" class="mono" font-size="20" letter-spacing="2">${xml(message.header)}</text>
     ${marker ? `<text x="1552" y="111" text-anchor="end" fill="#71717A" class="mono" font-size="12" letter-spacing="1">${xml(marker)}</text>` : ""}
     ${palette}

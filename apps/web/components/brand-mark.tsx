@@ -1,5 +1,5 @@
-import { TinctaMark } from "./tincta-logo";
+import { RewardsArtwork } from "@manekineko/ui/rewards-artwork";
 
 export function BrandMark({ className }: { className?: string }) {
-  return <TinctaMark className={className} title="" />;
+  return <RewardsArtwork className={className} title="" />;
 }

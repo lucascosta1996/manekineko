@@ -1,0 +1,29 @@
+[
+  {
+    "id": "a",
+    "name": "Ribbonfield",
+    "slug": "ribbonfield",
+    "tag": "Flow",
+    "alt": "Red and orange filaments sweep into an asymmetric twist, with a broad fan and a shorter open return.",
+    "description": "Fine filaments compress into a diagonal twist and spread back into open fans. The tension between narrow and wide sections creates the motion.",
+    "assessment": "The most fluid direction. The small version needs fewer filaments and a cleaner crossing."
+  },
+  {
+    "id": "b",
+    "name": "Foldscape",
+    "slug": "foldscape",
+    "tag": "Plane",
+    "alt": "Angular vermilion, orange and oxblood planes fold around an offset spine with white clefts.",
+    "description": "Broad planes fold around an offset spine. Sharp edges, stepped proportions and white clefts create a compact, architectural composition.",
+    "assessment": "The strongest solid masses. The joins and pointed outer edges need precise vector refinement."
+  },
+  {
+    "id": "c",
+    "name": "Phasefield",
+    "slug": "phasefield",
+    "tag": "Particle",
+    "alt": "A field of red, orange and oxblood ellipses bends into a broad crest and smaller returning lobe.",
+    "description": "Separate particles bend through a changing field. Their size, spacing and orientation create an apparent wave without any connecting lines.",
+    "assessment": "The most different construction. Tiny particles need reducing so the flow survives at small sizes."
+  }
+]

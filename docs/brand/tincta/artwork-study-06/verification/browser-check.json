@@ -1,0 +1,57 @@
+{
+  "date": "2026-10-22",
+  "scope": "Minimal Unfold study 06 only",
+  "browser": "145.0.7632.6",
+  "viewports": [
+    {
+      "width": 320,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "width": 960,
+      "overflow": false
+    },
+    {
+      "width": 961,
+      "overflow": false
+    },
+    {
+      "width": 999,
+      "overflow": false
+    },
+    {
+      "width": 1000,
+      "overflow": false
+    },
+    {
+      "width": 1001,
+      "overflow": false
+    },
+    {
+      "width": 1280,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "overflow": false
+    }
+  ],
+  "axe": [],
+  "interactions": [
+    "Square/circle framing",
+    "32–128px avatar slider",
+    "Keyboard activation",
+    "Reference disclosure",
+    "Hide/reveal concept explanations"
+  ],
+  "errors": [],
+  "status": "pass"
+}

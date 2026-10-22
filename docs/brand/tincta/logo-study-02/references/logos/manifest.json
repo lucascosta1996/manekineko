@@ -1,0 +1,252 @@
+[
+  {
+    "name": "Crypto.com",
+    "url": "https://crypto.com/us",
+    "file": "06-crypto-com-logo.png",
+    "selected": {
+      "i": 1,
+      "score": 20,
+      "tag": "IMG",
+      "x": 64,
+      "y": 15,
+      "width": 120,
+      "height": 24,
+      "hint": "Crypto.com Logo  h-[24px] w-[120px]  https://mkt-site-asset.crypto.com/assets/logo/crypto-com.svg"
+    }
+  },
+  {
+    "name": "Gemini",
+    "url": "https://www.gemini.com/",
+    "file": "05-gemini-logo.png",
+    "selected": {
+      "i": 1,
+      "score": 0,
+      "tag": "svg",
+      "x": 80,
+      "y": 17.796875,
+      "width": 94,
+      "height": 20,
+      "hint": "   "
+    }
+  },
+  {
+    "name": "Kraken",
+    "url": "https://www.kraken.com/",
+    "file": "03-kraken-logo.png",
+    "selected": {
+      "i": 1,
+      "score": 10,
+      "tag": "IMG",
+      "x": 18,
+      "y": 14.5,
+      "width": 142.578125,
+      "height": 34,
+      "hint": "  kraken-image-svg h-[16px] w-auto https://assets-cms.kraken.com/images/51n36hrp/facade/4d67f3f4eac6aa0702c6ae62b1e0b1abc41b10cd-650x155.svg"
+    }
+  },
+  {
+    "name": "OKX",
+    "url": "https://www.okx.com/en-us",
+    "file": "04-okx-logo.png",
+    "selected": {
+      "i": 1,
+      "score": 20,
+      "tag": "IMG",
+      "x": 24,
+      "y": 6,
+      "width": 82,
+      "height": 36,
+      "hint": "OKX - Leading Cryptocurrency Exchange  logo-img   \n         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKQAAABICAQAAADSOpYzAAAABGdBTUEAALGPC/xhBQAA"
+    }
+  },
+  {
+    "name": "Binance",
+    "url": "https://www.binance.com/en",
+    "error": "No suitable logo element"
+  },
+  {
+    "name": "Bitget",
+    "url": "https://www.bitget.com/",
+    "file": "08-bitget-logo.png",
+    "selected": {
+      "i": 2,
+      "score": 20,
+      "tag": "IMG",
+      "x": 24,
+      "y": 16,
+      "width": 103,
+      "height": 32,
+      "hint": "bitget logo  !rotate-y-0 w-80px h-24px !md:w-103px !md:h-32px data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAATYAAABgCAYAAACXHF73AAAACXBIWXMAACE4AAAhOA"
+    }
+  },
+  {
+    "name": "Morpho",
+    "url": "https://brand.morpho.org",
+    "file": "20-morpho-logo.png",
+    "selected": {
+      "i": 2,
+      "score": 0,
+      "tag": "svg",
+      "x": 60,
+      "y": 40,
+      "width": 104,
+      "height": 21,
+      "hint": "   "
+    }
+  },
+  {
+    "name": "Sushi",
+    "url": "https://www.sushi.com/ethereum/swap",
+    "file": "11-sushi-logo.png",
+    "selected": {
+      "i": 4,
+      "score": 0,
+      "tag": "svg",
+      "x": 12,
+      "y": 16.640625,
+      "width": 90,
+      "height": 21.71875,
+      "hint": "   "
+    }
+  },
+  {
+    "name": "Uniswap",
+    "url": "https://about.uniswap.org/",
+    "file": "09-uniswap-logo.png",
+    "selected": {
+      "i": 0,
+      "score": 0,
+      "tag": "svg",
+      "x": 75,
+      "y": 20.5,
+      "width": 86.8125,
+      "height": 26.25,
+      "hint": "  h-7 w-auto text-pink-primary "
+    }
+  },
+  {
+    "name": "1inch",
+    "url": "https://1inch.com/",
+    "file": "12-1inch-logo.png",
+    "selected": {
+      "i": 1,
+      "score": 15,
+      "tag": "A",
+      "x": 20,
+      "y": 20.5,
+      "width": 84,
+      "height": 31,
+      "hint": " 1inch home logo-wrapper "
+    }
+  },
+  {
+    "name": "Aave",
+    "url": "https://aave.com/brand",
+    "file": "19-aave-logo.png",
+    "selected": {
+      "i": 3,
+      "score": 10,
+      "tag": "svg",
+      "x": 147,
+      "y": 32.828125,
+      "width": 96,
+      "height": 16.328125,
+      "hint": "  styles_logo___vDjy styles_headerLogo__uE_lb "
+    }
+  },
+  {
+    "name": "PancakeSwap",
+    "url": "https://pancakeswap.finance/",
+    "file": "10-pancakeswap-logo.png",
+    "selected": {
+      "i": 3,
+      "score": 0,
+      "tag": "svg",
+      "x": 32,
+      "y": 23.078125,
+      "width": 160,
+      "height": 24.84375,
+      "hint": "  Svg-sc-7debf4a5-0 hOPkLL "
+    }
+  },
+  {
+    "name": "Pendle",
+    "url": "https://www.pendle.finance/",
+    "file": "25-pendle-logo.png",
+    "selected": {
+      "i": 1,
+      "score": 10,
+      "tag": "IMG",
+      "x": 24,
+      "y": 16,
+      "width": 229.921875,
+      "height": 47.03125,
+      "hint": "   /.netlify/images?url=%2Flogo.png"
+    }
+  },
+  {
+    "name": "Hyperliquid",
+    "url": "https://hyperfoundation.org/",
+    "error": "No suitable logo element"
+  },
+  {
+    "name": "Lido",
+    "url": "https://lido.fi/",
+    "file": "22-lido-logo.png",
+    "selected": {
+      "i": 8,
+      "score": 10,
+      "tag": "svg",
+      "x": 230,
+      "y": 88,
+      "width": 130,
+      "height": 32,
+      "hint": "  header-content_textLogoML__sH1Rj "
+    }
+  },
+  {
+    "name": "Compound",
+    "url": "https://www.compound.xyz/",
+    "file": "21-compound-logo.png",
+    "selected": {
+      "i": 1,
+      "score": 0,
+      "tag": "IMG",
+      "x": 40,
+      "y": 16.234375,
+      "width": 140,
+      "height": 31.53125,
+      "hint": "   https://framerusercontent.com/images/MHkmyvXQcMf4GVNNuCKEJulrPw.svg?width=141&height=32"
+    }
+  },
+  {
+    "name": "Chainlink",
+    "url": "https://chain.link/brand-assets",
+    "file": "26-chainlink-logo.png",
+    "selected": {
+      "i": 1,
+      "score": 20,
+      "tag": "svg",
+      "x": 49.28125,
+      "y": 22,
+      "width": 143,
+      "height": 36,
+      "hint": "  chainlink-system--chainlink-logo "
+    }
+  },
+  {
+    "name": "Stripe",
+    "url": "https://stripe.com/",
+    "file": "27-stripe-logo.png",
+    "selected": {
+      "i": 1,
+      "score": 20,
+      "tag": "svg",
+      "x": 34,
+      "y": 25.5,
+      "width": 60,
+      "height": 25,
+      "hint": " Stripe logo  "
+    }
+  }
+]

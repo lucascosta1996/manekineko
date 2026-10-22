@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-21",
+  "scope": "Standalone artwork study only",
+  "viewports": [
+    {
+      "width": 320,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "overflow": false
+    }
+  ],
+  "browser": "145.0.7632.6",
+  "interactions": [
+    "Circle/square framing",
+    "Positive/reversed ink",
+    "32–128px avatar slider",
+    "Keyboard button activation"
+  ],
+  "axe": [],
+  "errors": [],
+  "status": "pass"
+}

@@ -1,11 +1,14 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import sharp from "sharp";
 
 // Keep standalone apps synchronized without introducing a runtime dependency.
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const identity = "docs/brand/tincta/identity";
 const geometry = JSON.parse(await readFile(resolve(root, identity, "geometry.json"), "utf8"));
+const rewardsDirectory = "docs/brand/tincta/rewards-open";
+const rewards = JSON.parse(await readFile(resolve(root, rewardsDirectory, "geometry.json"), "utf8"));
 const check = process.argv.includes("--check");
 const { wordmark, mark } = geometry;
 const paths = wordmark.paths.map(d => `      <path d="${d}" />`).join("\n");
@@ -14,9 +17,9 @@ type TinctaLogoProps = { className?: string; title?: string };
 
 export function TinctaWordmark({ className, title = "Tincta" }: TinctaLogoProps) {
   return (
-    <svg className={className} width="135" height="42" viewBox="${wordmark.viewBox}" role={title ? "img" : undefined} aria-label={title || undefined} aria-hidden={title ? undefined : true} focusable="false" data-tincta-logo="wordmark">
+    <svg className={className} width="135" height="${135 * wordmark.height / wordmark.width}" viewBox="${wordmark.viewBox}" role={title ? "img" : undefined} aria-label={title || undefined} aria-hidden={title ? undefined : true} focusable="false" data-tincta-logo="wordmark" data-tincta-identity="ligature">
       {title && <title>{title}</title>}
-      <g transform="translate(${wordmark.translate})" fill="none" stroke="currentColor" strokeWidth={${wordmark.strokeWidth}} strokeLinecap="butt" strokeLinejoin="round">
+      <g fill="currentColor">
 ${paths}
       </g>
     </svg>
@@ -25,7 +28,7 @@ ${paths}
 
 export function TinctaMark({ className, title = "Tincta" }: TinctaLogoProps) {
   return (
-    <svg className={className} width="32" height="32" viewBox="${mark.viewBox}" role={title ? "img" : undefined} aria-label={title || undefined} aria-hidden={title ? undefined : true} focusable="false" data-tincta-logo="mark">
+    <svg className={className} width="32" height="32" viewBox="${mark.viewBox}" role={title ? "img" : undefined} aria-label={title || undefined} aria-hidden={title ? undefined : true} focusable="false" data-tincta-logo="mark" data-tincta-identity="ligature">
       {title && <title>{title}</title>}
       <path fill="currentColor" d="${mark.path}" />
     </svg>
@@ -33,28 +36,80 @@ export function TinctaMark({ className, title = "Tincta" }: TinctaLogoProps) {
 }
 `;
 const wrap = (viewBox, body, label) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" role="img" aria-label="${label}"><title>${label}</title>${body}</svg>\n`;
-const wordmarkSvg = color => wrap(wordmark.viewBox, `<g transform="translate(${wordmark.translate})" fill="none" stroke="${color}" stroke-width="${wordmark.strokeWidth}" stroke-linecap="butt" stroke-linejoin="round">${wordmark.paths.map(d => `<path d="${d}"/>`).join("")}</g>`, "Tincta");
+const wordmarkBody = color => `<g fill="${color}">${wordmark.paths.map(d => `<path d="${d}"/>`).join("")}</g>`;
+const wordmarkSvg = color => wrap(wordmark.viewBox, wordmarkBody(color), "Tincta");
 const markSvg = color => wrap(mark.viewBox, `<path fill="${color}" d="${mark.path}"/>`, "Tincta");
 const icon = wrap("0 0 64 64", `<rect width="64" height="64" rx="14" fill="#111111"/><path transform="translate(8 8) scale(.48)" fill="#FFFFFF" d="${mark.smallPath}"/>`, "Tincta");
+const lockupBody = color => `<svg width="56" height="56" viewBox="${mark.viewBox}"><path fill="${color}" d="${mark.path}"/></svg><svg x="72" y="8" width="${40 * wordmark.width / wordmark.height}" height="40" viewBox="${wordmark.viewBox}">${wordmarkBody(color)}</svg>`;
 const assets = {
   "tincta-wordmark.svg": wordmarkSvg("#111111"),
   "tincta-wordmark-white.svg": wordmarkSvg("#FFFFFF"),
   "tincta-mark.svg": markSvg("#111111"),
   "tincta-mark-white.svg": markSvg("#FFFFFF"),
+  "tincta-lockup.svg": wrap("0 0 275 56", lockupBody("#111111"), "Tincta"),
+  "tincta-lockup-white.svg": wrap("0 0 275 56", lockupBody("#FFFFFF"), "Tincta"),
 };
 const outputs = new Map(Object.entries(assets).map(([name, content]) => [`${identity}/${name}`, content]));
+// The approved Rewards artwork is separate from the parent Ligature identity.
+const rewardsBody = rewards.faces.map(face => `<path fill="${face.fill}" d="${face.d}"/>`).join("");
+const rewardsSvg = wrap(rewards.viewBox, rewardsBody, "Tincta Rewards — Open");
+const pfpSvg = wrap(rewards.viewBox, `<path fill="#FFFFFF" d="M0 0H1254V1254H0Z"/><g transform="${rewards.pfpTransform}">${rewardsBody}</g>`, "Tincta Rewards — Open");
+outputs.set(`${rewardsDirectory}/tincta-rewards-open.svg`, rewardsSvg);
+outputs.set(`${rewardsDirectory}/tincta-rewards-pfp.svg`, pfpSvg);
+for (const size of [400, 1024]) outputs.set(`${rewardsDirectory}/tincta-rewards-pfp-${size}.png`, await sharp(Buffer.from(pfpSvg)).resize(size, size).png().toBuffer());
+outputs.set(`${rewardsDirectory}/tincta-rewards-open-transparent-1024.png`, await sharp(Buffer.from(rewardsSvg)).resize(1024, 1024).png().toBuffer());
+outputs.set("packages/ui/src/rewards-artwork.tsx", `// Generated by scripts/generate-tincta-brand.mjs. Edit rewards-open/geometry.json.
+type RewardsArtworkProps = { className?: string; title?: string };
+
+export function RewardsArtwork({ className, title = "Tincta Rewards" }: RewardsArtworkProps) {
+  return (
+    <svg className={className} width="1254" height="1254" viewBox="${rewards.viewBox}" role={title ? "img" : undefined} aria-label={title || undefined} aria-hidden={title ? undefined : true} focusable="false" data-tincta-artwork="open">
+      {title && <title>{title}</title>}
+${rewards.faces.map(face => `      <path fill="${face.fill}" d="${face.d}" />`).join("\n")}
+    </svg>
+  );
+}
+`);
+// Transparent references for raster campaign authoring use the same paths.
+for (const [name, svg] of Object.entries(assets)) {
+  const width = name.includes("-mark") ? 1024 : 2000;
+  outputs.set(`${identity}/${name.replace(/\.svg$/, ".png")}`, await sharp(Buffer.from(svg)).resize({ width }).png().toBuffer());
+}
 outputs.set(`${identity}/tincta-icon.svg`, icon);
+// One outlined signature for the worker, Launch preview and local X templates.
+// No filesystem, font or native-image dependency enters their SVG renderer.
+const socialLockup = `<g transform="translate(48 44)" data-tincta-logo="lockup" data-tincta-identity="ligature"><svg width="56" height="56" viewBox="${rewards.viewBox}" data-tincta-artwork="open">${rewardsBody}</svg><svg x="72" y="8" width="${40 * wordmark.width / wordmark.height}" height="40" viewBox="${wordmark.viewBox}">${wordmarkBody("#111111")}</svg></g>`;
+outputs.set("packages/contracts/src/tincta-brand.ts", `// Generated by scripts/generate-tincta-brand.mjs. Edit the canonical geometry, not this file.\nexport const TINCTA_SOCIAL_LOCKUP_SVG = ${JSON.stringify(socialLockup)};\n`);
+// PNG-compressed ICO entries retain the optical small-size drawing at 16/32/48 px.
+const iconPngs = await Promise.all([16, 32, 48].map(size => sharp(Buffer.from(icon)).resize(size, size).png().toBuffer()));
+const directory = Buffer.alloc(6 + 16 * iconPngs.length);
+directory.writeUInt16LE(1, 2); directory.writeUInt16LE(iconPngs.length, 4);
+let offset = directory.length;
+iconPngs.forEach((png, index) => {
+  const entry = 6 + index * 16, size = [16, 32, 48][index];
+  directory[entry] = size; directory[entry + 1] = size;
+  directory.writeUInt16LE(1, entry + 4); directory.writeUInt16LE(32, entry + 6);
+  directory.writeUInt32LE(png.length, entry + 8); directory.writeUInt32LE(offset, entry + 12);
+  offset += png.length;
+});
+const favicon = Buffer.concat([directory, ...iconPngs]);
+const appleIcon = await sharp(Buffer.from(icon)).resize(180, 180).png().toBuffer();
+outputs.set(`${identity}/tincta-favicon.ico`, favicon);
+outputs.set(`${identity}/tincta-apple-icon.png`, appleIcon);
 for (const app of ["web", "launch", "landing-page"]) {
+  outputs.set(`apps/${app}/public/tincta-rewards-open.svg`, rewardsSvg);
   outputs.set(`apps/${app}/components/tincta-logo.tsx`, component);
   outputs.set(`apps/${app}/app/icon.svg`, icon);
+  outputs.set(`apps/${app}/app/favicon.ico`, favicon);
+  outputs.set(`apps/${app}/app/apple-icon.png`, appleIcon);
   for (const [name, content] of Object.entries(assets)) outputs.set(`apps/${app}/public/${name}`, content);
 }
 const mismatches = [];
 for (const [name, content] of outputs) {
   const path = resolve(root, name);
   if (check) {
-    const actual = await readFile(path, "utf8").catch(error => { if (error.code === "ENOENT") return null; throw error; });
-    if (actual !== content) mismatches.push(name);
+    const actual = await readFile(path).catch(error => { if (error.code === "ENOENT") return null; throw error; });
+    if (!actual?.equals(Buffer.from(content))) mismatches.push(name);
   } else {
     await mkdir(dirname(path), { recursive: true });
     await writeFile(path, content);
@@ -64,5 +119,5 @@ if (mismatches.length) {
   console.error(`Tincta brand artifacts differ from the master:\n${mismatches.join("\n")}`);
   process.exitCode = 1;
 } else {
-  console.log(`${check ? "Verified" : "Generated"} ${outputs.size} Tincta brand artifacts from approved direction 06.`);
+  console.log(`${check ? "Verified" : "Generated"} ${outputs.size} Tincta brand artifacts from approved ${geometry.direction}.`);
 }

@@ -1,0 +1,35 @@
+[
+  {
+    "id": "a",
+    "name": "Essential",
+    "slug": "essential",
+    "tag": "Faithful",
+    "alt": "Two unequal folded wings and a broad lower fold reveal a small orange and red center.",
+    "cue": "Original gesture, fewer folds",
+    "description": "Keeps the tall right wing and lower supporting fold. Secondary shards are removed and the center becomes a simple two-face polygon.",
+    "connection": "The enclosing planes pull away to reveal a distinct center: the same opening and discovery idea as Unfold.",
+    "assessment": "Closest to the selected artwork. The separated folds keep a sculptural quality, with more space between the major pieces."
+  },
+  {
+    "id": "b",
+    "name": "Cradle",
+    "slug": "cradle",
+    "tag": "Compact",
+    "alt": "A compact broad folded cradle opens around a small orange and red polygon.",
+    "cue": "A compact reveal",
+    "description": "A broader, continuous lower form gathers the folds into one silhouette. The center sits higher in the opening and remains visibly separate.",
+    "connection": "The supporting outer structure frames the revealed center. The intended association remains discovering something valuable.",
+    "assessment": "My preferred PFP direction: the broad base and larger center give it more presence at small sizes. The structure feels cohesive."
+  },
+  {
+    "id": "c",
+    "name": "Open",
+    "slug": "open",
+    "tag": "Airy",
+    "alt": "Two diagonal folded wings open widely around a small center above a low angular base.",
+    "cue": "More space, more motion",
+    "description": "The wings stretch outward around a wider white opening. A continuous lower bend connects the sweeping diagonal forms.",
+    "connection": "The outward gesture emphasizes the moment of opening, with the center as the thing being discovered.",
+    "assessment": "The most expansive silhouette. Strong directional movement, with a smaller center relative to the surrounding wings."
+  }
+]

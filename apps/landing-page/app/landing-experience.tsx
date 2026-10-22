@@ -1,5 +1,6 @@
 "use client";
 import { RewardsBrand } from "@manekineko/ui/rewards-brand";
+import { RewardsArtwork } from "@manekineko/ui/rewards-artwork";
 import { Button, IconButton, LinkButton } from "@manekineko/ui/button";
 import { PublicFooter } from "@manekineko/ui/footer";
 import type { PublicLinks } from "@manekineko/ui/links";
@@ -22,73 +23,6 @@ function Brand({ footer = false }: { footer?: boolean }) {
     >
       <RewardsBrand decorative><TinctaWordmark className="brand-wordmark" title="" /></RewardsBrand>
     </a>
-  );
-}
-
-/** Decorative SVG sculpture. Colors are copied directly from the public color catalog. */
-function ColorSculpture({ colors }: { colors: string[] }) {
-  return (
-    <svg
-      className="color-sculpture"
-      viewBox="0 0 700 660"
-      fill="none"
-      aria-hidden="true"
-    >
-      <defs>
-        <radialGradient id="ground-shadow">
-          <stop stopColor="#212026" stopOpacity=".14" />
-          <stop offset="1" stopColor="#212026" stopOpacity="0" />
-        </radialGradient>
-      </defs>
-      <ellipse cx="354" cy="581" rx="241" ry="28" fill="url(#ground-shadow)" />
-      <g className="sculpture-orbit">
-        {Array.from({ length: 72 }, (_, i) => {
-          const angle = i * 5;
-          return (
-            <ellipse
-              key={i}
-              cx="350"
-              cy="326"
-              rx="220"
-              ry="92"
-              stroke={colors[Math.floor(i / 8) % colors.length]}
-              strokeWidth="2.7"
-              transform={`rotate(${angle} 350 326)`}
-            />
-          );
-        })}
-      </g>
-      <g className="sculpture-core">
-        {Array.from({ length: 28 }, (_, i) => (
-          <ellipse
-            key={i}
-            cx="350"
-            cy="326"
-            rx={50 + i * 2.05}
-            ry={53 + i * 2.6}
-            stroke={colors[(i + 4) % colors.length]}
-            strokeOpacity=".8"
-            strokeWidth="1.15"
-            transform={`rotate(${i * 4} 350 326)`}
-          />
-        ))}
-      </g>
-      <g className="sculpture-center" transform="translate(350 326)">
-        <circle r="68" fill="#fafaf7" />
-        <path
-          d="M0-22c0 16-6 22-22 22 16 0 22 6 22 22 0-16 6-22 22-22C6 0 0-6 0-22Z"
-          stroke="#1a1a1a"
-          strokeWidth="1.2"
-        />
-      </g>
-      <path
-        d="M49 107h14m-7-7v14M627 461h14m-7-7v14"
-        stroke="currentColor"
-        strokeOpacity=".3"
-      />
-      <circle cx="591" cy="153" r="4" fill={colors[colors.length - 1]} />
-      <circle cx="109" cy="481" r="3" fill={colors[4] ?? colors[0]} />
-    </svg>
   );
 }
 
@@ -153,7 +87,6 @@ export function LandingExperience({
 }) {
   const [failedArtwork, setFailedArtwork] = useState<string[]>([]);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const [heroSeason, setHeroSeason] = useState(0);
   const [catalogSeason, setCatalogSeason] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showCatalog, setShowCatalog] = useState(false);
@@ -162,8 +95,6 @@ export function LandingExperience({
   const gallery = useRef<HTMLDivElement>(null);
   const menuButton = useRef<HTMLButtonElement>(null);
   const motionOff = reducedMotion;
-  const featuredSeasons = [0, 5, 10, 13, 15, 19];
-  const currentPalette = seasons[featuredSeasons[heroSeason]];
   const selectedSeason = seasons[catalogSeason];
   const totalCollections = seasons.reduce(
     (total, season) => total + season.colors.length,
@@ -178,19 +109,6 @@ export function LandingExperience({
     return () => preference.removeEventListener("change", sync);
   }, []);
 
-  useEffect(() => {
-    if (motionOff) return;
-    const timer = window.setInterval(() => {
-      if (
-        !document.hidden &&
-        (root.current?.querySelector(".hero")?.getBoundingClientRect().bottom ??
-          0) > 0
-      ) {
-        setHeroSeason((value) => (value + 1) % featuredSeasons.length);
-      }
-    }, 6500);
-    return () => window.clearInterval(timer);
-  }, [motionOff]);
 
   useEffect(() => {
     if (!root.current || motionOff) return;
@@ -355,7 +273,7 @@ export function LandingExperience({
               </div>
             </div>
             <div className="hero-art">
-              <ColorSculpture colors={currentPalette.colors} />
+              <RewardsArtwork className="rewards-hero-artwork" title="" />
             </div>
           </div>
         </section>

@@ -1,0 +1,45 @@
+{
+  "stats": {
+    "startTime": "2026-10-21T06:48:04.321Z",
+    "duration": 322490.894,
+    "expected": 471,
+    "skipped": 159,
+    "unexpected": 4,
+    "flaky": 0
+  },
+  "failures": [
+    {
+      "title": "Stale collection status explains unavailable updates 390",
+      "project": "chromium",
+      "status": "unexpected",
+      "errors": [
+        "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.collection-activity').first().locator('.lifecycle-badge')\nExpected: \u001b[32m\"Status unavailable\"\u001b[39m\nReceived: \u001b[31m\"Collection update delayed\"\u001b[39m\nTimeout:  10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('.collection-activity').first().locator('.lifecycle-badge')\u001b[22m\n\u001b[2m    14 \u00d7 locator resolved to <span role=\"status\" data-live=\"false\" data-busy=\"false\" class=\"lifecycle-badge\">Collection update delayed</span>\u001b[22m\n\u001b[2m       - unexpected value \"Collection update delayed\"\u001b[22m\n"
+      ]
+    },
+    {
+      "title": "Stale collection status explains unavailable updates 1440",
+      "project": "chromium",
+      "status": "unexpected",
+      "errors": [
+        "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.collection-activity').first().locator('.lifecycle-badge')\nExpected: \u001b[32m\"Status unavailable\"\u001b[39m\nReceived: \u001b[31m\"Collection update delayed\"\u001b[39m\nTimeout:  10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('.collection-activity').first().locator('.lifecycle-badge')\u001b[22m\n\u001b[2m    14 \u00d7 locator resolved to <span role=\"status\" data-live=\"false\" data-busy=\"false\" class=\"lifecycle-badge\">Collection update delayed</span>\u001b[22m\n\u001b[2m       - unexpected value \"Collection update delayed\"\u001b[22m\n"
+      ]
+    },
+    {
+      "title": "Stale collection status explains unavailable updates 390",
+      "project": "webkit",
+      "status": "unexpected",
+      "errors": [
+        "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.collection-activity').first().locator('.lifecycle-badge')\nExpected: \u001b[32m\"Status unavailable\"\u001b[39m\nReceived: \u001b[31m\"Collection update delayed\"\u001b[39m\nTimeout:  10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('.collection-activity').first().locator('.lifecycle-badge')\u001b[22m\n\u001b[2m    14 \u00d7 locator resolved to <span role=\"status\" data-live=\"false\" data-busy=\"false\" class=\"lifecycle-badge\">Collection update delayed</span>\u001b[22m\n\u001b[2m       - unexpected value \"Collection update delayed\"\u001b[22m\n"
+      ]
+    },
+    {
+      "title": "Stale collection status explains unavailable updates 1440",
+      "project": "webkit",
+      "status": "unexpected",
+      "errors": [
+        "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.collection-activity').first().locator('.lifecycle-badge')\nExpected: \u001b[32m\"Status unavailable\"\u001b[39m\nReceived: \u001b[31m\"Collection update delayed\"\u001b[39m\nTimeout:  10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('.collection-activity').first().locator('.lifecycle-badge')\u001b[22m\n\u001b[2m    14 \u00d7 locator resolved to <span role=\"status\" data-live=\"false\" data-busy=\"false\" class=\"lifecycle-badge\">Collection update delayed</span>\u001b[22m\n\u001b[2m       - unexpected value \"Collection update delayed\"\u001b[22m\n"
+      ]
+    }
+  ],
+  "note": "Four pre-existing stale-status copy assertions from tests/visual/web.spec.ts:227-228; production collection-activity.tsx was not changed. Brand route and layout checks passed. Screenshot baselines refreshed for the approved identity."
+}

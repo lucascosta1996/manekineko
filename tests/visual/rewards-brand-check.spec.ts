@@ -8,6 +8,11 @@ for (const [app, routes] of Object.entries({landing:['/rewards'],web:['/docs','/
    if(app==='launch'&&route==='/dashboard'&&width<1024) await page.getByRole('button',{name:"Open navigation"}).first().click();
    const brands=page.locator('.ui-rewards-brand:visible');expect(await brands.count()).toBeGreaterThan(0);
    for(const brand of await brands.all()) {
+    await expect(brand.locator('[data-tincta-artwork="open"]')).toHaveCount(1);
+    const logo = brand.locator('[data-tincta-logo="wordmark"]');
+    await expect(logo).toHaveAttribute('data-tincta-identity', 'ligature');
+    const ratio = await logo.evaluate(el => { const box = el.getBoundingClientRect(); return box.width / box.height; });
+    expect(ratio).toBeCloseTo(3947 / 780, 1);
     await expect(brand.locator('.ui-rewards-label')).toHaveText('Rewards');
     const metrics=await brand.evaluate(el=>{const box=el.getBoundingClientRect(),s=getComputedStyle(el.querySelector('.ui-rewards-label')!);return {left:box.left,right:box.right,gap:getComputedStyle(el).gap,size:s.fontSize,radius:s.borderRadius};});
     expect(metrics.left).toBeGreaterThanOrEqual(0);expect(metrics.right).toBeLessThanOrEqual(width);expect(metrics.gap).toBe('14px');expect(metrics.size).toBe('13px');expect(metrics.radius).toBe('3px');

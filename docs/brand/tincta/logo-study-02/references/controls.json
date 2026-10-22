@@ -1,0 +1,27 @@
+[
+  {
+    "key": "tether",
+    "url": "https://tether.to",
+    "title": "Tether – Official Home of Tether"
+  },
+  {
+    "key": "nexo",
+    "url": "https://nexo.com",
+    "title": "Nexo: Your Wealth Platform for Digital Assets"
+  },
+  {
+    "key": "tezos",
+    "url": "https://tezos.com",
+    "title": "Home | Tezos"
+  },
+  {
+    "key": "linear",
+    "url": "https://linear.app",
+    "title": "Linear – The system for product development"
+  },
+  {
+    "key": "ledger",
+    "url": "https://www.ledger.com",
+    "title": "Ledger Crypto Wallet - Security for DeFi & Web3"
+  }
+]

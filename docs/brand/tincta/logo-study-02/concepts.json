@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-21",
+  "status": "C / Ligature selected by the user on 2026-10-21",
+  "recommended": "a",
+  "concepts": [
+    {
+      "id": "a",
+      "name": "Aperture",
+      "tone": "Open. Precise. Architectural.",
+      "position": "A parent identity for research, code and participation.",
+      "idea": "Two offset brackets define one open field. The space between them is as deliberate as the ink: a compact metaphor for rules that leave room for participation.",
+      "mark": "M14 72V32Q14 14 32 14H56V36H42Q36 36 36 42V72ZM86 28V68Q86 86 68 86H44V64H58Q64 64 64 58V28Z",
+      "micro": "M12.5 75V31.25Q12.5 12.5 31.25 12.5H56.25V37.5H43.75Q37.5 37.5 37.5 43.75V75ZM87.5 25V68.75Q87.5 87.5 68.75 87.5H43.75V62.5H56.25Q62.5 62.5 62.5 56.25V25Z",
+      "lettering": "Lowercase, medium weight, open counters. Custom upright t forms and square i dot, with Manrope-derived n/c/a outlines and optical spacing.",
+      "benefit": "Strongest balance of institutional restraint and Tincta\u2019s geometric art heritage. No standalone letter silhouette.",
+      "risk": "Offset brackets are a familiar design vocabulary. Review against software, custody and infrastructure marks; avoid adding a containing square or linking it into a chain.",
+      "refine": "Explore asymmetric proportions and opening widths; refine the n\u2013c spacing, t shoulder and a terminal; compare a rounded and a sharper master."
+    },
+    {
+      "id": "b",
+      "name": "Fold",
+      "tone": "Decisive. Structural. Forward.",
+      "position": "The strongest direction for a financial technology company.",
+      "idea": "A broad horizontal plane and an upright plane meet across a diagonal cut. The fold suggests a published edition becoming a structure.",
+      "mark": "M12 14H88L60 42H12ZM60 54L84 30V88H60Z",
+      "micro": "M12.5 12.5H87.5L56.25 43.75H12.5ZM62.5 56.25L87.5 31.25V87.5H62.5Z",
+      "lettering": "Title case, compact grotesk, moderate weight. Instrument Sans outlines with custom pair spacing, led by the flat capital T.",
+      "benefit": "Bold silhouette, very simple reproduction and a clear move toward a corporate identity.",
+      "risk": "May read as a 7, flag or folded arrow. Angular finance and exchange logos are crowded; the cut and proportions need further differentiation.",
+      "refine": "Test three seam angles and stem positions; resolve the possible 7 reading; develop a distinctive t terminal shared by the lettering and fold."
+    },
+    {
+      "id": "c",
+      "name": "Ligature",
+      "tone": "Measured. Editorial. Established.",
+      "position": "A research publisher with a restrained institutional voice.",
+      "idea": "A compact T/C monogram pairs the opening initial with the central consonant. A shared top edge brings the two letters into one editorial signature.",
+      "mark": "M8 14H62V32H40V86H20V32H8ZM94 29L80 42C76 36 71 33 64 33C53 33 47 41 47 52C47 64 54 71 65 71C72 71 77 68 81 62L95 75C88 85 77 91 64 91C42 91 27 75 27 52C27 30 42 14 64 14C77 14 88 19 94 29Z",
+      "micro": "M6.25 12.5H62.5V31.25H40.625V87.5H18.75V31.25H6.25ZM93.75 28.125L78.125 43.75Q73.4375 34.375 64.0625 34.375Q46.875 34.375 46.875 53.125Q46.875 71.875 64.0625 71.875Q73.4375 71.875 79.6875 62.5L95.3125 76.5625Q84.375 93.75 64.0625 93.75Q25 93.75 25 53.125Q25 12.5 64.0625 12.5Q84.375 12.5 93.75 28.125Z",
+      "lettering": "Spaced uppercase with a moderate stroke. Instrument Sans outlines with revised T/I, C/T and T/A spacing.",
+      "benefit": "The most editorial direction; works naturally on research covers and formal communications.",
+      "risk": "TC can imply two words, a consultancy or a fashion house. Less distinctive and less connected to participation than Aperture; monogram complexity is weakest at 16 px.",
+      "refine": "Test whether the monogram reads as one signature; simplify the shared junction; tighten uppercase tracking for navigation."
+    }
+  ],
+  "selected": "c"
+}

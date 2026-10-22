@@ -1,0 +1,104 @@
+{
+  "accounts": [
+    {
+      "handle": "tinctaxyz",
+      "name": "Tincta",
+      "artwork": "Main TC Ligature glyph",
+      "source": "docs/brand/tincta/identity/geometry.json"
+    },
+    {
+      "handle": "tinctarewards",
+      "name": "Tincta Rewards",
+      "artwork": "Open",
+      "source": "docs/brand/tincta/rewards-open/tincta-rewards-pfp.svg"
+    },
+    {
+      "handle": "tinctamorph",
+      "name": "Tincta Morph",
+      "artwork": "Nested rotating frames",
+      "source": "apps/landing-page/components/research-art.tsx + seasons.json"
+    },
+    {
+      "handle": "tinctaassembly",
+      "name": "Tincta Assembly",
+      "artwork": "Quarter-circle assembly",
+      "source": "apps/landing-page/components/research-art.tsx + seasons.json"
+    }
+  ],
+  "generation": "node --import tsx scripts/generate-twitter-account-kit.mjs",
+  "framing": "Opaque white square canvases. Existing geometry and colors preserved. Artwork remains inside a circular crop.",
+  "files": [
+    {
+      "file": "tinctaxyz/tinctaxyz-pfp-400.png",
+      "width": 400,
+      "height": 400,
+      "bytes": 6860,
+      "coloredPixelsOutsideCircle": 0,
+      "transparentPixels": 0,
+      "sha256": "552d5e572476b431a9c192864f91db064cba3a2814d7a0bf89536946b6cf7984"
+    },
+    {
+      "file": "tinctaxyz/tinctaxyz-pfp-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 24533,
+      "coloredPixelsOutsideCircle": 0,
+      "transparentPixels": 0,
+      "sha256": "c501aa1ad221789b2342af32e078f5775650564d438299e13842e5e944ecd58c"
+    },
+    {
+      "file": "tinctarewards/tinctarewards-pfp-400.png",
+      "width": 400,
+      "height": 400,
+      "bytes": 14077,
+      "coloredPixelsOutsideCircle": 0,
+      "transparentPixels": 0,
+      "sha256": "8c37c7478658b8098f1500309af6be81738e56a987c30e3850d149477843032a"
+    },
+    {
+      "file": "tinctarewards/tinctarewards-pfp-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 44907,
+      "coloredPixelsOutsideCircle": 0,
+      "transparentPixels": 0,
+      "sha256": "cda5f3c2bd7bb831ac70b5f69916d1503295cdf1005f16daa1d76c4c7491e63d"
+    },
+    {
+      "file": "tinctamorph/tinctamorph-pfp-400.png",
+      "width": 400,
+      "height": 400,
+      "bytes": 86316,
+      "coloredPixelsOutsideCircle": 0,
+      "transparentPixels": 0,
+      "sha256": "3a571991d68d6bf673851e766644305cf2f4afe0235418c61c8f083fccf1dc68"
+    },
+    {
+      "file": "tinctamorph/tinctamorph-pfp-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 271802,
+      "coloredPixelsOutsideCircle": 0,
+      "transparentPixels": 0,
+      "sha256": "b0f350b2b16e638fd5873be80fb1b01ff257e29707291cd3b886919559325f25"
+    },
+    {
+      "file": "tinctaassembly/tinctaassembly-pfp-400.png",
+      "width": 400,
+      "height": 400,
+      "bytes": 11204,
+      "coloredPixelsOutsideCircle": 0,
+      "transparentPixels": 0,
+      "sha256": "6a51b8456753032bf6e4082b11557df8270e5426d8c52853c7a365516119ab5e"
+    },
+    {
+      "file": "tinctaassembly/tinctaassembly-pfp-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 35305,
+      "coloredPixelsOutsideCircle": 0,
+      "transparentPixels": 0,
+      "sha256": "c8021523d087ebec6567cc5e3d80d47f25d4e32b65c9732e5781c4e46a7fe8ca"
+    }
+  ]
+}
