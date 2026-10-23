@@ -1,0 +1,1433 @@
+{
+  "chainId": 1,
+  "seasons": [
+    {
+      "seasonId": "0x751d48ff48d8b240e1d699e858d53579ae13f38eed9215183f687d24734d3c6b",
+      "name": "Crimson & Blood Orange",
+      "collections": [
+        {
+          "name": "Velvet Ember",
+          "symbol": "TINCTA101",
+          "color": "#330000",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Garnet Veil",
+          "symbol": "TINCTA102",
+          "color": "#660000",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Ruby Current",
+          "symbol": "TINCTA103",
+          "color": "#990000",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Crimson Pulse",
+          "symbol": "TINCTA104",
+          "color": "#CC0000",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Scarlet Signal",
+          "symbol": "TINCTA105",
+          "color": "#FF0000",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Smoked Ochre",
+          "symbol": "TINCTA106",
+          "color": "#663300",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Rust Horizon",
+          "symbol": "TINCTA107",
+          "color": "#993300",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Copper Flare",
+          "symbol": "TINCTA108",
+          "color": "#CC3300",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Vermilion Glow",
+          "symbol": "TINCTA109",
+          "color": "#FF3300",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Citrus Blaze",
+          "symbol": "TINCTA110",
+          "color": "#FF6600",
+          "textColor": "#000000"
+        }
+      ]
+    },
+    {
+      "seasonId": "0xdc76c6d84f910e3275be19ecd1d7b54a9bb779a1b906aa361be3fc01023896e9",
+      "name": "Burnt Sienna & Terracotta",
+      "collections": [
+        {
+          "name": "Golden Earth",
+          "symbol": "TINCTA201",
+          "color": "#996600",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Sienna Kiln",
+          "symbol": "TINCTA202",
+          "color": "#CC6600",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Ochre Terrace",
+          "symbol": "TINCTA203",
+          "color": "#CC9900",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Apricot Fire",
+          "symbol": "TINCTA204",
+          "color": "#FF9900",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Marigold Sun",
+          "symbol": "TINCTA205",
+          "color": "#FFCC00",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Clay Shadow",
+          "symbol": "TINCTA206",
+          "color": "#663333",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Brick Reverie",
+          "symbol": "TINCTA207",
+          "color": "#993333",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Terracotta Heat",
+          "symbol": "TINCTA208",
+          "color": "#CC3333",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Coral Spark",
+          "symbol": "TINCTA209",
+          "color": "#FF3333",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Canyon Dust",
+          "symbol": "TINCTA210",
+          "color": "#996633",
+          "textColor": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x020d6f9f115e38208a4a1d1df8b6a9922579c7c3a420745c53df76454c7d6ad3",
+      "name": "Desert Sand & Warm Amber",
+      "collections": [
+        {
+          "name": "Amber Dune",
+          "symbol": "TINCTA301",
+          "color": "#CC6633",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Persimmon Sun",
+          "symbol": "TINCTA302",
+          "color": "#FF6633",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Desert Honey",
+          "symbol": "TINCTA303",
+          "color": "#CC9933",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Tangerine Haze",
+          "symbol": "TINCTA304",
+          "color": "#FF9933",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Saffron Drift",
+          "symbol": "TINCTA305",
+          "color": "#FFCC33",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Rose Sand",
+          "symbol": "TINCTA306",
+          "color": "#996666",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Dusty Adobe",
+          "symbol": "TINCTA307",
+          "color": "#CC6666",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Papaya Bloom",
+          "symbol": "TINCTA308",
+          "color": "#FF6666",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Sandstone Silk",
+          "symbol": "TINCTA309",
+          "color": "#CC9966",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Peach Mirage",
+          "symbol": "TINCTA310",
+          "color": "#FF9966",
+          "textColor": "#000000"
+        }
+      ]
+    },
+    {
+      "seasonId": "0xf411f2c1c3ec37720d9cbda862e33086a5b2d66d8d8b70ab2accf50b6967a52b",
+      "name": "Solar Yellow & Pastel Gold",
+      "collections": [
+        {
+          "name": "Solar Noon",
+          "symbol": "TINCTA401",
+          "color": "#FFFF00",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Lemon Halo",
+          "symbol": "TINCTA402",
+          "color": "#FFFF33",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Primrose Light",
+          "symbol": "TINCTA403",
+          "color": "#FFFF66",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Buttercup Air",
+          "symbol": "TINCTA404",
+          "color": "#FFFF99",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Vanilla Dawn",
+          "symbol": "TINCTA405",
+          "color": "#FFFFCC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Citron Gold",
+          "symbol": "TINCTA406",
+          "color": "#CCCC00",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Golden Pollen",
+          "symbol": "TINCTA407",
+          "color": "#CCCC33",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Wheat Gleam",
+          "symbol": "TINCTA408",
+          "color": "#CCCC66",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Champagne Mist",
+          "symbol": "TINCTA409",
+          "color": "#CCCC99",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Honey Silk",
+          "symbol": "TINCTA410",
+          "color": "#FFCC66",
+          "textColor": "#000000"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x2af77d493026ef552a2a27a1e066a296fd33d8c4c5f2fecc50f27cf82b436d60",
+      "name": "Olive & Dried Moss",
+      "collections": [
+        {
+          "name": "Olive Night",
+          "symbol": "TINCTA501",
+          "color": "#333300",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Antique Grove",
+          "symbol": "TINCTA502",
+          "color": "#666600",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Lichen Stone",
+          "symbol": "TINCTA503",
+          "color": "#666633",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Moss Lantern",
+          "symbol": "TINCTA504",
+          "color": "#999900",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Dried Laurel",
+          "symbol": "TINCTA505",
+          "color": "#999933",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Sage Dust",
+          "symbol": "TINCTA506",
+          "color": "#999966",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Fern Gold",
+          "symbol": "TINCTA507",
+          "color": "#669900",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Meadow Olive",
+          "symbol": "TINCTA508",
+          "color": "#669933",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Lime Canopy",
+          "symbol": "TINCTA509",
+          "color": "#99CC00",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Orchard Light",
+          "symbol": "TINCTA510",
+          "color": "#99CC33",
+          "textColor": "#000000"
+        }
+      ]
+    },
+    {
+      "seasonId": "0xf26c1615b93c62848ca2778040f9c462977efa5ba502bf9a8bb568c98efb973f",
+      "name": "Vivid Lime & Chartreuse",
+      "collections": [
+        {
+          "name": "Cedar Lime",
+          "symbol": "TINCTA601",
+          "color": "#336600",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Orchard Shade",
+          "symbol": "TINCTA602",
+          "color": "#339900",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Leaf Voltage",
+          "symbol": "TINCTA603",
+          "color": "#33CC00",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Neon Sprout",
+          "symbol": "TINCTA604",
+          "color": "#33FF00",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Lime Rush",
+          "symbol": "TINCTA605",
+          "color": "#66CC00",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Electric Zest",
+          "symbol": "TINCTA606",
+          "color": "#66FF00",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Chartreuse Flash",
+          "symbol": "TINCTA607",
+          "color": "#99FF00",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Acid Dew",
+          "symbol": "TINCTA608",
+          "color": "#99FF33",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Citron Beam",
+          "symbol": "TINCTA609",
+          "color": "#CCFF00",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Lemon Current",
+          "symbol": "TINCTA610",
+          "color": "#CCFF33",
+          "textColor": "#000000"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x2d116744ddb96838db4467c1b038898a6ee01adb211920ca12de4223934cc88d",
+      "name": "Spring Foliage & Meadow",
+      "collections": [
+        {
+          "name": "Early Bud",
+          "symbol": "TINCTA701",
+          "color": "#CCFF66",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Linden Veil",
+          "symbol": "TINCTA702",
+          "color": "#CCFF99",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Pear Blossom",
+          "symbol": "TINCTA703",
+          "color": "#CCFFCC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Willow Field",
+          "symbol": "TINCTA704",
+          "color": "#99CC66",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Sage Meadow",
+          "symbol": "TINCTA705",
+          "color": "#99CC99",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Spring Shoot",
+          "symbol": "TINCTA706",
+          "color": "#66CC33",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Clover Breeze",
+          "symbol": "TINCTA707",
+          "color": "#66CC66",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Grass Pulse",
+          "symbol": "TINCTA708",
+          "color": "#33CC33",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Garden Fern",
+          "symbol": "TINCTA709",
+          "color": "#339933",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Laurel Shade",
+          "symbol": "TINCTA710",
+          "color": "#336633",
+          "textColor": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "seasonId": "0xd8c957f46e8bbd9ba108daa0cefc8116210b85ac8590adcf060f7b3b7b31c83e",
+      "name": "Deep Forest & Pine",
+      "collections": [
+        {
+          "name": "Forest Floor",
+          "symbol": "TINCTA801",
+          "color": "#003300",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Pine Heart",
+          "symbol": "TINCTA802",
+          "color": "#006600",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Emerald Thicket",
+          "symbol": "TINCTA803",
+          "color": "#009900",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Canopy Rise",
+          "symbol": "TINCTA804",
+          "color": "#00CC00",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Wild Chlorophyll",
+          "symbol": "TINCTA805",
+          "color": "#00FF00",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Cypress Night",
+          "symbol": "TINCTA806",
+          "color": "#003333",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Juniper Shadow",
+          "symbol": "TINCTA807",
+          "color": "#006633",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Woodland Jade",
+          "symbol": "TINCTA808",
+          "color": "#009933",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Rainleaf",
+          "symbol": "TINCTA809",
+          "color": "#00CC33",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Verdant Flame",
+          "symbol": "TINCTA810",
+          "color": "#00FF33",
+          "textColor": "#000000"
+        }
+      ]
+    },
+    {
+      "seasonId": "0xbe95fb5deadb87fdbbc9a463b9f56d8554d1c3972f0f172a04d30f1afd85e494",
+      "name": "Spearmint & Crisp Jade",
+      "collections": [
+        {
+          "name": "Spearmint Spark",
+          "symbol": "TINCTA901",
+          "color": "#00FF66",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Jade Fountain",
+          "symbol": "TINCTA902",
+          "color": "#00FF99",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Mint Leaf",
+          "symbol": "TINCTA903",
+          "color": "#33FF66",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Green Lagoon",
+          "symbol": "TINCTA904",
+          "color": "#33FF99",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Apple Frost",
+          "symbol": "TINCTA905",
+          "color": "#66FF66",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Mint Sorbet",
+          "symbol": "TINCTA906",
+          "color": "#66FF99",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Pear Glimmer",
+          "symbol": "TINCTA907",
+          "color": "#99FF66",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Spring Foam",
+          "symbol": "TINCTA908",
+          "color": "#99FF99",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Jade Creek",
+          "symbol": "TINCTA909",
+          "color": "#00CC66",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Garden Dew",
+          "symbol": "TINCTA910",
+          "color": "#33CC66",
+          "textColor": "#000000"
+        }
+      ]
+    },
+    {
+      "seasonId": "0xcee7c781df34524983d64c97663e54bb5ca4fc52c11cc0677c35eb08c532f8b8",
+      "name": "Abyssal Waters & Dark Teal",
+      "collections": [
+        {
+          "name": "Pelagic Night",
+          "symbol": "TINCTA1001",
+          "color": "#003366",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Deep Estuary",
+          "symbol": "TINCTA1002",
+          "color": "#006666",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Trench Blue",
+          "symbol": "TINCTA1003",
+          "color": "#006699",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Kelp Current",
+          "symbol": "TINCTA1004",
+          "color": "#009966",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Teal Abyss",
+          "symbol": "TINCTA1005",
+          "color": "#009999",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Harbor Slate",
+          "symbol": "TINCTA1006",
+          "color": "#336666",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Tidal Moss",
+          "symbol": "TINCTA1007",
+          "color": "#339966",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Stillwater",
+          "symbol": "TINCTA1008",
+          "color": "#339999",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Sapphire Trench",
+          "symbol": "TINCTA1009",
+          "color": "#003399",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Deepwater Beacon",
+          "symbol": "TINCTA1010",
+          "color": "#0033CC",
+          "textColor": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "seasonId": "0xbe6bf1e72c88bbeab339d8f0895da327851128fb6a7f84e14860a2630abdaa8e",
+      "name": "Electric Cyan & Turquoise",
+      "collections": [
+        {
+          "name": "Turquoise Tide",
+          "symbol": "TINCTA1101",
+          "color": "#00CC99",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Cyan Reef",
+          "symbol": "TINCTA1102",
+          "color": "#00CCCC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Aqua Voltage",
+          "symbol": "TINCTA1103",
+          "color": "#00CCFF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Lagoon Flash",
+          "symbol": "TINCTA1104",
+          "color": "#00FFCC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Liquid Neon",
+          "symbol": "TINCTA1105",
+          "color": "#00FFFF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Reef Glass",
+          "symbol": "TINCTA1106",
+          "color": "#33CCCC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Cyan Arc",
+          "symbol": "TINCTA1107",
+          "color": "#33CCFF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Mint Current",
+          "symbol": "TINCTA1108",
+          "color": "#33FFCC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Electric Foam",
+          "symbol": "TINCTA1109",
+          "color": "#33FFFF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Luminous Tide",
+          "symbol": "TINCTA1110",
+          "color": "#66FFFF",
+          "textColor": "#000000"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x889931f4aea876e5a1830037b12239204e38600d3d0d9147091bdc0eff6e1534",
+      "name": "Glacier & Pure Aquamarine",
+      "collections": [
+        {
+          "name": "Glacier Glass",
+          "symbol": "TINCTA1201",
+          "color": "#66CCCC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Polar Sky",
+          "symbol": "TINCTA1202",
+          "color": "#66CCFF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Frozen Lagoon",
+          "symbol": "TINCTA1203",
+          "color": "#66FFCC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Sea Mist",
+          "symbol": "TINCTA1204",
+          "color": "#99CCCC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Arctic Veil",
+          "symbol": "TINCTA1205",
+          "color": "#99CCFF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Frosted Mint",
+          "symbol": "TINCTA1206",
+          "color": "#99FFCC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Ice Halo",
+          "symbol": "TINCTA1207",
+          "color": "#99FFFF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Snowmelt",
+          "symbol": "TINCTA1208",
+          "color": "#CCFFFF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Meltwater Blue",
+          "symbol": "TINCTA1209",
+          "color": "#3399CC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Glacial Depth",
+          "symbol": "TINCTA1210",
+          "color": "#336699",
+          "textColor": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "seasonId": "0xfbd5fc7d6a37a0efdf4dad6b706c40ee2016cf9a1837618379b5a90bc624d84d",
+      "name": "Cerulean & Sky Blue",
+      "collections": [
+        {
+          "name": "Cerulean Flight",
+          "symbol": "TINCTA1301",
+          "color": "#0066CC",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Azure Rush",
+          "symbol": "TINCTA1302",
+          "color": "#0066FF",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Coastal Sky",
+          "symbol": "TINCTA1303",
+          "color": "#0099CC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Open Atmosphere",
+          "symbol": "TINCTA1304",
+          "color": "#0099FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Blue Altitude",
+          "symbol": "TINCTA1305",
+          "color": "#3366CC",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Sky Frequency",
+          "symbol": "TINCTA1306",
+          "color": "#3366FF",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Horizon Signal",
+          "symbol": "TINCTA1307",
+          "color": "#3399FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Denim Cloud",
+          "symbol": "TINCTA1308",
+          "color": "#6699CC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Periwinkle Air",
+          "symbol": "TINCTA1309",
+          "color": "#6699FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Dusk Haze",
+          "symbol": "TINCTA1310",
+          "color": "#666699",
+          "textColor": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x777306c2e47b8e63b08e8041a85b636d5f23b8da270d549b785a0030595e2a1d",
+      "name": "Cobalt & Deep Azure",
+      "collections": [
+        {
+          "name": "Ink Below",
+          "symbol": "TINCTA1401",
+          "color": "#000033",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Navy Silence",
+          "symbol": "TINCTA1402",
+          "color": "#000066",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Cobalt Depth",
+          "symbol": "TINCTA1403",
+          "color": "#000099",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Ultramarine Core",
+          "symbol": "TINCTA1404",
+          "color": "#0000CC",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Blue Voltage",
+          "symbol": "TINCTA1405",
+          "color": "#0000FF",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Aubergine Night",
+          "symbol": "TINCTA1406",
+          "color": "#330033",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Indigo Vault",
+          "symbol": "TINCTA1407",
+          "color": "#330066",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Iris Depth",
+          "symbol": "TINCTA1408",
+          "color": "#330099",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Violet Reactor",
+          "symbol": "TINCTA1409",
+          "color": "#3300CC",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Indigo Flash",
+          "symbol": "TINCTA1410",
+          "color": "#3300FF",
+          "textColor": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x487e241687feadcf1d7d33ad2f7201f3039cd3e7a8b10f4b5b8c3e323247df38",
+      "name": "Midnight Navy & Steel",
+      "collections": [
+        {
+          "name": "Midnight Signal",
+          "symbol": "TINCTA1501",
+          "color": "#0033FF",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Steel Iris",
+          "symbol": "TINCTA1502",
+          "color": "#6666CC",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Twilight Current",
+          "symbol": "TINCTA1503",
+          "color": "#6666FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Blue Alloy",
+          "symbol": "TINCTA1504",
+          "color": "#9999CC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Moonlit Periwinkle",
+          "symbol": "TINCTA1505",
+          "color": "#9999FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Silver Cloud",
+          "symbol": "TINCTA1506",
+          "color": "#CCCCFF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Naval Ink",
+          "symbol": "TINCTA1507",
+          "color": "#333366",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Nightwatch",
+          "symbol": "TINCTA1508",
+          "color": "#333399",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Cobalt Steel",
+          "symbol": "TINCTA1509",
+          "color": "#3333CC",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Afterhours Blue",
+          "symbol": "TINCTA1510",
+          "color": "#3333FF",
+          "textColor": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x36e9a2925f1e2f586df391c7732610ce6cc75abf30eeb4f416b25f62a25d9f05",
+      "name": "Royal Violet & Indigo",
+      "collections": [
+        {
+          "name": "Royal Mulberry",
+          "symbol": "TINCTA1601",
+          "color": "#660033",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Velvet Plum",
+          "symbol": "TINCTA1602",
+          "color": "#660066",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Indigo Throne",
+          "symbol": "TINCTA1603",
+          "color": "#660099",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Violet Scepter",
+          "symbol": "TINCTA1604",
+          "color": "#6600CC",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Imperial Light",
+          "symbol": "TINCTA1605",
+          "color": "#6600FF",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Wine Brocade",
+          "symbol": "TINCTA1606",
+          "color": "#990033",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Berry Crown",
+          "symbol": "TINCTA1607",
+          "color": "#990066",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Royal Orchid",
+          "symbol": "TINCTA1608",
+          "color": "#990099",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Amethyst Reign",
+          "symbol": "TINCTA1609",
+          "color": "#9900CC",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Violet Coronation",
+          "symbol": "TINCTA1610",
+          "color": "#9900FF",
+          "textColor": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x5786a752180448b7e8b0801aa0392dfcb6c0075bf750f53d8fc7c0214dd962f8",
+      "name": "Imperial Amethyst & Plum",
+      "collections": [
+        {
+          "name": "Garnet Seal",
+          "symbol": "TINCTA1701",
+          "color": "#CC0033",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Raspberry Jewel",
+          "symbol": "TINCTA1702",
+          "color": "#CC0066",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Magenta Diadem",
+          "symbol": "TINCTA1703",
+          "color": "#CC0099",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Orchid Majesty",
+          "symbol": "TINCTA1704",
+          "color": "#CC00CC",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Amethyst Flare",
+          "symbol": "TINCTA1705",
+          "color": "#CC00FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Plum Chamber",
+          "symbol": "TINCTA1706",
+          "color": "#663366",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Violet Tapestry",
+          "symbol": "TINCTA1707",
+          "color": "#663399",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Iris Gem",
+          "symbol": "TINCTA1708",
+          "color": "#6633CC",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Purple Radiance",
+          "symbol": "TINCTA1709",
+          "color": "#6633FF",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Damson Silk",
+          "symbol": "TINCTA1710",
+          "color": "#993366",
+          "textColor": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "seasonId": "0xa0fe53f9201ac7839e2e63632dc69f5230cd1c9cc172b69a5ab627c8ca3e665e",
+      "name": "Orchid & Wild Berry",
+      "collections": [
+        {
+          "name": "Wild Mulberry",
+          "symbol": "TINCTA1801",
+          "color": "#993399",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Orchid Grove",
+          "symbol": "TINCTA1802",
+          "color": "#9933CC",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Violet Bloom",
+          "symbol": "TINCTA1803",
+          "color": "#9933FF",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Berry Nectar",
+          "symbol": "TINCTA1804",
+          "color": "#CC3366",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Bramble Flower",
+          "symbol": "TINCTA1805",
+          "color": "#CC3399",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Orchid Pulse",
+          "symbol": "TINCTA1806",
+          "color": "#CC33CC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Wisteria Spark",
+          "symbol": "TINCTA1807",
+          "color": "#CC33FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Heather Veil",
+          "symbol": "TINCTA1808",
+          "color": "#996699",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Lilac Garden",
+          "symbol": "TINCTA1809",
+          "color": "#9966CC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Lavender Drift",
+          "symbol": "TINCTA1810",
+          "color": "#9966FF",
+          "textColor": "#000000"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x6cf108d26c3b432267a85f34e3c14e993747f52ddf0e9dae62fd19c5913c14ef",
+      "name": "Vivid Fuchsia & Magenta",
+      "collections": [
+        {
+          "name": "Cherry Flash",
+          "symbol": "TINCTA1901",
+          "color": "#FF0033",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Raspberry Voltage",
+          "symbol": "TINCTA1902",
+          "color": "#FF0066",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Hot Pink Horizon",
+          "symbol": "TINCTA1903",
+          "color": "#FF0099",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Fuchsia Fever",
+          "symbol": "TINCTA1904",
+          "color": "#FF00CC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Magenta Pulse",
+          "symbol": "TINCTA1905",
+          "color": "#FF00FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Guava Flare",
+          "symbol": "TINCTA1906",
+          "color": "#FF3366",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Dragonfruit Glow",
+          "symbol": "TINCTA1907",
+          "color": "#FF3399",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Pink Frequency",
+          "symbol": "TINCTA1908",
+          "color": "#FF33CC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Orchid Neon",
+          "symbol": "TINCTA1909",
+          "color": "#FF33FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Roseberry Silk",
+          "symbol": "TINCTA1910",
+          "color": "#CC6699",
+          "textColor": "#000000"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x55fe85abf6f5fd707575c1f005dc8cadccf5179f0a6e2ecc8f6056616a6322ea",
+      "name": "Bubblegum & Pastel Coral",
+      "collections": [
+        {
+          "name": "Mauve Candy",
+          "symbol": "TINCTA2001",
+          "color": "#CC66CC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Lilac Pop",
+          "symbol": "TINCTA2002",
+          "color": "#CC66FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Coral Kiss",
+          "symbol": "TINCTA2003",
+          "color": "#FF6699",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Bubblegum Cloud",
+          "symbol": "TINCTA2004",
+          "color": "#FF66CC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Orchid Sorbet",
+          "symbol": "TINCTA2005",
+          "color": "#FF66FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Mallow Mist",
+          "symbol": "TINCTA2006",
+          "color": "#CC99CC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Lavender Foam",
+          "symbol": "TINCTA2007",
+          "color": "#CC99FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Rose Macaron",
+          "symbol": "TINCTA2008",
+          "color": "#FF99CC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Pink Marshmallow",
+          "symbol": "TINCTA2009",
+          "color": "#FF99FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Cotton Bloom",
+          "symbol": "TINCTA2010",
+          "color": "#FFCCFF",
+          "textColor": "#000000"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x5712abc1ffd4724fd97b27b2e698d76f48f50b7563233d8ced20cb17c0c7512d",
+      "name": "Warm Neutral & Blush Tints",
+      "collections": [
+        {
+          "name": "Eucalyptus Shade",
+          "symbol": "TINCTA2101",
+          "color": "#669966",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Patina Quiet",
+          "symbol": "TINCTA2102",
+          "color": "#669999",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Rose Clay",
+          "symbol": "TINCTA2103",
+          "color": "#CC9999",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Nude Apricot",
+          "symbol": "TINCTA2104",
+          "color": "#FFCC99",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Blush Linen",
+          "symbol": "TINCTA2105",
+          "color": "#FFCCCC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Burgundy Ink",
+          "symbol": "TINCTA2106",
+          "color": "#330011",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Espresso Velvet",
+          "symbol": "TINCTA2107",
+          "color": "#331100",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Blackberry Night",
+          "symbol": "TINCTA2108",
+          "color": "#110033",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Inkstone Blue",
+          "symbol": "TINCTA2109",
+          "color": "#001133",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Evergreen Ink",
+          "symbol": "TINCTA2110",
+          "color": "#003311",
+          "textColor": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x83069685ecbe687ccb1d76f3f59ccccf81fa28f39ecfcc58a517eb14c1078ad2",
+      "name": "The Monochromatic Zenith",
+      "collections": [
+        {
+          "name": "Absolute Night",
+          "symbol": "TINCTA2201",
+          "color": "#000000",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Graphite Form",
+          "symbol": "TINCTA2202",
+          "color": "#333333",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Slate Silence",
+          "symbol": "TINCTA2203",
+          "color": "#666666",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Silver Grain",
+          "symbol": "TINCTA2204",
+          "color": "#999999",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Pearl Haze",
+          "symbol": "TINCTA2205",
+          "color": "#CCCCCC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Pure Light",
+          "symbol": "TINCTA2206",
+          "color": "#FFFFFF",
+          "textColor": "#000000"
+        }
+      ]
+    }
+  ]
+}

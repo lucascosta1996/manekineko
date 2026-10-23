@@ -16,8 +16,8 @@ const reviewedCompiler = {
 const v6Compiler = { ...reviewedCompiler, settings: { ...reviewedCompiler.settings, optimizer: { enabled: true, runs: 1 }, viaIR: true } };
 const compilerProfile = {
   compilers: [reviewedCompiler],
-  overrides: Object.fromEntries(["Factory", "Round", "Renderer", "RoundDeployer"].flatMap(component =>
-    [6, 7, 8, 9, 10, 11].map(version => [`contracts/Manekineko${component}V${version}.sol`, v6Compiler]))),
+  overrides: { "contracts/ManekinekoVotingV12.sol": v6Compiler, "contracts/ManekinekoSeasonControllerV12.sol": v6Compiler, "contracts/ManekinekoWinnerCreditsV8.sol": v6Compiler, ...Object.fromEntries(["Factory", "Round", "Renderer", "RoundDeployer"].flatMap(component =>
+    [6, 7, 8, 9, 10, 11, 12].map(version => [`contracts/Manekineko${component}V${version}.sol`, v6Compiler]))), },
 };
 
 export default defineConfig({
@@ -33,6 +33,7 @@ export default defineConfig({
   },
   networks: {
     hardhatMainnet: { type: "edr-simulated", chainType: "l1", hardfork: "cancun" },
+    hardhatV12Rehearsal: { type: "edr-simulated", chainType: "l1", chainId: 11155111, hardfork: "cancun" },
     localhost: { type: "http", chainType: "l1", url: "http://127.0.0.1:8545" },
     mainnetReadOnly: { type: "http", chainType: "l1", chainId: 1, url: configVariable("MAINNET_RPC_URL"), accounts: [] },
     sepoliaReadOnly: { type: "http", chainType: "l1", chainId: 11155111, url: configVariable("SEPOLIA_RPC_URL"), accounts: [] },

@@ -1,5 +1,7 @@
 # Sepolia mock seasons
 
+**V12 interface supersession (2026-10-22):** the former Launch import/edit pages described here have been retired. Existing saved V10 mock identities remain unchanged. New V12 planning catalogs mirror the 22-season / 216-collection Mainnet structure with independent names and IDs; see [the current operator interface handoff](v12-operator-interface-2026-10-22.md). This document remains the historical migration and deployment record.
+
 Sepolia rehearsals mirror saved Mainnet collection terms while using independent fictional identities. In Launch, choose **Sepolia testnet → Create Sepolia mock seasons**. This copies missing current Mainnet plans into persisted Sepolia drafts. Repeating the action preserves every existing copy, including manual edits and prepared plans. Later Mainnet edits do not rewrite a rehearsal.
 
 Copied terms include collection counts/order, exact colors, supply, price, version, prizes, mint caps, affiliate economics, duration/enrollment settings, sponsorship amounts and season cadence. New random names, symbols, season IDs and collection UUIDs replace public identities. Source plans and finalized historical configurations remain unchanged.

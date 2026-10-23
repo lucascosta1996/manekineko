@@ -54,7 +54,7 @@ function Navigation({ entries, pathname }: { entries: DocSearchEntry[]; pathname
         {results.length ? results.map(entry => <Link href={docHref(entry.slug)} key={entry.slug} onClick={() => setOpen(false)}><strong>{entry.title}</strong><span>{entry.description}</span></Link>)
           : <p className="docs-no-results">No matching pages. Try “mint”, “prizes” or “affiliate”.</p>}
       </div> : <nav aria-label="Reward guide topics">{docGroups.map(group => <div className="docs-nav-group" key={group}><p className="docs-nav-label">{group}</p>{entries.filter(entry => entry.group === group).map(entry => <Link href={docHref(entry.slug)} key={entry.slug} aria-current={pathname === docHref(entry.slug) ? "page" : undefined} onClick={() => setOpen(false)}>{entry.title}</Link>)}</div>)}</nav>}
-      <Link className="docs-back-app" href="/seasons">Explore seasons <span aria-hidden="true"><Icon name="diagonal" /></span></Link>
+      <Link className="docs-back-app" href="/">Back to participate <span aria-hidden="true"><Icon name="diagonal" /></span></Link>
     </div>
   </aside>;
 }

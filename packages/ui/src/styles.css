@@ -1,6 +1,6 @@
 @import "./tokens.css";
 
-.ui-rewards-brand { display: inline-flex; align-items: center; gap: var(--ui-brand-gap); flex: none; white-space: nowrap; vertical-align: middle; }
+.ui-rewards-brand { display: inline-flex; align-items: center; flex-wrap: wrap; max-width: 100%; gap: var(--ui-brand-gap); flex: 0 1 auto; white-space: nowrap; vertical-align: middle; }
 .ui-rewards-brand > svg { flex: none; }
 .ui-rewards-signature { display: inline-flex; align-items: center; gap: var(--ui-space-3); }
 .ui-rewards-signature > svg { flex: none; }
@@ -175,6 +175,7 @@ details[open] > summary .ui-disclosure-icon { transform: rotate(180deg); }
 .ui-footer :is(nav, .ui-footer-support) { display: flex; flex-direction: column; align-items: flex-start; gap: var(--ui-space-2); }
 .ui-footer-heading { margin: 0 0 var(--ui-space-1); color: var(--ui-ink); font: 600 var(--ui-caption)/var(--ui-caption-line) var(--ui-font-sans); }
 .ui-footer-copy { max-width: 24ch; margin: var(--ui-space-2) 0 0; color: var(--ui-muted); font: 400 var(--ui-footer-type)/var(--ui-control-line) var(--ui-font-sans); }
+.ui-footer > * { min-width: 0; overflow-wrap: anywhere; }
 .ui-footer-link, .ui-footer .ui-text-action { display: inline-flex; align-items: center; justify-content: flex-start; gap: var(--ui-space-2); min-height: var(--ui-text-action-height); color: var(--ui-muted); font: 400 var(--ui-footer-type)/var(--ui-control-line) var(--ui-font-sans); text-decoration: none; }
 .ui-footer-link:hover, .ui-footer .ui-text-action:hover { color: var(--ui-ink); text-decoration: underline; text-underline-offset: 0.2em; }
 .ui-footer-unavailable { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--ui-space-2); min-height: var(--ui-text-action-height); color: var(--ui-muted); font: 400 var(--ui-footer-type)/var(--ui-control-line) var(--ui-font-sans); }

@@ -1,0 +1,29 @@
+{
+  "name": "@manekineko/protocol",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./chain": "./src/chain.ts",
+    "./config": "./src/config.ts",
+    "./wallet": "./src/wallet.ts",
+    "./wallet-discovery": "./src/wallet-discovery.ts",
+    "./walletconnect": "./src/walletconnect.ts",
+    "./wallet-account-picker": "./src/wallet-account-picker.tsx",
+    "./use-wallet-session": "./src/use-wallet-session.ts",
+    "./experience": "./src/experience.tsx",
+    "./styles.css": "./src/protocol.css",
+    "./progress": "./src/progress.ts"
+  },
+  "dependencies": {
+    "ethers": "6.17.0",
+    "@manekineko/contract-abi": "0.1.0",
+    "@manekineko/ui": "0.1.0",
+    "@reown/appkit": "1.8.24"
+  },
+  "peerDependencies": {
+    "next": "^16.3.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

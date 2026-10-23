@@ -12,6 +12,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 Follow the root visual-identity instructions and read [the shared standard](../../docs/design/visual-identity.md) and [quality gates](../../docs/design/quality-gates.md). Include public docs, wallet/disconnected states, claims feedback, portals and footers in applicable checks. Report vendor-wallet, authenticated and hosted verification separately.
 
+## Current V12 interface
+
+The October 22 V12 interface replaces the legacy page workflows below. Read [the operator interface handoff](../../docs/v12-operator-interface-2026-10-22.md) before restoring or adding routes. Launch serves only the operator dashboard; Web uses `/` for stage-driven voting/minting, `/claims` for winning addresses/prizes/refunds, `/affiliates` for enrollment/referrals/rewards, and `/docs`. Older `/collections` and `/vote` links redirect home. See [the public workflow update](../../docs/v12-public-workflow-2026-10-23.md). Retired workflow APIs return 410. Historical helpers and tests remain versioned and do not authorize restoring database or worker control to V12.
+
 ## Protocol version handoff
 
 Read [the root architecture](../../docs/architecture.md) and [V10 permanent combinations](../../docs/permanent-combinations-v10.md) before protocol changes. Local Web runtime supports V10 (`affiliate-v10`, `unique-rank-v6`) alongside historical versions; deployment remains separate. V10 uses an independently pinned V10 factory, Eligibility V5 and Winner Credits V6. Keep exact contract/algorithm pairs and never reuse historical pins under new labels.

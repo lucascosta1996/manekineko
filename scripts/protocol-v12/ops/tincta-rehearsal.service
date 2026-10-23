@@ -1,0 +1,26 @@
+# Review/install explicitly. This service is not started by the build command.
+[Unit]
+Description=Tincta two-season Sepolia rehearsal
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=tincta
+Group=tincta
+WorkingDirectory=/opt/tincta-rehearsal/runtime
+EnvironmentFile=/etc/tincta/rehearsal.env
+# Set V12_REHEARSAL_APPROVAL_HASH to the exact init/preflight output.
+ExecStart=/usr/bin/node runner.mjs run /var/lib/tincta/rehearsal ${V12_REHEARSAL_APPROVAL_HASH}
+# A policy, nonce or journal failure requires review; do not loop through signing errors.
+Restart=no
+TimeoutStopSec=300
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/tincta/rehearsal
+
+[Install]
+WantedBy=multi-user.target

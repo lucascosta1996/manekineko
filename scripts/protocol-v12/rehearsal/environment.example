@@ -1,0 +1,9 @@
+# Private file only, mode 600. Use a dedicated Sepolia-only EOA, never a Mainnet key.
+V12_REHEARSAL_OPERATOR_KEY=
+# Generate 32 cryptographically random bytes encoded as 64 hex characters.
+# Keep this key backed up separately from wallets.enc; losing it loses access to test wallets.
+V12_REHEARSAL_VAULT_KEY=
+V12_REHEARSAL_RPC_URL=
+V12_REHEARSAL_SECONDARY_RPC_URL=
+# Used by the optional systemd service, after offline initialization.
+V12_REHEARSAL_APPROVAL_HASH=

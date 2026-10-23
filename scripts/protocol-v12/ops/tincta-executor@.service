@@ -1,0 +1,28 @@
+# Install only after reviewing the private config, deployment verification and spending limits.
+# Each instance needs a distinct gas wallet and private state directory.
+[Unit]
+Description=Tincta permissionless executor (%i)
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=600
+StartLimitBurst=3
+
+[Service]
+Type=simple
+User=tincta
+Group=tincta
+WorkingDirectory=/opt/tincta
+EnvironmentFile=/etc/tincta/%i.env
+ExecStart=/usr/bin/node --import tsx scripts/protocol-v12/executor.mts /etc/tincta/%i.json /var/lib/tincta/%i/intent.json --watch
+Restart=on-failure
+RestartSec=30
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/tincta/%i
+
+[Install]
+WantedBy=multi-user.target

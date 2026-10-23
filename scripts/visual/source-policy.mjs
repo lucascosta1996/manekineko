@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 import postcss from 'postcss';
 
-const roots = ['apps/landing-page/app', 'apps/landing-page/components', 'apps/web/app', 'apps/web/components', 'apps/launch/app', 'apps/launch/components', 'packages/ui/src'];
+const roots = ['apps/landing-page/app', 'apps/landing-page/components', 'apps/web/app', 'apps/web/components', 'apps/launch/app', 'apps/launch/components', 'packages/ui/src', 'packages/protocol/src'];
 const ownedClass = /\.ui-(?:button(?:-[\w-]+)?|icon-button|text-action(?:-[\w-]+)?|input|textarea|select(?:-[\w-]+)?|checkbox|radio|switch|check-field|field(?:-[\w-]+)?|disclosure(?:-[\w-]+)?|card-action|tab|segment)(?![\w-])/;
 const ownedProperty = /^(?:font(?:-.*)?|padding(?:-.*)?|border(?:-.*)?|color|background(?:-.*)?|(?:row-|column-)?gap|line-height|letter-spacing|text-transform|text-decoration(?:-.*)?|(?:min-|max-)?(?:height|block-size)|min-(?:width|inline-size)|appearance|cursor|box-shadow|outline(?:-.*)?|transition(?:-.*)?)$/;
 

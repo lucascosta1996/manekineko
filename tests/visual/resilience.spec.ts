@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { prepare, ready, urls, metrics } from './fixtures';
 const boundaries=[599,600,601,759,760,761,959,960,961];
-for(const [app,path] of [['landing','/rewards'],['web','/seasons'],['launch','/dashboard']] as const) {
+for(const [app,path] of [['landing','/rewards'],['web','/?state=unconfigured'],['launch','/dashboard?state=unconfigured']] as const) {
  test(`${app} breakpoint boundaries and text spacing`,async({page})=>{
   await prepare(page);await page.goto(urls[app]+path);await ready(page);
   for(const width of boundaries) {

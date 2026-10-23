@@ -24,3 +24,8 @@ test("landing preserves ordered public colors and safely ignores malformed decor
     assert.equal(result?.status, "complete");
   }
 });
+
+test('landing accepts a pinned onchain collection link and rejects additional query authority', () => {
+  assert.equal(parseLiveCollection({ ...summary, href: '/collections?collection=216' }, new URL('https://app.example'))?.href, 'https://app.example/collections?collection=216');
+  for (const href of ['/collections?collection=0', '/collections?collection=1&redirect=evil', '/collections?collection=1000']) assert.throws(() => parseLiveCollection({ ...summary, href }, new URL('https://app.example')));
+});

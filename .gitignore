@@ -25,3 +25,7 @@ test-results/
 playwright-report/
 .visual/
 tests/visual/apps/*/public/
+
+# Generated, frozen rehearsal runtimes and audit archives stay local.
+output/rehearsal/
+output/security/

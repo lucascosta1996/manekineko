@@ -39,22 +39,20 @@
   "web": {
     "routes": [
       "/",
-      "/seasons",
-      "/seasons/[chainId]/[seasonId]",
-      "/mint",
-      "/mint/[collectionId]",
-      "/mint/[collectionId]/affiliates",
-      "/mint/[collectionId]/contract",
-      "/history",
-      "/my-nfts",
-      "/nfts/[collectionId]/[tokenId]",
-      "/prizes",
+      "/claims",
+      "/affiliates",
       "/docs",
       "/docs/[slug]"
     ],
     "redirects": {
-      "/": "/seasons",
-      "/mint": "/seasons"
+      "/mint": "/",
+      "/seasons": "/",
+      "/history": "/",
+      "/my-nfts": "/",
+      "/prizes": "/claims",
+      "/operations": "/",
+      "/vote": "/",
+      "/collections": "/"
     },
     "boundaries": [
       "root-loading",
@@ -86,26 +84,34 @@
       "claim-available",
       "claim-read-pending",
       "claim-read-error",
-      "expanded-disclosures"
+      "expanded-disclosures",
+      "v12-voting",
+      "v12-minting",
+      "v12-refunds",
+      "v12-unconfigured",
+      "v12-rpc-error",
+      "v12-home-stage-switch",
+      "v12-winning-addresses",
+      "v12-affiliate-enrollment",
+      "v12-historical-claims"
     ]
   },
   "launch": {
     "routes": [
       "/",
-      "/login",
-      "/dashboard",
-      "/activity",
-      "/settings",
-      "/seasons",
-      "/launch",
-      "/automations",
-      "/active-collection",
-      "/upcoming-collection",
-      "/earnings"
+      "/dashboard"
     ],
     "redirects": {
       "/": "/dashboard",
-      "/automations": "/seasons"
+      "/login": "/dashboard",
+      "/settings": "/dashboard",
+      "/activity": "/dashboard",
+      "/seasons": "/dashboard",
+      "/launch": "/dashboard",
+      "/automations": "/dashboard",
+      "/earnings": "/dashboard",
+      "/active-collection": "/dashboard",
+      "/upcoming-collection": "/dashboard"
     },
     "boundaries": [
       "root-loading",
@@ -113,21 +119,18 @@
       "root-not-found"
     ],
     "states": [
-      "authenticated-fixture",
-      "login",
-      "invalid",
-      "pending",
-      "empty",
+      "unconfigured-catalog",
+      "pending-signatures",
+      "onchain-tree",
+      "loading",
       "error",
+      "stale",
       "recovery",
+      "wrong-wallet",
       "confirm-cancel",
-      "confirm-intercepted",
-      "mobile-drawer",
-      "collection-editor-all-four-tabs",
-      "expanded-season-settings",
-      "expanded-cadence",
-      "expanded-collection-terms",
-      "sequence-review"
+      "rejected-signature",
+      "unknown-submission",
+      "network-change"
     ]
   },
   "fixtureBoundary": "Separate Next production-mode fixture applications import production components and styles. They do not import auth/database repositories. Browser requests intercept every API and block external origins and all real writes. Route SSR repositories, real sessions, real wallets, devices and hosted deployment require separate evidence."

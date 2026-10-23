@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import roundV10Abi from "@manekineko/contract-abi/round-v10" with { type: "json" };
+import roundV12Abi from "@manekineko/contract-abi/round-v12" with { type: "json" };
 import { docPages } from "../lib/docs/content.ts";
 import { docGroups, docHref, docSearchEntry, searchDocs } from "../lib/docs/model.ts";
 
@@ -42,38 +42,27 @@ test("documentation search finds page titles and explanations without a server r
   assert.equal(searchDocs(entries, affiliate.title)[0]?.slug, "affiliates");
   const refund = entries.find(page => page.slug === "refunds")!;
   assert.equal(searchDocs(entries, refund.title.toUpperCase())[0]?.slug, "refunds");
-  assert.ok(searchDocs(entries, "gas").some(page => page.slug === "minting"));
+  assert.ok(searchDocs(entries, "gas").some(page => page.slug === "quickstart"));
   assert.ok(searchDocs(entries, "holder prize").some(page => page.slug === "prizes"));
-  assert.ok(searchDocs(entries, "permanent numbers").some(page => page.slug === "randomness"));
-  assert.ok(searchDocs(entries, "V8/V9 sealed").some(page => page.slug === "faq"));
+  assert.ok(searchDocs(entries, "snapshot").some(page => page.slug === "onchain-voting"));
   assert.ok(searchDocs(entries, "scoreCombination").some(page => page.slug === "verification"));
 });
 
-test("verification docs link identity and score checks to actual V10 read functions", () => {
-  const reads = docPages.find(page => page.slug === "verification")!.sections.find(section => section.id === "useful-contract-reads")!;
-  const table = reads.blocks.find(block => block.type === "table")!;
-  const functions = new Map(roundV10Abi.filter(item => item.type === "function").map(item => [item.name, item.stateMutability]));
-  const documented = new Set<string>();
-  for (const [, expression] of table.rows) {
-    for (const call of expression.split(";")[0].split(/, | or /)) {
-      const name = call.replace(/\([^)]*\)/g, "");
-      assert.ok(["view", "pure"].includes(functions.get(name) ?? ""), `Documented read ${name} must exist and require no transaction`);
-      documented.add(name);
-    }
-  }
-  for (const name of ["CONTRACT_VERSION", "ALGORITHM_VERSION", "combination", "tokenIdForCombination", "score", "scoreCombination", "revealed", "prizeClaimed"]) {
-    assert.ok(documented.has(name), `${name} is needed to verify identity and results separately`);
+test("verification documentation names real V12 read functions", () => {
+  const text = docSearchEntry(docPages.find(page => page.slug === "verification")!).text;
+  const functions = new Map(roundV12Abi.filter(item => item.type === "function").map(item => [item.name, item.stateMutability]));
+  for (const name of ["maxSupply", "mintPrice", "totalMinted", "mintDeadline", "phase", "winningTokenIds", "prizeClaimed", "affiliateClaimable", "refundsAvailable", "operatorWithdrawable", "protectedBalance", "combination", "tokenIdForCombination", "tokenURI", "score", "scoreCombination"]) {
+    assert.ok(text.includes(name));
+    assert.ok(["view", "pure"].includes(functions.get(name) ?? ""));
   }
 });
-
-test("V10 docs preserve rollout, pending-result and explorer boundaries", () => {
+test("current guides preserve economic floors, holder claims and deployment boundaries", () => {
   const text = (slug: string) => docSearchEntry(docPages.find(page => page.slug === slug)!).text;
-  assert.match(text("overview"), /September 27, 2026 Sepolia test recorded a V10 collection selling out and revealing six winning NFTs/);
-  assert.match(text("overview"), /testnet observation does not establish Mainnet availability/);
-  assert.doesNotMatch(text("overview"), /no live V10 deployment is recorded/);
-  assert.match(text("verification"), /result = 0.*pending/);
-  assert.match(text("verification"), /RevealNotAvailable/);
-  assert.match(text("my-nfts"), /metadata deliberately omits score, award rank, prize and status/);
-  assert.match(text("my-nfts"), /immediate display is not guaranteed/);
-  assert.match(text("randomness"), /V8\/V9 derive their four numbers from the final score after the draw/);
+  assert.match(text("onchain-voting"), /0.01 ETH/);
+  assert.match(text("onchain-voting"), /1,000–65,536/);
+  assert.match(text("onchain-voting"), /operator percentage stays 20%/);
+  assert.match(text("overview"), /unconfigured deployment is not a live sale/);
+  assert.match(text("prizes"), /Only the current holder can claim/);
+  assert.match(text("refunds"), /No operator cancellation or approval/);
+  assert.match(text("affiliates"), /No server-issued admission permit/);
 });

@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const config: NextConfig = {
   reactStrictMode: true,
+  transpilePackages: ["@manekineko/protocol", "@manekineko/ui"],
+  async redirects() { return ["/login", "/activity", "/settings", "/seasons", "/launch", "/automations", "/active-collection", "/upcoming-collection", "/earnings"].map(source => ({ source, destination: "/dashboard", permanent: false })); },
   poweredByHeader: false,
   async headers() {
     return [{ source: "/:path*", headers: [

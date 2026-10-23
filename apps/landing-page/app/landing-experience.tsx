@@ -35,17 +35,17 @@ const faqs = (plannedRewards: PlannedRewards) => [
   {
     question: "How can I verify the contract?",
     answer:
-      "At launch, every collection will link to its deployed Ethereum contract and verified source code. You will be able to inspect the fixed terms, draw results, prize claims, and commission claims on the blockchain before and after participating. V10 deployment and source verification are still pending.",
+      "At launch, every collection will link to its deployed Ethereum contract and verified source code. You will be able to inspect the fixed terms, draw results, prize claims, and commission claims on the blockchain before and after participating. Check the connected deployment and network before participating.",
   },
   {
     question: "Are rewards sent to my wallet automatically?",
     answer:
-      "The contract determines entitlement and executes payment, without team approval. You submit a claim transaction from the wallet holding the winning NFT or the qualifying affiliate wallet. Sale activation and draw progression also require transactions; autonomous rewards does not mean the entire launch runs without external services or transaction submissions.",
+      "The contract determines entitlement and executes payment, without team approval. You submit a claim transaction from the wallet holding the winning NFT or the qualifying affiliate wallet. Minting opens at the voting deadline without activation. Preparation and draw finalization require transactions; autonomous rewards does not mean the entire launch runs without external services or transaction submissions.",
   },
   {
     question: "How do I win a prize?",
     answer:
-      "Each NFT enters the draw for its own collection. When all NFTs sell out, one verifiable Chainlink VRF draw selects distinct winning NFTs. Under the planned default terms, six winning NFTs each receive 1 ETH, claimed by their holders. One wallet can hold more than one winning NFT. A win is never guaranteed.",
+      "Each NFT enters the draw for its own collection. When all NFTs sell out, one verifiable Chainlink VRF draw selects distinct winning NFTs. For example, 1,000 mints at 0.01 ETH with six winners give each winning NFT 1 ETH, claimed by their holders. One wallet can hold more than one winning NFT. A win is never guaranteed.",
   },
   {
     question: "What are my chances?",
@@ -55,7 +55,7 @@ const faqs = (plannedRewards: PlannedRewards) => [
   {
     question: "How do affiliate rewards work?",
     answer:
-      "Eligible holders of an NFT from an earlier official completed collection can enroll before minting opens, subject to available positions; the first collection has a bootstrap exception. With the default terms, one attributed paid mint qualifies you. The contract calculates equal commissions for qualifying affiliates, subject to the collection’s payout limits. Planned pools are up to 2 ETH per sold-out Growth collection and up to 1 ETH per Standard collection. Earned commissions are claimed directly from the contract, without team approval. Pool budgets are not individual earnings; unused funds remain in a separate reserve.",
+      "Eligible holders enroll during voting, subject to an available position and onchain eligibility. One attributed paid referral qualifies an affiliate. All qualifiers share the full 20% pool equally after sellout. Three qualifiers each receive one third, regardless of referral count. Division dust or a pool with no qualifiers remains a separate reserve. Earned commissions stay protected and can be claimed directly.",
   },
   {
     question: "What if a collection doesn’t sell out?",
@@ -70,7 +70,7 @@ const faqs = (plannedRewards: PlannedRewards) => [
   {
     question: "Is Tincta live?",
     answer:
-      `This is a preview of the planned launch. The ${plannedRewards.seasonCount}-season, ${plannedRewards.collectionCount}-collection catalog is in planning, and the V10 launch is pending. The all-season figures assume every planned collection sells out: ${Number(plannedRewards.prizePoolEth).toLocaleString("en-US")} ETH in prizes and up to ${plannedRewards.affiliatePoolEth} ETH in affiliate budgets across ${plannedRewards.growthCollectionCount} Growth and ${plannedRewards.standardCollectionCount} Standard collections. These are planned budgets, not funds already collected or paid. Affiliate qualification and payout caps apply. Every published collection will have its own fixed terms to review before minting.`,
+      `The catalog plans ${plannedRewards.seasonCount} seasons and ${plannedRewards.collectionCount} collections. The illustrated totals assume every collection sells out 1,000 NFTs at 0.01 ETH with six winners: ${Number(plannedRewards.prizePoolEth).toLocaleString("en-US")} ETH in prizes and ${plannedRewards.affiliatePoolEth} ETH in affiliate pools. Voting selects actual terms. These examples are not collected funds or a Mainnet launch announcement. Check the configured collection before participating.`,
   },
 ];
 
@@ -263,7 +263,7 @@ export function LandingExperience({
                 {" "}autonomous rewards.
               </h1>
               <p className="hero-description">
-                Earn up to 6 ETH per collection.
+                You vote. The next collection opens.
               </p>
               <div className="hero-actions">
                 <LinkButton  href="#rewards">
@@ -283,7 +283,7 @@ export function LandingExperience({
             <div className="reward-metric">
               <div className="metric-top">
                 <Icon name="spark" />
-                <span>PLANNED PRIZE REWARDS</span>
+                <span>PRIZE POOL EXAMPLE</span>
               </div>
               <div className="metric-number">
                 {Number(plannedRewards.prizePoolEth).toLocaleString("en-US")} <span>ETH</span>
@@ -295,8 +295,8 @@ export function LandingExperience({
             <div className="reward-metric affiliate-metric">
               <div className="metric-top">
                 <Icon name="diagonal" />
-                <span>PLANNED AFFILIATE POOLS</span>
-                <span className="up-to">UP TO</span>
+                <span>AFFILIATE POOL EXAMPLE</span>
+
               </div>
               <div className="metric-number">
                 {Number(plannedRewards.affiliatePoolEth).toLocaleString("en-US")} <span>ETH</span>
@@ -322,9 +322,8 @@ export function LandingExperience({
             </div>
           </div>
           <p className="terms-note">
-            <span>Planned totals if all {plannedRewards.collectionCount} collections sell out.
-            Affiliate eligibility and payout limits apply. These are planned budgets,
-            not funded balances. Launch pending.</span>
+            <span>Example totals if all {plannedRewards.collectionCount} collections sell out 1,000 NFTs at 0.01 ETH with six winners.
+            Voting selects actual terms. These are not funded balances.</span>
             <a href="#questions">
               See the details
               <Icon name="diagonal" />
@@ -514,7 +513,7 @@ export function LandingExperience({
               </div>
             </div>
             <p className="section-footnote">
-              *Six prizes is the planned default. Each NFT enters only its own
+              *Six prizes is the illustrated example. Each NFT enters only its own
               collection’s draw. Final collection terms may vary.
             </p>
           </div>
@@ -641,7 +640,7 @@ export function LandingExperience({
               <p>
                 A verifiable draw determines the winners after sellout. Each
                 winning holder claims their ETH directly from the contract.
-                Planned default: 6 ETH in prizes per sold-out collection.
+                Example: 6 ETH in prizes when 1,000 NFTs sell out at 0.01 ETH. Voting decides the actual terms.
               </p>
               <div className="prize-micro">
                 <span>
@@ -661,7 +660,7 @@ export function LandingExperience({
             </div>
             <div
               className="prize-tickets"
-              aria-label="Six equal planned prizes of 1 ETH each"
+              aria-label="Example of six equal prizes of 1 ETH each"
             >
               {Array.from({ length: 6 }, (_, i) => (
                 <div className="prize-ticket" key={i}>
@@ -702,8 +701,8 @@ export function LandingExperience({
                   </g>
                 </svg>
                 <div className="affiliate-value">
-                  <span className="affiliate-value-label">Up to</span>
-                  <span className="affiliate-amount">2 ETH</span>
+                  <span className="affiliate-value-label">Always</span>
+                  <span className="affiliate-amount">20%</span>
                 </div>
               </div>
               <div className="affiliate-caption">
@@ -722,12 +721,12 @@ export function LandingExperience({
                 Qualifying referrals are recorded onchain. The contract calculates
                 your earned commission and lets you claim it directly, without
                 team approval. Eligible holders enroll before minting opens;
-                under planned defaults, one paid referral qualifies you.
+                one attributed paid referral qualifies you for an equal share.
               </p>
               <div className="affiliate-detail">
                 <span>
-                  Up to <strong>2 ETH</strong>
-                  <small>budgeted per sold-out Growth collection</small>
+                  <strong>20% of mint revenue</strong>
+                  <small>shared equally by qualified affiliates</small>
                 </span>
                 <LinkButton
                   className="ui-icon-button"
@@ -738,10 +737,9 @@ export function LandingExperience({
                 </LinkButton>
               </div>
               <p className="affiliate-note">
-                Planned pools are up to 2 ETH for Growth collections and up to
-                1 ETH for Standard collections. Qualifying affiliates share
-                equally, subject to payout limits. Pool budgets are not individual
-                earnings. Unallocated funds remain in a separate operator-accessible
+                Every sold-out collection allocates 20% to its affiliate pool.
+                All qualifying affiliates share it equally. A 10 ETH sellout creates
+                a 2 ETH pool; a 20 ETH sellout creates a 4 ETH pool. Unallocated funds remain in a separate operator-accessible
                 reserve; earned commissions remain protected.
               </p>
             </div>

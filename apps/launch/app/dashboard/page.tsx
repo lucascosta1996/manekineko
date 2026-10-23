@@ -1,26 +1,9 @@
-import { redirect } from "next/navigation";
-import { getLaunchSession } from "../../lib/launch-auth";
-import { configuredLaunchChain } from "../../lib/chain-policy";
-import { launchNetwork, launchDestination } from "../../lib/launch-navigation";
-import { LaunchDashboard } from "../../components/dashboard/launch-dashboard";
-export const dynamic = "force-dynamic";
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<{ chainId?: string }>;
-}) {
-  const chainId = launchNetwork(
-    (await searchParams).chainId,
-    configuredLaunchChain() ?? "1"
-  );
-  const session = await getLaunchSession();
-  if (!session)
-    redirect(
-      `/login?next=${encodeURIComponent(
-        launchDestination("/dashboard", chainId)
-      )}`
-    );
-  return (
-    <LaunchDashboard username={session.username} initialChainId={chainId} />
-  );
+import { ProtocolExperience } from '@manekineko/protocol/experience';
+import { protocolConfig } from '@manekineko/protocol/config';
+import { OperatorShell } from '../../components/operator-shell';
+import mainnet from '../../catalog/mainnet.json';
+import sepolia from '../../catalog/sepolia.json';
+export default async function Page({ searchParams }: { searchParams: Promise<{ chainId?: string }> }) {
+  const chainId = (await searchParams).chainId === '1' ? 1 : 11155111;
+  return <OperatorShell chainId={chainId}><ProtocolExperience key={chainId} config={protocolConfig(chainId)} view="operations" catalog={chainId === 1 ? mainnet : sepolia} /></OperatorShell>;
 }

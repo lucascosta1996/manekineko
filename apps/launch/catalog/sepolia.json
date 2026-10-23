@@ -1,0 +1,1433 @@
+{
+  "chainId": 11155111,
+  "seasons": [
+    {
+      "seasonId": "0xdf3b80c2c7b93cdf304b349a2cb72a68ba433574bd76706dd1184e8cdf3ba7c1",
+      "name": "Aster Study",
+      "collections": [
+        {
+          "name": "Aster Atlas",
+          "symbol": "STUDY101",
+          "color": "#330000",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Aster Beacon",
+          "symbol": "STUDY102",
+          "color": "#660000",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Aster Current",
+          "symbol": "STUDY103",
+          "color": "#990000",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Aster Drift",
+          "symbol": "STUDY104",
+          "color": "#CC0000",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Aster Ember",
+          "symbol": "STUDY105",
+          "color": "#FF0000",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Aster Fold",
+          "symbol": "STUDY106",
+          "color": "#663300",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Aster Glimmer",
+          "symbol": "STUDY107",
+          "color": "#993300",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Aster Haven",
+          "symbol": "STUDY108",
+          "color": "#CC3300",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Aster Islet",
+          "symbol": "STUDY109",
+          "color": "#FF3300",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Aster Journey",
+          "symbol": "STUDY110",
+          "color": "#FF6600",
+          "textColor": "#000000"
+        }
+      ]
+    },
+    {
+      "seasonId": "0xc47ab000587df536da66cdb738f5bb5608b90a827719051ab6d55109ae379807",
+      "name": "Beryl Study",
+      "collections": [
+        {
+          "name": "Beryl Atlas",
+          "symbol": "STUDY201",
+          "color": "#996600",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Beryl Beacon",
+          "symbol": "STUDY202",
+          "color": "#CC6600",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Beryl Current",
+          "symbol": "STUDY203",
+          "color": "#CC9900",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Beryl Drift",
+          "symbol": "STUDY204",
+          "color": "#FF9900",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Beryl Ember",
+          "symbol": "STUDY205",
+          "color": "#FFCC00",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Beryl Fold",
+          "symbol": "STUDY206",
+          "color": "#663333",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Beryl Glimmer",
+          "symbol": "STUDY207",
+          "color": "#993333",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Beryl Haven",
+          "symbol": "STUDY208",
+          "color": "#CC3333",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Beryl Islet",
+          "symbol": "STUDY209",
+          "color": "#FF3333",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Beryl Journey",
+          "symbol": "STUDY210",
+          "color": "#996633",
+          "textColor": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x6bb686a14c8d8b39ae6dcad86dc76cf292a4456a31bcfd3dd0d0e04539a22e11",
+      "name": "Cinder Study",
+      "collections": [
+        {
+          "name": "Cinder Atlas",
+          "symbol": "STUDY301",
+          "color": "#CC6633",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Cinder Beacon",
+          "symbol": "STUDY302",
+          "color": "#FF6633",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Cinder Current",
+          "symbol": "STUDY303",
+          "color": "#CC9933",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Cinder Drift",
+          "symbol": "STUDY304",
+          "color": "#FF9933",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Cinder Ember",
+          "symbol": "STUDY305",
+          "color": "#FFCC33",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Cinder Fold",
+          "symbol": "STUDY306",
+          "color": "#996666",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Cinder Glimmer",
+          "symbol": "STUDY307",
+          "color": "#CC6666",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Cinder Haven",
+          "symbol": "STUDY308",
+          "color": "#FF6666",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Cinder Islet",
+          "symbol": "STUDY309",
+          "color": "#CC9966",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Cinder Journey",
+          "symbol": "STUDY310",
+          "color": "#FF9966",
+          "textColor": "#000000"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x6830649593431c35a04b2f1f3b5d90862b5840fb3731047acf09d9ddc59a6b81",
+      "name": "Dew Study",
+      "collections": [
+        {
+          "name": "Dew Atlas",
+          "symbol": "STUDY401",
+          "color": "#FFFF00",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Dew Beacon",
+          "symbol": "STUDY402",
+          "color": "#FFFF33",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Dew Current",
+          "symbol": "STUDY403",
+          "color": "#FFFF66",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Dew Drift",
+          "symbol": "STUDY404",
+          "color": "#FFFF99",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Dew Ember",
+          "symbol": "STUDY405",
+          "color": "#FFFFCC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Dew Fold",
+          "symbol": "STUDY406",
+          "color": "#CCCC00",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Dew Glimmer",
+          "symbol": "STUDY407",
+          "color": "#CCCC33",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Dew Haven",
+          "symbol": "STUDY408",
+          "color": "#CCCC66",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Dew Islet",
+          "symbol": "STUDY409",
+          "color": "#CCCC99",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Dew Journey",
+          "symbol": "STUDY410",
+          "color": "#FFCC66",
+          "textColor": "#000000"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x2896db1d9100a8a16b5dff6028bc0f119ba43ffbfd63e53e12567ee482871264",
+      "name": "Elm Study",
+      "collections": [
+        {
+          "name": "Elm Atlas",
+          "symbol": "STUDY501",
+          "color": "#333300",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Elm Beacon",
+          "symbol": "STUDY502",
+          "color": "#666600",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Elm Current",
+          "symbol": "STUDY503",
+          "color": "#666633",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Elm Drift",
+          "symbol": "STUDY504",
+          "color": "#999900",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Elm Ember",
+          "symbol": "STUDY505",
+          "color": "#999933",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Elm Fold",
+          "symbol": "STUDY506",
+          "color": "#999966",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Elm Glimmer",
+          "symbol": "STUDY507",
+          "color": "#669900",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Elm Haven",
+          "symbol": "STUDY508",
+          "color": "#669933",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Elm Islet",
+          "symbol": "STUDY509",
+          "color": "#99CC00",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Elm Journey",
+          "symbol": "STUDY510",
+          "color": "#99CC33",
+          "textColor": "#000000"
+        }
+      ]
+    },
+    {
+      "seasonId": "0xc213856da98e7fa1611e7a41fdb4eb32ed3959c68bc8f25f0317c707578cd0c6",
+      "name": "Fable Study",
+      "collections": [
+        {
+          "name": "Fable Atlas",
+          "symbol": "STUDY601",
+          "color": "#336600",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Fable Beacon",
+          "symbol": "STUDY602",
+          "color": "#339900",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Fable Current",
+          "symbol": "STUDY603",
+          "color": "#33CC00",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Fable Drift",
+          "symbol": "STUDY604",
+          "color": "#33FF00",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Fable Ember",
+          "symbol": "STUDY605",
+          "color": "#66CC00",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Fable Fold",
+          "symbol": "STUDY606",
+          "color": "#66FF00",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Fable Glimmer",
+          "symbol": "STUDY607",
+          "color": "#99FF00",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Fable Haven",
+          "symbol": "STUDY608",
+          "color": "#99FF33",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Fable Islet",
+          "symbol": "STUDY609",
+          "color": "#CCFF00",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Fable Journey",
+          "symbol": "STUDY610",
+          "color": "#CCFF33",
+          "textColor": "#000000"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x4f08da6ba5b8e437e8972c2841cecef1d3bf78f135b8947648e2635c6fd6ca0e",
+      "name": "Gossamer Study",
+      "collections": [
+        {
+          "name": "Gossamer Atlas",
+          "symbol": "STUDY701",
+          "color": "#CCFF66",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Gossamer Beacon",
+          "symbol": "STUDY702",
+          "color": "#CCFF99",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Gossamer Current",
+          "symbol": "STUDY703",
+          "color": "#CCFFCC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Gossamer Drift",
+          "symbol": "STUDY704",
+          "color": "#99CC66",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Gossamer Ember",
+          "symbol": "STUDY705",
+          "color": "#99CC99",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Gossamer Fold",
+          "symbol": "STUDY706",
+          "color": "#66CC33",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Gossamer Glimmer",
+          "symbol": "STUDY707",
+          "color": "#66CC66",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Gossamer Haven",
+          "symbol": "STUDY708",
+          "color": "#33CC33",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Gossamer Islet",
+          "symbol": "STUDY709",
+          "color": "#339933",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Gossamer Journey",
+          "symbol": "STUDY710",
+          "color": "#336633",
+          "textColor": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x835bdce657f4220ca531112801b15049c76a93c26847910e68047f5cded52d61",
+      "name": "Hearth Study",
+      "collections": [
+        {
+          "name": "Hearth Atlas",
+          "symbol": "STUDY801",
+          "color": "#003300",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Hearth Beacon",
+          "symbol": "STUDY802",
+          "color": "#006600",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Hearth Current",
+          "symbol": "STUDY803",
+          "color": "#009900",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Hearth Drift",
+          "symbol": "STUDY804",
+          "color": "#00CC00",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Hearth Ember",
+          "symbol": "STUDY805",
+          "color": "#00FF00",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Hearth Fold",
+          "symbol": "STUDY806",
+          "color": "#003333",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Hearth Glimmer",
+          "symbol": "STUDY807",
+          "color": "#006633",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Hearth Haven",
+          "symbol": "STUDY808",
+          "color": "#009933",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Hearth Islet",
+          "symbol": "STUDY809",
+          "color": "#00CC33",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Hearth Journey",
+          "symbol": "STUDY810",
+          "color": "#00FF33",
+          "textColor": "#000000"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x6c2a0da4e8ae410125113abd8d31ff594779bb4f8c01e0fc347efab76f9a29b2",
+      "name": "Indigo Study",
+      "collections": [
+        {
+          "name": "Indigo Atlas",
+          "symbol": "STUDY901",
+          "color": "#00FF66",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Indigo Beacon",
+          "symbol": "STUDY902",
+          "color": "#00FF99",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Indigo Current",
+          "symbol": "STUDY903",
+          "color": "#33FF66",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Indigo Drift",
+          "symbol": "STUDY904",
+          "color": "#33FF99",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Indigo Ember",
+          "symbol": "STUDY905",
+          "color": "#66FF66",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Indigo Fold",
+          "symbol": "STUDY906",
+          "color": "#66FF99",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Indigo Glimmer",
+          "symbol": "STUDY907",
+          "color": "#99FF66",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Indigo Haven",
+          "symbol": "STUDY908",
+          "color": "#99FF99",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Indigo Islet",
+          "symbol": "STUDY909",
+          "color": "#00CC66",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Indigo Journey",
+          "symbol": "STUDY910",
+          "color": "#33CC66",
+          "textColor": "#000000"
+        }
+      ]
+    },
+    {
+      "seasonId": "0xa6906d40a5ae9259274f5394691b952d8b0f22f66b6f2034a591865d00dbafd4",
+      "name": "Juniper Study",
+      "collections": [
+        {
+          "name": "Juniper Atlas",
+          "symbol": "STUDY1001",
+          "color": "#003366",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Juniper Beacon",
+          "symbol": "STUDY1002",
+          "color": "#006666",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Juniper Current",
+          "symbol": "STUDY1003",
+          "color": "#006699",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Juniper Drift",
+          "symbol": "STUDY1004",
+          "color": "#009966",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Juniper Ember",
+          "symbol": "STUDY1005",
+          "color": "#009999",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Juniper Fold",
+          "symbol": "STUDY1006",
+          "color": "#336666",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Juniper Glimmer",
+          "symbol": "STUDY1007",
+          "color": "#339966",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Juniper Haven",
+          "symbol": "STUDY1008",
+          "color": "#339999",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Juniper Islet",
+          "symbol": "STUDY1009",
+          "color": "#003399",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Juniper Journey",
+          "symbol": "STUDY1010",
+          "color": "#0033CC",
+          "textColor": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x994646abc51e8a774e851743f04b9313a12709c76c8ed0583c3a4ef2836e2f19",
+      "name": "Kestrel Study",
+      "collections": [
+        {
+          "name": "Kestrel Atlas",
+          "symbol": "STUDY1101",
+          "color": "#00CC99",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Kestrel Beacon",
+          "symbol": "STUDY1102",
+          "color": "#00CCCC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Kestrel Current",
+          "symbol": "STUDY1103",
+          "color": "#00CCFF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Kestrel Drift",
+          "symbol": "STUDY1104",
+          "color": "#00FFCC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Kestrel Ember",
+          "symbol": "STUDY1105",
+          "color": "#00FFFF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Kestrel Fold",
+          "symbol": "STUDY1106",
+          "color": "#33CCCC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Kestrel Glimmer",
+          "symbol": "STUDY1107",
+          "color": "#33CCFF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Kestrel Haven",
+          "symbol": "STUDY1108",
+          "color": "#33FFCC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Kestrel Islet",
+          "symbol": "STUDY1109",
+          "color": "#33FFFF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Kestrel Journey",
+          "symbol": "STUDY1110",
+          "color": "#66FFFF",
+          "textColor": "#000000"
+        }
+      ]
+    },
+    {
+      "seasonId": "0xdaca8b663eef1e669be743d62e08414123377c054dd3808f52d49e8a0fd4a203",
+      "name": "Lichen Study",
+      "collections": [
+        {
+          "name": "Lichen Atlas",
+          "symbol": "STUDY1201",
+          "color": "#66CCCC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Lichen Beacon",
+          "symbol": "STUDY1202",
+          "color": "#66CCFF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Lichen Current",
+          "symbol": "STUDY1203",
+          "color": "#66FFCC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Lichen Drift",
+          "symbol": "STUDY1204",
+          "color": "#99CCCC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Lichen Ember",
+          "symbol": "STUDY1205",
+          "color": "#99CCFF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Lichen Fold",
+          "symbol": "STUDY1206",
+          "color": "#99FFCC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Lichen Glimmer",
+          "symbol": "STUDY1207",
+          "color": "#99FFFF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Lichen Haven",
+          "symbol": "STUDY1208",
+          "color": "#CCFFFF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Lichen Islet",
+          "symbol": "STUDY1209",
+          "color": "#3399CC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Lichen Journey",
+          "symbol": "STUDY1210",
+          "color": "#336699",
+          "textColor": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "seasonId": "0xa9c653c4af83f93127762a5ef2df302329fa8e6b64414323ce667d2f4ca5b06d",
+      "name": "Morrow Study",
+      "collections": [
+        {
+          "name": "Morrow Atlas",
+          "symbol": "STUDY1301",
+          "color": "#0066CC",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Morrow Beacon",
+          "symbol": "STUDY1302",
+          "color": "#0066FF",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Morrow Current",
+          "symbol": "STUDY1303",
+          "color": "#0099CC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Morrow Drift",
+          "symbol": "STUDY1304",
+          "color": "#0099FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Morrow Ember",
+          "symbol": "STUDY1305",
+          "color": "#3366CC",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Morrow Fold",
+          "symbol": "STUDY1306",
+          "color": "#3366FF",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Morrow Glimmer",
+          "symbol": "STUDY1307",
+          "color": "#3399FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Morrow Haven",
+          "symbol": "STUDY1308",
+          "color": "#6699CC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Morrow Islet",
+          "symbol": "STUDY1309",
+          "color": "#6699FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Morrow Journey",
+          "symbol": "STUDY1310",
+          "color": "#666699",
+          "textColor": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x5c879df4f8404cbbc324c1a6a1ea58eecea406ead9766c09641052cf5982a1de",
+      "name": "Nectar Study",
+      "collections": [
+        {
+          "name": "Nectar Atlas",
+          "symbol": "STUDY1401",
+          "color": "#000033",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Nectar Beacon",
+          "symbol": "STUDY1402",
+          "color": "#000066",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Nectar Current",
+          "symbol": "STUDY1403",
+          "color": "#000099",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Nectar Drift",
+          "symbol": "STUDY1404",
+          "color": "#0000CC",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Nectar Ember",
+          "symbol": "STUDY1405",
+          "color": "#0000FF",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Nectar Fold",
+          "symbol": "STUDY1406",
+          "color": "#330033",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Nectar Glimmer",
+          "symbol": "STUDY1407",
+          "color": "#330066",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Nectar Haven",
+          "symbol": "STUDY1408",
+          "color": "#330099",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Nectar Islet",
+          "symbol": "STUDY1409",
+          "color": "#3300CC",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Nectar Journey",
+          "symbol": "STUDY1410",
+          "color": "#3300FF",
+          "textColor": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x14a94f6d3901d03e587d35daf61c0f93102111a56c67e9903402b9649eec813e",
+      "name": "Oriel Study",
+      "collections": [
+        {
+          "name": "Oriel Atlas",
+          "symbol": "STUDY1501",
+          "color": "#0033FF",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Oriel Beacon",
+          "symbol": "STUDY1502",
+          "color": "#6666CC",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Oriel Current",
+          "symbol": "STUDY1503",
+          "color": "#6666FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Oriel Drift",
+          "symbol": "STUDY1504",
+          "color": "#9999CC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Oriel Ember",
+          "symbol": "STUDY1505",
+          "color": "#9999FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Oriel Fold",
+          "symbol": "STUDY1506",
+          "color": "#CCCCFF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Oriel Glimmer",
+          "symbol": "STUDY1507",
+          "color": "#333366",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Oriel Haven",
+          "symbol": "STUDY1508",
+          "color": "#333399",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Oriel Islet",
+          "symbol": "STUDY1509",
+          "color": "#3333CC",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Oriel Journey",
+          "symbol": "STUDY1510",
+          "color": "#3333FF",
+          "textColor": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "seasonId": "0xcdf0005783194fb95d29b47aeefbd0be99043634e591ab94a7605fd03b112da5",
+      "name": "Pollen Study",
+      "collections": [
+        {
+          "name": "Pollen Atlas",
+          "symbol": "STUDY1601",
+          "color": "#660033",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Pollen Beacon",
+          "symbol": "STUDY1602",
+          "color": "#660066",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Pollen Current",
+          "symbol": "STUDY1603",
+          "color": "#660099",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Pollen Drift",
+          "symbol": "STUDY1604",
+          "color": "#6600CC",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Pollen Ember",
+          "symbol": "STUDY1605",
+          "color": "#6600FF",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Pollen Fold",
+          "symbol": "STUDY1606",
+          "color": "#990033",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Pollen Glimmer",
+          "symbol": "STUDY1607",
+          "color": "#990066",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Pollen Haven",
+          "symbol": "STUDY1608",
+          "color": "#990099",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Pollen Islet",
+          "symbol": "STUDY1609",
+          "color": "#9900CC",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Pollen Journey",
+          "symbol": "STUDY1610",
+          "color": "#9900FF",
+          "textColor": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x4b1e7ba25ca328aad558f9452134914e06f095cce2dae59b6c24592b45671275",
+      "name": "Quartz Study",
+      "collections": [
+        {
+          "name": "Quartz Atlas",
+          "symbol": "STUDY1701",
+          "color": "#CC0033",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Quartz Beacon",
+          "symbol": "STUDY1702",
+          "color": "#CC0066",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Quartz Current",
+          "symbol": "STUDY1703",
+          "color": "#CC0099",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Quartz Drift",
+          "symbol": "STUDY1704",
+          "color": "#CC00CC",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Quartz Ember",
+          "symbol": "STUDY1705",
+          "color": "#CC00FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Quartz Fold",
+          "symbol": "STUDY1706",
+          "color": "#663366",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Quartz Glimmer",
+          "symbol": "STUDY1707",
+          "color": "#663399",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Quartz Haven",
+          "symbol": "STUDY1708",
+          "color": "#6633CC",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Quartz Islet",
+          "symbol": "STUDY1709",
+          "color": "#6633FF",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Quartz Journey",
+          "symbol": "STUDY1710",
+          "color": "#993366",
+          "textColor": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x8cb1d3f14ad2078c6a13fc3547eb7298dfdcb26a155e2f4418f11d0211bff29a",
+      "name": "Reed Study",
+      "collections": [
+        {
+          "name": "Reed Atlas",
+          "symbol": "STUDY1801",
+          "color": "#993399",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Reed Beacon",
+          "symbol": "STUDY1802",
+          "color": "#9933CC",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Reed Current",
+          "symbol": "STUDY1803",
+          "color": "#9933FF",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Reed Drift",
+          "symbol": "STUDY1804",
+          "color": "#CC3366",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Reed Ember",
+          "symbol": "STUDY1805",
+          "color": "#CC3399",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Reed Fold",
+          "symbol": "STUDY1806",
+          "color": "#CC33CC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Reed Glimmer",
+          "symbol": "STUDY1807",
+          "color": "#CC33FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Reed Haven",
+          "symbol": "STUDY1808",
+          "color": "#996699",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Reed Islet",
+          "symbol": "STUDY1809",
+          "color": "#9966CC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Reed Journey",
+          "symbol": "STUDY1810",
+          "color": "#9966FF",
+          "textColor": "#000000"
+        }
+      ]
+    },
+    {
+      "seasonId": "0xa6aedead34970180ec069e87b4db16d63a20b617c60a94df7a6eabf19104eeb0",
+      "name": "Solace Study",
+      "collections": [
+        {
+          "name": "Solace Atlas",
+          "symbol": "STUDY1901",
+          "color": "#FF0033",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Solace Beacon",
+          "symbol": "STUDY1902",
+          "color": "#FF0066",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Solace Current",
+          "symbol": "STUDY1903",
+          "color": "#FF0099",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Solace Drift",
+          "symbol": "STUDY1904",
+          "color": "#FF00CC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Solace Ember",
+          "symbol": "STUDY1905",
+          "color": "#FF00FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Solace Fold",
+          "symbol": "STUDY1906",
+          "color": "#FF3366",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Solace Glimmer",
+          "symbol": "STUDY1907",
+          "color": "#FF3399",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Solace Haven",
+          "symbol": "STUDY1908",
+          "color": "#FF33CC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Solace Islet",
+          "symbol": "STUDY1909",
+          "color": "#FF33FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Solace Journey",
+          "symbol": "STUDY1910",
+          "color": "#CC6699",
+          "textColor": "#000000"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x05b05d14b076dad249da1e8795d981f1e884348cefe54c35fb409ec5680c0804",
+      "name": "Thistle Study",
+      "collections": [
+        {
+          "name": "Thistle Atlas",
+          "symbol": "STUDY2001",
+          "color": "#CC66CC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Thistle Beacon",
+          "symbol": "STUDY2002",
+          "color": "#CC66FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Thistle Current",
+          "symbol": "STUDY2003",
+          "color": "#FF6699",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Thistle Drift",
+          "symbol": "STUDY2004",
+          "color": "#FF66CC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Thistle Ember",
+          "symbol": "STUDY2005",
+          "color": "#FF66FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Thistle Fold",
+          "symbol": "STUDY2006",
+          "color": "#CC99CC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Thistle Glimmer",
+          "symbol": "STUDY2007",
+          "color": "#CC99FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Thistle Haven",
+          "symbol": "STUDY2008",
+          "color": "#FF99CC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Thistle Islet",
+          "symbol": "STUDY2009",
+          "color": "#FF99FF",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Thistle Journey",
+          "symbol": "STUDY2010",
+          "color": "#FFCCFF",
+          "textColor": "#000000"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x75e25e8101d6678335d2cef9b3eefabc8017b4142f1995875560825e6dd9fe26",
+      "name": "Umber Study",
+      "collections": [
+        {
+          "name": "Umber Atlas",
+          "symbol": "STUDY2101",
+          "color": "#669966",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Umber Beacon",
+          "symbol": "STUDY2102",
+          "color": "#669999",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Umber Current",
+          "symbol": "STUDY2103",
+          "color": "#CC9999",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Umber Drift",
+          "symbol": "STUDY2104",
+          "color": "#FFCC99",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Umber Ember",
+          "symbol": "STUDY2105",
+          "color": "#FFCCCC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Umber Fold",
+          "symbol": "STUDY2106",
+          "color": "#330011",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Umber Glimmer",
+          "symbol": "STUDY2107",
+          "color": "#331100",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Umber Haven",
+          "symbol": "STUDY2108",
+          "color": "#110033",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Umber Islet",
+          "symbol": "STUDY2109",
+          "color": "#001133",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Umber Journey",
+          "symbol": "STUDY2110",
+          "color": "#003311",
+          "textColor": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "seasonId": "0x955068f6c9d9bf8a3f2b7aeb8dbfe0359284a5ec87e01d7f50e71d6c698d04c8",
+      "name": "Vale Study",
+      "collections": [
+        {
+          "name": "Vale Atlas",
+          "symbol": "STUDY2201",
+          "color": "#000000",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Vale Beacon",
+          "symbol": "STUDY2202",
+          "color": "#333333",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Vale Current",
+          "symbol": "STUDY2203",
+          "color": "#666666",
+          "textColor": "#FFFFFF"
+        },
+        {
+          "name": "Vale Drift",
+          "symbol": "STUDY2204",
+          "color": "#999999",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Vale Ember",
+          "symbol": "STUDY2205",
+          "color": "#CCCCCC",
+          "textColor": "#000000"
+        },
+        {
+          "name": "Vale Fold",
+          "symbol": "STUDY2206",
+          "color": "#FFFFFF",
+          "textColor": "#000000"
+        }
+      ]
+    }
+  ]
+}

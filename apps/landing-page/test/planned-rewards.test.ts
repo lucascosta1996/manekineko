@@ -6,16 +6,14 @@ import {
   summarizePlannedRewards,
 } from "../lib/planned-rewards";
 
-test("catalog totals retain the planned Growth and Standard mix", () => {
+test("catalog example applies a 20% affiliate pool to every collection", () => {
   assert.deepEqual(plannedRewards, {
     seasonCount: 22,
     collectionCount: 216,
-    growthCollectionCount: 76,
-    standardCollectionCount: 140,
     winningNftCount: 1296,
     prizePoolEth: "1296",
-    affiliatePoolEth: "292",
-    communityPoolEth: "1588",
+    affiliatePoolEth: "432",
+    communityPoolEth: "1728",
   });
   assert.deepEqual(JSON.parse(JSON.stringify(plannedRewards)), plannedRewards);
 });
@@ -26,21 +24,16 @@ test("the six-collection final season contributes only its actual editions", () 
   assert.deepEqual(summarizePlannedRewards([finalSeason]), {
     seasonCount: 1,
     collectionCount: 6,
-    growthCollectionCount: 2,
-    standardCollectionCount: 4,
     winningNftCount: 36,
     prizePoolEth: "36",
-    affiliatePoolEth: "8",
-    communityPoolEth: "44",
+    affiliatePoolEth: "12",
+    communityPoolEth: "48",
   });
 });
 
-test("Growth allocation follows the original season identity at the pilot boundary", () => {
+test("the fixed pool does not change after the pilot seasons", () => {
   const pilot = summarizePlannedRewards([seasons[3]!]);
   const later = summarizePlannedRewards([seasons[4]!]);
-  assert.equal(pilot.growthCollectionCount, 10);
   assert.equal(pilot.affiliatePoolEth, "20");
-  assert.equal(later.growthCollectionCount, 2);
-  assert.equal(later.standardCollectionCount, 8);
-  assert.equal(later.affiliatePoolEth, "12");
+  assert.equal(later.affiliatePoolEth, "20");
 });

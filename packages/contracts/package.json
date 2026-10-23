@@ -115,7 +115,17 @@
     "./affiliate-eligibility-v6-source": "./src/ManekinekoAffiliateEligibilityV6.source.json",
     "./winner-credits-v7": "./src/ManekinekoWinnerCreditsV7.json",
     "./winner-credits-v7-source": "./src/ManekinekoWinnerCreditsV7.source.json",
-    "./v11-config": "./src/v11-config.ts"
+    "./v11-config": "./src/v11-config.ts",
+    "./round-v12": "./src/ManekinekoRoundV12.json",
+    "./round-v12-source": "./src/ManekinekoRoundV12.source.json",
+    "./round-deployer-v12": "./src/ManekinekoRoundDeployerV12.json",
+    "./round-deployer-v12-source": "./src/ManekinekoRoundDeployerV12.source.json",
+    "./voting-v12": "./src/ManekinekoVotingV12.json",
+    "./voting-v12-source": "./src/ManekinekoVotingV12.source.json",
+    "./season-controller-v12": "./src/ManekinekoSeasonControllerV12.json",
+    "./season-controller-v12-source": "./src/ManekinekoSeasonControllerV12.source.json",
+    "./winner-credits-v8": "./src/ManekinekoWinnerCreditsV8.json",
+    "./winner-credits-v8-source": "./src/ManekinekoWinnerCreditsV8.source.json"
   },
   "dependencies": {
     "ethers": "6.17.0"
