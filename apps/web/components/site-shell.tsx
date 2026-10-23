@@ -1,6 +1,6 @@
 import { RewardsBrand } from "@manekineko/ui/rewards-brand";
 import { PublicFooter } from "@manekineko/ui/footer";
-import { publicLinks } from "@manekineko/ui/links";
+import { publicLinks, publicXProfiles } from "@manekineko/ui/links";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { TinctaWordmark } from "./tincta-logo";
@@ -27,7 +27,7 @@ export function SiteShell({ children, section = "home", chainId = null, classNam
         </span>}
       </header>
       <main id="main">{children}</main>
-      <PublicFooter brand={<RewardsBrand><TinctaWordmark title="" className="ui-footer-wordmark" /></RewardsBrand>} links={{ ...publicLinks({ website: process.env.NEXT_PUBLIC_LANDING_URL ?? (process.env.NODE_ENV === "development" ? "http://localhost:3101" : undefined), app: process.env.NEXT_PUBLIC_WEB_URL ?? process.env.AFFILIATE_PUBLIC_ORIGIN ?? (process.env.NODE_ENV === "development" ? "http://localhost:3100" : undefined), contact: process.env.NEXT_PUBLIC_CONTACT_URL, telegram: process.env.NEXT_PUBLIC_TELEGRAM_URL, social: process.env.NEXT_PUBLIC_X_URL }), app: "/", docs: "/docs" }} />
+      <PublicFooter brand={<RewardsBrand><TinctaWordmark title="" className="ui-footer-wordmark" /></RewardsBrand>} links={{ ...publicLinks({ website: process.env.NEXT_PUBLIC_LANDING_URL ?? (process.env.NODE_ENV === "development" ? "http://localhost:3101" : undefined), app: process.env.NEXT_PUBLIC_WEB_URL ?? process.env.AFFILIATE_PUBLIC_ORIGIN ?? (process.env.NODE_ENV === "development" ? "http://localhost:3100" : undefined), contact: process.env.NEXT_PUBLIC_CONTACT_URL, telegram: process.env.NEXT_PUBLIC_TELEGRAM_URL, social: publicXProfiles.rewards }), app: "/", docs: "/docs" }} />
     </div>
   );
 }

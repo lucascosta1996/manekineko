@@ -1,11 +1,8 @@
 .studio { overflow-wrap: anywhere; }
 .studio-wrap { width: min(100%, 80rem); margin-inline: auto; padding-inline: var(--ui-space-10); }
-.studio-header { display: flex; align-items: center; justify-content: space-between; gap: var(--ui-space-6); min-height: 5rem; border-bottom: 1px solid var(--ui-line); }
+.studio-header { border-bottom: 1px solid var(--ui-line); }
 .studio-brand { display: inline-flex; align-items: center; min-height: 2.75rem; flex: none; }
 .studio-wordmark { width: 6rem; height: auto; }
-.studio-nav { display: flex; flex-wrap: wrap; gap: var(--ui-space-6); align-items: center; }
-.studio-nav a { display: inline-flex; align-items: center; min-height: 2.75rem; font-size: var(--ui-control); }
-.studio-nav a:hover { text-decoration: underline; text-underline-offset: var(--ui-space-1); }
 .studio-eyebrow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ui-space-3); color: var(--ui-muted); font: 400 var(--ui-caption)/var(--ui-caption-line) var(--ui-font-mono); margin: 0 0 var(--ui-space-6); }
 .studio-hero { padding-block: calc(var(--ui-space-24) + var(--ui-space-8)); text-align: center; }
 .studio-hero-copy { max-width: 64rem; margin-inline: auto; }
@@ -45,6 +42,10 @@
 .studio-roadmap-note { margin-top: var(--ui-space-8); margin-bottom: 0; color: var(--ui-muted); font-size: var(--ui-label); line-height: 1.6; }
 .studio-closing { display: flex; align-items: center; justify-content: space-between; gap: var(--ui-space-8); }
 .studio-closing h2 { max-width: 24ch; }
+.studio-launch { text-align: center; }
+.studio-launch .studio-eyebrow { justify-content: center; }
+.studio-launch h2 { margin-inline: auto; }
+.studio-launch > p:not(.studio-eyebrow) { max-width: 44ch; margin: var(--ui-space-6) auto var(--ui-space-8); color: var(--ui-muted); line-height: 1.6; }
 .studio-footer { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: var(--ui-space-10); border-top: 1px solid var(--ui-line); padding-block: var(--ui-space-10) var(--ui-space-6); }
 .studio-footer .studio-wordmark { width: 5.5rem; }
 .studio-footer-description { font-size: var(--ui-footer-type); line-height: 1.538462; color: var(--ui-muted); margin-top: var(--ui-space-4); max-width: 28ch; }
@@ -69,9 +70,6 @@
 }
 @media (max-width: 599px) {
   .studio-wrap { padding-inline: var(--ui-space-4); }
-  .studio-header { gap: var(--ui-space-3); flex-wrap: wrap; padding-block: var(--ui-space-3); }
   .studio-wordmark { width: 5.5rem; }
-  .studio-nav { gap: var(--ui-space-4); }
-  .studio-header .studio-nav { width: 100%; justify-content: space-between; }
 }
 @media (prefers-reduced-motion: reduce) { html:has(.studio) { scroll-behavior: auto; } }

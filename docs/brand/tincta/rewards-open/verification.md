@@ -49,3 +49,15 @@ Local production preview: `http://127.0.0.1:8129/rewards`. The production previe
 ## Boundaries
 
 Source/build/browser verification is local. There was no deployment, X upload/post, database change, wallet signature or chain transaction. Launch authenticated screens and connected-wallet states were tested with isolated fixtures; live authentication, hosted UI, physical-device and manual screen-reader acceptance remain unverified. This report does not assert full repository acceptance while the known unrelated assertions and those evidence boundaries remain open.
+
+## Rewards hero animation · 23 October 2026
+
+Scope: Rewards Landing `/rewards` only. `RewardsHeroArtwork` reuses the unchanged shared SVG; Landing CSS supplies an eight-second translation loop for the overall artwork, folded wings and center. Intersection and document-visibility observers pause the loop when it cannot be seen. Reduced motion renders the original static composition from first paint. Shared tokens, controls, header/footer artwork, product copy and generated assets are unchanged.
+
+Local checks passed: Landing typecheck and production build; isolated Landing fixture build; `npm run ui:source` (10 tests plus source policy); canonical brand parity (55 artifacts); visual harness typecheck; diff whitespace. `npm run landing:test` passed 17 tests with two database-dependent skips across its two suites.
+
+`UI_APP=landing npx playwright test tests/visual/landing.spec.ts tests/visual/resilience.spec.ts --grep 'Landing|landing breakpoint|landing coarse'` passed **75 checks**, with six planned secondary-engine viewport skips. Motion frames were sampled at 0/2/4/6/8 seconds, checking unchanged path dimensions/colors, contained artwork, a seamless loop and a stable CTA. The same coverage checks offscreen/hidden-tab pause/resume, live reduced-motion changes and static header branding. The suite also covers initial pending, empty/error/retry/stale states, newsletter interception, keyboard navigation, axe, breakpoint reflow, 200% text, text spacing and coarse targets. Existing screenshot baselines passed without updates.
+
+Environment: macOS 15.4.1 arm64, Node 22.20.0, Playwright 1.58.2, Chromium 145.0.7632.6, Firefox 146.0.1 and WebKit 26.0; system sans, en-US, UTC. Motion coverage: Chromium at 320/390/768/1280/1440 px; Firefox/WebKit at 390/1440 px. Desktop/mobile sampled frames were visually inspected. Local artifacts: `test-results/visual/results.json`, `test-results/visual-environment.json`, and the `landing-Landing-Open-hero-*` screenshot/trace/video folders. Browser fixtures block external requests and intercept writes.
+
+The local production preview at `http://127.0.0.1:3101/rewards` was opened for review; its collection-status service was unavailable and displayed the existing recovery state. No deployment, hosted data changes or wallet/chain operations were performed. Physical devices and manual screen-reader review remain unverified. The existing user-directed omission of hero pause controls remains documented in the visual standard.

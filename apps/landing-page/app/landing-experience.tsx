@@ -1,6 +1,5 @@
 "use client";
 import { RewardsBrand } from "@manekineko/ui/rewards-brand";
-import { RewardsArtwork } from "@manekineko/ui/rewards-artwork";
 import { Button, IconButton, LinkButton } from "@manekineko/ui/button";
 import { PublicFooter } from "@manekineko/ui/footer";
 import type { PublicLinks } from "@manekineko/ui/links";
@@ -8,6 +7,8 @@ import { Icon } from "@manekineko/ui/icons";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { LiveCollection } from "../components/live-collection";
+import { RewardsHeroArtwork } from "../components/rewards-hero-artwork";
+import { LandingNavigation } from "../components/landing-navigation";
 import artwork from "./artwork.json";
 import { NewsletterSignup } from "./newsletter-signup";
 import { TinctaWordmark } from "../components/tincta-logo";
@@ -28,6 +29,11 @@ function Brand({ footer = false }: { footer?: boolean }) {
 
 const faqs = (plannedRewards: PlannedRewards) => [
   {
+    question: "What is the protocol treasury for?",
+    answer:
+      "After a successful draw, 20% of mint revenue is allocated to the protocol treasury to cover current infrastructure costs and fund upcoming Tincta projects. The fixed operator wallet can withdraw this allocation; the team manages its spending, which is not restricted by the collection contract. Prize, earned affiliate and refund obligations remain protected. Refundable collections create no treasury allocation from mint revenue.",
+  },
+  {
     question: "Can the team withdraw my prize or commission?",
     answer:
       "No. The contract reserves unpaid prizes and earned affiliate commissions for their recipients. The operator cannot withdraw those funds or claim them for you. Unallocated affiliate budget is a separate reserve that the operator can withdraw after the draw; it is not an earned commission.",
@@ -43,9 +49,14 @@ const faqs = (plannedRewards: PlannedRewards) => [
       "The contract determines entitlement and executes payment, without team approval. You submit a claim transaction from the wallet holding the winning NFT or the qualifying affiliate wallet. Minting opens at the voting deadline without activation. Preparation and draw finalization require transactions; autonomous rewards does not mean the entire launch runs without external services or transaction submissions.",
   },
   {
+    question: "How does community voting change the prizes?",
+    answer:
+      "Eligible NFT holders vote for a published package of mint price, NFT supply, winner count, and mint duration. The option with the most votes sets the collection’s terms; ties and no-vote outcomes use the published fallback rules. After sellout and a successful draw, 60% of mint revenue is divided equally among the winning NFTs. A higher price or supply grows the pool; more winners divide it into smaller prizes. The 1 ETH illustration is neither a minimum nor a maximum. Review the final voted terms before minting.",
+  },
+  {
     question: "How do I win a prize?",
     answer:
-      "Each NFT enters the draw for its own collection. When all NFTs sell out, one verifiable Chainlink VRF draw selects distinct winning NFTs. For example, 1,000 mints at 0.01 ETH with six winners give each winning NFT 1 ETH, claimed by their holders. One wallet can hold more than one winning NFT. A win is never guaranteed.",
+      "Each NFT enters its own collection’s draw. After sellout, Chainlink VRF supplies verifiable randomness and the draw selects the voted number of distinct winning NFTs. Their holders claim equal prizes directly. For example, 1,000 mints at 0.01 ETH with six winners produce 1 ETH per prize; 2,000 mints at the same price with six winners produce 2 ETH each. One wallet can hold more than one winning NFT.",
   },
   {
     question: "What are my chances?",
@@ -55,12 +66,12 @@ const faqs = (plannedRewards: PlannedRewards) => [
   {
     question: "How do affiliate rewards work?",
     answer:
-      "Eligible holders enroll during voting, subject to an available position and onchain eligibility. One attributed paid referral qualifies an affiliate. All qualifiers share the full 20% pool equally after sellout. Three qualifiers each receive one third, regardless of referral count. Division dust or a pool with no qualifiers remains a separate reserve. Earned commissions stay protected and can be claimed directly.",
+      "Eligible holders enroll during voting, subject to an available position and onchain eligibility. One attributed paid referral qualifies an affiliate. Sellout fixes equal shares of the 20% affiliate pool, claimable after successful draw finalization. Three qualifiers each receive one third, regardless of referral count. Division dust or a pool with no qualifiers remains a separate reserve. Refundable collections create no affiliate payout.",
   },
   {
     question: "What if a collection doesn’t sell out?",
     answer:
-      "There is no prize draw for an unsold collection. After its sale expires, NFT holders can claim a refund of the mint price. Network gas is not refunded, and the refunded NFT is burned. A sold-out collection follows its draw and claim process instead.",
+      "There is no prize draw for an unsold collection. After its mint deadline, current NFT holders can claim the original mint price. A sold-out collection also becomes refundable if valid randomness is not recorded within its fixed 72-hour window. Randomness recorded on time preserves the draw and cannot expire. Refunds burn the NFT and exclude network gas and secondary-market price differences.",
   },
   {
     question: "Can I choose my NFT’s numbers?",
@@ -75,12 +86,10 @@ const faqs = (plannedRewards: PlannedRewards) => [
 ];
 
 export function LandingExperience({
-  appUrl,
   footerLinks,
   seasons,
   plannedRewards,
 }: {
-  appUrl: string | null;
   footerLinks: PublicLinks;
   seasons: Season[];
   plannedRewards: PlannedRewards;
@@ -88,12 +97,10 @@ export function LandingExperience({
   const [failedArtwork, setFailedArtwork] = useState<string[]>([]);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [catalogSeason, setCatalogSeason] = useState(0);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [showCatalog, setShowCatalog] = useState(false);
   const [galleryEdges, setGalleryEdges] = useState({ start: true, end: false });
   const root = useRef<HTMLDivElement>(null);
   const gallery = useRef<HTMLDivElement>(null);
-  const menuButton = useRef<HTMLButtonElement>(null);
   const motionOff = reducedMotion;
   const selectedSeason = seasons[catalogSeason];
   const totalCollections = seasons.reduce(
@@ -147,17 +154,6 @@ export function LandingExperience({
     };
   }, [motionOff]);
 
-  useEffect(() => {
-    if (!menuOpen) return;
-    const close = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setMenuOpen(false);
-        menuButton.current?.focus();
-      }
-    };
-    document.addEventListener("keydown", close);
-    return () => document.removeEventListener("keydown", close);
-  }, [menuOpen]);
 
   function moveGallery(direction: number) {
     const container = gallery.current;
@@ -186,60 +182,19 @@ export function LandingExperience({
         Skip to content
       </a>
       <LiveCollection />
-      <header className="header wrap">
+      <header className="header landing-header wrap">
         <Brand />
-        <nav className="desktop-nav" aria-label="Main navigation">
-          <a href="#rewards">Rewards</a>
-          <a href="#seasons">Collections</a>
-          <a href="#affiliates">Affiliates</a>
-          <a href="#how-it-works">How it works</a>
-        </nav>
-        <LinkButton
-          className="header-cta"
-          href="#launch-list"
-        >
-          Join the launch list
-          <Icon name="diagonal" />
-        </LinkButton>
-        <IconButton
-          ref={menuButton}
-          className="menu-toggle"
-          aria-label={menuOpen ? "Close navigation" : "Open navigation"}
-          aria-expanded={menuOpen}
-          aria-controls="mobile-nav"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          <Icon name={menuOpen ? "close" : "menu"} />
-        </IconButton>
-        {menuOpen && (
-          <nav
-            id="mobile-nav"
-            className="mobile-nav"
-            aria-label="Mobile navigation"
-            onClick={() => setMenuOpen(false)}
-          >
-            <a href="#rewards">
-              Rewards
-              <Icon />
-            </a>
-            <a href="#seasons">
-              Collections
-              <Icon />
-            </a>
-            <a href="#affiliates">
-              Affiliates
-              <Icon />
-            </a>
-            <a href="#how-it-works">
-              How it works
-              <Icon />
-            </a>
-            <a href="#questions">
-              FAQ
-              <Icon />
-            </a>
-          </nav>
-        )}
+        <LandingNavigation
+          links={[
+            { label: "Rewards", href: "#rewards" },
+            { label: "Collections", href: "#seasons" },
+            { label: "Affiliates", href: "#affiliates" },
+            { label: "How it works", href: "#how-it-works" },
+            { label: "FAQ", href: "#questions", mobileOnly: true },
+            { label: "Join the launch list", href: "#launch-list", mobileOnly: true },
+          ]}
+          action={{ label: "Open app", href: "https://app.tincta.xyz" }}
+        />
       </header>
 
       <main id="main">
@@ -272,9 +227,7 @@ export function LandingExperience({
                 </LinkButton>
               </div>
             </div>
-            <div className="hero-art">
-              <RewardsArtwork className="rewards-hero-artwork" title="" />
-            </div>
+            <RewardsHeroArtwork />
           </div>
         </section>
 
@@ -289,7 +242,7 @@ export function LandingExperience({
                 {Number(plannedRewards.prizePoolEth).toLocaleString("en-US")} <span>ETH</span>
               </div>
               <p>
-                {plannedRewards.winningNftCount.toLocaleString("en-US")} winning NFTs. <strong>1 ETH each.</strong>
+                Example: {plannedRewards.winningNftCount.toLocaleString("en-US")} winning NFTs at <strong>1 ETH each.</strong>
               </p>
             </div>
             <div className="reward-metric affiliate-metric">
@@ -323,7 +276,8 @@ export function LandingExperience({
           </div>
           <p className="terms-note">
             <span>Example totals if all {plannedRewards.collectionCount} collections sell out 1,000 NFTs at 0.01 ETH with six winners.
-            Voting selects actual terms. These are not funded balances.</span>
+            Community voting selects the actual price, supply, winner count, and mint duration from published options.
+            Actual prizes may be higher or lower. These are not funded balances.</span>
             <a href="#questions">
               See the details
               <Icon name="diagonal" />
@@ -339,7 +293,7 @@ export function LandingExperience({
         >
           <div className="launch-content">
             <h2 id="launch-title">Stay in the loop.</h2>
-            <p id="launch-description">Be first to know when minting opens.</p>
+            <p id="launch-description">Get notified when voting and minting open.</p>
             <NewsletterSignup />
           </div>
         </section>
@@ -353,16 +307,18 @@ export function LandingExperience({
             <span className="section-index">01 /</span> CONTRACT-CONTROLLED REWARDS
           </p>
           <h2 id="manifesto-title">
-            The contract controls
+            The community chooses.
             <br />
-            <span className="muted-heading">the rewards.</span>
+            <span className="muted-heading">The contract enforces.</span>
           </h2>
           <div className="manifesto-bottom">
             <p>
-              Prize amounts and commission rules are fixed before the collection
-              launches. The contract calculates entitlements and executes claims.
-              The operator cannot withdraw funds owed as prizes or earned
-              affiliate commissions.
+              Eligible NFT holders vote on published packages of price, supply,
+              winner count, and mint duration. The winning package becomes fixed
+              when voting ends. The allocation stays the same: 60% for prizes,
+              20% for affiliates, and 20% for the protocol treasury after a successful draw.
+              The treasury covers current infrastructure costs and funds upcoming Tincta projects.
+              Funds owed as prizes or earned commissions remain protected.
             </p>
             <LinkButton
               className="ui-icon-button"
@@ -388,13 +344,14 @@ export function LandingExperience({
                 <h2 id="seasons-title">
                   Every collection.
                   <br />
-                  Its own <span className="serif">rules.</span>
+                  Its own <span className="serif">voted terms.</span>
                 </h2>
               </div>
               <p>
-                Every collection publishes its rules onchain at launch. Review
-                the entry price, prize amounts, and commission terms before
-                minting. Each sold-out collection has its own draw.
+                Review the published options and follow the community vote.
+                At the voting deadline, the selected terms become final and
+                minting opens. Each collection has its own supply, prize amounts,
+                and draw.
               </p>
             </div>
             <div className="season-explorer" data-reveal>
@@ -507,14 +464,15 @@ export function LandingExperience({
               </div>
               <div>
                 <span>
-                  6<sup>*</sup>
+                  1–10<sup>*</sup>
                 </span>
-                <p>Equal prizes per sold-out collection</p>
+                <p>Winning NFTs, selected by the voted terms</p>
               </div>
             </div>
             <p className="section-footnote">
-              *Six prizes is the illustrated example. Each NFT enters only its own
-              collection’s draw. Final collection terms may vary.
+              *Winner counts come from the published options and must divide the
+              prize allocation exactly; seven and nine are excluded. Each NFT
+              enters only its own collection’s draw.
             </p>
           </div>
         </section>
@@ -633,26 +591,24 @@ export function LandingExperience({
                 <Icon name="spark" /> PRIZES CLAIMED DIRECTLY
               </p>
               <h2 id="prizes-title">
-                Six winning NFTs.
+                The community votes.
                 <br />
-                <span className="serif">1 ETH each.</span>
+                <span className="serif">The prize amount follows.</span>
               </h2>
               <p>
-                A verifiable draw determines the winners after sellout. Each
-                winning holder claims their ETH directly from the contract.
-                Example: 6 ETH in prizes when 1,000 NFTs sell out at 0.01 ETH. Voting decides the actual terms.
+                Each prize is an equal share of 60% of the collection’s mint
+                revenue. The voted price, supply, and winner count determine its
+                size. After sellout and a successful draw, winning NFT holders
+                claim directly from the contract.
               </p>
-              <div className="prize-micro">
-                <span>
-                  1,000<small>NFTS IN THE DRAW</small>
-                </span>
-                <span>
-                  6<small>WINNING NFTS</small>
-                </span>
-                <span>
-                  1 ETH<small>PER PRIZE</small>
-                </span>
-              </div>
+              <dl className="prize-examples" aria-label="Illustrative prizes at sellout, not live voting options">
+                <div><dt>1,000 NFTs · 0.01 ETH · 6 winners</dt><dd>1 ETH each</dd></div>
+                <div><dt>2,000 NFTs · 0.01 ETH · 6 winners</dt><dd>2 ETH each</dd></div>
+                <div><dt>1,000 NFTs · 0.01 ETH · 10 winners</dt><dd>0.6 ETH each</dd></div>
+              </dl>
+              <p>Illustrations at sellout, not live voting options. 1 ETH is an
+                example, not a minimum or a cap. The final voted terms determine
+                the prize.</p>
               <a className="ui-text-action" href="#questions">
                 Understand the draw
                 <Icon name="diagonal" />
@@ -674,7 +630,7 @@ export function LandingExperience({
                     1 <span>ETH</span>
                   </span>
                   <span className="ticket-bottom">
-                    ONE WINNING NFT
+                    EXAMPLE PRIZE
                     <Icon name="spark" />
                   </span>
                 </div>
@@ -719,8 +675,8 @@ export function LandingExperience({
               </h2>
               <p>
                 Qualifying referrals are recorded onchain. The contract calculates
-                your earned commission and lets you claim it directly, without
-                team approval. Eligible holders enroll before minting opens;
+                your share of the affiliate pool, claimable directly after a
+                successful draw. Eligible holders enroll during voting;
                 one attributed paid referral qualifies you for an equal share.
               </p>
               <div className="affiliate-detail">
@@ -737,8 +693,9 @@ export function LandingExperience({
                 </LinkButton>
               </div>
               <p className="affiliate-note">
-                Every sold-out collection allocates 20% to its affiliate pool.
-                All qualifying affiliates share it equally. A 10 ETH sellout creates
+                Community-voted price and supply determine the size of the
+                20% affiliate pool. All qualifying affiliates share it equally
+                after a successful draw. A 10 ETH sellout creates
                 a 2 ETH pool; a 20 ETH sellout creates a 4 ETH pool. Unallocated funds remain in a separate operator-accessible
                 reserve; earned commissions remain protected.
               </p>
@@ -754,16 +711,16 @@ export function LandingExperience({
           <div className="section-heading" data-reveal>
             <div>
               <p className="eyebrow">
-                <span className="section-index">04 /</span> FROM CONTRACT TO CLAIM
+                <span className="section-index">04 /</span> FROM VOTE TO CLAIM
               </p>
               <h2 id="how-title">
-                Review. Mint.
+                Vote. Mint.
                 <br />
                 Claim if you win.
               </h2>
             </div>
             <p>
-              Review the rules before entering. Follow the draw onchain.
+              Follow the community vote. Review final terms before minting.
               Submit your claim directly to the contract.
             </p>
           </div>
@@ -773,13 +730,13 @@ export function LandingExperience({
                 01
                 <Icon name="plus" />
               </span>
-              <h3>Review the contract.</h3>
+              <h3>Choose the terms.</h3>
               <p>
-                Explore the season. Choose a collection and review its fixed
-                price, supply, prizes, and terms.
+                Eligible NFT holders vote for a published package of price,
+                supply, winner count, and mint duration. Follow the result onchain.
               </p>
               <span className="step-caption">
-                FIXED TERMS. PUBLISHED ONCHAIN.
+                COMMUNITY VOTE. ONCHAIN RESULT.
               </span>
             </article>
             <article>
@@ -789,8 +746,8 @@ export function LandingExperience({
               </span>
               <h3>Mint your NFT.</h3>
               <p>
-                Mint an NFT to your wallet. Each NFT enters its collection’s
-                draw, with its permanent identity assigned by the contract.
+                At the voting deadline, minting opens under the selected terms.
+                Review them before minting. Each NFT enters its collection’s draw.
               </p>
               <span className="step-caption">
                 YOUR NFT. YOUR DRAW ENTRY.
@@ -846,7 +803,7 @@ export function LandingExperience({
             <dl className="refund-rules">
               <div>
                 <dt>A fixed deadline</dt>
-                <dd>The mint deadline is fixed in the contract at deployment and cannot be extended.</dd>
+                <dd>The voted mint duration fixes the deadline when voting ends. It cannot then be extended.</dd>
               </div>
               <div>
                 <dt>Funds reserved for refunds</dt>
@@ -859,7 +816,7 @@ export function LandingExperience({
             </dl>
             <div className="refund-terms">
               <p>You submit a claim transaction and pay gas. Claiming burns the NFT. The refund covers the original mint price; network fees and secondary-market price differences are not refunded.</p>
-              <p>Sold-out collections follow their draw and prize-claim rules.</p>
+              <p>A sold-out collection is also refundable if valid randomness is not recorded within 72 hours of sellout. Randomness recorded on time preserves the draw; its results cannot expire.</p>
             </div>
           </div>
         </section>
@@ -917,15 +874,16 @@ export function LandingExperience({
               <Icon name="diagonal" />
             </LinkButton>
             <span className="closing-note">
-              Get notified when the first collection opens for minting.
+              Get notified when the first collection opens for voting and minting.
             </span>
           </div>
         </section>
       </main>
       <PublicFooter
+        density="compact"
         brand={<RewardsBrand><TinctaWordmark title="" className="ui-footer-wordmark" /></RewardsBrand>}
         links={footerLinks}
-        legal={<>Launch preview. Rewards shown use planned default terms and require sellout. Prizes and affiliate earnings are not guaranteed. Review each collection’s final terms.</>}
+        legal={<>Launch preview. Illustrative amounts depend on community-voted terms. Prize and affiliate payouts require sellout and a successful draw. Review final terms before minting.</>}
       />
     </div>
   );

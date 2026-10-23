@@ -60,7 +60,10 @@ test("current guides preserve economic floors, holder claims and deployment boun
   const text = (slug: string) => docSearchEntry(docPages.find(page => page.slug === slug)!).text;
   assert.match(text("onchain-voting"), /0.01 ETH/);
   assert.match(text("onchain-voting"), /1,000–65,536/);
-  assert.match(text("onchain-voting"), /operator percentage stays 20%/);
+  assert.match(text("onchain-voting"), /treasury allocation stays 20%/);
+  assert.match(text("onchain-voting"), /current infrastructure costs and fund upcoming Tincta projects/);
+  assert.match(text("onchain-voting"), /fixed operator wallet withdraws and manages these funds/);
+  assert.match(text("onchain-voting"), /not an onchain spending restriction/);
   assert.match(text("overview"), /unconfigured deployment is not a live sale/);
   assert.match(text("prizes"), /Only the current holder can claim/);
   assert.match(text("refunds"), /No operator cancellation or approval/);

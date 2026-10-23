@@ -1,8 +1,10 @@
 import { LinkButton } from "@manekineko/ui/button";
 import { Icon } from "@manekineko/ui/icons";
-import { publicLinks } from "@manekineko/ui/links";
+import { publicLinks, publicXProfiles } from "@manekineko/ui/links";
 import { TinctaWordmark } from "../components/tincta-logo";
 import { ResearchArt } from "../components/research-art";
+import { LandingNavigation } from "../components/landing-navigation";
+import { NewsletterSignup } from "./newsletter-signup";
 import "./studio.css";
 
 const principles = [
@@ -16,16 +18,18 @@ const concepts = [
 ];
 
 export default function LandingPage() {
-  const links = publicLinks({ contact: process.env.NEXT_PUBLIC_CONTACT_URL, social: process.env.NEXT_PUBLIC_X_URL });
+  const links = publicLinks({ contact: process.env.NEXT_PUBLIC_CONTACT_URL, social: publicXProfiles.tincta });
   return (
     <div className="studio" id="top">
       <a className="skip-link" href="#main">Skip to content</a>
       <div className="studio-wrap">
-        <header className="studio-header">
+        <header className="studio-header landing-header">
           <a className="studio-brand" href="/" aria-label="Tincta home"><TinctaWordmark className="studio-wordmark" title="" /></a>
-          <nav className="studio-nav" aria-label="Main navigation">
-            <a href="#research">Research</a><a href="#projects">Projects</a><a href="#upcoming">Upcoming</a>
-          </nav>
+          <LandingNavigation links={[
+            { label: "Research", href: "#research" },
+            { label: "Projects", href: "#projects" },
+            { label: "Upcoming", href: "#upcoming" },
+          ]} action={{ label: "Join the launch list", href: "#launch-list" }} />
         </header>
         <main id="main">
           <section className="studio-hero" aria-labelledby="studio-title">
@@ -70,11 +74,21 @@ export default function LandingPage() {
             </article>)}</div>
             <p className="studio-roadmap-note">Morph and Assembly are proposed research directions. Their scope and release timing are not yet established.</p>
           </section>
+          <section className="studio-section studio-launch" id="launch-list" aria-labelledby="studio-launch-title" tabIndex={-1}>
+            <p className="studio-eyebrow">Stay in the loop</p>
+            <h2 id="studio-launch-title">Be part of what comes next.</h2>
+            <p id="studio-launch-description">Get notified about Tincta project launches, starting with Rewards.</p>
+            <NewsletterSignup
+              endpoint={process.env.LANDING_SITE_ROLE === "studio" ? "https://rewards.tincta.xyz/api/newsletter" : undefined}
+              descriptionId="studio-launch-description"
+              successMessage="You’re on the list. We’ll email you about upcoming Tincta launches."
+            />
+          </section>
           <section className="studio-section studio-closing" aria-labelledby="closing-title"><div><p className="studio-eyebrow">Built to remain</p><h2 id="closing-title">The rules stay fixed.<br />The possibilities unfold.</h2></div><LinkButton href="/rewards" icon={<Icon name="arrow" />}>Discover Tincta Rewards</LinkButton></section>
         </main>
         <footer className="studio-footer">
           <div><a className="studio-brand" href="/" aria-label="Tincta home"><TinctaWordmark className="studio-wordmark" title="" /></a><p className="studio-footer-description">Research and publishing<br />for immutable onchain systems.</p></div>
-          <nav aria-label="Explore Tincta"><strong className="ui-footer-heading">Explore</strong><a className="ui-footer-link" href="#research">Our research</a><a className="ui-footer-link" href="/rewards">Tincta Rewards<Icon name="arrow" size="footer" /></a><a className="ui-footer-link" href="#upcoming">Upcoming projects</a></nav>
+          <nav aria-label="Explore Tincta"><strong className="ui-footer-heading">Explore</strong><a className="ui-footer-link" href="#research">Our research</a><a className="ui-footer-link" href="/rewards">Tincta Rewards<Icon name="arrow" size="footer" /></a><a className="ui-footer-link" href="#upcoming">Upcoming projects</a><a className="ui-footer-link" href="#launch-list">Join the launch list</a></nav>
           <nav aria-label="Tincta information"><strong className="ui-footer-heading">Tincta</strong><a className="ui-footer-link" href="#top">Back to top<Icon name="up" size="footer" /></a>{links.contact && <a className="ui-footer-link" href={links.contact}>Contact<Icon name="diagonal" size="footer" /></a>}{links.social && <a className="ui-footer-link" href={links.social}>X<Icon name="diagonal" size="footer" /></a>}</nav>
           <div className="studio-footer-legal"><span>© {new Date().getFullYear()} Tincta</span><span>Defined 100% onchain. Shaped by participation.</span></div>
         </footer>

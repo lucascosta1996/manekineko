@@ -348,9 +348,19 @@ export function PublicWorkspace({
       </nav>
       <section className="public-explainer" aria-label="How a collection works">
         <p className="public-allocation">
-          60% winning tickets · 20% qualified affiliates · 20% operator.
+          60% winning tickets · 20% qualified affiliates · 20% protocol treasury.
+        </p>
+        <p>
+          The 20% protocol treasury allocation covers current infrastructure costs
+          and funds upcoming Tincta projects.
         </p>
         <Disclosure title="How it works · Voting, prizes and refunds">
+          <p>
+            The fixed operator wallet can withdraw the treasury allocation after
+            a successful draw. The team manages its spending; the collection
+            contract does not restrict how those withdrawn funds are used.
+            Prize, earned affiliate and refund obligations stay protected.
+          </p>
           <p>
             Mint price is always at least 0.01 ETH. Voted supply is 1,000–65,536
             NFTs and becomes fixed when minting opens. Up to 20 primary mints

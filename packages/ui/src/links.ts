@@ -1,3 +1,8 @@
+export const publicXProfiles = {
+  tincta: "https://x.com/tinctaxyz",
+  rewards: "https://x.com/tinctarewards",
+} as const;
+
 export type PublicLinks = {
   website: string | null;
   app: string | null;

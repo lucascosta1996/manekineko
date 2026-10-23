@@ -2,9 +2,14 @@
 import { Button } from "@manekineko/ui/button";
 import { Icon } from "@manekineko/ui/icons";
 
-import { useRef, useState, type FormEvent } from "react";
+import { useId, useRef, useState, type FormEvent } from "react";
 
-export function NewsletterSignup() {
+export function NewsletterSignup({ endpoint = "/api/newsletter", descriptionId = "launch-description", successMessage = "You’re on the list. We’ll email you when voting and minting open." }: {
+  endpoint?: string;
+  descriptionId?: string;
+  successMessage?: string;
+}) {
+  const id = useId();
   const [status, setStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
 
@@ -25,8 +30,9 @@ export function NewsletterSignup() {
     setStatus("pending");
     setMessage("");
     try {
-      const response = await fetch("/api/newsletter", {
+      const response = await fetch(endpoint, {
         method: "POST",
+        credentials: "omit",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: data.get("email"), website: data.get("website") }),
         signal: AbortSignal.timeout(15000),
@@ -44,7 +50,7 @@ export function NewsletterSignup() {
       const result = await response.json();
       if (result.success !== true) throw new Error("Signup was not confirmed");
       setStatus("success");
-      setMessage("You’re on the list. We’ll email you when minting opens.");
+      setMessage(successMessage);
     } catch {
       setStatus("error");
       setMessage("We couldn’t confirm your signup. Please try again.");
@@ -52,15 +58,15 @@ export function NewsletterSignup() {
   }
 
   return (
-    <form noValidate className="newsletter" onSubmit={submit} aria-label="Launch notifications" aria-describedby="launch-description" aria-busy={status === "pending"}>
-      <label className="visually-hidden" htmlFor="launch-email">Email address</label>
+    <form noValidate className="newsletter" onSubmit={submit} aria-label="Launch notifications" aria-describedby={descriptionId} aria-busy={status === "pending"}>
+      <label className="visually-hidden" htmlFor={`${id}-email`}>Email address</label>
       <div className="newsletter-field">
         <input
           ref={emailInput}
           className="ui-input"
           aria-invalid={invalid || undefined}
           onChange={() => { if (invalid) { setInvalid(false); setMessage(""); setStatus("idle"); } }}
-          id="launch-email"
+          id={`${id}-email`}
           name="email"
           type="email"
           autoComplete="email"
@@ -68,17 +74,17 @@ export function NewsletterSignup() {
           required
           maxLength={254}
           readOnly={status === "pending" || status === "success"}
-          aria-describedby="newsletter-status"
+          aria-describedby={`${id}-status`}
         />
         <Button type="submit" busy={status === "pending"} busyLabel="Joining…" disabled={status === "success"} reserveLabels={["Join the launch list", "Joining…", "You’re in"]} icon={<Icon name="arrow" />}>
           {status === "pending" ? "Joining…" : status === "success" ? "You’re in" : "Join the launch list"}
         </Button>
       </div>
       <div className="newsletter-trap" aria-hidden="true" inert>
-        <label htmlFor="launch-website">Website</label>
-        <input id="launch-website" name="website" tabIndex={-1} autoComplete="off" />
+        <label htmlFor={`${id}-website`}>Website</label>
+        <input id={`${id}-website`} name="website" tabIndex={-1} autoComplete="off" />
       </div>
-      <p id="newsletter-status" className={`newsletter-status${status === "error" ? " newsletter-error" : ""}`} role="status" aria-live="polite" aria-atomic="true">{message}</p>
+      <p id={`${id}-status`} className={`newsletter-status${status === "error" ? " newsletter-error" : ""}`} role="status" aria-live="polite" aria-atomic="true">{message}</p>
     </form>
   );
 }

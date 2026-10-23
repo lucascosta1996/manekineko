@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { NextRequest } from "next/server";
-import { normalizeNewsletterEmail, registerNewsletter, type NewsletterRepository } from "../lib/newsletter";
+import { newsletterPreflight, normalizeNewsletterEmail, registerNewsletter, type NewsletterRepository } from "../lib/newsletter";
 
 const env = {
   NODE_ENV: "production", VERCEL: "1",
@@ -53,6 +53,17 @@ test("Next route requests bind the canonical URL and ignore alternate forwarded 
   assert.equal((await registerNewsletter(canonical, store, env)).status, 200);
   const alias = new NextRequest(request(undefined, { "x-forwarded-host": "tincta.example", Host: "tincta.example" }, "https://preview.vercel.app/api/newsletter"));
   assert.equal((await registerNewsletter(alias, store, env)).status, 403);
+  assert.equal(store.emails.length, 1);
+});
+
+test("next start loopback normalization still binds the browser origin to Host and port", async () => {
+  const store = repository();
+  const config = { NODE_ENV: "production", NEWSLETTER_IP_HASH_SECRET: env.NEWSLETTER_IP_HASH_SECRET, NEWSLETTER_ALLOW_LOCAL_PREVIEW: "1" };
+  const localRequest = (headers = {}) => request(undefined, { Origin: "http://127.0.0.1:3101", Host: "127.0.0.1:3101", ...headers }, "http://localhost:3101/api/newsletter");
+  assert.equal((await registerNewsletter(localRequest(), store, config)).status, 200);
+  assert.equal((await registerNewsletter(localRequest({Host:"localhost:3101"}), store, config)).status, 403);
+  assert.equal((await registerNewsletter(localRequest({Origin:"http://127.0.0.1:3102",Host:"127.0.0.1:3102"}), store, config)).status, 403);
+  assert.equal((await registerNewsletter(localRequest({Origin:"http://attacker.example:3101",Host:"attacker.example:3101"}), store, config)).status, 403);
   assert.equal(store.emails.length, 1);
 });
 
@@ -121,4 +132,60 @@ test("localhost works with an explicit secret and a shared development quota", a
   const response = await registerNewsletter(request(undefined, { Origin: "http://localhost:3101" }, "http://localhost:3101/api/newsletter"), store, { NODE_ENV: "development", NEWSLETTER_IP_HASH_SECRET: env.NEWSLETTER_IP_HASH_SECRET });
   assert.equal(response.status, 200);
   assert.deepEqual(store.emails, ["collector@example.com"]);
+});
+
+test("published Rewards accepts its canonical domain and the two parent origins after an alias move", async () => {
+  const store = repository();
+  for (const origin of ["https://rewards.tincta.xyz", "https://tincta.xyz", "https://www.tincta.xyz"]) {
+    const response = await registerNewsletter(request(undefined, { Origin: origin, "sec-fetch-site": "same-site" }, "https://rewards.tincta.xyz/api/newsletter"), store, env);
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("access-control-allow-origin"), origin);
+    assert.equal(response.headers.has("access-control-allow-credentials"), false);
+  }
+  assert.equal(store.emails.length, 3);
+  for (const origin of ["null", "https://tincta.xyz.attacker.example", "https://preview.tincta.xyz", "http://tincta.xyz"]) {
+    const response = await registerNewsletter(request(undefined, { Origin: origin }, "https://rewards.tincta.xyz/api/newsletter"), store, env);
+    assert.equal(response.status, 403);
+    assert.equal(response.headers.has("access-control-allow-origin"), false);
+  }
+  assert.equal(store.emails.length, 3);
+  assert.equal((await registerNewsletter(request(undefined, { Origin: "https://tincta.xyz" }), store, env)).status, 403, "Parent origins cannot write through arbitrary aliases");
+});
+
+test("parent preflight only permits JSON POST and never grants credentials or arbitrary headers", () => {
+  const preflight = (overrides: Record<string, string> = {}) => newsletterPreflight(new Request("https://rewards.tincta.xyz/api/newsletter", { method: "OPTIONS", headers: {
+    Origin: "https://tincta.xyz", "Access-Control-Request-Method": "POST", "Access-Control-Request-Headers": "content-type", ...overrides,
+  } }), env);
+  const response = preflight();
+  assert.equal(response.status, 204);
+  assert.equal(response.headers.get("access-control-allow-origin"), "https://tincta.xyz");
+  assert.equal(response.headers.get("access-control-allow-methods"), "POST");
+  assert.equal(response.headers.get("access-control-allow-headers"), "Content-Type");
+  assert.equal(preflight({ Origin: "https://attacker.example" }).status, 403);
+  assert.equal(preflight({ "Access-Control-Request-Method": "DELETE" }).status, 403);
+  assert.equal(preflight({ "Access-Control-Request-Headers": "content-type, x-vercel-forwarded-for" }).status, 403);
+});
+
+test("trusted parent can read validation, quota and storage errors for inline retry", async (t) => {
+  t.mock.method(console, "error", () => {});
+  for (const status of [400, 429, 503]) {
+    const store = repository();
+    if (status === 429) store.consumeRateLimit = async () => false;
+    if (status === 503) store.save = async () => { throw new Error("Unavailable"); };
+    const response = await registerNewsletter(request(status === 400 ? {} : undefined, { Origin: "https://tincta.xyz" }, "https://rewards.tincta.xyz/api/newsletter"), store, env);
+    assert.equal(response.status, status);
+    assert.equal(response.headers.get("access-control-allow-origin"), "https://tincta.xyz");
+    assert.deepEqual(store.emails, []);
+  }
+});
+
+test("production localhost requires explicit opt-in and cannot bypass hosted network attribution", async () => {
+  const store = repository();
+  const config = { NODE_ENV: "production", NEWSLETTER_IP_HASH_SECRET: env.NEWSLETTER_IP_HASH_SECRET, NEWSLETTER_ALLOW_LOCAL_PREVIEW: "1" };
+  const localRequest = () => request(undefined, { Origin: "http://127.0.0.1:3101" }, "http://127.0.0.1:3101/api/newsletter");
+  assert.equal((await registerNewsletter(localRequest(), store, { ...config, NEWSLETTER_ALLOW_LOCAL_PREVIEW: "" })).status, 503);
+  assert.equal((await registerNewsletter(localRequest(), store, { ...config, VERCEL: "1" })).status, 503);
+  assert.equal((await registerNewsletter(localRequest(), store, config)).status, 200);
+  assert.equal((await registerNewsletter(request(undefined, { Origin: "http://public.example" }, "http://public.example/api/newsletter"), store, config)).status, 503);
+  assert.equal(store.emails.length, 1);
 });

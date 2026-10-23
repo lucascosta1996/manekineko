@@ -25,12 +25,14 @@ The generator produces the shared `RewardsArtwork` component, all three public S
 
 ## Application
 
-- Parent Landing: hero artwork and Rewards project panel.
+- Parent Landing: Rewards project panel.
 - Rewards Landing: hero, header and footer.
 - Web/docs: shared header/footer and wallet collection welcome artwork.
 - Launch: shared branding in login, sidebar, mobile navigation and loading/error/not-found shells.
 - Generated Mainnet X images: Open artwork beside the Ligature wordmark. Sepolia retains its existing neutral network branding.
 
 The artwork keeps its approved warm palette; it does not cycle through season colors or rotate. Existing seasonal palettes, Morph/Assembly artwork, protocol behavior and frozen exports are unchanged. This is a local implementation; publishing the apps or updating an X account is separate.
+
+The Rewards hero has a user-requested floating animation (23 October 2026): the folds gently open and settle while the center lifts independently over eight seconds. Landing-scoped CSS translates the original planes without changing their paths, palette or orientation. The reserved square prevents layout movement. Motion pauses offscreen/in hidden tabs and reduced-motion preferences show the canonical static composition, including before hydration. Other placements remain static. The existing hero pause-control exception in the visual standard applies.
 
 Local verification and remaining evidence boundaries are recorded in `verification.md`.

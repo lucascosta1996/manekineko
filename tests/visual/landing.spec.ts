@@ -197,10 +197,20 @@ test.describe('Landing asynchronous production states', () => {
   await expect(form).toContainText('You’re on the list.');expect(await button.boundingBox()).toEqual(before);
   await expect(page.locator('footer')).toHaveCount(1);await expect(page.locator('footer')).toContainText('©');
  });
- test('mobile navigation, FAQ, missing image and support dialog',async({page})=>{
+ test('mobile navigation, FAQ, missing image and support dialog',async({page,browserName})=>{
   await prepare(page);await page.setViewportSize({width:390,height:568});
   await page.route('**/artwork/*.svg',r=>r.abort());await page.goto(`${urls.landing}/rewards`);await ready(page);
-  await page.getByRole('button',{name:'Open navigation'}).click();await page.keyboard.press('Escape');await expect(page.getByRole('button',{name:'Open navigation'})).toBeFocused();
+  const menu=page.getByRole('button',{name:'Open navigation'});
+  await menu.focus();await page.keyboard.press('Enter');
+  const navigation=page.getByRole('navigation',{name:'Mobile navigation'});
+  await expect(navigation).toBeVisible();
+  await expect(page.getByRole('button',{name:'Close navigation'})).toHaveAttribute('aria-expanded','true');
+  // macOS WebKit uses Option+Tab to include links in keyboard navigation.
+  await page.keyboard.press(browserName === 'webkit' && process.platform === 'darwin' ? 'Alt+Tab' : 'Tab');
+  await expect(navigation.getByRole('link',{name:'Rewards',exact:true})).toBeFocused();
+  await page.keyboard.press('Escape');await expect(menu).toBeFocused();
+  await menu.click();await navigation.getByRole('link',{name:'Join the launch list'}).click();
+  await expect(navigation).toBeHidden();await expect(page).toHaveURL(/#launch-list$/);
   await page.getByText('How can I verify the contract?',{exact:true}).click();await expect(page.locator('details[open]')).toHaveCount(1);
   await expect(page.locator('.artwork-fallback')).toHaveCount(6);
   await page.getByRole('button',{name:'Support',exact:true}).click();await expect(page.getByRole('dialog')).toBeVisible();
@@ -239,19 +249,71 @@ test('Landing late response cannot restore fresh availability while offline', as
  await expect(page.locator('.collection-announcement')).toHaveAttribute('data-phase','ready');
 });
 
-test('Landing keeps the approved Open artwork stable across motion preferences', async ({page}) => {
+for (const width of [320,390,768,1280,1440]) test(`Landing Open hero motion preserves geometry and respects preferences ${width}`, async ({page}, info) => {
+ test.skip(info.project.name !== 'chromium' && ![390,1440].includes(width), 'Secondary engines cover phone and desktop.');
+ await page.setViewportSize({width,height:width < 768 ? 844 : 900});
  await page.emulateMedia({reducedMotion:'no-preference'});await prepare(page);await page.goto(`${urls.landing}/rewards`);await ready(page);
+ const container=page.locator('.hero-art');
  const artwork=page.locator('.hero-art [data-tincta-artwork="open"]');
  await expect(artwork).toHaveCount(1);
+ await expect(container).toHaveAttribute('data-motion','running');
  const original=await artwork.innerHTML();
- await expect(artwork).toHaveCSS('animation-name','none');
- await page.clock.runFor(7000);expect(await artwork.innerHTML()).toBe(original);
+ const cta=page.getByRole('link',{name:'Explore the rewards',exact:true});
+ const layout=await cta.boundingBox();
+ const frame=async (time:number) => artwork.evaluate((svg,time) => {
+  for(const animation of svg.getAnimations({subtree:true})) { animation.pause();animation.currentTime=time; }
+  return [...svg.querySelectorAll('path')].map(path=>{
+   const bounds=path.getBoundingClientRect();
+   return {x:bounds.x,y:bounds.y,width:bounds.width,height:bounds.height,fill:getComputedStyle(path).fill};
+  });
+ },time);
+ const initial=await frame(0);
+ for(const time of [2000,4000,6000]) {
+  const planes=await frame(time);
+  expect(planes[0].y).toBeLessThan(initial[0].y);
+  expect(planes[8].y-initial[8].y).toBeLessThan(planes[7].y-initial[7].y);
+  const box=(await container.boundingBox())!;
+  planes.forEach((plane,index)=>{
+   expect(plane.fill).toBe(initial[index].fill);
+   expect(plane.width).toBeCloseTo(initial[index].width,1);
+   expect(plane.height).toBeCloseTo(initial[index].height,1);
+   expect(plane.x).toBeGreaterThanOrEqual(box.x);
+   expect(plane.x+plane.width).toBeLessThanOrEqual(box.x+box.width);
+   expect(plane.y).toBeGreaterThanOrEqual(box.y);
+   expect(plane.y+plane.height).toBeLessThanOrEqual(box.y+box.height);
+  });
+  expect(await cta.boundingBox()).toEqual(layout);
+  await page.screenshot({path:info.outputPath(`open-${width}-${time}.png`),animations:'allow'});
+ }
+ expect(await frame(8000)).toEqual(initial);
+ expect(await artwork.innerHTML()).toBe(original);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+ // Reload before lifecycle checks: WAAPI scrubbing can retain script-owned
+ // animations in Chromium after the originating CSS rule is removed.
+ await page.reload();await ready(page);
+ await expect(container).toHaveAttribute('data-motion','running');
+ await page.evaluate(()=>window.scrollTo({top:document.body.scrollHeight,behavior:'instant'}));
+ await expect(container).toHaveAttribute('data-motion','paused');
+ await expect(artwork).toHaveCSS('animation-play-state','paused');
+ await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
+ await expect(container).toHaveAttribute('data-motion','running');
+ await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));});
+ await expect(container).toHaveAttribute('data-motion','paused');
+ await page.evaluate(()=>{delete (document as any).hidden;document.dispatchEvent(new Event('visibilitychange'));});
+ await expect(container).toHaveAttribute('data-motion','running');
  await page.emulateMedia({reducedMotion:'reduce'});
  await expect(page.locator('.site')).toHaveClass(/motion-paused/);
+ expect(await artwork.evaluate(svg=>svg.getAnimations({subtree:true}).length)).toBe(0);
+ await expect(artwork).toHaveCSS('transform','none');
+ for(const path of await artwork.locator('path').all()) await expect(path).toHaveCSS('transform','none');
  await expect(page.locator('.affiliate-rings')).toHaveCSS('animation-name','none');
  await page.clock.runFor(7000);expect(await artwork.innerHTML()).toBe(original);
+ await page.screenshot({path:info.outputPath(`open-${width}-reduced.png`)});
  await page.emulateMedia({reducedMotion:'no-preference'});
  await expect(page.locator('.site')).not.toHaveClass(/motion-paused/);
+ await expect(artwork).toHaveCSS('animation-play-state','running');
+ // Brand artwork elsewhere stays static even when the hero is moving.
+ expect(await page.locator('.header [data-tincta-artwork="open"]').evaluate(svg=>svg.getAnimations({subtree:true}).length)).toBe(0);
  await expect(page.locator('.affiliate-rings')).toHaveCSS('animation-play-state','running');
 });
 
@@ -270,3 +332,27 @@ test('Landing recovery focuses the empty status without stealing moved focus', a
  const cta=page.getByRole('link',{name:'Explore the rewards',exact:true});await cta.focus();release();
  await expect(region).toHaveAttribute('data-phase','ready');await expect(cta).toBeFocused();
 });
+
+for (const width of [320, 390, 768, 1280, 1440]) {
+ test(`Landing compact navigation and footer ${width}`, async ({page}, info) => {
+  test.skip(info.project.name !== 'chromium' && ![390,1440].includes(width), 'Primary engine covers every viewport.');
+  await page.setViewportSize({width,height:900});await prepare(page);await page.goto(`${urls.landing}/rewards`);await ready(page);
+  expect((await page.locator('.header').boundingBox())?.height).toBe(56);
+  const menu=page.getByRole('button',{name:'Open navigation'});
+  if(width<960) {
+   await expect(menu).toBeVisible();await menu.click();
+   const navigation=page.getByRole('navigation',{name:'Mobile navigation'});
+   await expect(navigation.getByRole('link')).toHaveCount(7);
+   for(const link of await navigation.getByRole('link').all()) expect((await link.boundingBox())?.height).toBeGreaterThanOrEqual(44);
+   await page.screenshot({path:`test-results/rewards-menu-${info.project.name}-${width}.png`});
+   await page.keyboard.press('Escape');
+  } else { await expect(menu).toBeHidden();await expect(page.getByRole('navigation',{name:'Main navigation'})).toBeVisible(); }
+  const footer=page.locator('footer');await expect(footer).toHaveClass(/ui-footer-compact/);
+  const explore=footer.getByRole('navigation',{name:'Explore'}), connect=footer.getByRole('navigation',{name:'Connect'});
+  expect((await explore.boundingBox())?.y).toBe((await connect.boundingBox())?.y);
+  for(const link of await footer.locator('a,button').all()) expect((await link.boundingBox())?.height).toBeGreaterThanOrEqual(32);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
+  await footer.screenshot({path:`test-results/rewards-footer-${info.project.name}-${width}.png`});
+  await page.clock.resume();expect((await new AxeBuilder({page}).include('footer').analyze()).violations).toEqual([]);
+ });
+}

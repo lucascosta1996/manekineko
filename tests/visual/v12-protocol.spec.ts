@@ -21,7 +21,7 @@ for (const width of [320, 390, 768, 1280, 1440])
       await ready(page);
       await expect(
         page.getByText(
-          '60% winning tickets · 20% qualified affiliates · 20% operator.'
+          '60% winning tickets · 20% qualified affiliates · 20% protocol treasury.'
         )
       ).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);

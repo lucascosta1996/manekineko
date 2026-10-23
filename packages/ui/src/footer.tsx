@@ -9,12 +9,14 @@ export function PublicFooter({
   brand,
   legal,
   actions,
+  density = "default",
   year = new Date().getFullYear(),
 }: {
   links: PublicLinks;
   brand?: ReactNode;
   legal?: ReactNode;
   actions?: ReactNode;
+  density?: "default" | "compact";
   year?: number;
 }) {
   const group = (title: string, entries: [string, string | null][]) => (
@@ -36,7 +38,7 @@ export function PublicFooter({
     </nav>
   );
   return (
-    <footer className="ui-footer">
+    <footer className={`ui-footer${density === "compact" ? " ui-footer-compact" : ""}`}>
       <div className="ui-footer-brand">
         {brand}
         <p className="ui-footer-copy">Rewards governed by smart contracts.</p>

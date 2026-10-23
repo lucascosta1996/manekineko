@@ -30,22 +30,61 @@ export interface NewsletterRepository {
   save(email: string): Promise<void>;
 }
 
-function assertOrigin(request: Request, env: Environment): void {
+const REWARDS_ORIGIN = "https://rewards.tincta.xyz";
+const STUDIO_ORIGINS = new Set(["https://tincta.xyz", "https://www.tincta.xyz"]);
+
+function isLocalPreview(request: Request, env: Environment): boolean {
+  const url = new URL(request.url);
+  return env.VERCEL !== "1" && url.protocol === "http:"
+    && ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname)
+    && (env.NODE_ENV !== "production" || env.NEWSLETTER_ALLOW_LOCAL_PREVIEW === "1");
+}
+
+function assertOrigin(request: Request, env: Environment): string {
   const requestedUrl = new URL(request.url);
-  const local = requestedUrl.protocol === "http:" && ["localhost", "127.0.0.1", "[::1]"].includes(requestedUrl.hostname);
   let origin: string;
   try {
-    const configured = new URL(env.NEWSLETTER_PUBLIC_ORIGIN || (env.NODE_ENV !== "production" && local ? requestedUrl.origin : ""));
+    // The published Rewards domain remains valid after moving off a preview alias.
+    const configured = new URL(requestedUrl.origin === REWARDS_ORIGIN || isLocalPreview(request, env)
+      ? requestedUrl.origin : env.NEWSLETTER_PUBLIC_ORIGIN || "");
     if (configured.username || configured.password || configured.pathname !== "/" || configured.search || configured.hash
-      || (configured.protocol !== "https:" && !(env.NODE_ENV !== "production" && local && configured.origin === requestedUrl.origin))) throw new Error();
+      || (configured.protocol !== "https:" && !isLocalPreview(request, env))) throw new Error();
     origin = configured.origin;
   } catch { throw new NewsletterError("Email registration is not available yet. Please try again later.", 503); }
-  if (request.headers.get("origin") !== origin || requestedUrl.origin !== origin
+  const caller = request.headers.get("origin") ?? "";
+  const trustedStudio = requestedUrl.origin === REWARDS_ORIGIN && STUDIO_ORIGINS.has(caller);
+  let localAlias = false;
+  if (isLocalPreview(request, env)) {
+    try {
+      // `next start` can normalize its internal URL to localhost even when the
+      // browser uses 127.0.0.1. Bind that exception to the actual Host and port.
+      const callerUrl = new URL(caller);
+      localAlias = callerUrl.protocol === "http:" && ["localhost", "127.0.0.1", "[::1]"].includes(callerUrl.hostname)
+        && callerUrl.port === requestedUrl.port && request.headers.get("host") === callerUrl.host && callerUrl.origin === caller;
+    } catch { /* Invalid origins remain rejected below. */ }
+  }
+  if ((!trustedStudio && !localAlias && caller !== origin) || requestedUrl.origin !== origin
     || request.headers.get("sec-fetch-site") === "cross-site") {
     throw new NewsletterError("Please register from the Tincta website.", 403);
   }
-  if (request.headers.get("content-type")?.split(";")[0].trim().toLowerCase() !== "application/json") {
-    throw new NewsletterError("Send a JSON request.", 415);
+  return caller;
+}
+
+const responseHeaders = { "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff", "Vary": "Origin" };
+
+export function newsletterPreflight(request: Request, env: Environment = process.env): Response {
+  try {
+    const origin = assertOrigin(request, env);
+    const requestedHeaders = (request.headers.get("access-control-request-headers") ?? "").split(",").map(header => header.trim().toLowerCase()).filter(Boolean);
+    if (request.headers.get("access-control-request-method") !== "POST" || requestedHeaders.some(header => header !== "content-type")) {
+      throw new NewsletterError("This signup request is not supported.", 403);
+    }
+    return new Response(null, { status: 204, headers: { ...responseHeaders,
+      "Access-Control-Allow-Origin": origin, "Access-Control-Allow-Methods": "POST", "Access-Control-Allow-Headers": "Content-Type",
+      "Vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+    } });
+  } catch (error) {
+    return Response.json({ error: "Please register from the Tincta website." }, { status: error instanceof NewsletterError ? error.status : 403, headers: responseHeaders });
   }
 }
 
@@ -92,8 +131,8 @@ function networkDigest(request: Request, env: Environment): string {
     const forwarded = request.headers.get("x-vercel-forwarded-for")?.trim();
     if (!forwarded || !isIP(forwarded)) throw new NewsletterError("Your network could not be verified. Please try again.", 503);
     network = isIP(forwarded) === 6 ? new URL(`http://[${forwarded}]/`).hostname.toLowerCase() : forwarded;
-  } else if (env.NODE_ENV !== "production" && ["localhost", "127.0.0.1", "[::1]"].includes(new URL(request.url).hostname)) {
-    // Local development has one shared quota; client-supplied forwarding headers are not trusted.
+  } else if (isLocalPreview(request, env)) {
+    // Local previews have one shared quota; client-supplied forwarding headers are not trusted.
     network = "local-development";
   } else {
     throw new NewsletterError("Email registration is not available yet. Please try again later.", 503);
@@ -102,9 +141,12 @@ function networkDigest(request: Request, env: Environment): string {
 }
 
 export async function registerNewsletter(request: Request, repository: NewsletterRepository, env: Environment = process.env): Promise<Response> {
-  const headers = { "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff", "Vary": "Origin" };
+  const headers: Record<string, string> = { ...responseHeaders };
   try {
-    assertOrigin(request, env);
+    headers["Access-Control-Allow-Origin"] = assertOrigin(request, env);
+    if (request.headers.get("content-type")?.split(";")[0].trim().toLowerCase() !== "application/json") {
+      throw new NewsletterError("Send a JSON request.", 415);
+    }
     const body = await readBody(request);
     if (body.website !== undefined && body.website !== "") throw new NewsletterError("Unable to accept this registration.", 400);
     const email = normalizeNewsletterEmail(body.email);

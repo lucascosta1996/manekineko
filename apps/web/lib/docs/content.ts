@@ -19,7 +19,11 @@ export const docPages: DocPage[] = [
           },
           {
             "type": "paragraph",
-            "text": "Each successfully finalized collection allocates 60% of mint revenue to winning NFTs, 20% to qualified affiliates and 20% to the operator. These percentages cannot be voted away. All mint funds stay reserved until finalization. Unsold expiry or missing randomness at the fixed cutoff allows full mint-price refunds."
+            "text": "Each successfully finalized collection allocates 60% of mint revenue to winning NFTs, 20% to qualified affiliates and 20% to the protocol treasury to cover current infrastructure costs and fund upcoming Tincta projects. These percentages cannot be voted away. All mint funds stay reserved until finalization. Unsold expiry or missing randomness at the fixed cutoff allows full mint-price refunds."
+          },
+          {
+            "type": "paragraph",
+            "text": "The protocol treasury is the public name for the contract’s ordinary operator allocation. After a successful draw, the fixed operator wallet can withdraw it. The team manages treasury spending; the collection contract does not restrict how withdrawn funds are used. Prize, earned affiliate and refund obligations remain protected."
           },
           {
             "type": "paragraph",
@@ -68,7 +72,7 @@ export const docPages: DocPage[] = [
           },
           {
             "type": "paragraph",
-            "text": "A sold-out collection of 1,000 NFTs at 0.01 ETH collects 10 ETH and allocates 2 ETH to the operator. A collection of 2,000 at the same price collects 20 ETH and allocates 4 ETH. The operator percentage stays 20%, before execution costs."
+            "text": "A sold-out collection of 1,000 NFTs at 0.01 ETH collects 10 ETH and allocates 2 ETH to the protocol treasury after a successful draw. A collection of 2,000 at the same price collects 20 ETH and allocates 4 ETH. The treasury allocation stays 20%, intended to cover current infrastructure costs and fund upcoming Tincta projects. The fixed operator wallet withdraws and manages these funds; this purpose is not an onchain spending restriction."
           },
           {
             "type": "paragraph",
@@ -142,7 +146,7 @@ export const docPages: DocPage[] = [
           },
           {
             "type": "paragraph",
-            "text": "Preparation funds randomness, sponsorship and a 0.01 ETH executor reward separately from mint receipts, then publishes the voting schedule. After verified randomness arrives, the operator can finalize the draw, withdraw the remaining 20% and prepare the next collection in one transaction. A scheduled opening happens at the voting deadline without another signature. The dashboard shows pending actions and the current collection’s timing."
+            "text": "Preparation funds randomness, sponsorship and a 0.01 ETH executor reward separately from mint receipts, then publishes the voting schedule. After verified randomness arrives, the operator can finalize the draw, withdraw the remaining 20% protocol treasury allocation for infrastructure and future Tincta projects, and prepare the next collection in one transaction. A scheduled opening happens at the voting deadline without another signature. The dashboard shows pending actions and the current collection’s timing."
           },
           {
             "type": "paragraph",
@@ -230,7 +234,7 @@ export const docPages: DocPage[] = [
           },
           {
             "type": "paragraph",
-            "text": "Claim your equal affiliate share from Affiliates after successful draw finalization; you do not need to wait for prize holders. Until then, the entire mint revenue stays reserved. Unsold expiry or a randomness timeout returns mint funds to holders and creates no affiliate or operator mint proceeds."
+            "text": "Claim your equal affiliate share from Affiliates after successful draw finalization; you do not need to wait for prize holders. Until then, the entire mint revenue stays reserved. Unsold expiry or a randomness timeout returns mint funds to holders and creates no affiliate payout or protocol treasury allocation from mint revenue."
           }
         ]
       }
