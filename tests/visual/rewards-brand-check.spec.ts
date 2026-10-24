@@ -14,7 +14,8 @@ for (const [app, routes] of Object.entries({landing:['/rewards'],web:['/docs','/
     expect(ratio).toBeCloseTo(3947 / 780, 1);
     await expect(brand.locator('.ui-rewards-label')).toHaveText('Rewards');
     const metrics=await brand.evaluate(el=>{const box=el.getBoundingClientRect(),s=getComputedStyle(el.querySelector('.ui-rewards-label')!);return {left:box.left,right:box.right,gap:getComputedStyle(el).gap,size:s.fontSize,radius:s.borderRadius};});
-    expect(metrics.left).toBeGreaterThanOrEqual(0);expect(metrics.right).toBeLessThanOrEqual(width);expect(metrics.gap).toBe('14px');expect(metrics.size).toBe('13px');expect(metrics.radius).toBe('3px');
+    const compact = await brand.evaluate(el => el.classList.contains('ui-rewards-brand-compact'));
+    expect(metrics.left).toBeGreaterThanOrEqual(0);expect(metrics.right).toBeLessThanOrEqual(width);expect(metrics.gap).toBe(compact ? '8px' : '14px');expect(metrics.size).toBe(compact ? '12px' : '13px');expect(metrics.radius).toBe('3px');
    }
    expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1)).toBe(false);
    const routeName = route.replaceAll('/','').replace(/[^a-zA-Z0-9_-]+/g,'-') || 'home';

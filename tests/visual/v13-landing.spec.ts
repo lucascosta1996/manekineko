@@ -16,7 +16,7 @@ for (const [width, height] of widths)
       name: "Not a winner, but still a holder?",
     });
     await section.scrollIntoViewIfNeeded();
-    await expect(section).toContainText("PLANNED FOR V13");
+    await expect(section).toContainText("PLANNED FOR LAUNCH");
     await expect(section).toContainText("first 5%");
     await expect(
       section.getByRole("link", { name: "Explore holder rewards" })

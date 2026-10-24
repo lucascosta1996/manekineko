@@ -83,3 +83,19 @@ test("current guides preserve economic floors, holder claims and deployment boun
   assert.match(text("refunds"), /No operator cancellation or approval/);
   assert.match(text("affiliates"), /No server-issued admission permit/);
 });
+
+test("diagrams and formulas are included in search and explain the draw's boundaries", () => {
+  const entries = docPages.map(docSearchEntry);
+  for (const page of docPages) assert.ok(page.sections.some(section => section.blocks.some(block => ['flow', 'formula', 'allocation'].includes(block.type))), page.slug);
+  assert.ok(searchDocs(entries, 'modulo bias').some(page => page.slug === 'prizes'));
+  assert.ok(searchDocs(entries, 'Feistel').some(page => page.slug === 'verification'));
+  assert.ok(searchDocs(entries, 'L =').some(page => page.slug === 'holder-rewards'));
+  assert.doesNotMatch(entries.map(entry => entry.text + entry.description).join(' '), /\bV\d+\b/);
+  const allocation = docPages[0].sections.flatMap(section => section.blocks).find(block => block.type === 'allocation');
+  assert.ok(allocation?.type === 'allocation');
+  assert.equal(allocation.items.reduce((sum, item) => sum + item.share, 0), 100);
+  const holders = entries.find(entry => entry.slug === 'holder-rewards')!.text;
+  assert.match(holders, /L is greater than zero/);
+  assert.match(holders, /pending transaction does not reserve/);
+  assert.match(entries.find(entry => entry.slug === 'prizes')!.text, /does not randomly shuffle all losing NFTs/);
+});

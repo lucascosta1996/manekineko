@@ -1,5 +1,7 @@
 # Visual-system adoption audit
 
+**2026-10-24 compact Web update:** Smaller header branding, the first-party wallet account menu and versionless illustrated guides are documented in [the scoped verification record](compact-navigation-docs-2026-10-24.md). Its 317 passing browser checks are local evidence; deployment and real-wallet acceptance remain separate.
+
 **Implementation follow-up:** The local source migration and browser/CI harness are recorded in [the implementation and verification record](implementation-2026-09-28.md). The findings below preserve the initial source evidence; they are not a claim that the former defects remain unchanged. Read the follow-up for actual results and open verification boundaries.
 
 ## Current local implementation status

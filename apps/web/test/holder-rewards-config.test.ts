@@ -56,7 +56,7 @@ test("partial V13 configuration cannot silently fall back to a V12 deployment", 
     });
     assert.equal(protocolConfig()?.version, undefined);
     process.env.NEXT_PUBLIC_V13_HOLDER_REWARDS_CODE_HASH = pins.codeHash;
-    assert.throws(() => protocolConfig(), /V13 deployment pins/);
+    assert.throws(() => protocolConfig(), /Invalid deployment pins/);
     Object.assign(process.env, {
       NEXT_PUBLIC_V13_CONTROLLER: pins.controller,
       NEXT_PUBLIC_V13_CHAIN_ID: "11155111",

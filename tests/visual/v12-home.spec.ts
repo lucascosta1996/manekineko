@@ -283,9 +283,10 @@ test("live action reflows with enlarged text, keyboard navigation and coarse tar
   await expect(
     page.getByRole("heading", { name: "Cast your vote" })
   ).toBeVisible();
-  const m = await metrics(page, ".header-wallet .ui-button");
+  const m = await metrics(page, ".header-wallet .ui-button:visible");
   expect(m.height).toBeGreaterThanOrEqual(44);
-  expect(m.padding[0]).toBe("11px");
+  expect(m.width).toBeGreaterThanOrEqual(44);
+  expect(m.padding).toEqual(["12px", "12px", "12px", "12px"]);
   await page.getByRole("button", { name: "Open menu" }).focus();
   await page.keyboard.press("Enter");
   await expect(

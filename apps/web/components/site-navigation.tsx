@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@manekineko/ui/button";
+import { IconButton } from "@manekineko/ui/button";
 
 import { Icon } from "@manekineko/ui/icons";
 
@@ -13,6 +13,16 @@ export function SiteNavigation({ section, protocolEnabled = false }: { section: 
   const navigationId = useId();
   const container = useRef<HTMLDivElement>(null);
   const toggle = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const header = container.current?.closest("header");
+    const shell = header?.parentElement;
+    if (!header || !shell) return;
+    const measure = () => shell.style.setProperty("--web-header-height", `${header.getBoundingClientRect().height}px`);
+    const observer = new ResizeObserver(measure);
+    observer.observe(header); measure();
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const desktop = window.matchMedia("(min-width: 1101px)");
@@ -39,12 +49,9 @@ export function SiteNavigation({ section, protocolEnabled = false }: { section: 
         toggle.current?.focus();
       }
     }}>
-    <Button icon={<Icon name={open ? "close" : "menu"} />} iconPosition="end" variant="ghost" type="button" className="mobile-menu-toggle" ref={toggle}
+    <IconButton variant="ghost" className="mobile-menu-toggle" ref={toggle}
       aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} aria-controls={navigationId}
-      onClick={() => setOpen(value => !value)}>
-      <span>{open ? "Close" : "Menu"}</span>
-
-    </Button>
+      onClick={() => setOpen(value => !value)}><Icon name={open ? "close" : "menu"} /></IconButton>
     <nav id={navigationId} aria-label="Main navigation">
       <Link href="/" aria-current={section === "home" ? "page" : undefined} onClick={() => setOpen(false)}>Participate</Link>
       <Link href="/claims" aria-current={section === "claims" ? "page" : undefined} onClick={() => setOpen(false)}>Rewards</Link>

@@ -19,13 +19,9 @@ export function SiteShell({ children, section = "home", chainId = null, classNam
           href="/"
           aria-label="Tincta Rewards home"
         >
-          <RewardsBrand decorative><TinctaWordmark className="tincta-wordmark" title="" /></RewardsBrand>
+          <RewardsBrand decorative compact><TinctaWordmark title="" /></RewardsBrand>
         </Link>
         <SiteNavigation section={section} protocolEnabled={protocolEnabled} />
-        {section !== "docs" && <span className="environment-badge">
-          <span aria-hidden="true" />
-          {chainId === 11155111 ? "Sepolia testnet" : chainId === 1 ? "Ethereum Mainnet" : "Project preview"}
-        </span>}
         <HeaderWallet chainId={chainId} />
       </header>
       <main id="main">{children}</main>

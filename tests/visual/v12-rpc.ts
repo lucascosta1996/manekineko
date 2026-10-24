@@ -130,9 +130,9 @@ export async function rpc(page: Page, phase = 0, badPin = false, settings: { dea
   });
 }
 
-export async function installRejectingWallet(page: Page, account = A) {
+export async function installRejectingWallet(page: Page, account = A, identity?: { name: string; uuid: string; rdns: string }) {
   await page.addInitScript(
-    ({ address }) => {
+    ({ address, identity }) => {
       const submissions: unknown[] = [];
       const requests: unknown[] = [];
       const listeners = new Map<string, Set<(...args: unknown[]) => void>>();
@@ -164,7 +164,7 @@ export async function installRejectingWallet(page: Page, account = A) {
           ).result;
         },
       };
-      Object.assign(window, { __v12Submissions: submissions, __v12WalletRequests: requests,
+      if (!identity) Object.assign(window, { __v12Submissions: submissions, __v12WalletRequests: requests,
         __v12ChangeAccount: (next: string) => { activeAddress = next; emit('accountsChanged', [next]); },
         __v12ChangeChain: (next: string) => { activeChain = next; emit('chainChanged', next); },
       });
@@ -173,10 +173,10 @@ export async function installRejectingWallet(page: Page, account = A) {
           new CustomEvent('eip6963:announceProvider', {
             detail: {
               info: {
-                uuid: '12121212-1212-4212-8212-121212121212',
-                name: 'V12 fixture wallet',
+                uuid: identity?.uuid ?? '12121212-1212-4212-8212-121212121212',
+                name: identity?.name ?? 'V12 fixture wallet',
                 icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"/>',
-                rdns: 'invalid.v12',
+                rdns: identity?.rdns ?? 'invalid.v12',
               },
               provider,
             },
@@ -184,6 +184,6 @@ export async function installRejectingWallet(page: Page, account = A) {
         )
       );
     },
-    { address: account }
+    { address: account, identity }
   );
 }

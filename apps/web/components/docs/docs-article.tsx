@@ -3,9 +3,11 @@ import Link from "next/link";
 import { docPages } from "../../lib/docs/content";
 import { docGroups, docHref, type DocBlock, type DocPage } from "../../lib/docs/model";
 import { DocsOutline } from "./docs-outline";
+import { DocsVisual } from "./docs-visual";
 
 function Block({ block, sectionTitle }: { block: DocBlock; sectionTitle: string }) {
   switch (block.type) {
+    case "flow": case "formula": case "allocation": return <DocsVisual block={block} />;
     case "paragraph": return <p>{block.text}</p>;
     case "list": {
       const List = block.ordered ? "ol" : "ul";

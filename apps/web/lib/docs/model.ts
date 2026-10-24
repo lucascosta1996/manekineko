@@ -3,6 +3,9 @@ export type DocBlock =
   | { type: "list"; ordered?: boolean; items: string[] }
   | { type: "callout"; title: string; text: string }
   | { type: "table"; columns: string[]; rows: string[][] }
+  | { type: "flow"; title: string; steps: { title: string; text: string }[]; branches?: { title: string; text: string }[]; caption: string }
+  | { type: "formula"; title: string; equations: string[]; definitions: { symbol: string; meaning: string }[]; note: string }
+  | { type: "allocation"; title: string; items: { label: string; share: number; text: string }[]; caption: string }
   | { type: "links"; items: { label: string; description: string; href: string }[] };
 
 export interface DocSection { id: string; title: string; blocks: DocBlock[] }
@@ -32,6 +35,9 @@ export function docSearchEntry(page: DocPage): DocSearchEntry {
       case "callout": return [block.title, block.text];
       case "list": return block.items;
       case "table": return [...block.columns, ...block.rows.flat()];
+      case "flow": return [block.title, ...block.steps.flatMap(step => [step.title, step.text]), ...(block.branches ?? []).flatMap(branch => [branch.title, branch.text]), block.caption];
+      case "formula": return [block.title, ...block.equations, ...block.definitions.flatMap(entry => [entry.symbol, entry.meaning]), block.note];
+      case "allocation": return [block.title, ...block.items.flatMap(item => [item.label, `${item.share}%`, item.text]), block.caption];
       case "links": return block.items.flatMap(item => [item.label, item.description]);
     }
   })]).join(" ");

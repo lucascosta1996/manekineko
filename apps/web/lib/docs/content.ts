@@ -1,7 +1,8 @@
 import type { DocPage } from "./model";
+import { withDocVisuals } from "./visuals.ts";
 
 // Current onchain experience. Historical contracts retain their immutable terms.
-export const docPages: DocPage[] = [
+export const docPages: DocPage[] = withDocVisuals([
   {
     "slug": "overview",
     "title": "How rewards work",
@@ -19,11 +20,11 @@ export const docPages: DocPage[] = [
           },
           {
             "type": "paragraph",
-            "text": "New V13 seasons allocate 60% of mint revenue to winning NFTs, 20% to qualified affiliates, 8% to season holder rewards and 12% to the protocol treasury for infrastructure and upcoming projects. V13 is a new contract version pending deployment; existing V12 collections retain their 60/20/20 allocation and have no holder pool. These percentages cannot be voted away. Actual ETH allocations vary with the community-selected mint prices and supplies and the revenue received. All mint funds stay reserved until finalization. Unsold expiry or missing randomness at the fixed cutoff allows full mint-price refunds."
+            "text": "Tincta seasons allocate 60% of mint revenue to winning NFTs, 20% to qualified affiliates, 8% to season holder rewards and 12% to the protocol treasury for infrastructure and upcoming projects. These rules are planned for launch. Always review the terms of the selected collection before participating. These percentages cannot be voted away. Actual ETH allocations vary with the community-selected mint prices and supplies and the revenue received. All mint funds stay reserved until finalization. Unsold expiry or missing randomness at the fixed cutoff allows full mint-price refunds."
           },
           {
             "type": "paragraph",
-            "text": "The protocol treasury is the public name for the contract’s ordinary operator allocation. After a successful draw, the fixed operator wallet can withdraw it. The team manages treasury spending; the collection contract does not restrict how withdrawn funds are used. Prize, earned affiliate and refund obligations remain protected. V13 holder funds are held separately in a season pool with no operator withdrawal."
+            "text": "The protocol treasury is the public name for the contract’s ordinary operator allocation. After a successful draw, the fixed operator wallet can withdraw it. The team manages treasury spending; the collection contract does not restrict how withdrawn funds are used. Prize, earned affiliate and refund obligations remain protected. Holder funds are held separately in a season pool with no operator withdrawal."
           },
           {
             "type": "paragraph",
@@ -41,7 +42,7 @@ export const docPages: DocPage[] = [
         "blocks": [
           {
             "type": "paragraph",
-            "text": "Open Participate to vote or mint in the current collection and follow the draw. Rewards shows all winning NFT holder addresses, prizes and refunds; choose an earlier collection there at any time. Affiliates handles enrollment, referral links and affiliate claims. Holders shows the season pool, progress and remaining first-come claim slots for V13 seasons. Connecting a wallet never submits a transaction."
+            "text": "Open Participate to vote or mint in the current collection and follow the draw. Rewards shows all winning NFT holder addresses, prizes and refunds; choose an earlier collection there at any time. Affiliates handles enrollment, referral links and affiliate claims. Holders shows the season pool, progress and remaining first-come claim slots for each season. Connecting a wallet never submits a transaction."
           }
         ]
       }
@@ -50,12 +51,12 @@ export const docPages: DocPage[] = [
   {
     "slug": "holder-rewards",
     "title": "Season holder rewards",
-    "description": "The 8% season pool, 5% NFT coverage and first-come claims in V13.",
+    "description": "The 8% season pool, 5% NFT coverage and first-come claims.",
     "group": "The protocol",
     "minutes": 5,
     "sections": [
       { "id": "pool", "title": "Not a winner, but still a holder?", "blocks": [
-        { "type": "paragraph", "text": "New V13 collections automatically send 8% of mint receipts to a separate season holder pool when a draw finalizes. This contract has no operator withdrawal. The ordinary 12% treasury allocation remains withdrawable by the fixed operator for infrastructure and upcoming projects. V13 is pending deployment; existing collections are not upgraded and do not gain a new holder entitlement." },
+        { "type": "paragraph", "text": "Tincta collections automatically send 8% of mint receipts to a separate season holder pool when a draw finalizes. This contract has no operator withdrawal. The ordinary 12% treasury allocation remains withdrawable by the fixed operator for infrastructure and upcoming projects. Season holder rewards are planned for launch. Check the selected collection’s terms and pool availability before participating." },
         { "type": "paragraph", "text": "The pool is locked until every collection in its sealed season has completed a successful draw or become refundable. Unpaid prizes and refunds do not delay the unlock. No calendar timer, website switch or operator approval releases the pool. Before completion, the page shows accumulated ETH, settled collections and provisional claim estimates. A season has at most ten collections. Preparing the next season is not required to unlock this one." }
       ]},
       { "id": "dynamic-amounts", "title": "Different seasons, different amounts", "blocks": [
@@ -76,7 +77,7 @@ export const docPages: DocPage[] = [
         { "type": "links", "items": [{ "label": "Open holder rewards", "description": "Select a collection to view its season pool, settlement progress and claim availability.", "href": "/holders" }] }
       ]},
       { "id": "refunds", "title": "Failed collections keep full refunds", "blocks": [
-        { "type": "paragraph", "text": "Unsold or randomness-timeout collections do not contribute funds or eligible NFTs to this pool. Their full mint receipts remain reserved for NFT refunds. If every collection is refundable, the season ends with no holder claims. Already deployed versions keep their own immutable rules." }
+        { "type": "paragraph", "text": "Unsold or randomness-timeout collections do not contribute funds or eligible NFTs to this pool. Their full mint receipts remain reserved for NFT refunds. If every collection is refundable, the season ends with no holder claims. Always check the selected collection’s immutable terms." }
       ]}
     ]
   },
@@ -105,7 +106,7 @@ export const docPages: DocPage[] = [
           },
           {
             "type": "paragraph",
-            "text": "For illustration, a successful V13 collection of 1,000 NFTs at 0.01 ETH collects 10 ETH: 6 ETH for prizes, 2 ETH for affiliates, 0.8 ETH for season holders and 1.2 ETH for the treasury. The V13 treasury allocation stays 12%, intended to cover current infrastructure costs and fund upcoming Tincta projects. Existing V12 contracts keep their 20% treasury allocation. The fixed operator wallet withdraws and manages these funds; this purpose is not an onchain spending restriction."
+            "text": "For illustration, a successful collection of 1,000 NFTs at 0.01 ETH collects 10 ETH: 6 ETH for prizes, 2 ETH for affiliates, 0.8 ETH for season holders and 1.2 ETH for the treasury. The treasury allocation stays 12%, intended to cover current infrastructure costs and fund upcoming Tincta projects. The fixed operator wallet withdraws and manages these funds; this purpose is not an onchain spending restriction."
           },
           {
             "type": "paragraph",
@@ -138,7 +139,7 @@ export const docPages: DocPage[] = [
         "blocks": [
           {
             "type": "paragraph",
-            "text": "Select Connect wallet in the header to open Reown AppKit. Choose an installed Ethereum wallet or connect a mobile wallet with WalletConnect. The header shows your connected address and network across Participate, Rewards, Affiliates, Holders and these docs. Open it to manage or disconnect your wallet. Check Ethereum Mainnet or Sepolia, the collection address, final price, supply and mint deadline. Keep enough ETH for the purchase and gas."
+            "text": "Select Connect wallet in the header to open Reown AppKit. Choose an installed Ethereum wallet or connect a mobile wallet with WalletConnect. The header shows your connected address across Participate, Rewards, Affiliates, Holders and these docs. Open it to switch accounts, check the network or disconnect. Check the collection address, final price, supply and mint deadline. Keep enough ETH for the purchase and gas."
           }
         ]
       },
@@ -156,7 +157,7 @@ export const docPages: DocPage[] = [
           },
           {
             "type": "paragraph",
-            "text": "Wait for a confirmed receipt. If the outcome is uncertain, recover the original transaction by its hash rather than sending it again. Keep your token IDs from the transaction’s Transfer events for ticket-specific actions. In V13, follow Holders after a successful draw to see the season pool and its progress. Claims open only after every collection settles, with slots for the first 5% of eligible NFTs. Owning a ticket does not reserve a slot."
+            "text": "Wait for a confirmed receipt. If the outcome is uncertain, recover the original transaction by its hash rather than sending it again. Keep your token IDs from the transaction’s Transfer events for ticket-specific actions. Follow Holders after a successful draw to see the season pool and its progress. Claims open only after every collection settles, with slots for the first 5% of eligible NFTs. Owning a ticket does not reserve a slot."
           }
         ]
       }
@@ -175,11 +176,11 @@ export const docPages: DocPage[] = [
         "blocks": [
           {
             "type": "paragraph",
-            "text": "Season names, collection names, order and geometric artwork are planned before the catalog is sealed. The next collection can be prepared after the previous draw is finalized with all liabilities funded, or refunds become available after unsold expiry or the randomness timeout. Old unpaid prizes and refunds remain reserved. In V13, each successful draw also funds its season’s holder pool. The pool unlocks only when every planned collection in that season has drawn or become refundable; unpaid prizes and refunds do not delay it. The Holders page shows settled-collection progress before and after unlock."
+            "text": "Season names, collection names, order and geometric artwork are planned before the catalog is sealed. The next collection can be prepared after the previous draw is finalized with all liabilities funded, or refunds become available after unsold expiry or the randomness timeout. Old unpaid prizes and refunds remain reserved. Each successful draw also funds its season’s holder pool. The pool unlocks only when every planned collection in that season has drawn or become refundable; unpaid prizes and refunds do not delay it. The Holders page shows settled-collection progress before and after unlock."
           },
           {
             "type": "paragraph",
-            "text": "Preparation funds randomness, sponsorship and a 0.01 ETH executor reward separately from mint receipts, then publishes the voting schedule. After verified randomness arrives, the operator can finalize the draw, withdraw the remaining protocol treasury allocation (12% in V13; 20% in V12) for infrastructure and future Tincta projects, and prepare the next collection in one transaction. A scheduled opening happens at the voting deadline without another signature. The dashboard shows pending actions and the current collection’s timing."
+            "text": "Preparation funds randomness, sponsorship and a 0.01 ETH executor reward separately from mint receipts, then publishes the voting schedule. After verified randomness arrives, the operator can finalize the draw, withdraw the remaining protocol treasury allocation under the selected collection’s terms for infrastructure and future Tincta projects, and prepare the next collection in one transaction. A scheduled opening happens at the voting deadline without another signature. The dashboard shows pending actions and the current collection’s timing."
           },
           {
             "type": "paragraph",
@@ -216,7 +217,7 @@ export const docPages: DocPage[] = [
         "blocks": [
           {
             "type": "paragraph",
-            "text": "Open Rewards and select the collection. Its winning tickets list reads every current holder address, token ID, prize and claim status from the contract. Only the current holder can claim that ticket’s prize. Unclaimed winning tickets stay transfer-locked. Unpaid prizes remain reserved when later collections open. V13 holder rewards are separate: winning and non-winning NFTs from successful draws can claim from the season pool after season end, while the first-5% slots remain. Claiming one does not consume the other."
+            "text": "Open Rewards and select the collection. Its winning tickets list reads every current holder address, token ID, prize and claim status from the contract. Only the current holder can claim that ticket’s prize. Unclaimed winning tickets stay transfer-locked. Unpaid prizes remain reserved when later collections open. Holder rewards are separate: winning and non-winning NFTs from successful draws can claim from the season pool after season end, while the first-5% slots remain. Claiming one does not consume the other."
           }
         ]
       },
@@ -267,7 +268,7 @@ export const docPages: DocPage[] = [
           },
           {
             "type": "paragraph",
-            "text": "Claim your equal affiliate share from Affiliates after successful draw finalization; you do not need to wait for prize holders. Until then, the entire mint revenue stays reserved. Unsold expiry or a randomness timeout returns mint funds to holders and creates no affiliate payout, V13 holder contribution or protocol treasury allocation from mint revenue."
+            "text": "Claim your equal affiliate share from Affiliates after successful draw finalization; you do not need to wait for prize holders. Until then, the entire mint revenue stays reserved. Unsold expiry or a randomness timeout returns mint funds to holders and creates no affiliate payout, holder contribution or protocol treasury allocation from mint revenue."
           }
         ]
       }
@@ -290,7 +291,7 @@ export const docPages: DocPage[] = [
           },
           {
             "type": "paragraph",
-            "text": "Select the collection, enter your token ID and review the refund transaction. Each ticket can be refunded once. Burned tickets no longer exist, and refunds do not restore the cumulative mint allowance. A refundable collection contributes neither ETH nor eligible NFTs to the V13 holder pool, even if its holders have not requested refunds. Its full mint receipts remain reserved for those refunds."
+            "text": "Select the collection, enter your token ID and review the refund transaction. Each ticket can be refunded once. Burned tickets no longer exist, and refunds do not restore the cumulative mint allowance. A refundable collection contributes neither ETH nor eligible NFTs to the holder pool, even if its holders have not requested refunds. Its full mint receipts remain reserved for those refunds."
           },
           {
             "type": "paragraph",
@@ -313,7 +314,7 @@ export const docPages: DocPage[] = [
         "blocks": [
           {
             "type": "paragraph",
-            "text": "The website verifies the configured controller’s network and runtime code before reading the official collection bindings. V13 also verifies the separate holder pool’s code, controller binding and fixed allocation and coverage. Displayed state is read at one block. Failed or stale reads disable signing rather than showing unavailable balances as zero."
+            "text": "The website verifies the configured controller’s network and runtime code before reading the official collection bindings. The website also verifies the separate holder pool’s code, controller binding and fixed allocation and coverage. Displayed state is read at one block. Failed or stale reads disable signing rather than showing unavailable balances as zero."
           },
           {
             "type": "paragraph",
@@ -331,7 +332,7 @@ export const docPages: DocPage[] = [
           },
           {
             "type": "paragraph",
-            "text": "For settlement read phase, randomnessDeadline, randomnessReceived, executionReserve, executionRecipient, winningTokenIds, prizeClaimed, affiliateClaimable, refundsAvailable, operatorWithdrawable and protectedBalance. For permanent NFT identity read combination, tokenIdForCombination and tokenURI; score and scoreCombination require the finalized draw. In V13, read holderRewards on the controller and collection to locate the pool. Its summary(seasonId) reports funded ETH, eligibleNfts, claimLimit, rewardPerNft, claims, paid, collections, settledCollections and unlocked. Check fundedCollection, claimed(collection, tokenId) and the NFT’s ownerOf before a holder claim. HOLDER_BPS is 800 and COVERAGE_BPS is 500; neither fixes an ETH amount."
+            "text": "For settlement read phase, randomnessDeadline, randomnessReceived, executionReserve, executionRecipient, winningTokenIds, prizeClaimed, affiliateClaimable, refundsAvailable, operatorWithdrawable and protectedBalance. For permanent NFT identity read combination, tokenIdForCombination and tokenURI; score and scoreCombination require the finalized draw. Read holderRewards on the controller and collection to locate the pool. Its summary(seasonId) reports funded ETH, eligibleNfts, claimLimit, rewardPerNft, claims, paid, collections, settledCollections and unlocked. Check fundedCollection, claimed(collection, tokenId) and the NFT’s ownerOf before a holder claim. HOLDER_BPS is 800 and COVERAGE_BPS is 500; neither fixes an ETH amount."
           }
         ]
       },
@@ -341,10 +342,10 @@ export const docPages: DocPage[] = [
         "blocks": [
           {
             "type": "paragraph",
-            "text": "Source publication or a passing test suite is not an independent security audit. A configured site does not guarantee Chainlink availability. X is an independent event observer and can be delayed without affecting the protocol. Historical contracts retain their actual version and can still be read and called on their verified explorer pages."
+            "text": "Source publication or a passing test suite is not an independent security audit. A configured site does not guarantee Chainlink availability. X is an independent event observer and can be delayed without affecting the protocol. Deployed contracts can also be read and called on their verified explorer pages."
           }
         ]
       }
     ]
   }
-];
+]);

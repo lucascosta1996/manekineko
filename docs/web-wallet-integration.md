@@ -2,7 +2,7 @@
 
 Implementation and verification record · 2026-10-24.
 
-Web uses one Reown AppKit 1.8.24 instance with its Ethers adapter. The root layout keeps the selected wallet across Participate, Rewards, Affiliates, Holders and documentation. The header shows the address and network, opens account management, and provides network selection when the wallet does not match the page. Mobile navigation expands in the page flow; wallet status remains visible outside it.
+Web uses one Reown AppKit 1.8.24 instance with its Ethers adapter. The root layout keeps the selected wallet across Participate, Rewards, Affiliates, Holders and documentation. The compact header shows the address and opens Tincta’s account menu. Network details and selection are available inside the menu; a mismatched wallet still cannot authorize an action. Mobile navigation expands in the page flow; wallet status remains visible outside it.
 
 ## Configuration
 
@@ -22,8 +22,9 @@ The selector supports EIP-6963 installed wallets and WalletConnect mobile/QR pai
 
 - `packages/protocol/src/web-wallet-kit.ts`: lazy SDK singleton and supported networks (Ethereum and Sepolia).
 - `packages/protocol/src/web-wallet-provider.tsx`: root context, SDK subscriptions, account management and reconnect.
+- `packages/protocol/src/web-wallet-menu.tsx`: shared Tincta dialog and controls for connection/account switching, copying, disconnect and network details. Reown remains the session authority; cloud feature availability is respected.
 - `packages/protocol/src/connected-wallet.ts`: verifies the SDK-selected account with read-only `eth_accounts` and `eth_chainId`; constructs the existing Ethers session without requesting account permission again.
-- `apps/web/components/header-wallet.tsx`: shared Button controls, address/network status, busy feedback, retry and network selection.
+- `apps/web/components/header-wallet.tsx`: shared Button controls, address status, busy feedback, retry and responsive icon-only access.
 - `packages/protocol/src/use-wallet-session.ts`: Web consumers share the root session; consumers outside that provider keep their local picker.
 
 Provider account, network and disconnect events immediately revoke the old signer. Revision guards discard late restores, and disconnect cannot silently restore stale provider permissions. Navigation does not disconnect. Unsupported or mismatched networks disable protocol actions. Connecting, restoring and opening account management never submit a transaction. Existing runtime pin checks, fresh contract reads, simulation, explicit review and account/network-scoped recovery journals still govern every write.
@@ -31,6 +32,8 @@ Provider account, network and disconnect events immediately revoke the old signe
 This change does not modify financial rules, deployed contracts, network pins or deployment authority.
 
 ## Verification
+
+The compact header and first-party account-menu follow-up has a separate [2026-10-24 verification record](design/compact-navigation-docs-2026-10-24.md), including multi-wallet switching and disconnect-all. The results below describe the earlier shared-wallet integration and release preflight, not a deployment of that follow-up.
 
 - Web production build passed with the new local project ID. The local production server was restarted to load that build.
 - Web tests: 296 passed, 3 database-gated tests skipped. Focused wallet tests cover read-only restoration, signer invalidation, disconnect and stale restore handling.

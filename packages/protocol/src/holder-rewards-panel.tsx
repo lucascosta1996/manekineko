@@ -30,8 +30,8 @@ export function HolderRewardsPanel({
       <section className="public-empty">
         <h2>No holder pool in this deployment.</h2>
         <p>
-          Season holder rewards belong to the new V13 contracts. Existing
-          collections keep their original allocations and claims.
+          This collection does not include a season holder pool. Check its
+          prize and affiliate rewards under the collection’s own terms.
         </p>
       </section>
     );

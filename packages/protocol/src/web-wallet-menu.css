@@ -1,0 +1,14 @@
+/* Account menu composes the shared dialog, button, badge and typography contracts. */
+.wallet-menu-heading, .wallet-menu-provider, .wallet-menu-network, .wallet-menu-address, .wallet-menu-actions, .wallet-menu-footer { display: flex; align-items: center; gap: var(--ui-space-2); }
+.wallet-menu-heading { justify-content: space-between; gap: var(--ui-space-4); }
+.wallet-menu-network { justify-content: space-between; flex-wrap: wrap; margin-block: var(--ui-space-4); color: var(--ui-muted); font-size: var(--ui-label); }
+.wallet-menu-list { display: grid; gap: var(--ui-space-4); margin-block: var(--ui-space-4); }
+.wallet-menu-connection { border: 1px solid var(--ui-line); border-radius: var(--ui-radius); background: var(--ui-surface); padding: var(--ui-space-4); min-width: 0; }
+.wallet-menu-provider { flex-wrap: wrap; font: 500 var(--ui-label)/var(--ui-control-line) var(--ui-font-sans); }
+.wallet-menu-provider > .ui-text-action { margin-left: auto; }
+.wallet-menu-accounts { list-style: none; padding: 0; margin: var(--ui-space-2) 0 0; }
+.wallet-menu-accounts li { display: flex; align-items: center; justify-content: space-between; gap: var(--ui-space-2); flex-wrap: wrap; padding-block: var(--ui-space-3); }
+.wallet-menu-accounts li + li { border-top: 1px solid var(--ui-line); }
+.wallet-menu-address { flex-wrap: wrap; font: 400 var(--ui-control)/var(--ui-control-line) var(--ui-font-mono); }
+.wallet-menu-footer { flex-wrap: wrap; gap: var(--ui-space-3); }
+.wallet-menu-notice { min-height: var(--ui-control-line); margin: var(--ui-space-3) 0 0; color: var(--ui-muted); font-size: var(--ui-label); }

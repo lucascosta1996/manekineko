@@ -1,8 +1,12 @@
 # Tincta protocol architecture and agent handoff
 
+## 2026-10-24 public presentation update
+
+Public Landing, Web, metadata and guides describe Tincta without release-number labels. Internal source, configuration names, ABI exports and historical records retain their actual versions. Connected deployments still render their own immutable economics and capability availability. The public guides add accessible diagrams and formulas for voting, lifecycle, ordered winner sampling, permanent identity, allocations, claims and refunds. This presentation update changes no contract rules or deployment state.
+
 ## 2026-10-24 shared Web wallet
 
-Web's root layout owns one Reown AppKit 1.8.24 / Ethers adapter session. The header exposes Connect wallet, the selected address/network, account management and network selection across Participate, Rewards, Affiliates, Holders and docs. EIP-6963 installed wallets and WalletConnect mobile/QR connections use the same standard selector. `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` and exact Reown origin allowlisting are required; a missing configuration reports unavailable rather than pretending to connect. Launch and historical workflows retain their existing account picker.
+Web's root layout owns one Reown AppKit 1.8.24 / Ethers adapter session. The compact header exposes Connect wallet and the selected address. Its Tincta-styled account menu provides account management and network selection across Participate, Rewards, Affiliates, Holders and docs. EIP-6963 installed wallets and WalletConnect mobile/QR connections use the same standard selector. `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` and exact Reown origin allowlisting are required; a missing configuration reports unavailable rather than pretending to connect. Launch and historical workflows retain their existing account picker.
 
 `packages/protocol/src/connected-wallet.ts` bridges the SDK's active account to the existing verified Ethers signing path. Provider account/network/disconnect events immediately invalidate the old signer; revision guards discard stale asynchronous restores. Navigation does not disconnect. Unsupported/mismatched networks cannot authorize protocol actions. Existing fresh reads, runtime pins, explicit transaction review, simulation and account/network-scoped recovery journals remain authoritative. No contract rules or deployment pins change. See [Web wallet integration](web-wallet-integration.md) for configuration and verification boundaries.
 

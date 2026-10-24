@@ -5,6 +5,7 @@ import { createConnectedWalletBridge, type ConnectedAccount } from "./connected-
 import { SharedWalletContext } from "./use-wallet-session";
 import { walletError, type WalletProvider, type WalletSession } from "./wallet";
 import { webWalletKit } from "./web-wallet-kit";
+import { WebWalletMenu } from "./web-wallet-menu";
 
 export function WebWalletProvider({ children, defaultChainId = 1, projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "" }: {
   children: ReactNode; defaultChainId?: number; projectId?: string;
@@ -13,6 +14,9 @@ export function WebWalletProvider({ children, defaultChainId = 1, projectId = pr
   const [account, setAccount] = useState<{ address: string; chainId: number } | null>(null);
   const [notice, setNotice] = useState("");
   const [connecting, setConnecting] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const menuOrigin = useRef<HTMLElement | null>(null);
+  const connectOrigin = useRef<{ address?: string; provider: unknown } | null>(null);
   const kit = useRef<Awaited<ReturnType<typeof webWalletKit>> | null>(null);
   const bridge = useRef<ReturnType<typeof createConnectedWalletBridge> | null>(null);
   const mounted = useRef(false);
@@ -33,6 +37,10 @@ export function WebWalletProvider({ children, defaultChainId = 1, projectId = pr
         const chainId = Number(modal.getChainId());
         const next = selected?.isConnected && selected.address && provider?.request
           ? { address: selected.address, chainId, provider, name: modal.getWalletInfo("eip155")?.name } : null;
+        if (connectOrigin.current && next && (connectOrigin.current.address !== next.address || connectOrigin.current.provider !== next.provider)) {
+          connectOrigin.current = null;
+          void modal.close();
+        }
         setAccount(next ? { address: next.address, chainId } : null);
         return next;
       };
@@ -52,6 +60,7 @@ export function WebWalletProvider({ children, defaultChainId = 1, projectId = pr
     try {
       const modal = kit.current ?? await initialize.current?.();
       if (!modal) throw new Error("Wallet connections are loading. Please try again.");
+      connectOrigin.current = view === "Connect" ? { address: modal.getAccount("eip155")?.address, provider: modal.getWalletProvider() } : null;
       await modal.open({ view, namespace: "eip155" });
     } catch (error) { if (mounted.current) setNotice(walletError(error)); }
     finally { opening.current = false; if (mounted.current) setConnecting(false); }
@@ -62,10 +71,16 @@ export function WebWalletProvider({ children, defaultChainId = 1, projectId = pr
   }, []);
   return <SharedWalletContext.Provider value={{
     managed: true, session, account, connecting, notice, pickerChain: null,
-    openPicker: () => { void open("Connect"); }, openAccount: () => { void open(account ? "Account" : "Connect"); },
+    openPicker: () => { void open("Connect"); }, openAccount: () => {
+      if (!account || !kit.current) { void open("Connect"); return; }
+      menuOrigin.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      setAccountOpen(true);
+    },
     switchNetwork: () => { void open("Networks"); },
     closePicker: () => { void kit.current?.close(); }, disconnect,
-    // Web account selection belongs exclusively to AppKit. Legacy inline pickers are not rendered.
+    // Reown owns the session; the first-party menu uses its connection APIs.
     connect: () => { void bridge.current?.sync(); },
-  }}>{children}</SharedWalletContext.Provider>;
+  }}>{children}{kit.current && <WebWalletMenu modal={kit.current} open={accountOpen} onClose={() => setAccountOpen(false)} origin={menuOrigin.current}
+    invalidate={() => bridge.current?.clear()} synchronize={async () => { await bridge.current?.sync(); }}
+    openConnect={() => { void open("Connect"); }} openNetworks={() => { void open("Networks"); }} />}</SharedWalletContext.Provider>;
 }

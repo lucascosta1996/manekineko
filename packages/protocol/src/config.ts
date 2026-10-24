@@ -28,12 +28,12 @@ export function protocolConfig(selectedChain?: number): ProtocolConfig | null {
 export function validateProtocolConfig(input: { version?: 12 | 13; holderRewardsCodeHash?: string; controller?: string; chainId?: number; codeHash?: string; rpcUrl?: string; websocketUrl?: string }): ProtocolConfig {
   const { controller, chainId, codeHash, rpcUrl, websocketUrl } = input;
   if (input.version !== undefined && input.version !== 12 && input.version !== 13) throw new Error('Unsupported protocol version.');
-  if (input.version === 13 && !isHexString(input.holderRewardsCodeHash, 32)) throw new Error('V13 requires a verified holder rewards runtime pin.');
+  if (input.version === 13 && !isHexString(input.holderRewardsCodeHash, 32)) throw new Error('A verified holder rewards runtime pin is required.');
   if (!controller || !chainId || !rpcUrl || !codeHash || ![1, 11155111].includes(chainId) || !isHexString(codeHash, 32))
-    throw new Error(`Invalid V${input.version ?? 12} deployment pins.`);
+    throw new Error('Invalid deployment pins.');
   const url = new URL(rpcUrl);
   if (url.protocol !== 'https:' || url.username || url.password)
-    throw new Error(`V${input.version ?? 12} requires a public HTTPS RPC endpoint.`);
+    throw new Error('A public HTTPS RPC endpoint is required.');
   if (websocketUrl) {
     const ws = new URL(websocketUrl);
     if (ws.protocol !== 'wss:' || ws.username || ws.password)

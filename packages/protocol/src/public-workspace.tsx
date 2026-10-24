@@ -109,7 +109,7 @@ export function PublicWorkspace({
             : r?.name ?? "Your next move, onchain."}
         </h1>
         <p>
-          {view === "holders" ? (protocolVersion === 13 ? "Follow the season pool. At season end, the first 5% of eligible NFTs to claim share the rewards equally." : "Season holder pools are available only in V13. This deployment keeps its original reward rules.") : view === "claims"
+          {view === "holders" ? (protocolVersion === 13 ? "Follow the season pool. At season end, the first 5% of eligible NFTs to claim share the rewards equally." : "This collection does not include season holder rewards. Check its prize and affiliate rewards instead.") : view === "claims"
             ? "See the winners. Claim prizes and refunds directly from the collection."
             : view === "affiliates"
             ? "Enroll, share your link and claim your equal share of the affiliate pool."
@@ -359,7 +359,7 @@ export function PublicWorkspace({
           {protocolVersion === 13 ? "60% winning tickets · 20% qualified affiliates · 8% holder rewards · 12% protocol treasury." : "60% winning tickets · 20% qualified affiliates · 20% protocol treasury."}
         </p>
         <p>
-          {!configured && "Planned for new V13 seasons. "}The {protocolVersion === 13 ? "12%" : "20%"} protocol treasury allocation covers current infrastructure costs
+          {!configured && "Planned for Tincta seasons. "}The {protocolVersion === 13 ? "12%" : "20%"} protocol treasury allocation covers current infrastructure costs
           and funds upcoming Tincta projects.
         </p>
         <Disclosure title="How it works · Voting, prizes and refunds">

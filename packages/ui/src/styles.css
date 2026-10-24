@@ -6,6 +6,11 @@
 .ui-rewards-signature > svg { flex: none; }
 .ui-rewards-symbol { width: var(--ui-space-8); height: var(--ui-space-8); }
 .ui-rewards-label { box-sizing: border-box; display: inline-block; padding: var(--ui-brand-label-padding-block) var(--ui-space-2); border: 1px solid var(--ui-brand-label-border); border-radius: var(--ui-radius); background: var(--ui-surface); color: var(--ui-brand-label-ink); font: 500 var(--ui-label)/var(--ui-control-line) var(--ui-font-sans); letter-spacing: 0.01em; }
+.ui-rewards-brand-compact { gap: var(--ui-space-2); }
+.ui-rewards-brand-compact .ui-rewards-signature { gap: var(--ui-space-2); }
+.ui-rewards-brand-compact .ui-rewards-symbol { width: var(--ui-space-6); height: var(--ui-space-6); }
+.ui-rewards-brand-compact .ui-rewards-signature > svg:not(.ui-rewards-symbol) { width: var(--ui-space-20); height: auto; }
+.ui-rewards-brand-compact .ui-rewards-label { border: 0; padding: 0; background: transparent; color: var(--ui-muted); font-size: var(--ui-caption); letter-spacing: 0; }
 
 /* Component ownership: apps compose these contracts; they do not override them. */
 html { color-scheme: light; }
