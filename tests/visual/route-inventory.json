@@ -3,7 +3,8 @@
   "landing": {
     "routes": [
       "/",
-      "/rewards"
+      "/rewards",
+      "/whitepaper"
     ],
     "boundaries": [
       "error",

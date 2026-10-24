@@ -1,5 +1,11 @@
 # Tincta protocol architecture and agent handoff
 
+## 2026-10-25 TAS-1 whitepaper
+
+The parent site publishes `/whitepaper`: **TAS-1 — Tincta Autonomous Standard**, revision 0.1.0, a proposed architecture standard for autonomous EVM systems. It defines immutable authority graphs, complete onchain data, permissionless bounded progress, participant exits, accounting invariants, dependency disclosure and deployment-specific conformance evidence. It is independent of the Rewards protocol and has no assigned ERC/EIP number. The draft discovery interface and manifest conventions are proposals; the canonical schema, reference implementation and conformance suite remain future work. No existing deployment is certified by this document, and no contract behavior, runtime pin, financial term, or operational permission changes.
+
+The page is server rendered with a linked contents list, technical figures, primary-source references and print styling. Parent header/footer navigation links to it. Browser and release evidence is recorded in [the scoped verification record](design/whitepaper-2026-10-25.md).
+
 ## 2026-10-24 database-backed NFT collection galleries
 
 Web adds `/collections` and `/collections/[chainId]/[address]` for minted artwork and permanent numbers, linked from **NFTs** in the compact navbar. This supersedes the older `/collections` redirect below. These routes read only PostgreSQL, with a fixed 24-item page size and no RPC fallback. They do not restore legacy database control over voting, minting, eligibility, balances or signatures.

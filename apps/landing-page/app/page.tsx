@@ -1,10 +1,7 @@
-import { FooterBrand } from "@manekineko/ui/footer";
 import { LinkButton } from "@manekineko/ui/button";
 import { Icon } from "@manekineko/ui/icons";
-import { publicLinks, publicXProfiles } from "@manekineko/ui/links";
-import { TinctaWordmark } from "../components/tincta-logo";
 import { ResearchArt } from "../components/research-art";
-import { LandingNavigation } from "../components/landing-navigation";
+import { StudioHeader, StudioFooter } from "../components/studio-shell";
 import { NewsletterSignup } from "./newsletter-signup";
 import "./studio.css";
 
@@ -19,19 +16,11 @@ const concepts = [
 ];
 
 export default function LandingPage() {
-  const links = publicLinks({ contact: process.env.NEXT_PUBLIC_CONTACT_URL, social: publicXProfiles.tincta });
   return (
     <div className="studio" id="top">
       <a className="skip-link" href="#main">Skip to content</a>
       <div className="studio-wrap">
-        <header className="studio-header landing-header">
-          <a className="studio-brand" href="/" aria-label="Tincta home"><TinctaWordmark className="studio-wordmark" title="" /></a>
-          <LandingNavigation links={[
-            { label: "Research", href: "#research" },
-            { label: "Projects", href: "#projects" },
-            { label: "Upcoming", href: "#upcoming" },
-          ]} action={{ label: "Join the launch list", href: "#launch-list" }} />
-        </header>
+        <StudioHeader />
         <main id="main">
           <section className="studio-hero" aria-labelledby="studio-title">
             <div className="studio-hero-copy">
@@ -47,6 +36,7 @@ export default function LandingPage() {
               <div className="studio-copy">
                 <p>We publish immutable contracts so participants can inspect the rules before they act. Once deployed, that code cannot be edited by us or anyone else.</p>
                 <p>Participants shape outcomes through actions the contract already allows. Our research asks what becomes possible when shared activity rests on rules that remain fixed.</p>
+                <a className="ui-text-action" href="/whitepaper">Read the TAS-1 whitepaper<Icon name="arrow" /></a>
               </div>
             </div>
             <div className="studio-principles">{principles.map(([number, title, copy]) => <article className="studio-principle" key={number}><p className="studio-eyebrow">{number}</p><h3>{title}</h3><p>{copy}</p></article>)}</div>
@@ -89,12 +79,7 @@ export default function LandingPage() {
           </section>
           <section className="studio-section studio-closing" aria-labelledby="closing-title"><div><p className="studio-eyebrow">Built to remain</p><h2 id="closing-title">The rules stay fixed.<br />The possibilities unfold.</h2></div><LinkButton href="/rewards" icon={<Icon name="arrow" />}>Discover Tincta Rewards</LinkButton></section>
         </main>
-        <footer className="studio-footer">
-          <div><FooterBrand /><p className="studio-footer-description">Research and publishing<br />for immutable onchain systems.</p></div>
-          <nav aria-label="Explore Tincta"><strong className="ui-footer-heading">Explore</strong><a className="ui-footer-link" href="#research">Our research</a><a className="ui-footer-link" href="/rewards">Tincta Rewards<Icon name="arrow" size="footer" /></a><a className="ui-footer-link" href="#upcoming">Upcoming projects</a><a className="ui-footer-link" href="#launch-list">Join the launch list</a></nav>
-          <nav aria-label="Tincta information"><strong className="ui-footer-heading">Tincta</strong><a className="ui-footer-link" href="#top">Back to top<Icon name="up" size="footer" /></a>{links.contact && <a className="ui-footer-link" href={links.contact}>Contact<Icon name="diagonal" size="footer" /></a>}{links.social && <a className="ui-footer-link" href={links.social}>X<Icon name="diagonal" size="footer" /></a>}</nav>
-          <div className="studio-footer-legal"><span>© {new Date().getFullYear()} Tincta</span><span>Defined 100% onchain. Shaped by participation.</span></div>
-        </footer>
+        <StudioFooter />
       </div>
     </div>
   );

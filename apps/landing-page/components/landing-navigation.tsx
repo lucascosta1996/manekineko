@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { IconButton, LinkButton } from "@manekineko/ui/button";
 import { Icon } from "@manekineko/ui/icons";
 
-type NavigationLink = { label: string; href: string; mobileOnly?: boolean };
+type NavigationLink = { label: string; href: string; mobileOnly?: boolean; current?: boolean };
 
 export function LandingNavigation({
   links,
@@ -49,7 +49,7 @@ export function LandingNavigation({
     <>
       <nav className="desktop-nav" aria-label="Main navigation">
         {links.filter(link => !link.mobileOnly).map(link => (
-          <a key={link.href} href={link.href}>{link.label}</a>
+          <a key={link.href} href={link.href} aria-current={link.current ? "page" : undefined}>{link.label}</a>
         ))}
       </nav>
       {action && (
@@ -77,7 +77,7 @@ export function LandingNavigation({
         <ul>
           {links.map(link => (
             <li key={link.href}>
-              <a href={link.href} onClick={() => setOpen(false)}>
+              <a href={link.href} aria-current={link.current ? "page" : undefined} onClick={() => setOpen(false)}>
                 {link.label}<Icon name="arrow" />
               </a>
             </li>
