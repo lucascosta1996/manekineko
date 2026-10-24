@@ -7,13 +7,20 @@ for (const width of [390, 1440]) {
     await prepare(page); await page.clock.resume();
     await page.setViewportSize({ width, height: 900 });
     await page.goto(urls.landing + '/rewards'); await ready(page);
-    for (const selector of ['.hero-copy', '.hero-description', '.hero-actions .ui-button', '.hero-art']) {
-      const box = await page.locator(selector).boundingBox();
-      expect(Math.abs(box!.x + box!.width / 2 - width / 2)).toBeLessThanOrEqual(1);
-    }
+    const heroGroup = await page.locator('.hero-main').boundingBox();
+    const heroCopy = await page.locator('.hero-copy').boundingBox();
     const heroAction = await page.locator('.hero-actions .ui-button').boundingBox();
     const heroArt = await page.locator('.hero-art').boundingBox();
-    expect(heroArt!.y).toBeGreaterThan(heroAction!.y + heroAction!.height);
+    expect(Math.abs(heroGroup!.x + heroGroup!.width / 2 - width / 2)).toBeLessThanOrEqual(1);
+    expect(Math.abs(heroAction!.x + heroAction!.width / 2 - heroCopy!.x - heroCopy!.width / 2)).toBeLessThanOrEqual(1);
+    if (width >= 760) {
+      expect(heroArt!.x).toBeGreaterThan(heroCopy!.x + heroCopy!.width);
+      expect(Math.abs(heroCopy!.y + heroCopy!.height / 2 - heroArt!.y - heroArt!.height / 2)).toBeLessThanOrEqual(1);
+      expect(heroGroup!.width).toBeLessThanOrEqual(960);
+    } else {
+      expect(heroArt!.y).toBeGreaterThan(heroAction!.y + heroAction!.height);
+      expect(Math.abs(heroArt!.x + heroArt!.width / 2 - width / 2)).toBeLessThanOrEqual(1);
+    }
     await expect(page.locator('.site main .section-index')).toHaveText(['01 /', '02 /', '03 /', '04 /', '05 /', '06 /', '07 /']);
     const sections = await page.locator('.site main > section:not(.closing-section)').evaluateAll(elements => elements.map(element => {
       const style = getComputedStyle(element);
@@ -31,6 +38,16 @@ for (const width of [390, 1440]) {
     for (const [index, amount] of ['1,296', '432', '172.8'].entries()) await expect(metrics.nth(index).locator('.metric-number')).toContainText(amount);
     await expect(page.locator('.holder-metric')).toContainText('10,800 claims at 0.016 ETH each');
     await expect(page.locator('#refunds + #holder-rewards')).toHaveCount(1);
+    const holderTitle = await page.locator('#holders-title').boundingBox();
+    const exampleTitle = await page.locator('.holder-example h3').boundingBox();
+    if (width >= 760) {
+      expect(Math.abs(holderTitle!.y - exampleTitle!.y)).toBeLessThanOrEqual(1);
+      const faq = await page.locator('.faq-list').boundingBox();
+      expect(Math.abs(exampleTitle!.x - faq!.x)).toBeLessThanOrEqual(1);
+    } else {
+      const explanation = await page.locator('.holder-copy').boundingBox();
+      expect(exampleTitle!.y).toBeGreaterThan(explanation!.y + explanation!.height);
+    }
     expect(await page.locator('#reward-details').evaluate(el => !!(el.compareDocumentPosition(document.querySelector('#manifesto-title')!) & Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
     await expect(page.locator('.holder-calculation')).toContainText('8 ÷ 500 = 0.016 ETH');
     await expect(page.locator('.terms-note')).toContainText('These are not funded balances.');

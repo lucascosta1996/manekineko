@@ -826,10 +826,12 @@ export function LandingExperience({
 
         <section className="manifesto holder-section wrap" id="holder-rewards" aria-labelledby="holders-title">
           <p className="eyebrow section-kicker"><span className="section-index">06 /</span> SEASON HOLDER REWARDS · PLANNED FOR LAUNCH</p>
-          <h2 id="holders-title">Not a winner,<br /><span className="muted-heading">but still a holder?</span></h2>
-          <div className="holder-explanation">
-            <p>8% of actual mint revenue from successful draws builds a season pool. Voting changes prices and supplies, so the pool and ETH per claim vary by season. Once every collection has drawn or become refundable, the first 5% of eligible NFTs to claim share the final pool equally. Only NFTs from successful draws qualify, including winners. One claim per NFT, while slots remain.</p>
-            <LinkButton href={footerLinks.app ? `${footerLinks.app.replace(/\/$/, "")}/holders` : undefined}>Explore holder rewards <Icon name="diagonal" /></LinkButton>
+          <div className="holder-copy">
+            <h2 id="holders-title">Not a winner,<br /><span className="muted-heading">but still a holder?</span></h2>
+            <div className="holder-explanation">
+              <p>8% of actual mint revenue from successful draws builds a season pool. Voting changes prices and supplies, so the pool and ETH per claim vary by season. Once every collection has drawn or become refundable, the first 5% of eligible NFTs to claim share the final pool equally. Only NFTs from successful draws qualify, including winners. One claim per NFT, while slots remain.</p>
+              <LinkButton href={footerLinks.app ? `${footerLinks.app.replace(/\/$/, "")}/holders` : undefined}>Explore holder rewards <Icon name="diagonal" /></LinkButton>
+            </div>
           </div>
           <div className="holder-example" aria-label="Holder reward example for a ten-collection season">
             <h3>One season, ten successful collections</h3>
