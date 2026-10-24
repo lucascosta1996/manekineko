@@ -63,8 +63,8 @@ The approved logo is **C — Ligature**, selected on 2026-10-21. Follow the [can
 
 - Use the generated uppercase outlined wordmark, its `3947 × 780` view box and natural aspect ratio. Never recreate it as text, stretch it, add a period, add a second name, or revive an older mark in app chrome.
 - Use the compact `TC` ligature only in established small brand and favicon roles. Preserve canonical favicon geometry and its dark tile.
-- Rewards artwork is **Open**, approved 2026-10-22. Use its [canonical vector master](../brand/tincta/rewards-open/README.md) through the shared `RewardsArtwork` component. The Rewards lockup places a 32 px Open symbol before the Ligature wordmark with 12 px clear space, retaining the existing 14 px gap to the quiet Rewards label. Parent chrome and browser icons retain Ligature. Open keeps its fixed warm palette and orientation; it does not cycle through collection colors.
-- Header wordmark width: 96 px on desktop, 88 px in the mobile shell. Footer: 88 px. Height is automatic. Reserve at least 12 px clear space around the visible wordmark, within a larger accessible link target.
+- Rewards artwork is **Open**, approved 2026-10-22. Use its [canonical vector master](../brand/tincta/rewards-open/README.md) through the shared `RewardsArtwork` component. The Rewards lockup places a 20 px Open symbol before the Ligature wordmark with 8 px clear space, retaining an 8 px gap to the quiet Rewards label. Parent chrome and browser icons retain Ligature. Open keeps its fixed warm palette and orientation; it does not cycle through collection colors.
+- Header wordmark width: 72 px on desktop, 64 px in the mobile shell. Every footer uses only the canonical 28 px TC glyph, with no wordmark, Open artwork or Rewards badge. Height is automatic. Reserve at least 12 px exterior clear space around the lockup, within a larger accessible link target; internal gaps use 8 px.
 - Static brand assets retain their canonical ink `#111111`; UI text uses the ink token below. Inline wordmarks inherit the intended surface foreground. This is a documented brand-asset distinction, not an invitation to add more grays.
 - A home link has the accessible name “Tincta home”; a decorative SVG inside it does not repeat that name.
 - Preserve `seasons.json` ordering and exact hex colors, stable season identity and canonical geometric artwork. Collection colors are content, not arbitrary UI status colors.
@@ -111,18 +111,20 @@ Use the same stack in all apps, portals, inputs and overlays. No remote font req
 
 | Role | Size | Line height | Weight | Tracking |
 | --- | --- | --- | --- | --- |
-| `type.hero` | `clamp(1.875rem, 3.5vw, 2.5rem)` = 30–40 px | 1.12 | 500 | -0.035em |
-| `type.page` | `clamp(1.75rem, 3vw, 2.25rem)` = 28–36 px | 1.15 | 500 | -0.035em |
-| `type.marketing-section` | `clamp(1.5rem, 3vw, 2.25rem)` = 24–36 px | 1.2 | 500 | -0.025em |
-| `type.section` | `clamp(1.25rem, 2vw, 1.5rem)` = 20–24 px | 1.25 | 500 | -0.025em |
-| `type.subheading` | 18 px | 1.35 | 500 | -0.01em |
-| `type.body` | 15 px | 24 px / 1.6 | 400 | 0 |
-| `type.control` | 14 px | 20 px / 1.428571 | 500 | 0 |
-| `type.label` | 13 px | 20 px / 1.538462 | 500 | 0 |
-| `type.caption` | 12 px | 18 px / 1.5 | 400 | 0 |
-| `type.footer` | 13 px | 20 px / 1.538462 | 400 | 0 |
-| `type.footer-heading` | 12 px | 18 px / 1.5 | 600 | 0 |
-| `type.footer-legal` | 12 px | 18 px / 1.5 | 400 | 0 |
+| `type.hero` | `clamp(1.5rem, 2.5vw, 1.75rem)` = 24–28 px | 1.12 | 500 | -0.035em |
+| `type.page` | `clamp(1.25rem, 2vw, 1.5rem)` = 20–24 px | 1.15 | 500 | -0.035em |
+| `type.marketing-section` | `clamp(1.125rem, 2vw, 1.375rem)` = 18–22 px | 1.2 | 500 | -0.025em |
+| `type.section` | 18 px | 1.25 | 500 | -0.025em |
+| `type.subheading` | 16 px | 1.35 | 500 | -0.01em |
+| `type.body` | 14 px | 22 px | 400 | 0 |
+| `type.control` | 13 px | 18 px | 500 | 0 |
+| `type.label` | 12 px | 18 px | 500 | 0 |
+| `type.caption` | 12 px | 18 px | 400 | 0 |
+| `type.footer` | 12 px | 18 px | 400 | 0 |
+| `type.footer-heading` | 12 px | 18 px | 600 | 0 |
+| `type.footer-legal` | 12 px | 18 px | 400 | 0 |
+
+Compact scale, user-directed on 2026-10-24: these values replace the earlier large marketing and product scales in every app, including Launch and parent Landing. There is no universal smallest industry font. The 14 px reading base is informed by [Carbon’s productive type set](https://www.carbondesignsystem.com/building-blocks/foundations/typography/type-sets); the exact sizes here are Tincta decisions. Preserve 200% text reflow and contrast. Do not reduce essential text below body size. Controls have a 32 px default target and 44 px coarse-pointer target, exceeding the [WCAG 2.2 minimum target-size criterion](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum). Coarse-pointer inputs keep 16 px text to avoid browser focus zoom.
 
 - Use one semantic `h1` per page and an ordered heading structure. Visual size is a named role, not dictated by the HTML tag alone.
 - Readable article text has a maximum measure of 68ch. Hero support text has a maximum measure of 55ch; hero headings use 22ch. Adjust wrapping through layout, not arbitrary text compression.
@@ -144,10 +146,11 @@ Spacing scale: **0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96 px**. Use token
 | Field and helper/error | 4 px |
 | Related actions | 12 px |
 | Form groups | 24 px |
-| Card padding | 24 px desktop; 16 px mobile |
+| Card padding | 20 px desktop; 16 px mobile |
 | Page title and content | 24 px |
-| Product sections | 32 px mobile; 48 px desktop |
-| Marketing sections | 48 px mobile; 80 px desktop |
+| Product sections | 24–32 px mobile; 32–48 px desktop |
+| Marketing sections | 32 px mobile; 48 px desktop |
+| Content to footer separator | At least 64 px mobile; 96 px desktop, including compact footers |
 | Paragraphs in prose | 16 px |
 
 - Base control, card, menu and dialog radius: **3 px**. Circular swatches, circular status dots and intrinsic artwork circles are shape roles, not button radius exceptions.
@@ -166,18 +169,18 @@ Primary, secondary, ghost and destructive buttons share these metrics, including
 
 | Property | Fine pointer/default | Any coarse pointer |
 | --- | --- | --- |
-| Minimum height | 40 px | 44 px |
-| Padding block | 9 px | 11 px |
-| Padding inline | 14 px | 14 px |
+| Minimum height | 32 px | 44 px |
+| Padding block | 6 px | 12 px |
+| Padding inline | 12 px | 12 px |
 | Border | 1 px, always reserved | Same |
-| Text | 14 px / 20 px, weight 500, sans | Same |
-| Icon box / stroke | 18 × 18 px / 1.6 | Same |
+| Text | 13 px / 18 px, weight 500, sans | Same |
+| Icon box / stroke | 16 × 16 px / 1.6 | Same |
 | Label/icon gap | 8 px | Same |
 | Radius | 3 px | Same |
 | External margin | 0 | 0 |
 | Alignment | inline-flex; centered on both axes | Same |
 
-These yield 40 px = 20 + 2×9 + 2×1 at default text size. Use `min-height`, not a fixed height that clips enlarged/wrapped text. Increase the minimum inline size to 44 px on coarse input. Use `any-pointer: coarse` so touch-capable hybrids are included.
+These yield 32 px = 18 + 2×6 + 2×1 at default text size. Use `min-height`, not a fixed height that clips enlarged/wrapped text. Increase the minimum inline size to 44 px on coarse input. Use `any-pointer: coarse` so touch-capable hybrids are included.
 
 - Primary: ink fill and border, white text. Hover fill `#333333`; pressed fill `#000000`.
 - Secondary: white fill, ink text and control-border token. Hover surface-hover; pressed surface-pressed.
@@ -188,13 +191,13 @@ These yield 40 px = 20 + 2×9 + 2×1 at default text size. Use `min-height`, not
 
 Do not create a larger hero button, smaller retry button, different newsletter padding or special wallet-label typography. Full-width is a layout option, not a new type/spacing variant. Action groups wrap or stack with their documented gap. Button labels may wrap only when available width or text enlargement requires it; the icon keeps its size and the target grows.
 
-Icon-only buttons use a 40 × 40 px minimum box with **10 px padding on all sides**, or 44 × 44 px with **12 px on all sides** for coarse input, including the 18 px icon and 1 px border. Their text gap is zero. Do not inherit the text button's 14 px inline padding. Scaled tokens may grow the box; do not clip content to a fixed size. Provide a specific accessible name, such as “Close dialog,” and a tooltip when the action is not self-evident. Do not use a tooltip as the only accessible name.
+Icon-only buttons use a 32 × 32 px minimum box with **7 px padding on all sides**, or 44 × 44 px with **13 px on all sides** for coarse input, including the 16 px icon and 1 px border. Their text gap is zero. Do not inherit the text button's 12 px inline padding. Scaled tokens may grow the box; do not clip content to a fixed size. Provide a specific accessible name, such as “Close dialog,” and a tooltip when the action is not self-evident. Do not use a tooltip as the only accessible name.
 
 ### 6.2 Semantics and state
 
 - Use a real `<button type="button">` for actions and `<button type="submit">` for form submission. Use an `<a href>` for navigation. A navigation link may use the shared button appearance; it does not gain button keyboard behavior or an invented `disabled` attribute.
 - Give every button a specified default, hover, active, focus-visible, disabled and busy state. Selected/toggled controls also expose their actual selection semantics.
-- During a request, preserve the control box, show honest pending feedback and prevent duplicate submission. A spinner occupies the same 18 px slot as an icon and does not push the label sideways. Reserve the largest state label's width using layout/content, not arbitrary delays.
+- During a request, preserve the control box, show honest pending feedback and prevent duplicate submission. A spinner occupies the same 16 px slot as an icon and does not push the label sideways. Reserve the largest state label's width using layout/content, not arbitrary delays.
 - `aria-busy` belongs on the updating control/region. Communicate completion or failure accessibly once; do not replace a label with an unnamed spinner. Keep focus stable. When using `aria-disabled` to preserve focus, block activation in every input path.
 - A pressed state changes color or inset treatment, not padding, border width, font weight or position. No scale/bounce on routine controls.
 
@@ -202,7 +205,7 @@ Icon-only buttons use a 40 × 40 px minimum box with **10 px padding on all side
 
 An inline text action is a distinct semantic presentation, not an undersized filled button. Use it for secondary inline recovery, copy help or footer support. It uses the surrounding named text role, an explicit transparent background, zero border, inherited font/color and a visible underline or established contextual affordance. Inline sentence links/actions have zero padding and margin, follow text flow and use WCAG's inline exception. Standalone text actions use inline-flex, vertical centering, an 8 px icon gap, zero margin, zero padding and an explicit minimum target of **32 × 32 px** on fine input or **44 × 44 px** on coarse input; start-align list/footer text and center isolated actions. The minimum box supplies vertical space without changing adjacent text alignment. Do not enlarge overlapping hit regions with invisible pseudo-elements.
 
-All routine icons use the shared Lucide `Icon`, `currentColor`, 18 × 18 px and 1.6 stroke. A footer inline icon has an explicit **16 × 16 px** variant; standalone illustrations are separate assets. Do not mix Unicode arrows, emoji, another icon pack or `.icon` selectors that miss `.ui-icon`. Decorative icons are hidden from assistive technology; their parent control supplies the name. Add a semantic icon mapping in the shared source rather than pasting one-off SVG paths into pages.
+All routine icons use the shared Lucide `Icon`, `currentColor`, 16 × 16 px and 1.6 stroke. A footer inline icon has an explicit **16 × 16 px** variant; standalone illustrations are separate assets. Do not mix Unicode arrows, emoji, another icon pack or `.icon` selectors that miss `.ui-icon`. Decorative icons are hidden from assistive technology; their parent control supplies the name. Add a semantic icon mapping in the shared source rather than pasting one-off SVG paths into pages.
 
 ## 7. No browser-default presentation in first-party UI
 
@@ -220,15 +223,15 @@ All routine icons use the shared Lucide `Icon`, `currentColor`, 18 × 18 px and 
 
 | Family | Required visual and behavioral contract |
 | --- | --- |
-| Input / textarea | 40 px minimum field height, 9 px block / 12 px inline padding, 1 px control border, 3 px radius; 14/20 regular text. Coarse input: minimum 44 px, 16/20 text, 11 px block padding. Textarea grows; never clips content to the single-line height. Visible label, hint and associated error. Placeholder is supplemental, never the label. |
-| Select / combobox | Same field metrics and font; shared accessible primitive, same tokens in the portaled list; 8 px icon gap; options at least 40 px high, 44 px on coarse input. Correct keyboard, typeahead, selected/disabled states, scrolling and focus return. A search field is needed only when the option set justifies it. |
-| Checkbox / radio / switch | Shared accessible primitive or styled semantic input, visible checked/unchecked/focus/disabled states, clickable label. Indicator may be 18 px; combined target at least 40 px, 44 px coarse. Explain irreversible switches before activation. |
+| Input / textarea | 32 px minimum field height, 6 px block / 12 px inline padding, 1 px control border, 3 px radius; 13/18 regular text. Coarse input: minimum 44 px, 16/20 text, 11 px block padding. Textarea grows; never clips content to the single-line height. Visible label, hint and associated error. Placeholder is supplemental, never the label. |
+| Select / combobox | Same field metrics and font; shared accessible primitive, same tokens in the portaled list; 8 px icon gap; options at least 32 px high, 44 px on coarse input. Correct keyboard, typeahead, selected/disabled states, scrolling and focus return. A search field is needed only when the option set justifies it. |
+| Checkbox / radio / switch | Shared accessible primitive or styled semantic input, visible checked/unchecked/focus/disabled states, clickable label. Indicator may be 18 px; combined target at least 32 px, 44 px coarse. Explain irreversible switches before activation. |
 | Date / time / color / file | Branded field and trigger; preserve format/timezone meaning, keyboard editing, validation and a usable platform picker/chooser where appropriate. Do not display an unstyled native swatch/button inside the field. |
-| Tabs / segmented controls | One shared geometry, 40 px minimum/44 px coarse, explicit selected state independent of color alone. Use tab semantics only for same-page tab panels; navigation is links with `aria-current`. No pill styling added per page. |
-| Dialog / drawer | Shared accessible primitive, title, description when useful, named close control, focus containment, Escape policy, focus restoration and background interaction blocking. 24 px padding; 16 px on mobile. Dialog max-width 440 px for simple confirmations; documented larger content variant 640 px. At least 16 px viewport inset, internal scrolling for short heights and virtual keyboard. |
+| Tabs / segmented controls | One shared geometry, 32 px minimum/44 px coarse, explicit selected state independent of color alone. Use tab semantics only for same-page tab panels; navigation is links with `aria-current`. No pill styling added per page. |
+| Dialog / drawer | Shared accessible primitive, title, description when useful, named close control, focus containment, Escape policy, focus restoration and background interaction blocking. 20 px padding; 16 px on mobile. Dialog max-width 440 px for simple confirmations; documented larger content variant 640 px. At least 16 px viewport inset, internal scrolling for short heights and virtual keyboard. |
 | Menu / popover / tooltip | Shared tokens, owner-relative placement with collision handling; no clipped content or detached trigger. Correct role and keyboard behavior. Supplemental hover content is hoverable and persistent while its trigger/content is hovered or focused; the pointer can enter it. Tooltip also appears on focus, dismisses with Escape without moving focus, and never contains the only essential instruction. |
-| Card | 1 px decorative border only when grouping needs it, 3 px radius, 24/16 px padding, no default shadow. Optional whole-card link cannot contain nested interactive controls; otherwise use separate named links/actions. |
-| Table / list | Semantic header/cells, 14/20 body text, 12/18 header labels, tabular numeric alignment, units retained. 12 px cell padding; interactive rows at least 44 px. Show sorting state. On narrow screens use readable cards or a clearly bounded horizontal table scroller, not clipped columns. |
+| Card | 1 px decorative border only when grouping needs it, 3 px radius, 20/16 px padding, no default shadow. Optional whole-card link cannot contain nested interactive controls; otherwise use separate named links/actions. |
+| Table / list | Semantic header/cells, 13/18 compact tabular text, 12/18 header labels, tabular numeric alignment, units retained. 12 px cell padding; interactive rows at least 44 px. Show sorting state. On narrow screens use readable cards or a clearly bounded horizontal table scroller, not clipped columns. |
 | Accordion | Styled semantic disclosure or accessible primitive, shared chevron, visible focus, expanded state and generous target. Answer content remains readable and selectable. |
 | Badge / status | 12/18 label, 4 px block / 8 px inline padding, text plus optional symbol, 3 px radius. No clickable affordance unless interactive. Never use a colored dot as the sole status. |
 | Toast / inline feedback | Use inline persistent errors for recovery or decisions; a toast may supplement completion. Errors do not disappear on a timer. No essential detail conveyed only by animation. Toaster does not steal focus or cover the active control. |
@@ -251,7 +254,7 @@ New component families need a contract with anatomy, tokens, state table, semant
 
 One headline, one short support message, one dominant CTA and deliberate artwork/space. Current and upcoming collection information belongs in a slim announcement bar above the navbar, outside the hero. Keep the announcement to one line when space allows; allow long names and recovery feedback to wrap without clipping. On phones, retain the collection name, status and details link while omitting supplemental counts/countdowns. Newsletter capture remains below rewards. Do not add dense facts, multiple bright badges or another competing CTA to the hero.
 
-User-directed typography exception (2026-09-30): the Landing headline “100% onchain autonomous rewards.” fits one line at standard text settings across supported widths. It uses the hero role capped at 40 px, a copy-container-relative fit of 6.25cqi, and a 1rem minimum so enlarged text can still reflow. The supporting “Earn up to 6 ETH per collection.” uses the full hero type role and ink color. This is scoped to Landing's exact copy; recheck fit when copy changes, and preserve the detailed prize terms below. Shared type tokens are unchanged.
+The 2026-10-24 compact scale supersedes the earlier single-line Landing headline exception. Headlines may wrap naturally, including on mobile and at enlarged text settings; never compress text below its named role to force one line.
 
 The announcement's initial live-data request MUST NOT render “Refresh,” “Retry,” an error badge or a browser-looking button. It gets a neutral, styled pending state in a stable status slot. Retry is a response to an actual failure. Background refresh does not replace the hero with a loading panel. Preserve stale-state warnings and accessible observation context alongside the collection link.
 
@@ -261,15 +264,15 @@ The user-requested announcement gradient represents the featured season's publis
 
 ### Footer
 
-The footer is useful and quiet. Use one composed footer per page, not two separate footer systems with duplicated copyright or conflicting type. Typography, contrast and interaction rules below apply to all apps. The multi-column wordmark/link composition is the **public footer** for Web and Landing. Launch may retain a compact operator footer with relevant account/operational links; do not add public marketing columns or support promotion to its private shell.
+The footer is useful and quiet. Use one composed footer per page, not two separate footer systems with duplicated copyright or conflicting type. Typography, contrast and interaction rules below apply to all apps. The multi-column glyph/link composition is the **public footer** for Web and Landing. Launch may retain a compact operator footer with relevant account/operational links; do not add public marketing columns or support promotion to its private shell.
 
-- Link and supporting copy: **13/20 px**, weight 400, muted token.
+- Link and supporting copy: **12/18 px**, weight 400, muted token.
 - Group labels: **12/18 px**, weight 600, ink; no oversized headings.
 - Legal/copyright: **12/18 px**, muted; include each item once. Material transaction terms belong near the transaction, not only in the footer.
-- Public wordmark: 88 px, natural ratio. Optional link icon in any footer: 16 px, gap 8 px.
-- Public composition: top border 1 px line token; top margin 48 px; vertical padding 32 px desktop, 24 px mobile. Column gap 32/24 px. Four columns at 960 px+, two at 600–959 px, one below 600 px.
-- Rewards Landing opts into the shared `PublicFooter` compact density (2026-10-23): 24 px top margin, 16 px vertical padding/gaps and 12 px legal separator padding. Below 960 px, the brand and support span two link columns; at 960 px and above use the usual four columns. Typography, 32/44 px link targets and support behavior are unchanged. Other consumers keep the default density.
-- Private operator composition: 1 px line separator, 32 px top margin, 24 px vertical padding and 12 px row/action gap. Wrap naturally within the operator content container; use the same footer text roles and target minimums.
+- All footer branding: canonical TC glyph only, 28 px square. Optional link icon in any footer: 16 px, gap 8 px.
+- Public composition: top border 1 px line token; top margin 96 px desktop / 64 px mobile; vertical padding 32 px desktop, 24 px mobile. Column gap 32/24 px. Four columns at 960 px+, two at 600–959 px, one below 600 px.
+- Rewards Landing opts into the shared `PublicFooter` compact density (2026-10-23): 96/64 px top margin, 24 px vertical padding and 16 px gaps and 12 px legal separator padding. Below 960 px, the brand and support span two link columns; at 960 px and above use the usual four columns. Typography, 32/44 px link targets and support behavior are unchanged. Other consumers keep the default density.
+- Private operator composition: 1 px line separator, 96/64 px top margin, 24 px vertical padding and 12 px row/action gap. Wrap naturally within the operator content container; use the same footer text roles and target minimums.
 - Link/text-action rows: at least 32 px high on fine input, 44 px on coarse input. Smaller type does not mean smaller touch targets. Keyboard focus is fully visible.
 - Support opens the existing support experience through a quiet text action. A footer action must not masquerade as a working service when it is unavailable.
 - No primary filled CTA, oversized social icons, decorative motion or repeated signup promotion in the footer. Missing external URLs produce honest unavailable text or omission according to the existing product contract; never `href="#"`, invented URLs or dead buttons.
@@ -321,13 +324,13 @@ Completion language must distinguish source checks, local browser evidence, auth
 
 ## Tincta Rewards subproject lockup · 2026-10-09
 
-The approved quiet label identifies the current application as **Tincta Rewards**, a subproject of Tincta. In the Rewards landing (`/rewards`) and Web headers/footers and Launch branding, wrap the unchanged canonical wordmark in `RewardsBrand` from `@manekineko/ui/rewards-brand`. This approved subproject descriptor is the exception to the prohibition on adding a second name beside the logo; never recreate or alter the parent wordmark.
+The approved quiet label identifies the current application as **Tincta Rewards**, a subproject of Tincta. In the Rewards landing (`/rewards`) and Web headers and Launch branding, wrap the unchanged canonical wordmark in `RewardsBrand` from `@manekineko/ui/rewards-brand`. This approved subproject descriptor is the exception to the prohibition on adding a second name beside the logo; never recreate or alter the parent wordmark.
 
-Use the shared 14 px gap and title-case “Rewards” label: system sans, 13 px/20 px, weight 500, 0.01em tracking, 2 px vertical / 8 px horizontal padding, 3 px corners, #fafafa surface, #ddd border and #555 text. Dimensions scale in rem. Retain existing desktop/mobile/footer wordmark sizes. The label is not a button. Home links are named “Tincta Rewards home”; standalone lockups are named “Tincta Rewards”. Parent-brand assets, favicons and artwork signatures remain Tincta. The parent Tincta landing page lives at `/` and uses the unmodified parent wordmark. Rewards keeps its complete landing experience at `/rewards`.
+Use the shared 8 px gap and title-case “Rewards” label: system sans, 12 px/18 px, weight 500, no added tracking, 2 px vertical / 8 px horizontal padding, 3 px corners, #fafafa surface, #ddd border and #555 text. Dimensions scale in rem. Use 72 px desktop / 64 px mobile wordmarks; footers use only the 28 px TC glyph. The label is not a button. Home links are named “Tincta Rewards home”; standalone lockups are named “Tincta Rewards”. Parent-brand assets, favicons and artwork signatures remain Tincta. The parent Tincta landing page lives at `/` and uses the unmodified parent wordmark. Rewards keeps its complete landing experience at `/rewards`.
 
 ## Parent-brand landing · 2026-10-09
 
-`apps/landing-page/app/page.tsx` now owns the parent Tincta page at `/`; the original Rewards experience is composed by `app/rewards/page.tsx` at `/rewards`. Parent navigation and footer use the plain canonical wordmark. The parent page presents the research thesis, a Rewards feature, and Morph/Assembly as research concepts without launch dates or invented progress. Existing newsletter and live-collection behavior stays with Rewards.
+`apps/landing-page/app/page.tsx` now owns the parent Tincta page at `/`; the original Rewards experience is composed by `app/rewards/page.tsx` at `/rewards`. Parent navigation uses the canonical wordmark; its footer uses the TC glyph alone. The parent page presents the research thesis, a Rewards feature, and Morph/Assembly as research concepts without launch dates or invented progress. Existing newsletter and live-collection behavior stays with Rewards.
 
 Parent presentation uses shared foundation tokens, buttons, icons, disclosures and footer text contracts. The app-scoped `studio.css` owns its layout. `components/research-art.tsx` draws decorative, static geometric studies using exact catalog palettes; these are not minted artwork or assertions about deployed project behavior. No remote images, fonts or data requests are required for the parent page.
 
@@ -341,8 +344,17 @@ Verification: Landing source policy, typecheck, production build, generated-bran
 
 ## Compact Web header and wallet management · 2026-10-24
 
-User-directed Web shell refinement: the shared `RewardsBrand` compact variant uses a 24 px Open symbol, 80 px Ligature wordmark, 8 px gaps and an unframed 12/20 px muted Rewards descriptor. Canonical SVG geometry, default lockups and footers remain intact. The Web header has a 56 px minimum, 4 px vertical padding and a 44 px brand target. Navigation uses 13/20 px type with 24 px desktop gaps. Account and menu controls retain shared 40/44 px targets. Below 600 px the account control uses the shared icon-only button with the full address in its accessible name. The header grows with enlarged text and its navigation opens in normal flow. Network details belong in wallet management and transaction review; no network or preview badge appears in the navbar.
+User-directed Web shell refinement, updated 2026-10-24: `RewardsBrand` uses the shared 20 px Open symbol, 72 px desktop / 64 px mobile Ligature wordmark, 8 px gaps and a framed 12/18 px Rewards badge. All footers use the TC glyph alone. The Web header retains its 56 px minimum, 4 px vertical padding and 44 px brand target. Navigation uses the shared label type; account/menu controls use the shared 32/44 px targets. The header grows with enlarged text and navigation opens in normal flow. Network details remain in wallet management and transaction review.
 
 `WebWalletMenu` composes the shared Radix dialog, Button, IconButton, TextAction, badge, icon and typography contracts. It uses canvas/surface/line/muted tokens, 3 px corners, 16 px grouped padding, 8/12/16 px gaps and natural height with internal scrolling. Connected accounts, selection, disconnect and updates come from Reown; no private shadow DOM is styled. Wallet-provider logos are replaced with the shared neutral wallet icon. Installed-wallet connection, WalletConnect QR and network selection remain vendor surfaces themed through supported APIs; external wallet prompts remain system owned.
 
 Public documentation uses server-rendered flow diagrams, allocation figures and formula panels with selectable text, named figures, semantic lists/definitions and captions. Their palette, spacing and typography use the existing foundation tokens. Narrow figures stack without page overflow; formulas include plain-language definitions and explicit rounding/empty-case boundaries. Search indexes diagram and formula text. There is no diagram runtime, remote font or image dependency.
+
+
+## Compact composition update · 2026-10-24
+
+- Rewards headers retain the bordered, surface-filled Rewards badge at 12/18 px. Compact branding reduces the wordmark and Open symbol; it never strips badge framing. Parent headers retain the outlined wordmark alone.
+- Landing desktop navigation uses equal flexible side tracks around the centered navigation. The right action and left logo may have different intrinsic widths without shifting the menu. Preserve the existing accessible mobile menu and its normal document flow.
+- All public and operator footers use `FooterBrand` from `packages/ui`: canonical `/tincta-mark.svg`, 28 × 28 px, inside a named home link. Footer copy and links remain separate. The footer gap token is 96 px desktop / 64 px mobile, including compact variants.
+- Public rules use labeled sections for voting/minting, prizes, refunds, affiliates and holder rewards, with readable paragraph measures and a responsive two-column grid. Allocation percentages and treasury purpose stay visible above the disclosure.
+- Rewards Landing presents prize details before the collection explanations, then refunds followed by season holder rewards. The three overview examples show prize, affiliate and holder allocations under the same explicit assumptions. Holder calculations describe separate season pools, eligibility and limited claim slots; illustrative totals are never represented as funded balances.

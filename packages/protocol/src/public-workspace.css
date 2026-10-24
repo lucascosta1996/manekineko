@@ -10,7 +10,7 @@
   margin: 0 auto var(--ui-space-6);
 }
 .public-heading h1 {
-  font: 500 var(--ui-hero) / 1.12 var(--ui-font-sans);
+  font: 500 var(--ui-page) / 1.15 var(--ui-font-sans);
   letter-spacing: -0.035em;
   margin: var(--ui-space-3) 0 var(--ui-space-4);
 }
@@ -366,3 +366,14 @@
 @media (forced-colors: active) {
   .holder-progress { appearance: auto; }
 }
+
+.public-allocation-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,14rem),1fr)); gap: var(--ui-space-6); margin: 0 0 var(--ui-space-6); }
+.public-allocation-grid dt { font-weight: 500; margin-bottom: var(--ui-space-2); }
+.public-allocation-grid dd { margin: 0; color: var(--ui-muted); max-width: 45ch; }
+.public-explainer-note { color: var(--ui-muted); max-width: 68ch; margin-bottom: var(--ui-space-6); }
+.public-rules-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: var(--ui-space-8); padding-block: var(--ui-space-4) var(--ui-space-6); }
+.public-rules-grid > section { min-width: 0; border-top: 1px solid var(--ui-line); padding-top: var(--ui-space-4); }
+.public-rules-grid h3 { font-size: var(--ui-subheading); font-weight: 500; margin: 0 0 var(--ui-space-3); }
+.public-rules-grid p { max-width: 68ch; margin: 0; color: var(--ui-muted); }
+.public-rules-grid a { margin-top: var(--ui-space-3); }
+@media (max-width: 700px) { .public-rules-grid { grid-template-columns: minmax(0,1fr); } }

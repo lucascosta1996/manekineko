@@ -11,6 +11,9 @@ export type PlannedRewards = {
   winningNftCount: number;
   prizePoolEth: string;
   affiliatePoolEth: string;
+  holderPoolEth: string;
+  holderClaimSlots: number;
+  holderRewardEth: string;
   communityPoolEth: string;
 };
 
@@ -20,6 +23,8 @@ const COLLECTION_SUPPLY = 1_000n;
 const PRIZE_BPS = 6_000n;
 const AFFILIATE_BPS = 2_000n;
 const WINNERS_PER_COLLECTION = 6;
+const HOLDER_BPS = 800n;
+const HOLDER_COVERAGE_BPS = 500n;
 
 function formatEth(wei: bigint): string {
   const fraction = (wei % WEI_PER_ETH)
@@ -30,7 +35,7 @@ function formatEth(wei: bigint): string {
 }
 
 /** Minimum-term sellout illustration (1,000 NFTs at 0.01 ETH). Not collected funds.
- * Every V12 collection uses the fixed 60/20/20 split. Voting chooses actual terms. */
+ * Current seasons use 60/20/8/12 allocations. Voting chooses actual terms. */
 export function summarizePlannedRewards(
   catalog: readonly PlannedSeason[],
 ): PlannedRewards {
@@ -47,13 +52,20 @@ export function summarizePlannedRewards(
       (BigInt(collectionCount) * AFFILIATE_BPS)) /
     10_000n;
 
+  const holderPoolWei = BigInt(collectionCount) * collectionRevenueWei * HOLDER_BPS / 10_000n;
+  // Slots are rounded separately for each season, just like the onchain pool.
+  const holderClaimSlots = catalog.reduce((sum, season) => sum + BigInt(season.collections.length) * COLLECTION_SUPPLY * HOLDER_COVERAGE_BPS / 10_000n, 0n);
+  const holderRewardWei = holderClaimSlots ? holderPoolWei / holderClaimSlots : 0n;
   return {
     seasonCount: catalog.length,
     collectionCount,
     winningNftCount: collectionCount * WINNERS_PER_COLLECTION,
     prizePoolEth: formatEth(prizePoolWei),
     affiliatePoolEth: formatEth(affiliatePoolWei),
-    communityPoolEth: formatEth(prizePoolWei + affiliatePoolWei),
+    holderPoolEth: formatEth(holderPoolWei),
+    holderClaimSlots: Number(holderClaimSlots),
+    holderRewardEth: formatEth(holderRewardWei),
+    communityPoolEth: formatEth(prizePoolWei + affiliatePoolWei + holderPoolWei),
   };
 }
 

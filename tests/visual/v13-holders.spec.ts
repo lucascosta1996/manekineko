@@ -33,12 +33,10 @@ for (const [width, height] of widths)
           exact: true,
         })
       ).toBeDisabled();
-      await expect(
-        page.getByText(
-          "60% winning tickets · 20% qualified affiliates · 8% holder rewards · 12% protocol treasury.",
-          { exact: true }
-        )
-      ).toBeVisible();
+      await expect(page.locator(".public-allocation-grid dt")).toHaveText([
+        "60% · Winning tickets", "20% · Qualified affiliates",
+        "8% · Holder rewards", "12% · Protocol treasury",
+      ]);
       expect(
         await page.evaluate(
           () => document.documentElement.scrollWidth <= innerWidth

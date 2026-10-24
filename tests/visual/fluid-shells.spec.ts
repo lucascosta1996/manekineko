@@ -26,6 +26,18 @@ for (const surface of surfaces) test(`Fluid aligned page edges: ${surface.name}`
   for (const width of [320, 390, 768, 1280, 1440, 1920, 2560]) {
     await page.setViewportSize({ width, height: 900 });
     const gutter = Math.max(16, width * 0.025);
+    const footer = page.locator('footer').last();
+    await expect(footer.locator('[data-tincta-logo="mark"]')).toHaveCount(1);
+    await expect(footer.locator('[data-tincta-logo="wordmark"], .ui-rewards-brand')).toHaveCount(0);
+    expect(await footer.evaluate(el => parseFloat(getComputedStyle(el).marginTop))).toBeGreaterThanOrEqual(width < 600 ? 64 : 96);
+    const headings = await page.locator('main :is(h1,h2,h3)').evaluateAll(els => els.map(el => parseFloat(getComputedStyle(el).fontSize)));
+    expect(headings.every(size => size <= 28), 'Compact heading scale').toBe(true);
+    if (surface.name === 'parent' || surface.name === 'rewards') {
+      if (width >= 960) {
+        const nav = (await page.locator('.desktop-nav').boundingBox())!;
+        expect(Math.abs(nav.x + nav.width / 2 - width / 2), 'Centered desktop navigation').toBeLessThanOrEqual(0.5);
+      }
+    }
     for (const selector of surface.edges) {
       const box = (await page.locator(selector).first().boundingBox())!;
       expect(Math.abs(box.x - gutter), `${selector} left at ${width}`).toBeLessThanOrEqual(0.5);

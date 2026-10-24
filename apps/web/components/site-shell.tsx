@@ -25,7 +25,7 @@ export function SiteShell({ children, section = "home", chainId = null, classNam
         <HeaderWallet chainId={chainId} />
       </header>
       <main id="main">{children}</main>
-      <PublicFooter brand={<RewardsBrand><TinctaWordmark title="" className="ui-footer-wordmark" /></RewardsBrand>} links={{ ...publicLinks({ website: process.env.NEXT_PUBLIC_LANDING_URL ?? (process.env.NODE_ENV === "development" ? "http://localhost:3101" : undefined), app: process.env.NEXT_PUBLIC_WEB_URL ?? process.env.AFFILIATE_PUBLIC_ORIGIN ?? (process.env.NODE_ENV === "development" ? "http://localhost:3100" : undefined), contact: process.env.NEXT_PUBLIC_CONTACT_URL, telegram: process.env.NEXT_PUBLIC_TELEGRAM_URL, social: publicXProfiles.rewards }), app: "/", docs: "/docs" }} />
+      <PublicFooter links={{ ...publicLinks({ website: process.env.NEXT_PUBLIC_LANDING_URL ?? (process.env.NODE_ENV === "development" ? "http://localhost:3101" : undefined), app: process.env.NEXT_PUBLIC_WEB_URL ?? process.env.AFFILIATE_PUBLIC_ORIGIN ?? (process.env.NODE_ENV === "development" ? "http://localhost:3100" : undefined), contact: process.env.NEXT_PUBLIC_CONTACT_URL, telegram: process.env.NEXT_PUBLIC_TELEGRAM_URL, social: publicXProfiles.rewards }), app: "/", docs: "/docs" }} />
     </div>
   );
 }

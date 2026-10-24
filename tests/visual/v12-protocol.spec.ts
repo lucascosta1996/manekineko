@@ -20,11 +20,9 @@ for (const width of [320, 390, 768, 1280, 1440])
       await page.goto(`${urls.web}/${route}`);
       await expect(page.getByRole('heading', { name: 'Fictional voting study' })).toBeVisible();
       await ready(page);
-      await expect(
-        page.getByText(
-          '60% winning tickets · 20% qualified affiliates · 20% protocol treasury.'
-        )
-      ).toBeVisible();
+      await expect(page.locator('.public-allocation-grid dt')).toHaveText([
+        '60% · Winning tickets', '20% · Qualified affiliates', '20% · Protocol treasury',
+      ]);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       if (phase === 0) {
         await expect(page.getByRole('button', { name: 'Vote for option 1' })).toBeDisabled();

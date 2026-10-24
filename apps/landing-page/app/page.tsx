@@ -1,3 +1,4 @@
+import { FooterBrand } from "@manekineko/ui/footer";
 import { LinkButton } from "@manekineko/ui/button";
 import { Icon } from "@manekineko/ui/icons";
 import { publicLinks, publicXProfiles } from "@manekineko/ui/links";
@@ -89,7 +90,7 @@ export default function LandingPage() {
           <section className="studio-section studio-closing" aria-labelledby="closing-title"><div><p className="studio-eyebrow">Built to remain</p><h2 id="closing-title">The rules stay fixed.<br />The possibilities unfold.</h2></div><LinkButton href="/rewards" icon={<Icon name="arrow" />}>Discover Tincta Rewards</LinkButton></section>
         </main>
         <footer className="studio-footer">
-          <div><a className="studio-brand" href="/" aria-label="Tincta home"><TinctaWordmark className="studio-wordmark" title="" /></a><p className="studio-footer-description">Research and publishing<br />for immutable onchain systems.</p></div>
+          <div><FooterBrand /><p className="studio-footer-description">Research and publishing<br />for immutable onchain systems.</p></div>
           <nav aria-label="Explore Tincta"><strong className="ui-footer-heading">Explore</strong><a className="ui-footer-link" href="#research">Our research</a><a className="ui-footer-link" href="/rewards">Tincta Rewards<Icon name="arrow" size="footer" /></a><a className="ui-footer-link" href="#upcoming">Upcoming projects</a><a className="ui-footer-link" href="#launch-list">Join the launch list</a></nav>
           <nav aria-label="Tincta information"><strong className="ui-footer-heading">Tincta</strong><a className="ui-footer-link" href="#top">Back to top<Icon name="up" size="footer" /></a>{links.contact && <a className="ui-footer-link" href={links.contact}>Contact<Icon name="diagonal" size="footer" /></a>}{links.social && <a className="ui-footer-link" href={links.social}>X<Icon name="diagonal" size="footer" /></a>}</nav>
           <div className="studio-footer-legal"><span>© {new Date().getFullYear()} Tincta</span><span>Defined 100% onchain. Shaped by participation.</span></div>

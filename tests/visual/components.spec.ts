@@ -34,14 +34,14 @@ test.describe('Shared production component contracts', () => {
     await specimens(page);
     for (const variant of ['primary','secondary','ghost','destructive','disabled','link']) {
       const m = await metrics(page, `[data-testid="button-${variant}"]`);
-      expect(m.size).toBe('14px'); expect(m.line).toBe('20px'); expect(m.weight).toBe('500');
-      expect(m.padding).toEqual(['9px','14px','9px','14px']);
+      expect(m.size).toBe('13px'); expect(m.line).toBe('18px'); expect(m.weight).toBe('500');
+      expect(m.padding).toEqual(['6px','12px','6px','12px']);
       expect(m.margin).toEqual(['0px','0px','0px','0px']); expect(m.radius).toBe('3px'); expect(m.border).toBe('1px');
-      expect(m.height).toBe(40); expect(m.gap).toBe('8px');
+      expect(m.height).toBe(32); expect(m.gap).toBe('8px');
     }
     const icon = await metrics(page, '[data-testid="button-icon"]');
-    expect(icon.width).toBe(40); expect(icon.height).toBe(40); expect(icon.padding).toEqual(['10px','10px','10px','10px']);
-    expect(icon.icon).toEqual(['18px','18px','1.6']);
+    expect(icon.width).toBe(32); expect(icon.height).toBe(32); expect(icon.padding).toEqual(['7px','7px','7px','7px']);
+    expect(icon.icon).toEqual(['16px','16px','1.6']);
     for (const [variant, hover, pressed] of [['primary','rgb(51, 51, 51)','rgb(0, 0, 0)'],['secondary','rgb(240, 240, 240)','rgb(232, 232, 232)'],['ghost','rgb(240, 240, 240)','rgb(232, 232, 232)'],['destructive','rgb(146, 31, 22)','rgb(122, 26, 19)']]) {
       const control = page.getByTestId(`button-${variant}`);
       await control.hover(); await expect(control).toHaveCSS('background-color',hover);
@@ -51,14 +51,14 @@ test.describe('Shared production component contracts', () => {
     }
     const action = await metrics(page, '[data-testid="text-action"]');
     expect(action.height).toBeGreaterThanOrEqual(32); expect(action.padding).toEqual(['0px','0px','0px','0px']);
-    const footer = await metrics(page, '.ui-footer-link'); expect(footer.size).toBe('13px'); expect(footer.line).toBe('20px'); expect(footer.icon).toEqual(['16px','16px','1.6']);
+    const footer = await metrics(page, '.ui-footer-link'); expect(footer.size).toBe('12px'); expect(footer.line).toBe('18px'); expect(footer.icon).toEqual(['16px','16px','1.6']);
     expect((await metrics(page, '.ui-footer-heading')).size).toBe('12px');
     expect((await metrics(page, '.ui-footer-legal')).size).toBe('12px');
     await expect(page.locator('footer')).toHaveCount(1); expect(await page.locator('footer').innerText()).toMatch(/© 2026 Tincta/);
     await page.getByRole('combobox', { name: 'Network', exact: true }).click();
     await expect(page.getByRole('listbox')).toBeVisible();
     const portal = await metrics(page, '.ui-select-content'); const field = await metrics(page, '.ui-select');
-    expect(portal.font).toBe(field.font); expect(portal.size).toBe('14px');
+    expect(portal.font).toBe(field.font); expect(portal.size).toBe('13px');
     await expect(page.getByRole('option', { name:'Sepolia test network', exact:true })).toBeFocused();
     await page.keyboard.press('ArrowDown'); await expect(page.getByRole('option', { name:'Ethereum Mainnet', exact:true })).toBeFocused(); await page.keyboard.press('Enter');
     await expect(page.getByRole('combobox', { name: 'Network', exact: true })).toContainText('Ethereum Mainnet');
@@ -139,8 +139,8 @@ test.describe('Shared production component contracts', () => {
     const context = await browser.newContext({ serviceWorkers: 'block', hasTouch: true, viewport:{ width:1280,height:800 } });
     const page = await context.newPage(); await specimens(page);
     expect(await page.evaluate(() => matchMedia('(any-pointer: coarse)').matches)).toBe(true);
-    const button = await metrics(page, '[data-testid="button-primary"]'); expect(button.height).toBe(44); expect(button.padding).toEqual(['11px','14px','11px','14px']);
-    const icon = await metrics(page, '[data-testid="button-icon"]'); expect(icon.height).toBe(44); expect(icon.width).toBe(44); expect(icon.padding).toEqual(['12px','12px','12px','12px']);
+    const button = await metrics(page, '[data-testid="button-primary"]'); expect(button.height).toBe(44); expect(button.padding).toEqual(['12px','12px','12px','12px']);
+    const icon = await metrics(page, '[data-testid="button-icon"]'); expect(icon.height).toBe(44); expect(icon.width).toBe(44); expect(icon.padding).toEqual(['13px','13px','13px','13px']);
     const input = await metrics(page, 'input[type="email"]'); expect(input.size).toBe('16px'); expect(input.height).toBe(44); expect(input.padding).toEqual(['11px','12px','11px','12px']);
     expect((await metrics(page, '.ui-footer-link')).height).toBeGreaterThanOrEqual(44);
     await page.getByTestId('button-busy').tap();
@@ -152,7 +152,7 @@ test.describe('Shared production component contracts', () => {
     await page.goto(`${urls.landing}/specimens/tabs`);
     const short = await metrics(page, '[data-testid="button-short"]');
     expect(short.width).toBeGreaterThanOrEqual(44); expect(short.height).toBeGreaterThanOrEqual(44);
-    expect(short.padding).toEqual(['11px','14px','11px','14px']);
+    expect(short.padding).toEqual(['12px','12px','12px','12px']);
     await context.close();
   });
 
@@ -165,7 +165,7 @@ test.describe('Shared production component contracts', () => {
     expect(await page.getByTestId('button-primary').evaluate(element => getComputedStyle(element).outlineStyle)).toBe('solid');
     await page.emulateMedia({ forcedColors:'none' });
     await page.addStyleTag({content: 'html { font-size: 200%; }'});
-    const button = await metrics(page,'[data-testid="button-primary"]'); expect(button.height).toBeGreaterThanOrEqual(80); expect(button.size).toBe('28px');
+    const button = await metrics(page,'[data-testid="button-primary"]'); expect(button.height).toBeGreaterThanOrEqual(64); expect(button.size).toBe('26px');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
     await page.addStyleTag({content: ':where(p, span, a, button, input, textarea, label) { line-height:1.5; letter-spacing:.12em; word-spacing:.16em; } p { margin-block-end:2em; }'});
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);

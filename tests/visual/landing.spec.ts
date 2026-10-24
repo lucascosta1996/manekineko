@@ -66,7 +66,7 @@ test.describe('Landing asynchronous production states', () => {
    else await expect(supply).toBeVisible();
    await expect(page.locator('.hero')).not.toContainText(/Visual study|Mint open|tickets remaining/);
    const after=await cta.boundingBox(); expect(after?.x).toBe(before?.x);expect(after?.y).toBe(before?.y);
-   const m=await metrics(page,'.hero-actions .ui-button'); expect(m.padding).toEqual(['9px','14px','9px','14px']); expect(m.size).toBe('14px');expect(m.height).toBe(40);
+   const m=await metrics(page,'.hero-actions .ui-button'); expect(m.padding).toEqual(['6px','12px','6px','12px']); expect(m.size).toBe('13px');expect(m.height).toBe(32);
    await expect(page).toHaveScreenshot(`hero-loaded-${width}.png`);
   });
   test(`empty and failed retry retain truthful state ${width}`, async ({ page }) => {

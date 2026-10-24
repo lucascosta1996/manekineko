@@ -23,24 +23,24 @@
   --ui-primary-pressed: #000000;
   --ui-danger-hover: #921f16;
   --ui-danger-pressed: #7a1a13;
-  --ui-brand-gap: 0.875rem;
+  --ui-brand-gap: 0.5rem;
   --ui-brand-label-ink: #555555;
   --ui-brand-label-border: #dddddd;
   --ui-brand-label-padding-block: 0.125rem;
   --ui-radius: 0.1875rem;
-  --ui-hero: clamp(1.875rem, 3.5vw, 2.5rem);
-  --ui-page: clamp(1.75rem, 3vw, 2.25rem);
-  --ui-marketing-section: clamp(1.5rem, 3vw, 2.25rem);
-  --ui-section: clamp(1.25rem, 2vw, 1.5rem);
-  --ui-subheading: 1.125rem;
-  --ui-body: 0.9375rem;
-  --ui-body-line: 1.5rem;
-  --ui-control: 0.875rem;
-  --ui-control-line: 1.25rem;
-  --ui-label: 0.8125rem;
+  --ui-hero: clamp(1.5rem, 2.5vw, 1.75rem);
+  --ui-page: clamp(1.25rem, 2vw, 1.5rem);
+  --ui-marketing-section: clamp(1.125rem, 2vw, 1.375rem);
+  --ui-section: 1.125rem;
+  --ui-subheading: 1rem;
+  --ui-body: 0.875rem;
+  --ui-body-line: 1.375rem;
+  --ui-control: 0.8125rem;
+  --ui-control-line: 1.125rem;
+  --ui-label: 0.75rem;
   --ui-caption: 0.75rem;
   --ui-caption-line: 1.125rem;
-  --ui-footer-type: 0.8125rem;
+  --ui-footer-type: 0.75rem;
   --ui-space-0: 0;
   --ui-space-1: 0.25rem;
   --ui-space-2: 0.5rem;
@@ -55,18 +55,22 @@
   --ui-space-20: 5rem;
   --ui-space-24: 6rem;
   --ui-space: var(--ui-space-2);
+  --ui-brand-wordmark: 4.5rem;
+  --ui-footer-gap: var(--ui-space-24);
+  --ui-section-space: var(--ui-space-12);
   --ui-page-gutter: max(var(--ui-space-4), 2.5vw);
   --ui-page-width: calc(100% - 2 * var(--ui-page-gutter));
-  --ui-control-height: 2.5rem;
+  --ui-control-height: 2rem;
   --ui-button-min-width: 0;
-  --ui-button-padding-block: 0.5625rem;
-  --ui-button-padding-inline: 0.875rem;
-  --ui-icon-padding: 0.625rem;
-  --ui-icon-size: 1.125rem;
+  --ui-button-padding-block: 0.375rem;
+  --ui-button-padding-inline: 0.75rem;
+  --ui-icon-padding: 0.4375rem;
+  --ui-icon-size: 1rem;
   --ui-footer-icon-size: 1rem;
-  --ui-field-padding-block: 0.5625rem;
+  --ui-field-padding-block: 0.375rem;
   --ui-field-padding-inline: 0.75rem;
   --ui-field-type: var(--ui-control);
+  --ui-field-line: var(--ui-control-line);
   --ui-text-action-height: 2rem;
   --ui-card-padding: var(--ui-space-4);
   --ui-focus-width: 2px;
@@ -87,15 +91,17 @@
   --ui-z-toast: 180;
   --ui-z-tooltip: 190;
 }
-@media (min-width: 600px) { :root { --ui-card-padding: var(--ui-space-6); } }
+@media (min-width: 600px) { :root { --ui-card-padding: var(--ui-space-5); } }
+@media (max-width: 599px) { :root { --ui-brand-wordmark: 4rem; --ui-footer-gap: var(--ui-space-16); --ui-section-space: var(--ui-space-8); } }
 @media (any-pointer: coarse) {
   :root {
     --ui-control-height: 2.75rem;
     --ui-button-min-width: var(--ui-control-height);
-    --ui-button-padding-block: 0.6875rem;
-    --ui-icon-padding: 0.75rem;
+    --ui-button-padding-block: 0.75rem;
+    --ui-icon-padding: 0.8125rem;
     --ui-field-padding-block: 0.6875rem;
     --ui-field-type: 1rem;
+    --ui-field-line: 1.25rem;
     --ui-text-action-height: 2.75rem;
   }
 }

@@ -113,7 +113,7 @@ for (const width of [390, 1440]) test(`Tincta wallet menu switches connections a
     return { radius: s.borderRadius, background: s.backgroundColor, font: s.fontFamily, buttonFont: b.fontFamily, buttonSize: b.fontSize, buttonRadius: b.borderRadius };
   });
   expect(styles.radius).toBe('3px'); expect(styles.background).toBe('rgb(255, 255, 255)');
-  expect(styles.buttonFont).toBe(styles.font); expect(styles.buttonSize).toBe('14px'); expect(styles.buttonRadius).toBe('3px');
+  expect(styles.buttonFont).toBe(styles.font); expect(styles.buttonSize).toBe('13px'); expect(styles.buttonRadius).toBe('3px');
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: `test-results/wallet-menu-${width}-${info.project.name}.png` });

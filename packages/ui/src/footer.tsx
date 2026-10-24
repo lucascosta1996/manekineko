@@ -4,16 +4,18 @@ import * as Dialog from "./dialog";
 import { Icon } from "./icons";
 import { IconButton, LinkButton, TextAction } from "./button";
 import type { PublicLinks } from "./links";
+export function FooterBrand({ href = "https://tincta.xyz" }: { href?: string }) {
+  return <a className="ui-footer-home" href={href} aria-label="Tincta home"><img className="ui-footer-mark" src="/tincta-mark.svg" width="28" height="28" alt="" data-tincta-logo="mark" /></a>;
+}
+
 export function PublicFooter({
   links,
-  brand,
   legal,
   actions,
   density = "default",
   year = new Date().getFullYear(),
 }: {
   links: PublicLinks;
-  brand?: ReactNode;
   legal?: ReactNode;
   actions?: ReactNode;
   density?: "default" | "compact";
@@ -40,7 +42,7 @@ export function PublicFooter({
   return (
     <footer className={`ui-footer${density === "compact" ? " ui-footer-compact" : ""}`}>
       <div className="ui-footer-brand">
-        {brand}
+        <FooterBrand href={links.website ?? undefined} />
         <p className="ui-footer-copy">Rewards governed by smart contracts.</p>
       </div>
       {group("Explore", [

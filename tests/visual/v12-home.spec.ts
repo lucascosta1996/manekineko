@@ -286,7 +286,7 @@ test("live action reflows with enlarged text, keyboard navigation and coarse tar
   const m = await metrics(page, ".header-wallet .ui-button:visible");
   expect(m.height).toBeGreaterThanOrEqual(44);
   expect(m.width).toBeGreaterThanOrEqual(44);
-  expect(m.padding).toEqual(["12px", "12px", "12px", "12px"]);
+  expect(m.padding).toEqual(["13px", "13px", "13px", "13px"]);
   await page.getByRole("button", { name: "Open menu" }).focus();
   await page.keyboard.press("Enter");
   await expect(

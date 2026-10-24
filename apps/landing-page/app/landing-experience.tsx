@@ -91,7 +91,7 @@ const faqs = (plannedRewards: PlannedRewards) => [
   {
     question: "Is Tincta live?",
     answer:
-      `The catalog plans ${plannedRewards.seasonCount} seasons and ${plannedRewards.collectionCount} collections. The illustrated totals assume every collection sells out 1,000 NFTs at 0.01 ETH with six winners: ${Number(plannedRewards.prizePoolEth).toLocaleString("en-US")} ETH in prizes and ${plannedRewards.affiliatePoolEth} ETH in affiliate pools. Voting selects actual terms. These examples are not collected funds or a Mainnet launch announcement. Check the configured collection before participating.`,
+      `The catalog plans ${plannedRewards.seasonCount} seasons and ${plannedRewards.collectionCount} collections. The illustrated totals assume every collection sells out 1,000 NFTs at 0.01 ETH with six winners: ${Number(plannedRewards.prizePoolEth).toLocaleString("en-US")} ETH in prizes and ${plannedRewards.affiliatePoolEth} ETH in affiliate pools, plus ${plannedRewards.holderPoolEth} ETH across separate holder pools (${plannedRewards.holderClaimSlots.toLocaleString("en-US")} claim slots at ${plannedRewards.holderRewardEth} ETH each under these assumptions). Voting selects actual terms. These examples are not collected funds or a Mainnet launch announcement. Check the configured collection before participating.`,
   },
 ];
 
@@ -252,7 +252,7 @@ export function LandingExperience({
                 {Number(plannedRewards.prizePoolEth).toLocaleString("en-US")} <span>ETH</span>
               </div>
               <p>
-                Example: {plannedRewards.winningNftCount.toLocaleString("en-US")} winning NFTs at <strong>1 ETH each.</strong>
+                60% of example mint revenue. {plannedRewards.winningNftCount.toLocaleString("en-US")} winning NFTs at <strong>1 ETH each.</strong>
               </p>
             </div>
             <div className="reward-metric affiliate-metric">
@@ -265,29 +265,20 @@ export function LandingExperience({
                 {Number(plannedRewards.affiliatePoolEth).toLocaleString("en-US")} <span>ETH</span>
               </div>
               <p>
-                Across every season. <strong>Contract-calculated commissions.</strong>
+                20% of example mint revenue. <strong>2 ETH per collection</strong>, shared equally by its qualified affiliates.
               </p>
             </div>
-            <div className="reward-context">
-              <div className="overlapping-dots" aria-hidden="true">
-                <span />
-                <span />
-                <span />
-              </div>
-              <p>
-                {plannedRewards.seasonCount} seasons. {plannedRewards.collectionCount} collections.
-                <br />Prizes and commissions onchain.
-              </p>
-              <a className="ui-text-action" href="#reward-details">
-                Explore prize amounts
-                <Icon name="down" />
-              </a>
+            <div className="reward-metric holder-metric">
+              <div className="metric-top"><Icon name="layers" /><span>HOLDER POOL EXAMPLE</span></div>
+              <div className="metric-number">{plannedRewards.holderPoolEth} <span>ETH</span></div>
+              <p>8% across separate season pools. Example: {plannedRewards.holderClaimSlots.toLocaleString("en-US")} claims at <strong>{plannedRewards.holderRewardEth} ETH each.</strong></p>
+              <a className="ui-text-action" href="#holder-rewards">See holder calculations <Icon name="down" /></a>
             </div>
           </div>
           <p className="terms-note">
-            <span>Example totals if all {plannedRewards.collectionCount} collections sell out 1,000 NFTs at 0.01 ETH with six winners.
+            <span>{plannedRewards.seasonCount} seasons · {plannedRewards.collectionCount} collections. Example totals if all collections sell out 1,000 NFTs at 0.01 ETH with six winners.
             Community voting selects the actual price, supply, winner count, and mint duration from published options.
-            Actual prizes may be higher or lower. These are not funded balances.</span>
+            Actual rewards vary. Holder claims are limited to the first 5% of eligible NFTs per season. These are not funded balances.</span>
             <a href="#questions">
               See the details
               <Icon name="diagonal" />
@@ -308,12 +299,126 @@ export function LandingExperience({
           </div>
         </section>
 
-        <section className="manifesto wrap" aria-labelledby="holders-title">
-          <p className="eyebrow section-kicker">SEASON HOLDER REWARDS · PLANNED FOR LAUNCH</p>
-          <h2 id="holders-title">Not a winner,<br /><span className="muted-heading">but still a holder?</span></h2>
-          <div className="manifesto-bottom">
-            <p>8% of actual mint revenue from successful draws builds a season pool. Voting changes prices and supplies, so the pool and ETH per claim vary by season. Once every collection has drawn or become refundable, the first 5% of eligible NFTs to claim share the final pool equally. Only NFTs from successful draws qualify, including winners. One claim per NFT, while slots remain.</p>
-            <LinkButton href={footerLinks.app ? `${footerLinks.app.replace(/\/$/, "")}/holders` : undefined}>Explore holder rewards <Icon name="diagonal" /></LinkButton>
+        <section
+          className="rewards-section wrap"
+          id="reward-details"
+          aria-labelledby="prizes-title"
+        >
+          <div className="prize-panel" data-reveal>
+            <div className="prize-copy">
+              <p className="eyebrow">
+                <Icon name="spark" /> PRIZES CLAIMED DIRECTLY
+              </p>
+              <h2 id="prizes-title">
+                The community votes.
+                <br />
+                <span className="serif">The prize amount follows.</span>
+              </h2>
+              <p>
+                Each prize is an equal share of 60% of the collection’s mint
+                revenue. The voted price, supply, and winner count determine its
+                size. After sellout and a successful draw, winning NFT holders
+                claim directly from the contract.
+              </p>
+              <dl className="prize-examples" aria-label="Illustrative prizes at sellout, not live voting options">
+                <div><dt>1,000 NFTs · 0.01 ETH · 6 winners</dt><dd>1 ETH each</dd></div>
+                <div><dt>2,000 NFTs · 0.01 ETH · 6 winners</dt><dd>2 ETH each</dd></div>
+                <div><dt>1,000 NFTs · 0.01 ETH · 10 winners</dt><dd>0.6 ETH each</dd></div>
+              </dl>
+              <p>Illustrations at sellout, not live voting options. 1 ETH is an
+                example, not a minimum or a cap. The final voted terms determine
+                the prize.</p>
+              <a className="ui-text-action" href="#questions">
+                Understand the draw
+                <Icon name="diagonal" />
+              </a>
+            </div>
+            <div
+              className="prize-tickets"
+              aria-label="Example of six equal prizes of 1 ETH each"
+            >
+              {Array.from({ length: 6 }, (_, i) => (
+                <div className="prize-ticket" key={i}>
+                  <div className="ticket-top">
+                    <Icon name="ethereum" />
+                    <span className="mono">
+                      PRIZE {String(i + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+                  <span className="ticket-amount">
+                    1 <span>ETH</span>
+                  </span>
+                  <span className="ticket-bottom">
+                    EXAMPLE PRIZE
+                    <Icon name="spark" />
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="affiliate-panel" id="affiliates" data-reveal>
+            <div className="affiliate-visual" aria-hidden="true">
+              <div className="affiliate-art">
+                <svg viewBox="0 0 400 300" fill="none">
+                  <g className="affiliate-rings">
+                    {Array.from({ length: 20 }, (_, i) => (
+                      <ellipse
+                        key={i}
+                        cx="200"
+                        cy="150"
+                        rx={55 + i * 5}
+                        ry="100"
+                        transform={`rotate(${i * 9} 200 150)`}
+                        stroke="#9a8ad5"
+                        strokeWidth="1"
+                      />
+                    ))}
+                  </g>
+                </svg>
+                <div className="affiliate-value">
+                  <span className="affiliate-value-label">Always</span>
+                  <span className="affiliate-amount">20%</span>
+                </div>
+              </div>
+              <div className="affiliate-caption">
+                <span>Affiliate pool</span>
+                <small>per sold-out collection</small>
+              </div>
+            </div>
+            <div className="affiliate-copy">
+              <p className="eyebrow">COMMISSIONS CALCULATED ONCHAIN</p>
+              <h2>
+                Your referrals.
+                <br />
+                Contract-calculated <span className="serif">commissions.</span>
+              </h2>
+              <p>
+                Qualifying referrals are recorded onchain. The contract calculates
+                your share of the affiliate pool, claimable directly after a
+                successful draw. Eligible holders enroll during voting;
+                one attributed paid referral qualifies you for an equal share.
+              </p>
+              <div className="affiliate-detail">
+                <span>
+                  <strong>20% of mint revenue</strong>
+                  <small>shared equally by qualified affiliates</small>
+                </span>
+                <LinkButton
+                  className="ui-icon-button"
+                  href="#questions"
+                  aria-label="Read affiliate eligibility and payout terms"
+                >
+                  <Icon name="diagonal" />
+                </LinkButton>
+              </div>
+              <p className="affiliate-note">
+                Community-voted price and supply determine the size of the
+                20% affiliate pool. All qualifying affiliates share it equally
+                after a successful draw. A 10 ETH sellout creates
+                a 2 ETH pool; a 20 ETH sellout creates a 4 ETH pool. Unallocated funds remain in a separate operator-accessible
+                reserve; earned commissions remain protected.
+              </p>
+            </div>
           </div>
         </section>
 
@@ -599,128 +704,7 @@ export function LandingExperience({
           </div>
         </section>
 
-        <section
-          className="rewards-section wrap"
-          id="reward-details"
-          aria-labelledby="prizes-title"
-        >
-          <div className="prize-panel" data-reveal>
-            <div className="prize-copy">
-              <p className="eyebrow">
-                <Icon name="spark" /> PRIZES CLAIMED DIRECTLY
-              </p>
-              <h2 id="prizes-title">
-                The community votes.
-                <br />
-                <span className="serif">The prize amount follows.</span>
-              </h2>
-              <p>
-                Each prize is an equal share of 60% of the collection’s mint
-                revenue. The voted price, supply, and winner count determine its
-                size. After sellout and a successful draw, winning NFT holders
-                claim directly from the contract.
-              </p>
-              <dl className="prize-examples" aria-label="Illustrative prizes at sellout, not live voting options">
-                <div><dt>1,000 NFTs · 0.01 ETH · 6 winners</dt><dd>1 ETH each</dd></div>
-                <div><dt>2,000 NFTs · 0.01 ETH · 6 winners</dt><dd>2 ETH each</dd></div>
-                <div><dt>1,000 NFTs · 0.01 ETH · 10 winners</dt><dd>0.6 ETH each</dd></div>
-              </dl>
-              <p>Illustrations at sellout, not live voting options. 1 ETH is an
-                example, not a minimum or a cap. The final voted terms determine
-                the prize.</p>
-              <a className="ui-text-action" href="#questions">
-                Understand the draw
-                <Icon name="diagonal" />
-              </a>
-            </div>
-            <div
-              className="prize-tickets"
-              aria-label="Example of six equal prizes of 1 ETH each"
-            >
-              {Array.from({ length: 6 }, (_, i) => (
-                <div className="prize-ticket" key={i}>
-                  <div className="ticket-top">
-                    <Icon name="ethereum" />
-                    <span className="mono">
-                      PRIZE {String(i + 1).padStart(2, "0")}
-                    </span>
-                  </div>
-                  <span className="ticket-amount">
-                    1 <span>ETH</span>
-                  </span>
-                  <span className="ticket-bottom">
-                    EXAMPLE PRIZE
-                    <Icon name="spark" />
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="affiliate-panel" id="affiliates" data-reveal>
-            <div className="affiliate-visual" aria-hidden="true">
-              <div className="affiliate-art">
-                <svg viewBox="0 0 400 300" fill="none">
-                  <g className="affiliate-rings">
-                    {Array.from({ length: 20 }, (_, i) => (
-                      <ellipse
-                        key={i}
-                        cx="200"
-                        cy="150"
-                        rx={55 + i * 5}
-                        ry="100"
-                        transform={`rotate(${i * 9} 200 150)`}
-                        stroke="#9a8ad5"
-                        strokeWidth="1"
-                      />
-                    ))}
-                  </g>
-                </svg>
-                <div className="affiliate-value">
-                  <span className="affiliate-value-label">Always</span>
-                  <span className="affiliate-amount">20%</span>
-                </div>
-              </div>
-              <div className="affiliate-caption">
-                <span>Affiliate pool</span>
-                <small>per sold-out collection</small>
-              </div>
-            </div>
-            <div className="affiliate-copy">
-              <p className="eyebrow">COMMISSIONS CALCULATED ONCHAIN</p>
-              <h2>
-                Your referrals.
-                <br />
-                Contract-calculated <span className="serif">commissions.</span>
-              </h2>
-              <p>
-                Qualifying referrals are recorded onchain. The contract calculates
-                your share of the affiliate pool, claimable directly after a
-                successful draw. Eligible holders enroll during voting;
-                one attributed paid referral qualifies you for an equal share.
-              </p>
-              <div className="affiliate-detail">
-                <span>
-                  <strong>20% of mint revenue</strong>
-                  <small>shared equally by qualified affiliates</small>
-                </span>
-                <LinkButton
-                  className="ui-icon-button"
-                  href="#questions"
-                  aria-label="Read affiliate eligibility and payout terms"
-                >
-                  <Icon name="diagonal" />
-                </LinkButton>
-              </div>
-              <p className="affiliate-note">
-                Community-voted price and supply determine the size of the
-                20% affiliate pool. All qualifying affiliates share it equally
-                after a successful draw. A 10 ETH sellout creates
-                a 2 ETH pool; a 20 ETH sellout creates a 4 ETH pool. Unallocated funds remain in a separate operator-accessible
-                reserve; earned commissions remain protected.
-              </p>
-            </div>
-          </div>
-        </section>
+
 
         <section
           className="how-section wrap"
@@ -840,6 +824,26 @@ export function LandingExperience({
           </div>
         </section>
 
+        <section className="manifesto holder-section wrap" id="holder-rewards" aria-labelledby="holders-title">
+          <p className="eyebrow section-kicker">SEASON HOLDER REWARDS · PLANNED FOR LAUNCH</p>
+          <h2 id="holders-title">Not a winner,<br /><span className="muted-heading">but still a holder?</span></h2>
+          <div className="holder-explanation">
+            <p>8% of actual mint revenue from successful draws builds a season pool. Voting changes prices and supplies, so the pool and ETH per claim vary by season. Once every collection has drawn or become refundable, the first 5% of eligible NFTs to claim share the final pool equally. Only NFTs from successful draws qualify, including winners. One claim per NFT, while slots remain.</p>
+            <LinkButton href={footerLinks.app ? `${footerLinks.app.replace(/\/$/, "")}/holders` : undefined}>Explore holder rewards <Icon name="diagonal" /></LinkButton>
+          </div>
+          <div className="holder-example" aria-label="Holder reward example for a ten-collection season">
+            <h3>One season, ten successful collections</h3>
+            <p>Example only: each collection sells 1,000 NFTs at 0.01 ETH. All ten draws succeed.</p>
+            <dl className="holder-calculation">
+              <div><dt>Season mint revenue</dt><dd>10 × 1,000 × 0.01 = <strong>100 ETH</strong></dd></div>
+              <div><dt>Holder pool · 8%</dt><dd>100 × 8% = <strong>8 ETH</strong></dd></div>
+              <div><dt>Claim slots · first 5%</dt><dd>10,000 × 5% = <strong>500 NFTs</strong></dd></div>
+              <div><dt>Equal reward per claim</dt><dd>8 ÷ 500 = <strong>{plannedRewards.holderRewardEth} ETH</strong></dd></div>
+            </dl>
+            <p>Winners also qualify. The current owner claims once per eligible NFT, in onchain order, while slots remain. Refundable collections add neither funds nor eligible NFTs.</p>
+          </div>
+        </section>
+
         <section
           className="faq-section wrap"
           id="questions"
@@ -900,7 +904,6 @@ export function LandingExperience({
       </main>
       <PublicFooter
         density="compact"
-        brand={<RewardsBrand><TinctaWordmark title="" className="ui-footer-wordmark" /></RewardsBrand>}
         links={footerLinks}
         legal={<>Launch preview. Illustrative amounts depend on community-voted terms. Prize and affiliate payouts require sellout and a successful draw. Review final terms before minting.</>}
       />

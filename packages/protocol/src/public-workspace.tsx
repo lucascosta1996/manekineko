@@ -355,64 +355,22 @@ export function PublicWorkspace({
         )}
       </nav>
       <section className="public-explainer" aria-label="How a collection works">
-        <p className="public-allocation">
-          {protocolVersion === 13 ? "60% winning tickets · 20% qualified affiliates · 8% holder rewards · 12% protocol treasury." : "60% winning tickets · 20% qualified affiliates · 20% protocol treasury."}
-        </p>
-        <p>
-          {!configured && "Planned for Tincta seasons. "}The {protocolVersion === 13 ? "12%" : "20%"} protocol treasury allocation funds infrastructure costs,
-          future functionality and Tincta projects.
-        </p>
+        <dl className="public-allocation-grid">
+          <div><dt>60% · Winning tickets</dt><dd>Equal prizes for the winning NFTs after a successful draw.</dd></div>
+          <div><dt>20% · Qualified affiliates</dt><dd>Shared equally by affiliates with at least one paid referral.</dd></div>
+          {protocolVersion === 13 && <div><dt>8% · Holder rewards</dt><dd>A season pool for the first 5% of eligible NFTs to claim.</dd></div>}
+          <div><dt>{protocolVersion === 13 ? "12%" : "20%"} · Protocol treasury</dt><dd>For infrastructure costs, future functionality and Tincta projects.</dd></div>
+        </dl>
+        {!configured && <p className="public-explainer-note">Planned for Tincta seasons. Check the selected collection’s published terms before participating.</p>}
         <Disclosure title="How it works · Voting, prizes and refunds">
-          <p>
-            Prize, earned affiliate and refund obligations stay protected.
-          </p>
-          {protocolVersion === 13 && (
-            <>
-              <p>
-                Each successful draw sends 8% of actual mint revenue to its
-                season’s holder pool. Voting selects prices and supplies, so
-                pool totals and ETH rewards vary by season. The allocation
-                percentages stay fixed.
-              </p>
-              <p>
-                Holder claims unlock when every planned collection in the
-                season has drawn or become refundable. Only NFTs from
-                successful draws qualify, including winners. The first 5% of
-                eligible NFTs to claim, rounded down, share the final pool
-                equally. Each NFT can claim once through its current owner,
-                in onchain execution order. Transfers do not reset a used claim.
-                The operator cannot withdraw this pool.
-              </p>
-              <Link className={textActionClassName()} href="/docs/holder-rewards">
-                Read the holder reward rules
-              </Link>
-            </>
-          )}
-          <p>
-            Mint price is always at least 0.01 ETH. Voted supply is 1,000–65,536
-            NFTs and becomes fixed when minting opens. Up to 20 primary mints
-            per recipient.
-          </p>
-          <p>
-            Voting opens at the scheduled time; its deadline opens minting
-            without another operator signature. The next collection needs a
-            preparation transaction after this collection’s outcome. No one can
-            pause a live collection.
-          </p>
-          <p>
-            If no randomness is recorded within 72 hours of sellout, full
-            mint-price refunds become available. On-time recorded randomness
-            commits the draw permanently. A timer alone never grants a refund.
-          </p>
-          <p>
-            Affiliates need at least one paid referral. The 20% affiliate pool
-            is shared equally among those who qualify, after draw finalization.
-            With no qualified affiliates, the unused pool follows the contract’s
-            operator recovery rule.
-          </p>
-          <Link className={textActionClassName()} href="/docs">
-            Read the full rules
-          </Link>
+          <div className="public-rules-grid">
+            <section><h3>1. Vote &amp; mint</h3><p>Voting selects the collection’s price, supply, winner count and mint duration. Mint price is always at least 0.01 ETH. Voted supply is 1,000–65,536 NFTs, with up to 20 primary mints per recipient.</p><p>Voting opens at the scheduled time; its deadline opens minting without another operator signature. The next collection needs a preparation transaction after this collection’s outcome. No one can pause a live collection.</p></section>
+            <section><h3>2. Follow the draw</h3><p>After sellout, verified randomness selects the winning NFTs. Their current holders claim equal shares of the 60% prize pool directly from the contract.</p><p>Prize, earned affiliate and refund obligations stay protected.</p><Link className={textActionClassName()} href="/docs/prizes">Read the prize rules</Link></section>
+            <section><h3>3. Check refund eligibility</h3><p>If the collection is still unsold at its mint deadline, holders can burn their NFT to receive its full original mint price.</p><p>A sold-out collection becomes refundable if no randomness is recorded within 72 hours of sellout. On-time recorded randomness commits the draw permanently. A timer alone never grants a refund. Gas and secondary-market price differences are excluded.</p><Link className={textActionClassName()} href="/docs/refunds">Read the refund rules</Link></section>
+            <section><h3>Affiliate rewards</h3><p>Affiliates need at least one paid referral. The 20% affiliate pool is shared equally among those who qualify, after draw finalization. With no qualified affiliates, the unused pool follows the contract’s operator recovery rule.</p><Link className={textActionClassName()} href="/docs/affiliates">Read the affiliate rules</Link></section>
+            {protocolVersion === 13 && <section className="public-rules-holder"><h3>Season holder rewards</h3><p>Each successful draw sends 8% of actual mint revenue to its season’s holder pool. Voting selects prices and supplies, so pool totals and ETH rewards vary by season. The allocation percentages stay fixed.</p><p>Holder claims unlock when every planned collection in the season has drawn or become refundable. Only NFTs from successful draws qualify, including winners. The first 5% of eligible NFTs to claim, rounded down, share the final pool equally. Each NFT can claim once through its current owner, in onchain execution order. Transfers do not reset a used claim. The operator cannot withdraw this pool.</p><Link className={textActionClassName()} href="/docs/holder-rewards">Read the holder reward rules</Link></section>}
+          </div>
+          <Link className={textActionClassName()} href="/docs">Read the full rules</Link>
         </Disclosure>
       </section>
       {state && controller && (

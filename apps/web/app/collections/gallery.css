@@ -1,5 +1,5 @@
-.mirror-page { padding:var(--ui-space-12) 0 var(--ui-space-16); font:400 var(--ui-body)/var(--ui-body-line) var(--ui-font-sans); }
-.mirror-heading { display:grid; gap:var(--ui-space-3); max-width:48rem; margin-bottom:var(--ui-space-10); }
+.mirror-page { padding:var(--ui-space-8) 0 var(--ui-space-8); font:400 var(--ui-body)/var(--ui-body-line) var(--ui-font-sans); }
+.mirror-heading { display:grid; gap:var(--ui-space-3); max-width:48rem; margin-bottom:var(--ui-space-8); }
 .mirror-heading > p:last-child, .mirror-caption, .mirror-sync, .mirror-footnote, .mirror-section-label > p { color:var(--ui-muted); }
 .mirror-section-label { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:var(--ui-space-3); margin-bottom:var(--ui-space-6); }
 .mirror-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--ui-space-8) var(--ui-space-6); }

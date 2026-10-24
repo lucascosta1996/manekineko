@@ -10,7 +10,7 @@ for(const [app,path] of [['landing','/rewards'],['web','/?state=unconfigured'],[
    const buttons=page.locator('.ui-button:visible');
    for(let index=0;index<await buttons.count();index++) {
     const result=await buttons.nth(index).evaluate(el=>{const s=getComputedStyle(el);return {height:el.getBoundingClientRect().height,font:s.fontSize,padding:s.paddingBlockStart,radius:s.borderRadius};});
-    expect(result.height).toBeGreaterThanOrEqual(40);expect(result.font).toBe('14px');expect(result.radius).toBe('3px');
+    expect(result.height).toBeGreaterThanOrEqual(32);expect(result.font).toBe('13px');expect(result.radius).toBe('3px');
    }
   }
   await page.setViewportSize({width:844,height:390});
@@ -26,7 +26,7 @@ for(const [app,path] of [['landing','/rewards'],['web','/?state=unconfigured'],[
   const page=await context.newPage();await prepare(page);await page.goto(urls[app]+path);await ready(page);
   for(const button of await page.locator('.ui-button:visible').all()) {
    const data=await button.evaluate(el=>{const s=getComputedStyle(el);return {height:el.getBoundingClientRect().height,padding:s.paddingBlockStart,icon:el.classList.contains('ui-icon-button')};});
-   expect(data.height).toBeGreaterThanOrEqual(44);expect(data.padding).toBe(data.icon?'12px':'11px');
+   expect(data.height).toBeGreaterThanOrEqual(44);expect(data.padding).toBe(data.icon?'13px':'12px');
   }
   await context.close();
  });

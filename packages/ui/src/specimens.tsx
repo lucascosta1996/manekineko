@@ -103,7 +103,7 @@ function Specimens({ brand }: { brand?: ReactNode }) {
         <div role="status" aria-busy="true" aria-label="Loading collection details"><Skeleton /><span className="ui-specimen-row"><Spinner />Loading collection details…</span></div>
       </section>
     </main>
-    <PublicFooter brand={brand} year={2026} links={{ website: "#specimen-type", app: "#specimen-buttons", docs: "#specimen-forms", contact: null, telegram: null, social: null }} legal="Local component verification specimen." />
+    <PublicFooter year={2026} links={{ website: "#specimen-type", app: "#specimen-buttons", docs: "#specimen-forms", contact: null, telegram: null, social: null }} legal="Local component verification specimen." />
   </div>;
 }
 
