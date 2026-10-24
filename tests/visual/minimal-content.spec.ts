@@ -12,7 +12,10 @@ for (const width of [390, 1440]) {
     const heroAction = await page.locator('.hero-actions .ui-button').boundingBox();
     const heroArt = await page.locator('.hero-art').boundingBox();
     expect(Math.abs(heroGroup!.x + heroGroup!.width / 2 - width / 2)).toBeLessThanOrEqual(1);
-    expect(Math.abs(heroAction!.x + heroAction!.width / 2 - heroCopy!.x - heroCopy!.width / 2)).toBeLessThanOrEqual(1);
+    expect(Math.abs(heroAction!.x - heroCopy!.x)).toBeLessThanOrEqual(1);
+    await expect(page.locator('.hero-copy')).toHaveCSS('text-align', 'left');
+    const heroDescription = await page.locator('.hero-description').boundingBox();
+    expect(Math.abs(heroDescription!.x - heroCopy!.x)).toBeLessThanOrEqual(1);
     if (width >= 760) {
       expect(heroArt!.x).toBeGreaterThan(heroCopy!.x + heroCopy!.width);
       expect(Math.abs(heroCopy!.y + heroCopy!.height / 2 - heroArt!.y - heroArt!.height / 2)).toBeLessThanOrEqual(1);

@@ -228,7 +228,7 @@ export function LandingExperience({
                 {" "}autonomous rewards.
               </h1>
               <p className="hero-description">
-                You vote. The next collection opens.
+                You win. You vote. The next collection opens.
               </p>
               <div className="hero-actions">
                 <LinkButton  href="#rewards">

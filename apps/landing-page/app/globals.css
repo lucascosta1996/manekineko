@@ -39,12 +39,12 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 .menu-toggle, .mobile-nav { display: none; }
 .hero, .rewards-overview, .launch-section, .manifesto, .seasons-section, .art-section, .rewards-section, .how-section, .refund-section, .faq-section { padding-block: var(--ui-section-space); }
 .hero-main { display: grid; grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr); align-items: center; justify-items: center; gap: var(--ui-space-16); max-width: 60rem; margin-inline: auto; }
-.hero-copy { min-width: 0; width: 100%; max-width: 55rem; text-align: center; container-type: inline-size; }
+.hero-copy { min-width: 0; width: 100%; max-width: 55rem; text-align: left; container-type: inline-size; }
 /* The compact shared title scale wraps naturally as text is enlarged. */
 .hero-copy h1 { max-width: none; font-size: var(--ui-hero); text-wrap: wrap; }
-.hero-description { max-width: 55ch; margin: var(--ui-space-6) auto; }
+.hero-description { max-width: 55ch; margin: var(--ui-space-6) 0; }
 .hero-copy .hero-description { font-size: var(--ui-subheading); line-height: 1.12; letter-spacing: -.035em; font-weight: 500; color: var(--ui-ink); text-wrap: balance; }
-.hero-actions { display: flex; align-items: center; justify-content: center; }
+.hero-actions { display: flex; align-items: center; justify-content: flex-start; }
 .hero-art { position: relative; min-width: 0; width: 100%; max-width: 20rem; margin-inline: auto; }
 .rewards-hero-artwork { width: 100%; height: auto; aspect-ratio: 1; }
 /* Open's ten canonical planes: left fold 1–4, right fold 5–7,
