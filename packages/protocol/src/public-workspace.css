@@ -1,6 +1,5 @@
 /* Public composition only. Control, disclosure, and brand geometry stay in packages/ui. */
 .public-workspace {
-  max-width: 64rem;
   padding: var(--ui-space-8) 0;
   font-size: var(--ui-body);
   line-height: 1.6;

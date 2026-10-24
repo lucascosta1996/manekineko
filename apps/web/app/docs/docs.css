@@ -19,7 +19,7 @@
 .docs-search-results a:hover strong { text-decoration:underline; text-underline-offset:3px; }
 .docs-search-results a > span { color:var(--muted); font-size:var(--ui-body); line-height:1.6; font-weight:400; letter-spacing:0; }
 .docs-page { min-width:0; }
-.docs-reading-layout { display:grid; grid-template-columns:minmax(0,680px) 145px; gap:40px; align-items:start; }
+.docs-reading-layout { display:grid; grid-template-columns:minmax(0,1fr) 12rem; gap:40px; align-items:start; }
 .docs-article { min-width:0; padding:38px 0 30px; }
 .docs-breadcrumb { display:flex; gap:10px; align-items:center; color:var(--muted); margin-bottom:42px; font-size:var(--ui-caption); line-height:1.5; font-weight:400; letter-spacing:0; }
 .docs-breadcrumb a:hover { color:var(--ink); }
@@ -31,8 +31,9 @@
 .docs-intro-strip { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; padding:22px 0; border-bottom:1px solid var(--line); }
 .docs-intro-strip > span { display:flex; align-items:center; gap:10px; color:var(--muted); font-size:var(--ui-caption); line-height:1.5; font-weight:400; letter-spacing:0; font-family:var(--ui-font-mono); }
 .docs-intro-strip strong { color:var(--ink); font-size:var(--ui-label); line-height:1.538462; font-weight:500; letter-spacing:0; }
-.docs-prose { overflow-wrap:anywhere; max-width:68ch; color:var(--ui-ink); font-size:var(--ui-body); line-height:1.6; font-weight:400; letter-spacing:0; }
+.docs-prose { overflow-wrap:anywhere; color:var(--ui-ink); font-size:var(--ui-body); line-height:1.6; font-weight:400; letter-spacing:0; }
 .docs-prose > section { margin:40px 0; }
+.docs-prose > section > :where(p, ul, ol) { max-width:68ch; }
 .docs-prose h2 { position:relative; color:var(--ink); margin-bottom:18px; scroll-margin-top:104px; font-size:var(--ui-section); line-height:1.25; font-weight:500; letter-spacing:-.025em; }
 .docs-heading-anchor { margin-left:10px; color:var(--ui-muted); opacity:0; font-size:var(--ui-subheading); line-height:1.35; font-weight:500; letter-spacing:-.01em; }
 .docs-prose h2:hover .docs-heading-anchor, .docs-heading-anchor:focus-visible { opacity:1; }
@@ -95,7 +96,6 @@
   .docs-search-results a > span { font-size:var(--ui-body); line-height:1.6; font-weight:400; letter-spacing:0; }
   .docs-breadcrumb { margin-bottom:32px; }
   .docs-article-header h1, .docs-prose h2 { scroll-margin-top:calc(var(--web-header-height, 3.5rem) + var(--ui-space-24)); }
-  .docs-article { max-width:680px; margin:0 auto; }
 }
 @media (max-width:760px) {
   .docs-sidebar { top:var(--web-header-height, 3.5rem); }

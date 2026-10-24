@@ -53,8 +53,8 @@ img {
   background: var(--accent);
 }
 .mint-shell {
-  max-width: 80rem;
-  margin: auto;
+  width: var(--ui-page-width);
+  margin-inline: auto;
 }
 .skip-link {
   position: absolute;
@@ -1938,9 +1938,6 @@ img {
 
 /* Persistent recovery and protocol explanations use the body role. */
 .winner-credit-small { font-size:var(--ui-body); line-height:1.6; font-weight:400; letter-spacing:0; color:var(--ui-muted); }
-.mint-shell { padding-inline:var(--ui-space-4); }
-@media(min-width:600px) { .mint-shell { padding-inline:var(--ui-space-6); } }
-@media(min-width:960px) { .mint-shell { padding-inline:var(--ui-space-10); } }
 
 /* The ticket stepper already supplies accessible decrement/increment buttons. */
 .quantity-control input[type="number"] { appearance: textfield; -moz-appearance: textfield; }

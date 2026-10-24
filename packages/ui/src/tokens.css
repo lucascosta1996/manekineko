@@ -55,6 +55,8 @@
   --ui-space-20: 5rem;
   --ui-space-24: 6rem;
   --ui-space: var(--ui-space-2);
+  --ui-page-gutter: max(var(--ui-space-4), 2.5vw);
+  --ui-page-width: calc(100% - 2 * var(--ui-page-gutter));
   --ui-control-height: 2.5rem;
   --ui-button-min-width: 0;
   --ui-button-padding-block: 0.5625rem;

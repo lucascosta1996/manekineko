@@ -7,8 +7,8 @@ a { color: inherit; text-decoration: none; }
 svg, img { display: block; }
 img { max-width: 100%; }
 ::selection { background: var(--ui-surface-pressed); color: var(--ui-ink); }
-.wrap { width: min(100%, 80rem); margin-inline: auto; padding-inline: var(--ui-space-10); }
-.site > .ui-footer { width: min(calc(100% - 5rem), 75rem); margin-inline: auto; }
+.wrap { width: var(--ui-page-width); margin-inline: auto; }
+.site > .ui-footer { width: var(--ui-page-width); margin-inline: auto; }
 h1, h2, h3, p { margin-top: 0; }
 h1 { font-size: var(--ui-hero); line-height: 1.12; letter-spacing: -.035em; font-weight: 500; max-width: 22ch; margin-bottom: 0; }
 h2 { font-size: var(--ui-marketing-section); line-height: 1.2; letter-spacing: -.025em; font-weight: 500; margin-bottom: 0; }
@@ -136,7 +136,7 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 .section-footnote { font-size: var(--ui-caption); line-height: 1.5; color: var(--ui-muted); margin-block: var(--ui-space-6) 0; }
 .gallery-controls { display: flex; flex-wrap: wrap; max-width: 100%; align-items: center; gap: var(--ui-space-2); margin-top: var(--ui-space-6); }
 .gallery-controls > .mono { margin-right: auto; }
-.art-gallery { display: flex; gap: var(--ui-space-6); overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; padding: var(--ui-space-3) max(2.5rem, calc((100vw - 75rem) / 2)) var(--ui-space-8); }
+.art-gallery { display: flex; gap: var(--ui-space-6); overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; padding: var(--ui-space-3) var(--ui-page-gutter) var(--ui-space-8); }
 .art-gallery::-webkit-scrollbar { display: none; }
 .nft-card { flex: 0 0 min(27vw,22rem); min-width: 0; margin: 0; scroll-snap-align: center; }
 .nft-image-wrap { aspect-ratio: 4 / 5; background: var(--card-color); border-radius: var(--ui-radius); overflow: hidden; }
@@ -211,8 +211,6 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 .closing-note { display: block; margin-top: var(--ui-space-4); color: var(--ui-muted); font-size: var(--ui-caption); line-height: 1.5; }
 .motion-paused .affiliate-rings { animation-play-state: paused; }
 @media (max-width: 959px) {
-  .wrap { padding-inline: var(--ui-space-6); }
-  .site > .ui-footer { width: calc(100% - 3rem); }
   .desktop-nav { gap: var(--ui-space-3); }
   .hero-main { gap: var(--ui-space-6); }
   .reward-rail { grid-template-columns: repeat(2,minmax(0,1fr)); }
@@ -220,7 +218,6 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
   .section-heading, .manifesto-bottom { gap: var(--ui-space-8); }
   .prize-panel, .affiliate-panel { gap: var(--ui-space-6); }
   .faq-section { gap: var(--ui-space-8); }
-  .art-gallery { padding-inline: var(--ui-space-6); }
   .season-catalog { grid-template-columns: repeat(3,minmax(0,1fr)); }
 }
 @media (max-width: 959px) {
@@ -248,8 +245,6 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
   .season-facts > div { flex-direction: column; align-items: flex-start; gap: var(--ui-space-3); }
 }
 @media (max-width: 599px) {
-  .wrap { padding-inline: var(--ui-space-4); }
-  .site > .ui-footer { width: calc(100% - 2rem); }
   .brand-wordmark { width: 5.5rem; }
   .hero { padding-block: var(--ui-space-8); }
   .reward-rail { grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: var(--ui-space-6); }
@@ -267,7 +262,6 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
   .season-catalog { grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr)); }
   .prize-ticket { padding: var(--ui-space-3); }
   .ticket-top, .ticket-bottom { flex-wrap: wrap; }
-  .art-gallery { padding-inline: var(--ui-space-4); }
   .trust-strip { justify-content: flex-start; gap: var(--ui-space-4); }
 }
 @media (prefers-reduced-motion: reduce) {

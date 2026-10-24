@@ -1,7 +1,8 @@
 * { box-sizing: border-box; }
 body { margin: 0; color: var(--ui-ink); background: var(--ui-bg); font-family: var(--ui-font-sans); }
 a { color: inherit; }
-.operator-header, .operator-footer { max-width: 80rem; margin: 0 auto; padding: var(--ui-space-6); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ui-space-5); }
+.operator-shell { width: var(--ui-page-width); margin-inline: auto; }
+.operator-header, .operator-footer { padding-block: var(--ui-space-6); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ui-space-5); }
 .operator-header { border-bottom: 1px solid var(--ui-line); }
 .operator-header > a { max-width: 100%; text-decoration: none; }
 .operator-header nav { display: flex; flex-wrap: wrap; gap: var(--ui-space-5); }
@@ -10,9 +11,9 @@ a { color: inherit; }
 .operator-footer { margin-top: var(--ui-space-12); border-top: 1px solid var(--ui-line); font-size: .8125rem; color: var(--ui-muted); }
 .operator-skip { position: absolute; top: -8rem; padding: var(--ui-space-4); background: var(--ui-bg); z-index: 50; }
 .operator-skip:focus { top: 0; }
-.operator-boundary { max-width: 46rem; margin: var(--ui-space-12) auto; padding: var(--ui-space-6); }
+.operator-boundary { margin-block: var(--ui-space-12); }
 .operator-boundary h1 { font-size: 2rem; letter-spacing: -.03em; }
-.operator-boundary p { color: var(--ui-muted); line-height: 1.6; }
-@media (max-width: 700px) { .operator-header, .operator-footer { padding: var(--ui-space-4); } }
+.operator-boundary p { max-width: 68ch; color: var(--ui-muted); line-height: 1.6; }
+@media (max-width: 700px) { .operator-header, .operator-footer { padding-block: var(--ui-space-4); } }
 
 .operator-header .launch-brand { width: 128px; height: auto; display: block; }

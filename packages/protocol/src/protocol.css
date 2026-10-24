@@ -1,8 +1,8 @@
 .protocol-page {
-  max-width: 72rem;
+  width: 100%;
   overflow-wrap: anywhere;
   margin: 0 auto;
-  padding: var(--ui-space-12) var(--ui-space-6);
+  padding: var(--ui-space-12) 0;
 }
 .protocol-intro {
   max-width: 46rem;
@@ -157,7 +157,7 @@
 }
 @media (max-width: 700px) {
   .protocol-page {
-    padding: var(--ui-space-8) var(--ui-space-4);
+    padding: var(--ui-space-8) 0;
   }
   .protocol-grid,
   .protocol-overview {
