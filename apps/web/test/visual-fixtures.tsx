@@ -1,6 +1,11 @@
 "use client";
 
 /** Production components with isolated data. This module is never routed by apps/web. */
+import { CollectionDirectoryView, CollectionGalleryView } from "../components/nft-mirror/gallery";
+import { mirrorFixtureCollection, mirrorFixtureGallery } from "./nft-mirror-visual-data";
+import MirrorLoading from "../app/collections/loading";
+import MirrorError from "../app/collections/error";
+import MirrorNotFound from "../app/collections/not-found";
 import { keccak256 } from "ethers";
 import { ProtocolExperience } from "../components/protocol/protocol-experience";
 import { useState } from "react";
@@ -44,8 +49,16 @@ function ReviewControlsFixture() {
   return <SiteShell section="seasons" chainId={11155111}><main><h1>Enrollment review</h1><CollectionActivity collection={collection} showEnrollment initialNow={Date.parse(visualNow)} /><EnrollmentConfirmation siteKey="isolated-fixture" challengeId="11111111-1111-4111-8111-111111111111" onToken={setToken} onConfirm={()=>{}} busy={false} disabled={!token}/></main></SiteShell>;
 }
 
-export function WebVisualFixture({ path = "/", state = "loaded" }: { path?: string; state?: string }) {
-  if (["/", "/vote", "/collections", "/claims", "/affiliates", "/holders", "/operations"].includes(path)) {
+export function WebVisualFixture({ path = "/", state = "loaded", page = 1 }: { path?: string; state?: string; page?: number }) {
+  const [mirrorRecovered,setMirrorRecovered] = useState(false);
+  if (path === "/collections" || path.startsWith("/collections/") || path.startsWith("/visual/collections/")) {
+    const data = mirrorFixtureGallery(page,state);
+    const retry = () => setMirrorRecovered(true);
+    return <SiteShell section="nfts">{path === "/visual/collections/loading" ? <MirrorLoading /> : path === "/visual/collections/error" && !mirrorRecovered ? <MirrorError retry={retry} /> : path === "/visual/collections/not-found" ? <MirrorNotFound /> : path === "/collections" || mirrorRecovered
+      ? <CollectionDirectoryView data={{configured:state!=="unconfigured",page:1,total:state==="empty" || state==="unconfigured"?0:3,collections:state==="empty" || state==="unconfigured"?[]:[{...mirrorFixtureCollection,cover:data.tokens[0]?.image ?? null},{...mirrorFixtureCollection,address:'0x'+'3'.repeat(40),name:'Quiet rhythm',cover:null,minted:0,ready:0},{...mirrorFixtureCollection,address:'0x'+'4'.repeat(40),name:'Maroon echo',cover:data.tokens[2]?.image ?? null}]}} />
+      : <CollectionGalleryView data={data} />}</SiteShell>;
+  }
+  if (["/", "/vote", "/claims", "/affiliates", "/holders", "/operations"].includes(path)) {
     const view = path === "/holders" ? "holders" : path === "/claims" ? "claims" : path === "/affiliates" ? "affiliates" : path === "/operations" ? "operations" : "home";
     return <SiteShell section={view} protocolEnabled={state !== "unconfigured"} chainId={11155111}><ProtocolExperience view={view} config={state === "unconfigured" ? null : {chainId:11155111,controller:"0x1111111111111111111111111111111111111111",codeHash:keccak256("0x6000"),rpcUrl:"https://v12.fixture.invalid", ...(path === "/holders" && state !== "v12" ? { version: 13 as const, holderRewardsCodeHash: keccak256("0x6000") } : {})}} /></SiteShell>;
   }

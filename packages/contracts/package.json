@@ -135,7 +135,8 @@
     "./holder-rewards-v13": "./src/ManekinekoHolderRewardsV13.json",
     "./holder-rewards-v13-source": "./src/ManekinekoHolderRewardsV13.source.json",
     "./winner-credits-v9": "./src/ManekinekoWinnerCreditsV9.json",
-    "./winner-credits-v9-source": "./src/ManekinekoWinnerCreditsV9.source.json"
+    "./winner-credits-v9-source": "./src/ManekinekoWinnerCreditsV9.source.json",
+    "./onchain-metadata": "./src/onchain-metadata.ts"
   },
   "dependencies": {
     "ethers": "6.17.0"

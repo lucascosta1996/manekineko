@@ -7,6 +7,7 @@
   "regions": ["iad1"],
   "crons": [
     { "path": "/api/indexer/run", "schedule": "* * * * *" },
-    { "path": "/api/indexer/metadata", "schedule": "* * * * *" }
+    { "path": "/api/indexer/metadata", "schedule": "* * * * *" },
+    { "path": "/api/indexer/nfts", "schedule": "* * * * *" }
   ]
 }

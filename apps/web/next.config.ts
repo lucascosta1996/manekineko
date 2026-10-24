@@ -8,7 +8,6 @@ const nextConfig: NextConfig = {
     return [
       { source: "/prizes", destination: "/claims", permanent: false },
       ...[
-        "/collections",
         "/vote",
         "/mint/:path*",
         "/seasons/:path*",

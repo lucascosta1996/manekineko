@@ -13,7 +13,7 @@ export function DocsVisual({ block }: { block: VisualBlock }) {
         <div><strong>{step.title}</strong><p>{step.text}</p></div>
         {index < block.steps.length - 1 && <Icon name="down" className="docs-flow-arrow" />}
       </li>)}</ol>
-      {block.branches && <ul className="docs-flow-branches">{block.branches.map(branch => <li key={branch.title}><Icon name="down" /><strong>{branch.title}</strong><p>{branch.text}</p></li>)}</ul>}
+      {block.branches && <ul className="docs-flow-branches">{block.branches.map(branch => <li key={branch.title}><strong className="docs-flow-branch-heading"><Icon name="down" /><span>{branch.title}</span></strong><p>{branch.text}</p></li>)}</ul>}
       <p className="docs-visual-note">{block.caption}</p>
     </>}
     {block.type === "formula" && <>

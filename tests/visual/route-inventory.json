@@ -43,7 +43,9 @@
       "/affiliates",
       "/docs",
       "/docs/[slug]",
-      "/holders"
+      "/holders",
+      "/collections",
+      "/collections/[chainId]/[address]"
     ],
     "redirects": {
       "/mint": "/",
@@ -52,8 +54,7 @@
       "/my-nfts": "/",
       "/prizes": "/claims",
       "/operations": "/",
-      "/vote": "/",
-      "/collections": "/"
+      "/vote": "/"
     },
     "boundaries": [
       "root-loading",
@@ -68,7 +69,10 @@
       "seasons-not-found",
       "history-error",
       "nft-error",
-      "nft-not-found"
+      "nft-not-found",
+      "collections-loading",
+      "collections-error",
+      "collections-not-found"
     ],
     "states": [
       "loaded",
@@ -94,7 +98,11 @@
       "v12-home-stage-switch",
       "v12-winning-addresses",
       "v12-affiliate-enrollment",
-      "v12-historical-claims"
+      "v12-historical-claims",
+      "collection-directory",
+      "paginated-minted-artwork",
+      "mirror-syncing",
+      "mirror-refunded"
     ]
   },
   "launch": {

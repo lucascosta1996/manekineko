@@ -128,7 +128,8 @@
 .docs-flow-arrow { grid-column: 1; justify-self: center; margin-block: var(--ui-space-2); color: var(--ui-muted); }
 .docs-prose .docs-flow-branches { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: var(--ui-space-4); margin-top: var(--ui-space-4); border-top: 1px solid var(--ui-line); }
 .docs-prose .docs-flow-branches > li { padding: var(--ui-space-3) 0 0; margin: 0; }
-.docs-flow-branches .ui-icon { margin-bottom: var(--ui-space-2); color: var(--ui-muted); }
+.docs-flow-branch-heading { display: flex; align-items: flex-start; gap: var(--ui-space-2); }
+.docs-flow-branch-heading .ui-icon { margin-top: calc((var(--ui-control-line) - var(--ui-icon-size)) / 2); color: var(--ui-muted); }
 .docs-visual .docs-visual-note { margin-top: var(--ui-space-5); padding-top: var(--ui-space-4); border-top: 1px solid var(--ui-line); color: var(--ui-muted); font: 400 var(--ui-label)/var(--ui-control-line) var(--ui-font-sans); }
 .docs-equations { display: grid; gap: var(--ui-space-3); font: 400 var(--ui-body)/var(--ui-body-line) var(--ui-font-mono); overflow-wrap: anywhere; }
 .docs-equations p + p { margin: 0; }

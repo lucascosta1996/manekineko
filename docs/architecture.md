@@ -1,5 +1,13 @@
 # Tincta protocol architecture and agent handoff
 
+## 2026-10-24 database-backed NFT collection galleries
+
+Web adds `/collections` and `/collections/[chainId]/[address]` for minted artwork and permanent numbers, linked from **NFTs** in the compact navbar. This supersedes the older `/collections` redirect below. These routes read only PostgreSQL, with a fixed 24-item page size and no RPC fallback. They do not restore legacy database control over voting, minting, eligibility, balances or signatures.
+
+Migration **033** adds a separate current-protocol NFT read projection. `apps/indexer/lib/nft-mirror` discovers collections from explicitly pinned V12/V13 controller events, mirrors confirmed mint/burn events, and durably queues immutable artwork reads. The worker uses the round's own renderer and finalized permanent combination key; both current generations intentionally retain the actual V11 renderer metadata lineage. Stored SVGs pass the existing strict passive-artwork validator, now shared in `packages/contracts/src/onchain-metadata.ts`. Transfers do not duplicate NFTs, and burned/refunded mints retain their original artwork with an explicit label. No ownership or claim eligibility is inferred from this gallery.
+
+Source leases, transactional checkpoints and canonical anchors protect replay and retries. Reorganizations clear affected projections before replay; runtime/hash mismatches hide the source. Existing immutable artifacts and historical V5–V11 indexers remain separate. A dedicated authenticated minute cron and optional signed webhook activate only after migration, restricted grants and explicit mirror source configuration. No hosted migration, backfill or deployment is implied by the source implementation. See [NFT mirror operation and validation](nft-mirror.md).
+
 ## 2026-10-24 public presentation update
 
 Public Landing, Web, metadata and guides describe Tincta without release-number labels. Internal source, configuration names, ABI exports and historical records retain their actual versions. Connected deployments still render their own immutable economics and capability availability. The public guides add accessible diagrams and formulas for voting, lifecycle, ordered winner sampling, permanent identity, allocations, claims and refunds. This presentation update changes no contract rules or deployment state.

@@ -3,8 +3,9 @@ import { authenticateCron, authenticateQuickNode, IngressError } from "./auth.ts
 import type { DeliveryStore } from "./deliveries.ts";
 
 interface IngressEnvironment { CRON_SECRET?: string; QUICKNODE_WEBHOOK_SECRET?: string }
+type IngressCycle = Pick<CycleResult, 'ok'> & Partial<Pick<CycleResult, 'results' | 'confirmedBlock'>>;
 interface Dependencies {
-  run: () => Promise<CycleResult>;
+  run: () => Promise<IngressCycle>;
   env?: IngressEnvironment;
 }
 
@@ -22,8 +23,8 @@ function failure(error: unknown): Response {
     : response({ ok: false, error: "indexer_temporarily_unavailable" }, 503);
 }
 
-function completedCycle(result: CycleResult): boolean {
-  return result.ok && result.results.every(({ status }) => status === "updated" || status === "caught_up");
+function completedCycle(result: IngressCycle): boolean {
+  return result.ok && (!result.results || result.results.every(({ status }) => status === "updated" || status === "caught_up"));
 }
 
 export async function handleRun(request: Request, dependencies: Dependencies): Promise<Response> {

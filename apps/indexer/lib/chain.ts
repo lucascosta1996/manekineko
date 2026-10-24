@@ -45,7 +45,7 @@ class PacedJsonRpcProvider extends JsonRpcProvider {
   }
 }
 
-export function createRpcProvider(config: IndexerConfig): JsonRpcProvider {
+export function createRpcProvider(config: Pick<IndexerConfig, 'rpcUrl' | 'chainId'>): JsonRpcProvider {
   const request = new FetchRequest(config.rpcUrl);
   request.timeout = 10000;
   return new PacedJsonRpcProvider(request, config.chainId, { staticNetwork: true, cacheTimeout: -1, batchMaxCount: 10, batchStallTime: 10 });
