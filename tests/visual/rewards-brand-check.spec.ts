@@ -17,8 +17,9 @@ for (const [app, routes] of Object.entries({landing:['/rewards'],web:['/docs','/
     expect(metrics.left).toBeGreaterThanOrEqual(0);expect(metrics.right).toBeLessThanOrEqual(width);expect(metrics.gap).toBe('14px');expect(metrics.size).toBe('13px');expect(metrics.radius).toBe('3px');
    }
    expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1)).toBe(false);
-   await brands.first().screenshot({path:`test-results/rewards-lockup-${app}-${route.replaceAll('/','')}-${width}.png`});
-   await page.screenshot({path:`test-results/rewards-${app}-${route.replaceAll('/','')}-${width}.png`,fullPage:true});
+   const routeName = route.replaceAll('/','').replace(/[^a-zA-Z0-9_-]+/g,'-') || 'home';
+   await brands.first().screenshot({path:`test-results/rewards-lockup-${app}-${routeName}-${width}.png`});
+   await page.screenshot({path:`test-results/rewards-${app}-${routeName}-${width}.png`,fullPage:true});
    await page.clock.resume();const a=await new AxeBuilder({page}).include('.ui-rewards-brand').analyze();expect(a.violations).toEqual([]);
   });
  }
