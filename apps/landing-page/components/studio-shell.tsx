@@ -1,13 +1,13 @@
 import { FooterBrand } from "@manekineko/ui/footer";
 import { Icon } from "@manekineko/ui/icons";
 import { publicLinks, publicXProfiles } from "@manekineko/ui/links";
-import { TinctaWordmark } from "./tincta-logo";
+import { TinctaMark, TinctaWordmark } from "./tincta-logo";
 import { LandingNavigation } from "./landing-navigation";
 
 export function StudioHeader({ whitepaper = false }: { whitepaper?: boolean }) {
   return (
     <header className="studio-header landing-header">
-      <a className="studio-brand" href="/" aria-label="Tincta home"><TinctaWordmark className="studio-wordmark" title="" /></a>
+      <a className="studio-brand" href="/" aria-label="Tincta home"><TinctaMark className="studio-mark" title="" /><TinctaWordmark className="studio-wordmark" title="" /></a>
       <LandingNavigation links={[
         { label: "Research", href: "/#research" },
         { label: "Projects", href: "/#projects" },

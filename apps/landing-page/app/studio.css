@@ -1,11 +1,12 @@
-.studio { overflow-wrap: anywhere; }
+.studio { --studio-header-min-height: 3.5rem; overflow-wrap: anywhere; }
 .studio-wrap { width: var(--ui-page-width); margin-inline: auto; }
-.studio-header { border-bottom: 1px solid var(--ui-line); }
-.studio-brand { display: inline-flex; align-items: center; min-height: 2.75rem; flex: none; }
+.studio-header { min-height: var(--studio-header-min-height); border-bottom: 1px solid var(--ui-line); }
+.studio-brand { display: inline-flex; align-items: center; gap: var(--ui-space-2); min-height: 2.75rem; flex: none; }
+.studio-mark { width: var(--ui-space-6); height: var(--ui-space-6); flex: none; }
 .studio-wordmark { width: var(--ui-brand-wordmark); height: auto; }
 .studio-eyebrow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ui-space-3); color: var(--ui-muted); font: 400 var(--ui-caption)/var(--ui-caption-line) var(--ui-font-mono); margin: 0 0 var(--ui-space-6); }
-.studio-hero { padding-block: var(--ui-section-space); text-align: center; }
-.studio-hero-copy { max-width: 64rem; margin-inline: auto; }
+.studio-hero { min-height: calc(100dvh - var(--studio-header-min-height)); display: grid; place-items: center; padding-block: var(--ui-section-space); text-align: center; }
+.studio-hero-copy { width: 100%; max-width: 64rem; margin-inline: auto; }
 .studio-hero .studio-eyebrow { justify-content: center; }
 .studio h1 { max-width: none; font-size: var(--ui-hero); text-wrap: balance; }
 .studio h1 span { display: block; }
