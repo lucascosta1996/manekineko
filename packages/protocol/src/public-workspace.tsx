@@ -359,14 +359,11 @@ export function PublicWorkspace({
           {protocolVersion === 13 ? "60% winning tickets · 20% qualified affiliates · 8% holder rewards · 12% protocol treasury." : "60% winning tickets · 20% qualified affiliates · 20% protocol treasury."}
         </p>
         <p>
-          {!configured && "Planned for Tincta seasons. "}The {protocolVersion === 13 ? "12%" : "20%"} protocol treasury allocation covers current infrastructure costs
-          and funds upcoming Tincta projects.
+          {!configured && "Planned for Tincta seasons. "}The {protocolVersion === 13 ? "12%" : "20%"} protocol treasury allocation funds infrastructure costs,
+          future functionality and Tincta projects.
         </p>
         <Disclosure title="How it works · Voting, prizes and refunds">
           <p>
-            The fixed operator wallet can withdraw the treasury allocation after
-            a successful draw. The team manages its spending; the collection
-            contract does not restrict how those withdrawn funds are used.
             Prize, earned affiliate and refund obligations stay protected.
           </p>
           {protocolVersion === 13 && (

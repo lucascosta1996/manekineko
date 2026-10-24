@@ -9,7 +9,7 @@ export function operatorActions(s: Snapshot, config: ProtocolConfig): OperatorAc
   const r = s.round;
   const following = s.count < s.catalogCount;
   const shortfall = following && s.cost > s.operatingBalance ? s.cost - s.operatingBalance : 0n;
-  const treasuryPurpose = 'The treasury supports current infrastructure and upcoming projects; the team manages spending after withdrawal.';
+  const treasuryPurpose = 'The treasury funds infrastructure costs, future functionality and Tincta projects.';
   const holderProtection = config.version === 13 ? ' Successful draws also fund the separate 8% season holder pool, which the operator cannot withdraw. Its limited claims unlock only after every collection in the season settles.' : '';
   const batch = !!r && s.sealed && r.id === s.count && [4, 5, 6].includes(r.phase) &&
     (r.phase !== 4 || r.canFinalize) && (following || r.operatorRemaining > 0n || r.phase === 4);

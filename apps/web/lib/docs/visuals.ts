@@ -7,7 +7,7 @@ const visuals: Record<string, Record<string, DocBlock[]>> = {
       { label: "Winning NFTs", share: 60, text: "Equal prizes, claimed by each winning NFT’s current holder." },
       { label: "Qualified affiliates", share: 20, text: "Equal shares for enrolled affiliates with a paid referral." },
       { label: "Season holders", share: 8, text: "A separate pool, locked until the whole season settles." },
-      { label: "Protocol treasury", share: 12, text: "Withdrawable by the fixed operator after the draw." },
+      { label: "Protocol treasury", share: 12, text: "For infrastructure costs, future functionality and Tincta projects." },
     ], caption: "This allocation applies after a successful draw. Before finalization, mint receipts stay reserved; refundable collections return the full mint price. Holder rewards are planned for launch.",
   }] },
   "onchain-voting": { vote: [{

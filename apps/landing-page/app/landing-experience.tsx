@@ -31,7 +31,7 @@ const faqs = (plannedRewards: PlannedRewards) => [
   {
     question: "What is the protocol treasury for?",
     answer:
-      "For Tincta seasons, after a successful draw, 12% of mint revenue is allocated to the protocol treasury to cover current infrastructure costs and fund upcoming Tincta projects. The fixed operator wallet can withdraw this allocation; the team manages its spending, which is not restricted by the collection contract. Prize, earned affiliate and refund obligations remain protected. Another 8% funds a locked season holder pool for the first 5% of eligible NFTs to claim after season end. Season holder rewards are planned for launch. Refundable collections create no treasury or holder allocation from mint revenue.",
+      "For Tincta seasons, after a successful draw, 12% of mint revenue is allocated to the protocol treasury to fund infrastructure costs, future functionality and Tincta projects. Prize, earned affiliate and refund obligations remain protected. Another 8% funds a locked season holder pool for the first 5% of eligible NFTs to claim after season end. Season holder rewards are planned for launch. Refundable collections create no treasury or holder allocation from mint revenue.",
   },
   {
     question: "Can the team withdraw prizes, commissions or holder rewards?",
@@ -336,7 +336,7 @@ export function LandingExperience({
               winner count, and mint duration. The winning package becomes fixed
               when voting ends. For Tincta seasons: 60% for prizes,
               20% for affiliates, 8% for season holder rewards, and 12% for the protocol treasury after a successful draw.
-              The treasury covers current infrastructure costs and funds upcoming Tincta projects.
+              The treasury funds infrastructure costs, future functionality and Tincta projects.
               The holder pool unlocks at season end for the first 5% of eligible NFTs to claim. Season holder rewards are planned for launch. Funds owed as prizes, holder rewards or earned commissions remain protected.
             </p>
             <LinkButton

@@ -20,11 +20,11 @@ export const docPages: DocPage[] = withDocVisuals([
           },
           {
             "type": "paragraph",
-            "text": "Tincta seasons allocate 60% of mint revenue to winning NFTs, 20% to qualified affiliates, 8% to season holder rewards and 12% to the protocol treasury for infrastructure and upcoming projects. These rules are planned for launch. Always review the terms of the selected collection before participating. These percentages cannot be voted away. Actual ETH allocations vary with the community-selected mint prices and supplies and the revenue received. All mint funds stay reserved until finalization. Unsold expiry or missing randomness at the fixed cutoff allows full mint-price refunds."
+            "text": "Tincta seasons allocate 60% of mint revenue to winning NFTs, 20% to qualified affiliates, 8% to season holder rewards and 12% to the protocol treasury for infrastructure costs, future functionality and Tincta projects. These rules are planned for launch. Always review the terms of the selected collection before participating. These percentages cannot be voted away. Actual ETH allocations vary with the community-selected mint prices and supplies and the revenue received. All mint funds stay reserved until finalization. Unsold expiry or missing randomness at the fixed cutoff allows full mint-price refunds."
           },
           {
             "type": "paragraph",
-            "text": "The protocol treasury is the public name for the contract’s ordinary operator allocation. After a successful draw, the fixed operator wallet can withdraw it. The team manages treasury spending; the collection contract does not restrict how withdrawn funds are used. Prize, earned affiliate and refund obligations remain protected. Holder funds are held separately in a season pool with no operator withdrawal."
+            "text": "The protocol treasury funds infrastructure costs, future functionality and Tincta projects. Prize, earned affiliate and refund obligations remain protected. Holder funds are held separately in a season pool with no operator withdrawal."
           },
           {
             "type": "paragraph",
@@ -56,7 +56,7 @@ export const docPages: DocPage[] = withDocVisuals([
     "minutes": 5,
     "sections": [
       { "id": "pool", "title": "Not a winner, but still a holder?", "blocks": [
-        { "type": "paragraph", "text": "Tincta collections automatically send 8% of mint receipts to a separate season holder pool when a draw finalizes. This contract has no operator withdrawal. The ordinary 12% treasury allocation remains withdrawable by the fixed operator for infrastructure and upcoming projects. Season holder rewards are planned for launch. Check the selected collection’s terms and pool availability before participating." },
+        { "type": "paragraph", "text": "Tincta collections automatically send 8% of mint receipts to a separate season holder pool when a draw finalizes. This contract has no operator withdrawal. The 12% treasury allocation funds infrastructure costs, future functionality and Tincta projects. Season holder rewards are planned for launch. Check the selected collection’s terms and pool availability before participating." },
         { "type": "paragraph", "text": "The pool is locked until every collection in its sealed season has completed a successful draw or become refundable. Unpaid prizes and refunds do not delay the unlock. No calendar timer, website switch or operator approval releases the pool. Before completion, the page shows accumulated ETH, settled collections and provisional claim estimates. A season has at most ten collections. Preparing the next season is not required to unlock this one." }
       ]},
       { "id": "dynamic-amounts", "title": "Different seasons, different amounts", "blocks": [
@@ -106,7 +106,7 @@ export const docPages: DocPage[] = withDocVisuals([
           },
           {
             "type": "paragraph",
-            "text": "For illustration, a successful collection of 1,000 NFTs at 0.01 ETH collects 10 ETH: 6 ETH for prizes, 2 ETH for affiliates, 0.8 ETH for season holders and 1.2 ETH for the treasury. The treasury allocation stays 12%, intended to cover current infrastructure costs and fund upcoming Tincta projects. The fixed operator wallet withdraws and manages these funds; this purpose is not an onchain spending restriction."
+            "text": "For illustration, a successful collection of 1,000 NFTs at 0.01 ETH collects 10 ETH: 6 ETH for prizes, 2 ETH for affiliates, 0.8 ETH for season holders and 1.2 ETH for the treasury. The treasury allocation stays 12%, intended to fund infrastructure costs, future functionality and Tincta projects."
           },
           {
             "type": "paragraph",
@@ -180,7 +180,7 @@ export const docPages: DocPage[] = withDocVisuals([
           },
           {
             "type": "paragraph",
-            "text": "Preparation funds randomness, sponsorship and a 0.01 ETH executor reward separately from mint receipts, then publishes the voting schedule. After verified randomness arrives, the operator can finalize the draw, withdraw the remaining protocol treasury allocation under the selected collection’s terms for infrastructure and future Tincta projects, and prepare the next collection in one transaction. A scheduled opening happens at the voting deadline without another signature. The dashboard shows pending actions and the current collection’s timing."
+            "text": "Preparation funds randomness, sponsorship and a 0.01 ETH executor reward separately from mint receipts, then publishes the voting schedule. After verified randomness arrives, the operator can finalize the draw and prepare the next collection in one transaction. The protocol treasury allocation funds infrastructure costs, future functionality and Tincta projects. A scheduled opening happens at the voting deadline without another signature. The dashboard shows pending actions and the current collection’s timing."
           },
           {
             "type": "paragraph",
