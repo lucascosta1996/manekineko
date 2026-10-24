@@ -1,3 +1,4 @@
+import { connectWebWallet } from "./web-wallet-fixture";
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { Interface, toQuantity, parseEther } from 'ethers';
@@ -67,9 +68,7 @@ test('V12 simulated wallet reviews an exact ballot and rejected signatures are n
   await installRejectingWallet(page);
   await page.goto(`${urls.web}/`);
   await expect(page.getByRole('heading', { name: 'Fictional voting study' })).toBeVisible();
-  await page.getByRole('button', { name: 'Connect wallet', exact: true }).click();
-  await page.getByRole('button', { name: 'V12 fixture wallet', exact: true }).click();
-  await page.getByRole('button', { name: `Use account ${A}` }).click();
+  await connectWebWallet(page, A);
   const vote = page.getByRole('button', { name: 'Vote for option 1' });
   await expect(vote).toBeEnabled();
   await vote.click();
@@ -97,9 +96,7 @@ test('any wallet can review funded finalization and a rejected signature does no
   await page.goto(`${urls.web}/claims`);
   const action=page.getByRole('button',{name:'Finalize draw & collect reward',exact:true});
   await expect(action).toBeDisabled();
-  await page.getByRole('button',{name:'Connect wallet',exact:true}).click();
-  await page.getByRole('button',{name:'V12 fixture wallet',exact:true}).click();
-  await page.getByRole('button',{name:`Use account ${executor}`}).click();
+  await connectWebWallet(page, executor);
   await expect(action).toBeEnabled(); await action.click();
   await expect(page.getByRole('alertdialog')).toContainText('0.01 ETH');
   await page.getByRole('button',{name:'Continue to wallet'}).click();

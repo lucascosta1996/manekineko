@@ -1,6 +1,8 @@
 # Versioned contract behavior
 
-**V10 is the local contract, Web, Launch, indexer and worker baseline.** Exact version-aware reads, minting, identity validation, frozen manifests, migration 026, deployment preparation and registry setup tooling are implemented. New drafts target V10 while historical exports and explicit V9 recovery retain their actual version. Live database migration, Eligibility V5 / Winner Credits V6 deployment, hosted rollout and a V10 Sepolia rehearsal remain pending. The completed Sepolia collection remains immutable V8. Start with [architecture.md](architecture.md) and the [V10 rollout handoff](permanent-combinations-v10.md).
+**Current local implementation: V13, pending public deployment.** Read [V13 holder rewards](season-holder-rewards-v13.md) for the fixed 60/20/8/12 split, 12% treasury funding for infrastructure and upcoming projects, dynamic season amounts and limited claims covering the first 5% of eligible NFTs. Community voting selects price, supply, winner count and duration before minting opens. The season pool unlocks only after all its collections draw or become refundable. Existing contracts keep their immutable allocations; V12 retains 60/20/20 and has no holder pool. [V12 governance](deadline-governance-v12.md) documents the inherited voting/refund rules. [Architecture](architecture.md) records code and deployment boundaries.
+
+The V10 and V1 sections below are historical behavior references, not current release instructions.
 
 ## V10 permanent numbers and later results
 

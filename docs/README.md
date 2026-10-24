@@ -1,17 +1,28 @@
 # Tincta documentation
 
-V10 is the current protocol. Start with [architecture](architecture.md) and [permanent combinations](permanent-combinations-v10.md) for current rules, component versions and verification boundaries.
+The latest local protocol implementation is **V13**, pending public deployment. Start with [architecture](architecture.md) and [season holder rewards V13](season-holder-rewards-v13.md). Existing contracts retain their original versions and rules; source changes do not upgrade them.
 
 ## Current guides
 
-- [Season execution](season-automation.md) and [social automation](season-social-automation.md)
-- [Launch console](launch-console.md), [seasons](seasons.md) and [Sepolia mock catalog](sepolia-mock-seasons.md)
-- [Automatic indexing](automatic-indexing.md) and [Git deployments](git-deployments.md)
-- [Randomness](blockchain-randomness.md) and [winner uniqueness](unique-winner.md)
+- [V13 allocations, dynamic season amounts and holder claims](season-holder-rewards-v13.md): 60/20/8/12, first-5% coverage, settlement unlock, current-owner claims and verification boundaries
+- [V12 governance](deadline-governance-v12.md): inherited voting, deadlines, mint limits and refunds; its 60/20/20 allocation applies only to V12
+- [Versioned contract behavior](contracts.md) and [permanent NFT identity](permanent-combinations-v10.md)
+- Participant guides are authored in [Web documentation content](../apps/web/lib/docs/content.ts) and served at `/docs`, including `/docs/holder-rewards`.
+- [Shared Web wallet](web-wallet-integration.md): Reown configuration, header account controls, session safety and verification boundaries
+- [Git deployments](git-deployments.md): application releases are separate from public-chain deployment
 - [Brand and artwork](brand/tincta/README.md)
 - [Cross-app visual identity standard](design/visual-identity.md), [reusable UI prompt](design/agent-prompt.md), [quality gates](design/quality-gates.md) and [adoption audit](design/adoption-audit.md)
 
-Subsystem documents may contain dated implementation sections. Use the current architecture, exact versioned source and immutable deployed terms when those sections differ from V10.
+## Historical subsystem guides
+
+These preserve their named versions and operational evidence. They do not describe a completed V13 rollout.
+
+- [Season execution](season-automation.md) and [social automation](season-social-automation.md)
+- [Launch console](launch-console.md), [seasons](seasons.md) and [Sepolia mock catalog](sepolia-mock-seasons.md)
+- [Automatic indexing](automatic-indexing.md)
+- [Randomness](blockchain-randomness.md) and [winner uniqueness](unique-winner.md)
+
+Subsystem documents may contain dated implementation sections. Use the current architecture, exact versioned source and immutable deployed terms when those sections differ. Do not apply V12 treasury percentages or historical affiliate formulas to V13.
 
 ## Dated deployment and recovery evidence
 

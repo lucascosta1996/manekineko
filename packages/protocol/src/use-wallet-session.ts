@@ -1,10 +1,24 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { invalidateWallet, observeWalletSession, type WalletSession } from "./wallet";
 
 /** One explicitly selected provider/account. Connecting never submits an action. */
+export const SharedWalletContext = createContext<(ReturnType<typeof useLocalWalletSession> & {
+  managed: true;
+  connecting: boolean;
+  account: { address: string; chainId: number } | null;
+  openAccount: () => void;
+  switchNetwork: (chainId: number) => void;
+}) | null>(null);
+
 export function useWalletSession() {
+  const shared = useContext(SharedWalletContext);
+  const local = useLocalWalletSession();
+  return shared ?? { ...local, managed: false as const };
+}
+
+function useLocalWalletSession() {
   const [session, setSession] = useState<WalletSession | null>(null);
   const [pickerChain, setPickerChain] = useState<number | null>(null);
   const [notice, setNotice] = useState("");

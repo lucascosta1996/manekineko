@@ -1,0 +1,168 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "protocol",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "DeploymentFailed",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "OnlyFactory",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "codePart1",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "codePart2",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "seasonId",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "string",
+            "name": "seasonName",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "collectionColor",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "textColor",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "roundId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "operator",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "voting",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "holderRewards",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "vrfCoordinator",
+            "type": "address"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "keyHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "uint16",
+            "name": "requestConfirmations",
+            "type": "uint16"
+          },
+          {
+            "internalType": "uint32",
+            "name": "callbackGasLimit",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxAffiliateSlots",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "saleStartAt",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct ManekinekoRoundV13.Config",
+        "name": "config",
+        "type": "tuple"
+      },
+      {
+        "internalType": "address",
+        "name": "renderer",
+        "type": "address"
+      }
+    ],
+    "name": "deploy",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "round",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "factory",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

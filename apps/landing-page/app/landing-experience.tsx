@@ -31,27 +31,37 @@ const faqs = (plannedRewards: PlannedRewards) => [
   {
     question: "What is the protocol treasury for?",
     answer:
-      "After a successful draw, 20% of mint revenue is allocated to the protocol treasury to cover current infrastructure costs and fund upcoming Tincta projects. The fixed operator wallet can withdraw this allocation; the team manages its spending, which is not restricted by the collection contract. Prize, earned affiliate and refund obligations remain protected. Refundable collections create no treasury allocation from mint revenue.",
+      "For new V13 seasons, after a successful draw, 12% of mint revenue is allocated to the protocol treasury to cover current infrastructure costs and fund upcoming Tincta projects. The fixed operator wallet can withdraw this allocation; the team manages its spending, which is not restricted by the collection contract. Prize, earned affiliate and refund obligations remain protected. Another 8% funds a locked season holder pool for the first 5% of eligible NFTs to claim after season end. V13 is pending deployment; existing collections keep their original terms. Refundable collections create no treasury or holder allocation from mint revenue.",
   },
   {
-    question: "Can the team withdraw my prize or commission?",
+    question: "Can the team withdraw prizes, commissions or holder rewards?",
     answer:
-      "No. The contract reserves unpaid prizes and earned affiliate commissions for their recipients. The operator cannot withdraw those funds or claim them for you. Unallocated affiliate budget is a separate reserve that the operator can withdraw after the draw; it is not an earned commission.",
+      "No. The contract reserves unpaid prizes and earned affiliate commissions for their recipients. The operator cannot withdraw those funds or claim them for you. V13 holder funds are held in a separate season pool with no operator withdrawal. Unallocated affiliate budget is a separate reserve that the operator can withdraw after the draw; it is not an earned commission.",
+  },
+  {
+    question: "How are season holder rewards calculated?",
+    answer:
+      "V13 reserves 8% of actual mint revenue from successfully drawn collections for that season. Claim slots equal 5% of the eligible NFTs, rounded down. The final pool divided by those slots gives the equal ETH payout, rounded down to whole wei. Voting changes mint prices and supplies, so neither the pool nor the payout is a fixed ETH amount. Estimates can change until every planned collection has drawn or become refundable. Each season has its own pool.",
+  },
+  {
+    question: "Who can claim from the holder pool?",
+    answer:
+      "The current owner of an NFT from a successful draw in that V13 season can claim once per NFT, including winning NFTs. Only the first 5% of eligible NFTs to claim receive rewards, in onchain execution order. A pending transaction does not reserve a slot. Transferring an NFT transfers its unclaimed opportunity but never resets a completed claim. There is no per-wallet limit or claim expiry. Unclaimed winning NFTs remain transfer-locked until their prize is claimed. Holder rewards are separate from prizes, affiliate claims and lifetime sponsored mints. Any rounding dust stays protected in the pool.",
   },
   {
     question: "How can I verify the contract?",
     answer:
-      "At launch, every collection will link to its deployed Ethereum contract and verified source code. You will be able to inspect the fixed terms, draw results, prize claims, and commission claims on the blockchain before and after participating. Check the connected deployment and network before participating.",
+      "At launch, every collection will link to its deployed Ethereum contract and verified source code. You will be able to inspect the fixed terms, draw results, prize claims, affiliate claims, and V13 season holder pools on the blockchain before and after participating. Check the connected deployment and network before participating.",
   },
   {
     question: "Are rewards sent to my wallet automatically?",
     answer:
-      "The contract determines entitlement and executes payment, without team approval. You submit a claim transaction from the wallet holding the winning NFT or the qualifying affiliate wallet. Minting opens at the voting deadline without activation. Preparation and draw finalization require transactions; autonomous rewards does not mean the entire launch runs without external services or transaction submissions.",
+      "The contract determines entitlement and executes payment, without team approval. You submit a claim transaction from the current winning NFT holder or qualifying affiliate wallet. For V13 season rewards, the current owner of an eligible NFT can claim after season end while the first-5% slots remain. Minting opens at the voting deadline without activation. Preparation and draw finalization require transactions; autonomous rewards does not mean the entire launch runs without external services or transaction submissions.",
   },
   {
     question: "How does community voting change the prizes?",
     answer:
-      "Eligible NFT holders vote for a published package of mint price, NFT supply, winner count, and mint duration. The option with the most votes sets the collection’s terms; ties and no-vote outcomes use the published fallback rules. After sellout and a successful draw, 60% of mint revenue is divided equally among the winning NFTs. A higher price or supply grows the pool; more winners divide it into smaller prizes. The 1 ETH illustration is neither a minimum nor a maximum. Review the final voted terms before minting.",
+      "Eligible NFT holders vote for a published package of mint price, NFT supply, winner count, and mint duration. The option with the most votes sets the collection’s terms; ties and no-vote outcomes use the published fallback rules. After sellout and a successful draw, 60% of mint revenue is divided equally among the winning NFTs. A higher price or supply grows the pool; more winners divide it into smaller prizes. The 1 ETH illustration is neither a minimum nor a maximum. V13’s 8% holder pool also follows actual successful mint revenue across the season; its 5% claim count and equal payout are calculated from the final eligible NFT count and pool. Voting changes these amounts, not the fixed allocation percentages. Review the final voted terms before minting.",
   },
   {
     question: "How do I win a prize?",
@@ -71,7 +81,7 @@ const faqs = (plannedRewards: PlannedRewards) => [
   {
     question: "What if a collection doesn’t sell out?",
     answer:
-      "There is no prize draw for an unsold collection. After its mint deadline, current NFT holders can claim the original mint price. A sold-out collection also becomes refundable if valid randomness is not recorded within its fixed 72-hour window. Randomness recorded on time preserves the draw and cannot expire. Refunds burn the NFT and exclude network gas and secondary-market price differences.",
+      "There is no prize draw for an unsold collection. After its mint deadline, current NFT holders can claim the original mint price. A sold-out collection also becomes refundable if valid randomness is not recorded within its fixed 72-hour window. Randomness recorded on time preserves the draw and cannot expire. Refundable collections contribute neither funds nor eligible NFTs to the V13 holder pool. Refunds burn the NFT and exclude network gas and secondary-market price differences.",
   },
   {
     question: "Can I choose my NFT’s numbers?",
@@ -298,6 +308,15 @@ export function LandingExperience({
           </div>
         </section>
 
+        <section className="manifesto wrap" aria-labelledby="holders-title">
+          <p className="eyebrow section-kicker">SEASON HOLDER REWARDS · PLANNED FOR V13</p>
+          <h2 id="holders-title">Not a winner,<br /><span className="muted-heading">but still a holder?</span></h2>
+          <div className="manifesto-bottom">
+            <p>8% of actual mint revenue from successful draws builds a season pool. Voting changes prices and supplies, so the pool and ETH per claim vary by season. Once every collection has drawn or become refundable, the first 5% of eligible NFTs to claim share the final pool equally. Only NFTs from successful draws qualify, including winners. One claim per NFT, while slots remain.</p>
+            <LinkButton href={footerLinks.app ? `${footerLinks.app.replace(/\/$/, "")}/holders` : undefined}>Explore holder rewards <Icon name="diagonal" /></LinkButton>
+          </div>
+        </section>
+
         <section
           className="manifesto wrap"
           data-reveal
@@ -315,10 +334,10 @@ export function LandingExperience({
             <p>
               Eligible NFT holders vote on published packages of price, supply,
               winner count, and mint duration. The winning package becomes fixed
-              when voting ends. The allocation stays the same: 60% for prizes,
-              20% for affiliates, and 20% for the protocol treasury after a successful draw.
+              when voting ends. For new V13 seasons: 60% for prizes,
+              20% for affiliates, 8% for season holder rewards, and 12% for the protocol treasury after a successful draw.
               The treasury covers current infrastructure costs and funds upcoming Tincta projects.
-              Funds owed as prizes or earned commissions remain protected.
+              The holder pool unlocks at season end for the first 5% of eligible NFTs to claim. V13 is pending deployment; existing collections retain their original rules. Funds owed as prizes, holder rewards or earned commissions remain protected.
             </p>
             <LinkButton
               className="ui-icon-button"
@@ -758,10 +777,10 @@ export function LandingExperience({
                 03
                 <Icon name="spark" />
               </span>
-              <h3>Claim if you win.</h3>
+              <h3>Claim your rewards.</h3>
               <p>
                 After sellout, the verifiable draw selects the winning NFTs.
-                Hold a winner? Claim its ETH prize.
+                Hold a winner? Claim its ETH prize. In V13, eligible NFTs can also claim from the season holder pool after season end, while the first-5% slots remain.
               </p>
               <span className="step-caption">
                 DIRECT CLAIMS. NO TEAM APPROVAL.
@@ -816,7 +835,7 @@ export function LandingExperience({
             </dl>
             <div className="refund-terms">
               <p>You submit a claim transaction and pay gas. Claiming burns the NFT. The refund covers the original mint price; network fees and secondary-market price differences are not refunded.</p>
-              <p>A sold-out collection is also refundable if valid randomness is not recorded within 72 hours of sellout. Randomness recorded on time preserves the draw; its results cannot expire.</p>
+              <p>A sold-out collection is also refundable if valid randomness is not recorded within 72 hours of sellout. Randomness recorded on time preserves the draw; its results cannot expire. Refundable collections contribute neither ETH nor eligible NFTs to the V13 holder pool.</p>
             </div>
           </div>
         </section>
@@ -838,7 +857,7 @@ export function LandingExperience({
             </h2>
             <p>
               At launch, explore verified contract code, collection terms,
-              draw results, prize claims, and commission claims on Ethereum.
+              draw results, prize claims, affiliate claims, and V13 season holder pools on Ethereum.
             </p>
           </div>
           <div className="faq-list">

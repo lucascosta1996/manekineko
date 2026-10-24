@@ -125,7 +125,17 @@
     "./season-controller-v12": "./src/ManekinekoSeasonControllerV12.json",
     "./season-controller-v12-source": "./src/ManekinekoSeasonControllerV12.source.json",
     "./winner-credits-v8": "./src/ManekinekoWinnerCreditsV8.json",
-    "./winner-credits-v8-source": "./src/ManekinekoWinnerCreditsV8.source.json"
+    "./winner-credits-v8-source": "./src/ManekinekoWinnerCreditsV8.source.json",
+    "./round-v13": "./src/ManekinekoRoundV13.json",
+    "./round-v13-source": "./src/ManekinekoRoundV13.source.json",
+    "./round-deployer-v13": "./src/ManekinekoRoundDeployerV13.json",
+    "./round-deployer-v13-source": "./src/ManekinekoRoundDeployerV13.source.json",
+    "./season-controller-v13": "./src/ManekinekoSeasonControllerV13.json",
+    "./season-controller-v13-source": "./src/ManekinekoSeasonControllerV13.source.json",
+    "./holder-rewards-v13": "./src/ManekinekoHolderRewardsV13.json",
+    "./holder-rewards-v13-source": "./src/ManekinekoHolderRewardsV13.source.json",
+    "./winner-credits-v9": "./src/ManekinekoWinnerCreditsV9.json",
+    "./winner-credits-v9-source": "./src/ManekinekoWinnerCreditsV9.source.json"
   },
   "dependencies": {
     "ethers": "6.17.0"

@@ -4,7 +4,7 @@ import seasons from "../../../../seasons.json";
 import { LandingExperience } from "../landing-experience";
 import { plannedRewards } from "../../lib/planned-rewards";
 
-export const metadata: Metadata = { title: "Tincta Rewards — Community-voted terms. Onchain rewards.", description: "Eligible NFT holders vote on collection terms. Explore how price, supply, and winner count shape equal ETH prizes, plus affiliate rewards and refund rules." };
+export const metadata: Metadata = { title: "Tincta Rewards — Community-voted terms. Onchain rewards.", description: "Community-voted mint terms, ETH prizes and affiliate rewards. Explore V13’s planned season holder pool, limited first-come claims and protected refunds." };
 
 function getCollectionUrl() {
   const configured = process.env.NEXT_PUBLIC_WEB_URL;

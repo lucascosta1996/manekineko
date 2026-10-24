@@ -42,7 +42,8 @@
       "/claims",
       "/affiliates",
       "/docs",
-      "/docs/[slug]"
+      "/docs/[slug]",
+      "/holders"
     ],
     "redirects": {
       "/mint": "/",

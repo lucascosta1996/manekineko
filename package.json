@@ -84,7 +84,8 @@
     "protocol:v12:previews": "node --import tsx scripts/protocol-v12/preview-social.mts",
     "protocol:v12:audit-bundle": "npm run contracts:compile && node scripts/protocol-v12/audit-bundle.mjs",
     "protocol:v12:rehearsal:build": "npm run contracts:compile && node --import tsx scripts/protocol-v12/rehearsal/build.mts",
-    "protocol:v12:rehearsal:test": "npm run test --workspace @manekineko/contracts -- test/ProtocolV12Rehearsal.ts"
+    "protocol:v12:rehearsal:test": "npm run test --workspace @manekineko/contracts -- test/ProtocolV12Rehearsal.ts",
+    "protocol:v13:verify": "npm run contracts:compile && node --import tsx scripts/protocol-v13/verify-deployment.mts"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.11.1",

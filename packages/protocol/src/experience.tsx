@@ -46,6 +46,8 @@ import "./protocol.css";
 import { OperatorWorkspace } from "./operator-workspace";
 import { operatorActions } from "./operator-actions";
 import { readCatalog, type Catalog } from "./progress";
+import { HolderRewardsPanel } from "./holder-rewards-panel";
+import { holderClaimTransaction, verifyHolderPool } from "./holder-rewards";
 
 type View = PublicView | "operations";
 type Pending = {
@@ -139,7 +141,7 @@ function Experience({
   );
   const key =
     config && wallet.session
-      ? `tincta:v12:${config.chainId}:${config.controller}:${wallet.session.address}`
+      ? `tincta:v${config.version ?? 12}:${config.chainId}:${config.controller}:${wallet.session.address}`
       : null;
   useEffect(
     () => () => {
@@ -344,6 +346,10 @@ function Experience({
           "The wallet and display providers disagree about this collection."
         );
       const tx = await build(fresh, session.address);
+      if (fresh.holders) {
+        const pool = await verifyHolderPool(session.provider, config);
+        if (getAddress(await pool.getAddress()) !== fresh.holders.address) throw new Error("The wallet and display providers disagree about the holder pool.");
+      }
       if (
         !(await requestConfirmation({
           title: label,
@@ -384,6 +390,7 @@ function Experience({
           fresh.voting,
           fresh.credits,
           fresh.round?.address,
+          fresh.holders?.address,
         ].some((a) => a?.toLowerCase() === String(tx.to).toLowerCase())
       ) {
         if (
@@ -475,7 +482,7 @@ function Experience({
     }
   }
   const r = state?.round,
-    disabled = !wallet.session || busy || !!pending || !!error || !state;
+    disabled = !wallet.session || wallet.session.chainId !== config?.chainId || busy || !!pending || !!error || !state;
   const canVote =
     !!r &&
     !!state &&
@@ -1081,7 +1088,7 @@ function Experience({
       <Suspense fallback={null}>
         <QuerySelection setSelected={setSelected} setAffiliate={setAffiliate} />
       </Suspense>
-      <div className="protocol-toolbar">
+      {!wallet.managed && <div className="protocol-toolbar">
         <span>
           {wallet.session
             ? shortWallet(wallet.session.address)
@@ -1098,8 +1105,8 @@ function Experience({
         >
           {wallet.session ? "Disconnect" : "Connect wallet"}
         </Button>
-      </div>
-      {wallet.pickerChain !== null && (
+      </div>}
+      {!wallet.managed && wallet.pickerChain !== null && (
         <WalletAccountPicker
           purpose="onchain seasons"
           chainId={wallet.pickerChain}
@@ -1107,11 +1114,13 @@ function Experience({
           onCancel={wallet.closePicker}
         />
       )}
-      {wallet.notice && (
+      {!wallet.managed && wallet.notice && (
         <p className="protocol-note" role="status">
           {wallet.notice}
         </p>
       )}
+      {wallet.managed && !wallet.account && <p className="protocol-note">Connect your wallet in the header to participate.</p>}
+      {wallet.managed && wallet.account && wallet.account.chainId !== config.chainId && <p className="protocol-note" role="status">Switch your wallet to {config.chainId === 1 ? "Ethereum" : "Sepolia testnet"} using the header to continue.</p>}
       {error && (
         <div className="protocol-panel" role="alert">
           <p>{error}</p>
@@ -1215,6 +1224,12 @@ function Experience({
         refund={refundPanel}
         sponsored={sponsoredPanel}
         vault={vaultPanel}
+        holders={state && <HolderRewardsPanel state={state} token={token} onToken={setToken} disabled={disabled} busy={busy} connected={!!wallet.session} explorer={explorer} onClaim={() => {
+          if (!provider || !config || !state.holders || !r) return;
+          const reward = state.holders.rewardPerNft;
+          void submit("Claim holder reward", `Claim ${eth(reward)} for NFT #${token} in ${r.name} (${r.address}) from pool ${state.holders.address}. Recipient: ${wallet.session!.address}. Network: ${config.chainId === 1 ? "Ethereum Mainnet" : "Sepolia testnet"}. First come, first served in onchain execution order; a pending transaction does not reserve a slot. Network fees are separate.`, (fresh, address) => holderClaimTransaction(provider, config, fresh, integerInput(token), address, reward));
+        }} />}
+        protocolVersion={config?.version ?? (config ? 12 : 13)}
         explorer={explorer}
         controller={config?.controller}
       />

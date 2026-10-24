@@ -45,9 +45,9 @@ function ReviewControlsFixture() {
 }
 
 export function WebVisualFixture({ path = "/", state = "loaded" }: { path?: string; state?: string }) {
-  if (["/", "/vote", "/collections", "/claims", "/affiliates", "/operations"].includes(path)) {
-    const view = path === "/claims" ? "claims" : path === "/affiliates" ? "affiliates" : path === "/operations" ? "operations" : "home";
-    return <SiteShell section={view} protocolEnabled={state !== "unconfigured"} chainId={11155111}><ProtocolExperience view={view} config={state === "unconfigured" ? null : {chainId:11155111,controller:"0x1111111111111111111111111111111111111111",codeHash:keccak256("0x6000"),rpcUrl:"https://v12.fixture.invalid"}} /></SiteShell>;
+  if (["/", "/vote", "/collections", "/claims", "/affiliates", "/holders", "/operations"].includes(path)) {
+    const view = path === "/holders" ? "holders" : path === "/claims" ? "claims" : path === "/affiliates" ? "affiliates" : path === "/operations" ? "operations" : "home";
+    return <SiteShell section={view} protocolEnabled={state !== "unconfigured"} chainId={11155111}><ProtocolExperience view={view} config={state === "unconfigured" ? null : {chainId:11155111,controller:"0x1111111111111111111111111111111111111111",codeHash:keccak256("0x6000"),rpcUrl:"https://v12.fixture.invalid", ...(path === "/holders" && state !== "v12" ? { version: 13 as const, holderRewardsCodeHash: keccak256("0x6000") } : {})}} /></SiteShell>;
   }
   if(path === "/visual/review-controls") return <ReviewControlsFixture/>;
   const retry = () => window.location.reload(); // Only the isolated harness imports this callback.

@@ -72,7 +72,7 @@ test('Launch reviews exact operator proceeds and a rejection never resubmits', a
   await page.getByRole('button',{name:'V12 fixture wallet',exact:true}).click();
   await page.getByRole('button',{name:`Use account ${A}`}).click();
   await page.getByText(/^Individual actions & fund recovery/).click();
-  const action=page.locator('.operator-action-list > li').filter({has:page.getByRole('heading',{name:'Withdraw operator proceeds',exact:true})});
+  const action=page.locator('.operator-action-list > li').filter({has:page.getByRole('heading',{name:'Withdraw protocol treasury',exact:true})});
   await expect(action.getByRole('button',{name:'Review transaction'})).toBeEnabled();
   await action.getByRole('button',{name:'Review transaction'}).click();
   await expect(page.getByRole('alertdialog')).toContainText('Send 2.0 ETH to the fixed operator wallet');

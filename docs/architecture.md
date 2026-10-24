@@ -1,5 +1,16 @@
 # Tincta protocol architecture and agent handoff
 
+## 2026-10-24 shared Web wallet
+
+Web's root layout owns one Reown AppKit 1.8.24 / Ethers adapter session. The header exposes Connect wallet, the selected address/network, account management and network selection across Participate, Rewards, Affiliates, Holders and docs. EIP-6963 installed wallets and WalletConnect mobile/QR connections use the same standard selector. `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` and exact Reown origin allowlisting are required; a missing configuration reports unavailable rather than pretending to connect. Launch and historical workflows retain their existing account picker.
+
+`packages/protocol/src/connected-wallet.ts` bridges the SDK's active account to the existing verified Ethers signing path. Provider account/network/disconnect events immediately invalidate the old signer; revision guards discard stale asynchronous restores. Navigation does not disconnect. Unsupported/mismatched networks cannot authorize protocol actions. Existing fresh reads, runtime pins, explicit transaction review, simulation and account/network-scoped recovery journals remain authoritative. No contract rules or deployment pins change. See [Web wallet integration](web-wallet-integration.md) for configuration and verification boundaries.
+
+## 2026-10-24 local V13 holder rewards update
+
+[Season holder rewards V13](season-holder-rewards-v13.md) adds a new, undeployed graph with the user-selected 60% prizes / 20% affiliates / 8% season holders / 12% protocol treasury split. The first 5% of eligible NFTs to claim after season completion receive equal rewards, once per NFT, in onchain execution order. Pool totals, claim counts and ETH payouts are calculated separately for each season from actual successful mint receipts and eligible NFTs under the community-voted terms; only allocation and coverage percentages are fixed. Eligibility includes winning NFTs from successfully drawn collections; refundable collections retain full refunds. The holder vault has no operator withdrawal. Existing V12 and historical contracts keep their immutable economics. New `/holders` UI, explicit V13 runtime pins and a full-graph verifier accompany the implementation. This local source work is not deployment, migration, audit acceptance or live wallet evidence. Read the linked record for formulas, rounding, transfer rules, bounded season settlement and validation boundaries.
+
+
 **Public allocation terminology (2026-10-23):** Landing, Web and public docs call V12’s ordinary 20% operator allocation the **protocol treasury**, intended to fund current infrastructure and future Tincta projects. The immutable operator wallet still withdraws and manages it after a successful draw; collection contracts do not restrict its subsequent spending. The 60% prize / 20% affiliate / 20% treasury split, protected liabilities, voting choices and separate unused affiliate reserve remain unchanged. This is presentation terminology, not a new treasury contract, spending lock or deployment. See [exact funds and preserved rules](deadline-governance-v12.md#exact-funds-and-preserved-rules).
 
 **Public workflow update (2026-10-23):** Web now concentrates the active collection on `/`: Vote → Mint → Draw → Claim (or Refund), selected from verified contract state. `/claims` lists all winning NFTs/current holder addresses and supports earlier collection claims/refunds; `/affiliates` handles enrollment, collection-bound referral links and affiliate payouts. `/collections` and `/vote` redirect home while preserving query parameters. No protocol rules, deployed contracts, catalog identities, executor or frozen rehearsal runtime changed. See [the UI implementation and verification record](v12-public-workflow-2026-10-23.md).
@@ -70,6 +81,8 @@ Source files are linked throughout. The dated deployment snapshot distinguishes 
 - [Documentation map](#documentation-map)
 
 ## Protocol in one page
+
+This section preserves the historical V10 integration model. For the current local V13 rules, use [season holder rewards V13](season-holder-rewards-v13.md): community-voted terms, 60/20/8/12 allocation, dynamic season amounts, first-5% holder claims and protected refunds. V12 and V13 use the onchain controller and direct-chain interfaces described in the dated updates above; neither silently upgrades the older database/worker pipeline.
 
 The public name is **Tincta**, with the intended domain **tincta.xyz**. Internal package names, Solidity symbols, database prefixes and tooling remain **manekineko**. The visual identity is predominantly white with black type; collection colors and geometric NFT linework provide the color.
 

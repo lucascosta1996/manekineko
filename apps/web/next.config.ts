@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // The adapter is loaded in a browser effect. Its Node-only optional wallet SDKs are not SSR code.
+  serverExternalPackages: ["@reown/appkit-adapter-ethers"],
   transpilePackages: ["@manekineko/protocol", "@manekineko/ui"],
   async redirects() {
     return [

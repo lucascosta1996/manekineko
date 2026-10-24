@@ -11,15 +11,17 @@
     "./walletconnect": "./src/walletconnect.ts",
     "./wallet-account-picker": "./src/wallet-account-picker.tsx",
     "./use-wallet-session": "./src/use-wallet-session.ts",
+    "./web-wallet-provider": "./src/web-wallet-provider.tsx",
     "./experience": "./src/experience.tsx",
     "./styles.css": "./src/protocol.css",
     "./progress": "./src/progress.ts"
   },
   "dependencies": {
-    "ethers": "6.17.0",
     "@manekineko/contract-abi": "0.1.0",
     "@manekineko/ui": "0.1.0",
-    "@reown/appkit": "1.8.24"
+    "@reown/appkit": "1.8.24",
+    "@reown/appkit-adapter-ethers": "1.8.24",
+    "ethers": "6.17.0"
   },
   "peerDependencies": {
     "next": "^16.3.0",

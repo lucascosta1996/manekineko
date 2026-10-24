@@ -1,5 +1,7 @@
 # V12: deadline voting and onchain seasons
 
+**Version scope:** This document specifies V12, including its 60/20/20 allocation. The newer local [V13 implementation](season-holder-rewards-v13.md) inherits voting and deadline behavior but uses 60/20/8/12 and adds a protected season holder pool. V13 remains pending public deployment; do not relabel existing V12 contracts.
+
 Implementation record: 2026-10-22. **New local source, not a deployed upgrade.** Existing V8–V11 contracts, frozen terms, registries, metadata and exports retain their actual behavior. V12 must be deployed as a new protocol after review and a Sepolia rehearsal.
 
 ## What depended on Web2

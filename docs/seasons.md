@@ -1,5 +1,9 @@
 # Seasons and collection appearance
 
+**Current interface and V13 rules (2026-10-24):** The current Web/Launch interfaces use the sealed onchain catalog and reviewed wallet transactions. Community votes select each collection’s mint terms. V13 allocates 60% to prizes, 20% to affiliates, 8% to a season holder pool and 12% to the protocol treasury for infrastructure and upcoming projects. Actual ETH amounts vary with successful mint receipts. After all planned collections settle, the first 5% of eligible NFTs to claim receive equal season rewards in onchain execution order. V13 is locally implemented, not publicly deployed; historical seasons retain their original rules. See [V13 economics and rollout boundaries](season-holder-rewards-v13.md) and [architecture](architecture.md).
+
+## Historical reference: V6–V10 season planning and appearance
+
 Read [the architecture handoff](architecture.md) for current versions, deployment evidence and migration gaps. The local Launch/preparation/worker baseline is V10, including permanent-number previews, versioned registry pins and migration 026. Live database/registry rollout, hosting and rehearsal remain pending; see [the V10 handoff](permanent-combinations-v10.md). Appearance introduced in V6 remains supported by version-specific migrations. Existing saved drafts, catalog season identities, order/names/colors and finalized exports are preserved; a new default never silently rewrites them.
 
 The launch console manages a season as a named, revisioned group of one to ten collections. A season receives a nonzero 32-byte ID when its draft is created. Every collection in that season carries the same ID and season name, and keeps its own collection name, six-digit hex background color, supply, price, prize terms and deadline.

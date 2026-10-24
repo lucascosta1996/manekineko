@@ -286,3 +286,84 @@
 .public-stage[data-phase="0"] .protocol-panel > .ui-disclosure {
   margin-top: var(--ui-space-4);
 }
+
+.holder-rewards {
+  max-width: 44rem;
+  margin: auto;
+  display: grid;
+  gap: var(--ui-space-6);
+}
+.holder-pool {
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius);
+  padding: var(--ui-space-6);
+}
+.holder-pool-heading,
+.holder-progress-label {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--ui-space-2);
+  align-items: center;
+}
+.holder-pool h2,
+.holder-claim h2 {
+  font-size: var(--ui-subheading);
+  font-weight: 500;
+  margin: 0;
+}
+.holder-state {
+  font-size: var(--ui-label);
+  color: var(--ui-muted);
+}
+.holder-total {
+  margin-block: var(--ui-space-8);
+  overflow-wrap: anywhere;
+}
+.holder-total strong {
+  font-size: var(--ui-hero);
+  line-height: 1.12;
+  font-weight: 500;
+  letter-spacing: -0.035em;
+}
+.holder-total span {
+  display: block;
+  color: var(--ui-muted);
+  font-size: var(--ui-label);
+}
+.holder-progress-label { font-size: var(--ui-label); }
+.holder-progress {
+  display: block;
+  width: 100%;
+  height: var(--ui-space-2);
+  appearance: none;
+  background: var(--ui-line);
+  color: var(--ui-ink);
+  border: 0;
+  margin-block: var(--ui-space-3);
+}
+.holder-progress::-webkit-progress-bar { background: var(--ui-line); }
+.holder-progress::-webkit-progress-value { background: var(--ui-ink); }
+.holder-progress::-moz-progress-bar { background: var(--ui-ink); }
+.holder-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--ui-space-4);
+  border-top: 1px solid var(--ui-line);
+  padding-top: var(--ui-space-5);
+  margin-top: var(--ui-space-6);
+}
+.holder-stats dt { font-size: var(--ui-label); color: var(--ui-muted); }
+.holder-stats dd { margin: var(--ui-space-2) 0 0; font-size: var(--ui-subheading); overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.holder-stats dd span { font-size: var(--ui-label); color: var(--ui-muted); }
+.holder-claim { display: grid; gap: var(--ui-space-4); }
+.holder-claim > p { margin: 0; }
+@media (max-width: 599px) {
+  .holder-pool { padding: var(--ui-space-4); }
+  .holder-stats { grid-template-columns: 1fr; }
+  .holder-stats > div { display: flex; gap: var(--ui-space-3); justify-content: space-between; align-items: baseline; }
+  .holder-stats dd { text-align: right; }
+}
+@media (forced-colors: active) {
+  .holder-progress { appearance: auto; }
+}

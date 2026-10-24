@@ -57,9 +57,11 @@ export default function LandingPage() {
               <div>
                 <div className="studio-project-name">Tincta Rewards</div>
                 <h3>Rewards governed by immutable terms.</h3>
-                <p>Each Rewards collection fixes its mint terms, prize allocation, affiliate rules, and refund conditions at deployment. Claims follow those published rules.</p>
+                <p>Eligible NFT holders vote on each collection’s mint price, supply, winner count and mint duration. The selected terms become final when voting ends.</p>
+                <p>V13 allocates successful mint revenue to prizes (60%), qualified affiliates (20%), season holder rewards (8%) and the protocol treasury (12%) for infrastructure and upcoming projects. Holder claims open at season end for the first 5% of eligible NFTs to claim, with equal payouts calculated from that season’s actual pool.</p>
+                <p>V13 is pending deployment. Existing collections keep their original rules.</p>
                 <LinkButton href="/rewards" variant="secondary" icon={<Icon name="arrow" />}>Explore Tincta Rewards</LinkButton>
-                <div className="studio-feature-meta"><span>Terms fixed at deployment</span><span>Direct contract claims</span></div>
+                <div className="studio-feature-meta"><span>Community-voted terms</span><span>Direct contract claims</span></div>
               </div>
             </article>
           </section>

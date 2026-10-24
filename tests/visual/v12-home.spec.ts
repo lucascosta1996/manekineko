@@ -1,3 +1,4 @@
+import { connectWebWallet } from "./web-wallet-fixture";
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { Interface, parseEther } from "ethers";
@@ -5,15 +6,8 @@ import { prepare, ready, urls, metrics } from "./fixtures";
 import { rpc, installRejectingWallet, A, T } from "./v12-rpc";
 import ra from "../../packages/contracts/src/ManekinekoRoundV12.json";
 
-async function connect(page: Page) {
-  await page
-    .getByRole("button", { name: "Connect wallet", exact: true })
-    .click();
-  await page
-    .getByRole("button", { name: "V12 fixture wallet", exact: true })
-    .click();
-  await page.getByRole("button", { name: `Use account ${A}` }).click();
-}
+const connect = connectWebWallet;
+
 for (const width of [320, 390, 768, 1280, 1440]) {
   for (const [path, phase, heading] of [
     ["/", 3, "Your tickets are in the draw."],
@@ -289,7 +283,7 @@ test("live action reflows with enlarged text, keyboard navigation and coarse tar
   await expect(
     page.getByRole("heading", { name: "Cast your vote" })
   ).toBeVisible();
-  const m = await metrics(page, ".protocol-toolbar .ui-button");
+  const m = await metrics(page, ".header-wallet .ui-button");
   expect(m.height).toBeGreaterThanOrEqual(44);
   expect(m.padding[0]).toBe("11px");
   await page.getByRole("button", { name: "Open menu" }).focus();

@@ -16,7 +16,7 @@ import type { Snapshot } from "./chain";
 import { CollectionTiming } from "./collection-timing";
 import "./public-workspace.css";
 
-export type PublicView = "home" | "claims" | "affiliates";
+export type PublicView = "home" | "claims" | "affiliates" | "holders";
 export function formatDuration(seconds: bigint) {
   if (seconds % 3600n === 0n)
     return `${seconds / 3600n} ${seconds === 3600n ? "hour" : "hours"}`;
@@ -60,6 +60,8 @@ export function PublicWorkspace({
   vault,
   explorer,
   controller,
+  holders,
+  protocolVersion = 12,
 }: {
   view: PublicView;
   state: Snapshot | null;
@@ -76,6 +78,8 @@ export function PublicWorkspace({
   vault: ReactNode;
   explorer: (address: string) => string;
   controller?: string;
+  holders?: ReactNode;
+  protocolVersion?: 12 | 13;
 }) {
   const r = state?.round;
   const step = r
@@ -98,20 +102,22 @@ export function PublicWorkspace({
             : "Tincta Rewards · Onchain seasons"}
         </p>
         <h1>
-          {view === "claims"
+          {view === "holders" ? "Not a winner, but still a holder?" : view === "claims"
             ? "Your rewards."
             : view === "affiliates"
             ? "Grow the collection."
             : r?.name ?? "Your next move, onchain."}
         </h1>
         <p>
-          {view === "claims"
+          {view === "holders" ? (protocolVersion === 13 ? "Follow the season pool. At season end, the first 5% of eligible NFTs to claim share the rewards equally." : "Season holder pools are available only in V13. This deployment keeps its original reward rules.") : view === "claims"
             ? "See the winners. Claim prizes and refunds directly from the collection."
             : view === "affiliates"
             ? "Enroll, share your link and claim your equal share of the affiliate pool."
             : r
             ? beforeVote
               ? "The next collection is prepared. Voting begins at its onchain opening time."
+              : protocolVersion === 13 && [5, 6].includes(r.phase)
+              ? "The draw is complete. Check winning-ticket and affiliate claims now; season holder claims open after every collection settles, while slots remain."
               : stageDescriptions[r.phase]
             : "Vote on the next collection. Mint a ticket. Follow the draw. Everything starts here."}
         </p>
@@ -321,9 +327,11 @@ export function PublicWorkspace({
               )}
             </div>
           )}
+          {view === "holders" && holders}
         </>
       )}
       <nav className="public-shortcuts" aria-label="Your collection actions">
+        {view !== "holders" && <Link className={buttonClassName({ variant: "secondary" })} href={`/holders${query}`}>Season holder rewards</Link>}
         {view !== "home" && (
           <Link className={buttonClassName({ variant: "secondary" })} href="/">
             Back to the current collection
@@ -348,10 +356,10 @@ export function PublicWorkspace({
       </nav>
       <section className="public-explainer" aria-label="How a collection works">
         <p className="public-allocation">
-          60% winning tickets · 20% qualified affiliates · 20% protocol treasury.
+          {protocolVersion === 13 ? "60% winning tickets · 20% qualified affiliates · 8% holder rewards · 12% protocol treasury." : "60% winning tickets · 20% qualified affiliates · 20% protocol treasury."}
         </p>
         <p>
-          The 20% protocol treasury allocation covers current infrastructure costs
+          {!configured && "Planned for new V13 seasons. "}The {protocolVersion === 13 ? "12%" : "20%"} protocol treasury allocation covers current infrastructure costs
           and funds upcoming Tincta projects.
         </p>
         <Disclosure title="How it works · Voting, prizes and refunds">
@@ -361,6 +369,28 @@ export function PublicWorkspace({
             contract does not restrict how those withdrawn funds are used.
             Prize, earned affiliate and refund obligations stay protected.
           </p>
+          {protocolVersion === 13 && (
+            <>
+              <p>
+                Each successful draw sends 8% of actual mint revenue to its
+                season’s holder pool. Voting selects prices and supplies, so
+                pool totals and ETH rewards vary by season. The allocation
+                percentages stay fixed.
+              </p>
+              <p>
+                Holder claims unlock when every planned collection in the
+                season has drawn or become refundable. Only NFTs from
+                successful draws qualify, including winners. The first 5% of
+                eligible NFTs to claim, rounded down, share the final pool
+                equally. Each NFT can claim once through its current owner,
+                in onchain execution order. Transfers do not reset a used claim.
+                The operator cannot withdraw this pool.
+              </p>
+              <Link className={textActionClassName()} href="/docs/holder-rewards">
+                Read the holder reward rules
+              </Link>
+            </>
+          )}
           <p>
             Mint price is always at least 0.01 ETH. Voted supply is 1,000–65,536
             NFTs and becomes fixed when minting opens. Up to 20 primary mints

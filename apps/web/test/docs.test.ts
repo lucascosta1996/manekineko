@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import roundV12Abi from "@manekineko/contract-abi/round-v12" with { type: "json" };
+import holderV13Abi from "@manekineko/contract-abi/holder-rewards-v13" with { type: "json" };
 import { docPages } from "../lib/docs/content.ts";
 import { docGroups, docHref, docSearchEntry, searchDocs } from "../lib/docs/model.ts";
 
@@ -48,19 +49,32 @@ test("documentation search finds page titles and explanations without a server r
   assert.ok(searchDocs(entries, "scoreCombination").some(page => page.slug === "verification"));
 });
 
-test("verification documentation names real V12 read functions", () => {
+test("verification documentation names real collection and V13 holder-pool reads", () => {
   const text = docSearchEntry(docPages.find(page => page.slug === "verification")!).text;
   const functions = new Map(roundV12Abi.filter(item => item.type === "function").map(item => [item.name, item.stateMutability]));
   for (const name of ["maxSupply", "mintPrice", "totalMinted", "mintDeadline", "phase", "winningTokenIds", "prizeClaimed", "affiliateClaimable", "refundsAvailable", "operatorWithdrawable", "protectedBalance", "combination", "tokenIdForCombination", "tokenURI", "score", "scoreCombination"]) {
     assert.ok(text.includes(name));
     assert.ok(["view", "pure"].includes(functions.get(name) ?? ""));
   }
+  const holderFunctions = new Map(holderV13Abi.filter(item => item.type === "function").map(item => [item.name, item]));
+  for (const name of ["summary", "fundedCollection", "claimed", "HOLDER_BPS", "COVERAGE_BPS"]) {
+    assert.ok(text.includes(name), name);
+    assert.equal(holderFunctions.get(name)?.stateMutability, "view", name);
+  }
+  const summary = holderFunctions.get("summary")!;
+  assert.ok(summary.outputs);
+  for (const output of summary.outputs) {
+    if (!("components" in output)) continue;
+    for (const field of output.components) {
+      assert.ok(text.includes(field.name), `Document the actual summary field: ${field.name}`);
+    }
+  }
 });
 test("current guides preserve economic floors, holder claims and deployment boundaries", () => {
   const text = (slug: string) => docSearchEntry(docPages.find(page => page.slug === slug)!).text;
   assert.match(text("onchain-voting"), /0.01 ETH/);
   assert.match(text("onchain-voting"), /1,000–65,536/);
-  assert.match(text("onchain-voting"), /treasury allocation stays 20%/);
+  assert.match(text("onchain-voting"), /treasury allocation stays 12%/);
   assert.match(text("onchain-voting"), /current infrastructure costs and fund upcoming Tincta projects/);
   assert.match(text("onchain-voting"), /fixed operator wallet withdraws and manages these funds/);
   assert.match(text("onchain-voting"), /not an onchain spending restriction/);

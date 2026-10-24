@@ -4,6 +4,7 @@ import roundAbi from '@manekineko/contract-abi/round-v12' with { type: 'json' };
 import votingAbi from '@manekineko/contract-abi/voting-v12' with { type: 'json' };
 import creditsAbi from '@manekineko/contract-abi/winner-credits-v8' with { type: 'json' };
 import type { ProtocolConfig } from './config.ts';
+import { readHolderSeason, type HolderSeason } from './holder-rewards.ts';
 export { controllerAbi, roundAbi, votingAbi, creditsAbi };
 export type Option = { supply: bigint; price: bigint; winners: bigint; duration: bigint; votes: bigint };
 export type RoundState = {
@@ -41,6 +42,7 @@ export type RoundState = {
   awards: { rank: number; tokenId: bigint; amount: bigint; claimed: boolean; holder: string }[];
 };
 export type Snapshot = {
+  holders?: HolderSeason;
   block: number;
   timestamp: number;
   operator: string;
@@ -152,7 +154,7 @@ export async function readProtocol(
     r.growthReserveBalance(at),
     r.nextAvailableAffiliateId(at),
   ]);
-  if (version !== 'affiliate-v12' || getAddress(boundVoting) !== getAddress(voting))
+  if (version !== `affiliate-v${config.version ?? 12}` || getAddress(boundVoting) !== getAddress(voting))
     throw new Error('Collection verification failed.');
   const [
     name,
@@ -225,6 +227,7 @@ export async function readProtocol(
   );
   return {
     ...base,
+    ...(config.version === 13 ? { holders: await readHolderSeason(provider, config, address, block.number) } : {}),
     sources,
     round: {
       address,

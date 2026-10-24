@@ -16,8 +16,8 @@ const reviewedCompiler = {
 const v6Compiler = { ...reviewedCompiler, settings: { ...reviewedCompiler.settings, optimizer: { enabled: true, runs: 1 }, viaIR: true } };
 const compilerProfile = {
   compilers: [reviewedCompiler],
-  overrides: { "contracts/ManekinekoVotingV12.sol": v6Compiler, "contracts/ManekinekoSeasonControllerV12.sol": v6Compiler, "contracts/ManekinekoWinnerCreditsV8.sol": v6Compiler, ...Object.fromEntries(["Factory", "Round", "Renderer", "RoundDeployer"].flatMap(component =>
-    [6, 7, 8, 9, 10, 11, 12].map(version => [`contracts/Manekineko${component}V${version}.sol`, v6Compiler]))), },
+  overrides: { "contracts/ManekinekoVotingV12.sol": v6Compiler, "contracts/ManekinekoSeasonControllerV12.sol": v6Compiler, "contracts/ManekinekoWinnerCreditsV8.sol": v6Compiler, "contracts/ManekinekoWinnerCreditsV9.sol": v6Compiler, "contracts/ManekinekoSeasonControllerV13.sol": v6Compiler, "contracts/ManekinekoHolderRewardsV13.sol": v6Compiler, ...Object.fromEntries(["Factory", "Round", "Renderer", "RoundDeployer"].flatMap(component =>
+    [6, 7, 8, 9, 10, 11, 12, 13].map(version => [`contracts/Manekineko${component}V${version}.sol`, v6Compiler]))), },
 };
 
 export default defineConfig({
