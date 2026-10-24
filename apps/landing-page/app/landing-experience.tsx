@@ -825,7 +825,7 @@ export function LandingExperience({
         </section>
 
         <section className="manifesto holder-section wrap" id="holder-rewards" aria-labelledby="holders-title">
-          <p className="eyebrow section-kicker">SEASON HOLDER REWARDS · PLANNED FOR LAUNCH</p>
+          <p className="eyebrow section-kicker"><span className="section-index">06 /</span> SEASON HOLDER REWARDS · PLANNED FOR LAUNCH</p>
           <h2 id="holders-title">Not a winner,<br /><span className="muted-heading">but still a holder?</span></h2>
           <div className="holder-explanation">
             <p>8% of actual mint revenue from successful draws builds a season pool. Voting changes prices and supplies, so the pool and ETH per claim vary by season. Once every collection has drawn or become refundable, the first 5% of eligible NFTs to claim share the final pool equally. Only NFTs from successful draws qualify, including winners. One claim per NFT, while slots remain.</p>
@@ -852,7 +852,7 @@ export function LandingExperience({
         >
           <div>
             <p className="eyebrow">
-              <span className="section-index">06 /</span> INDEPENDENTLY VERIFIABLE
+              <span className="section-index">07 /</span> INDEPENDENTLY VERIFIABLE
             </p>
             <h2 id="faq-title">
               Inspect the code.

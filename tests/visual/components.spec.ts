@@ -47,7 +47,12 @@ test.describe('Shared production component contracts', () => {
       await control.hover(); await expect(control).toHaveCSS('background-color',hover);
       await page.mouse.down(); await expect(control).toHaveCSS('background-color',pressed);
       await page.mouse.up();
-      await page.keyboard.press('Tab'); await control.focus(); expect(await control.evaluate(element => [getComputedStyle(element).outlineWidth, getComputedStyle(element).outlineOffset])).toEqual(['2px','3px']);
+      await page.keyboard.press('Tab'); await control.focus();
+      await expect(control).toBeFocused();
+      await expect(control).toHaveCSS('outline-style', 'none');
+      await expect(control).toHaveCSS('box-shadow', 'none');
+      await expect(control).toHaveCSS('text-decoration-line', 'underline');
+      await expect(control).toHaveCSS('background-color', variant === 'primary' ? 'rgb(102, 102, 102)' : variant === 'destructive' ? 'rgb(146, 31, 22)' : 'rgb(232, 232, 232)');
     }
     const action = await metrics(page, '[data-testid="text-action"]');
     expect(action.height).toBeGreaterThanOrEqual(32); expect(action.padding).toEqual(['0px','0px','0px','0px']);
@@ -162,7 +167,13 @@ test.describe('Shared production component contracts', () => {
     expect(await page.locator('.ui-spinner').first().evaluate(element => getComputedStyle(element).animationName)).toBe('none');
     await page.emulateMedia({ forcedColors:'active' });
     await page.getByTestId('button-primary').focus();
-    expect(await page.getByTestId('button-primary').evaluate(element => getComputedStyle(element).outlineStyle)).toBe('solid');
+    await expect(page.getByTestId('button-primary')).toHaveCSS('outline-style', 'none');
+    await expect(page.getByTestId('button-primary')).toHaveCSS('text-decoration-line', 'underline');
+    const focusColors = await page.getByTestId('button-primary').evaluate(element => {
+      const style = getComputedStyle(element);
+      return [style.backgroundColor, style.color];
+    });
+    expect(focusColors[0]).not.toBe(focusColors[1]);
     await page.emulateMedia({ forcedColors:'none' });
     await page.addStyleTag({content: 'html { font-size: 200%; }'});
     const button = await metrics(page,'[data-testid="button-primary"]'); expect(button.height).toBeGreaterThanOrEqual(64); expect(button.size).toBe('26px');

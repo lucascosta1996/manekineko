@@ -7,6 +7,25 @@ for (const width of [390, 1440]) {
     await prepare(page); await page.clock.resume();
     await page.setViewportSize({ width, height: 900 });
     await page.goto(urls.landing + '/rewards'); await ready(page);
+    for (const selector of ['.hero-copy', '.hero-description', '.hero-actions .ui-button', '.hero-art']) {
+      const box = await page.locator(selector).boundingBox();
+      expect(Math.abs(box!.x + box!.width / 2 - width / 2)).toBeLessThanOrEqual(1);
+    }
+    const heroAction = await page.locator('.hero-actions .ui-button').boundingBox();
+    const heroArt = await page.locator('.hero-art').boundingBox();
+    expect(heroArt!.y).toBeGreaterThan(heroAction!.y + heroAction!.height);
+    await expect(page.locator('.site main .section-index')).toHaveText(['01 /', '02 /', '03 /', '04 /', '05 /', '06 /', '07 /']);
+    const sections = await page.locator('.site main > section:not(.closing-section)').evaluateAll(elements => elements.map(element => {
+      const style = getComputedStyle(element);
+      return [parseFloat(style.paddingTop), parseFloat(style.paddingBottom)];
+    }));
+    for (const padding of sections) expect(padding).toEqual(width < 600 ? [32, 32] : [48, 48]);
+    const separation = await page.locator('#holder-rewards').evaluate(element => {
+      const bottom = Math.max(...Array.from(element.children).map(child => child.getBoundingClientRect().bottom));
+      const nextTop = Math.min(...Array.from(document.querySelector('#questions')!.children).map(child => child.getBoundingClientRect().top));
+      return nextTop - bottom;
+    });
+    expect(separation).toBeGreaterThanOrEqual(width < 600 ? 64 : 96);
     const metrics = page.locator('.reward-metric');
     await expect(metrics).toHaveCount(3);
     for (const [index, amount] of ['1,296', '432', '172.8'].entries()) await expect(metrics.nth(index).locator('.metric-number')).toContainText(amount);

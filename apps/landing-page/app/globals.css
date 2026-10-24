@@ -37,15 +37,15 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 .desktop-nav a { display: inline-flex; align-items: center; min-height: 2.75rem; }
 .desktop-nav a:hover { text-decoration: underline; text-underline-offset: .25rem; }
 .menu-toggle, .mobile-nav { display: none; }
-.hero { padding-block: var(--ui-space-12); }
-.hero-main { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: var(--ui-space-12); align-items: center; }
-.hero-copy { min-width: 0; container-type: inline-size; }
+.hero, .rewards-overview, .launch-section, .manifesto, .seasons-section, .art-section, .rewards-section, .how-section, .refund-section, .faq-section { padding-block: var(--ui-section-space); }
+.hero-main { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; gap: var(--ui-space-8); }
+.hero-copy { min-width: 0; width: 100%; max-width: 55rem; text-align: center; container-type: inline-size; }
 /* The compact shared title scale wraps naturally as text is enlarged. */
 .hero-copy h1 { max-width: none; font-size: var(--ui-hero); text-wrap: wrap; }
-.hero-description { max-width: 55ch; margin-block: var(--ui-space-6); }
+.hero-description { max-width: 55ch; margin: var(--ui-space-6) auto; }
 .hero-copy .hero-description { font-size: var(--ui-subheading); line-height: 1.12; letter-spacing: -.035em; font-weight: 500; color: var(--ui-ink); text-wrap: balance; }
-.hero-actions { display: flex; align-items: center; }
-.hero-art { position: relative; min-width: 0; width: 100%; max-width: 24rem; margin-left: auto; }
+.hero-actions { display: flex; align-items: center; justify-content: center; }
+.hero-art { position: relative; min-width: 0; width: 100%; max-width: 20rem; margin-inline: auto; }
 .rewards-hero-artwork { width: 100%; height: auto; aspect-ratio: 1; }
 /* Open's ten canonical planes: left fold 1–4, right fold 5–7,
    lower bridge 8, center 9–10. Each fold moves as one connected piece. */
@@ -93,8 +93,7 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 .reward-metric > a { margin-top: var(--ui-space-3); }
 .terms-note { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--ui-space-5); margin-top: var(--ui-space-4); font-size: var(--ui-label); line-height: 1.538462; color: var(--ui-muted); }
 .terms-note a { display: inline-flex; align-items: center; gap: var(--ui-space-2); flex-shrink: 0; min-height: 2.75rem; text-decoration: underline; }
-.launch-section, .manifesto, .art-section { padding-block: var(--ui-section-space); }
-.launch-content { text-align: center; border-bottom: 1px solid var(--ui-line); padding-bottom: var(--ui-section-space); }
+.launch-content { text-align: center; }
 .launch-content > p { margin-block: var(--ui-space-6); }
 .newsletter { max-width: 40rem; margin-inline: auto; }
 .newsletter-field { display: flex; gap: var(--ui-space-3); }
@@ -103,7 +102,7 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 .newsletter-error { color: var(--ui-danger); }
 .manifesto-bottom { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--ui-space-8); margin-top: var(--ui-space-8); }
 .manifesto-bottom p { max-width: 55ch; margin-bottom: 0; }
-.seasons-section { background: var(--ui-surface); padding-block: var(--ui-section-space); }
+.seasons-section { background: var(--ui-surface); }
 .section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--ui-space-12); margin-bottom: var(--ui-space-8); }
 .section-heading > p, .section-heading > div:last-child { max-width: min(100%, 36ch); min-width: 0; }
 .section-heading > p { margin-bottom: 0; }
@@ -146,7 +145,6 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 .art-footnote { display: flex; justify-content: space-between; align-items: center; gap: var(--ui-space-8); }
 .art-footnote > span { display: flex; gap: var(--ui-space-2); align-items: center; font-size: var(--ui-label); }
 .art-footnote p { font-size: var(--ui-caption); line-height: 1.5; color: var(--ui-muted); margin: 0; max-width: min(100%, 55ch); min-width: 0; }
-.rewards-section, .how-section { padding-bottom: var(--ui-section-space); }
 .prize-panel, .affiliate-panel { background: var(--ui-surface); padding: var(--ui-space-6); border: 1px solid var(--ui-line); border-radius: var(--ui-radius); display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: var(--ui-space-12); }
 .prize-copy > p, .affiliate-copy > p { margin-block: var(--ui-space-6); max-width: min(100%, 55ch); min-width: 0; }
 .prize-examples { margin-block: var(--ui-space-6); font-size: var(--ui-label); line-height: 1.538462; }
@@ -181,7 +179,7 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 .step-caption { font-size: var(--ui-caption); line-height: 1.5; color: var(--ui-muted); }
 .trust-strip { display: flex; justify-content: center; flex-wrap: wrap; gap: var(--ui-space-8); border: 1px solid var(--ui-line); border-radius: var(--ui-radius); padding: var(--ui-space-6); margin-top: var(--ui-space-12); }
 .trust-strip > span { display: flex; gap: var(--ui-space-2); align-items: center; font-size: var(--ui-label); line-height: 1.538462; color: var(--ui-muted); }
-.refund-section { background: var(--ui-surface); border-block: 1px solid var(--ui-line); padding-block: var(--ui-space-12); margin-bottom: var(--ui-space-20); }
+.refund-section { background: var(--ui-surface); border-block: 1px solid var(--ui-line); }
 .refund-layout { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: var(--ui-space-8) var(--ui-space-16); }
 .refund-copy h2 { max-width: 24ch; }
 .refund-intro { max-width: 55ch; margin-block: var(--ui-space-6); }
@@ -195,7 +193,7 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 .refund-terms { grid-column: 1 / -1; border-top: 1px solid var(--ui-line); padding-top: var(--ui-space-6); }
 .refund-terms p { max-width: 90ch; color: var(--ui-muted); font-size: var(--ui-label); line-height: 1.538462; margin-bottom: var(--ui-space-2); }
 .refund-terms p:last-child { margin-bottom: 0; }
-.faq-section { display: grid; grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); gap: var(--ui-space-16); padding-bottom: var(--ui-section-space); }
+.faq-section { display: grid; grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); gap: var(--ui-space-16); }
 .faq-section > div > p:not(.eyebrow) { margin-top: var(--ui-space-6); max-width: min(100%, 55ch); min-width: 0; }
 .faq-list details { border-bottom: 1px solid var(--ui-line); }
 .faq-list p { max-width: 68ch; padding-bottom: var(--ui-space-5); margin-bottom: 0; }
@@ -209,7 +207,6 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 .motion-paused .affiliate-rings { animation-play-state: paused; }
 @media (max-width: 959px) {
   .desktop-nav { gap: var(--ui-space-3); }
-  .hero-main { gap: var(--ui-space-6); }
   .section-heading, .manifesto-bottom { gap: var(--ui-space-8); }
   .prize-panel, .affiliate-panel { gap: var(--ui-space-6); }
   .faq-section { gap: var(--ui-space-8); }
@@ -228,11 +225,8 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
   .mobile-nav .mobile-nav-action { margin-top: var(--ui-space-2); font-weight: 500; border-top: 1px solid var(--ui-line); }
 }
 @media (max-width: 759px) {
-  .hero-main { grid-template-columns: minmax(0,1fr); }
   .refund-layout { grid-template-columns: minmax(0,1fr); }
-  .refund-section { padding-block: var(--ui-space-8); }
   .collection-announcement-detail { display: none; }
-  .hero-art { max-width: 24rem; margin-inline: auto; }
   .section-heading, .manifesto-bottom, .art-footnote { align-items: flex-start; flex-direction: column; }
   .section-heading > p, .section-heading > div:last-child { max-width: min(100%, 55ch); min-width: 0; }
   .prize-panel, .affiliate-panel, .faq-section { grid-template-columns: minmax(0,1fr); }
@@ -242,12 +236,10 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 }
 @media (max-width: 599px) {
   .brand-wordmark { width: var(--ui-brand-wordmark); }
-  .hero { padding-block: var(--ui-space-8); }
   .reward-rail { grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: var(--ui-space-6); }
   .affiliate-metric, .holder-metric { border-left: 0; padding-left: 0; }
   .metric-top { flex-wrap: wrap; }
   .terms-note { flex-direction: column; gap: var(--ui-space-2); }
-  .launch-content, .rewards-section, .how-section, .faq-section { padding-bottom: var(--ui-space-12); }
   .season-explorer, .prize-panel, .affiliate-panel { padding: var(--ui-space-4); }
   .season-explorer-top, .season-explorer-bottom { flex-wrap: wrap; }
   .season-swatch-stage { height: 10rem; gap: var(--ui-space-1); }

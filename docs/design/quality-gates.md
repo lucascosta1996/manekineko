@@ -91,7 +91,7 @@ Required properties:
 - Font family, size, weight, line height, letter spacing and text transform.
 - Minimum and actual height/width, padding on all sides, external margins and display/alignment.
 - Icon width/height/stroke, label gap, flex shrinking and vertical centering.
-- Border width/style/color, radius, background, text color and focus outline/offset.
+- Border width/style/color, radius, background and text color. Controls keep their normal borders without an added focus outline/shadow; verify their keyboard surface/text cues and unchanged geometry. Navigation links and disclosures retain the specified outline/offset.
 - Disabled/busy behavior, accessible name, correct element type and duplicate activation guard.
 - Portal typography, viewport collision handling, owner-relative positioning, focus and stacking.
 - Footer text roles, 16 px icon variant, link target dimensions and single composed legal region.

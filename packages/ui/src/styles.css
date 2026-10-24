@@ -15,6 +15,8 @@ html { color-scheme: light; }
 body { font-family: var(--ui-font-sans); font-size: var(--ui-body); line-height: var(--ui-body-line); color: var(--ui-ink); }
 button, input, textarea, select { font-family: var(--ui-font-sans); }
 :where(a, button, input, textarea, select, summary, [tabindex]):focus-visible { outline: var(--ui-focus-width) solid var(--ui-focus); outline-offset: var(--ui-focus-offset); }
+/* Controls use surface/text focus cues; their normal borders never grow on focus. */
+:where(button, input, textarea, select, [role="button"], .ui-button, .ui-text-action, .ui-card-action, .ui-tab, .ui-segment, .ui-menu-item):focus { outline: none; }
 :where(a) { color: inherit; }
 .ui-button, .ui-text-action, .ui-input, .ui-textarea, .ui-select, .ui-select-content, .ui-select-item, .ui-dialog-content,
 .ui-card, .ui-card-action, .ui-tab, .ui-segment, .ui-menu, .ui-menu-item, .ui-check-field, .ui-checkbox, .ui-radio, .ui-switch,
@@ -68,7 +70,6 @@ button, input, textarea, select { font-family: var(--ui-font-sans); }
 .ui-button-ghost:not(:disabled):not([aria-disabled="true"]):active { border-color: transparent; }
 .ui-button-destructive:not(:disabled):not([aria-disabled="true"]):active { background: var(--ui-danger-pressed); border-color: var(--ui-danger-pressed); }
 .ui-button[aria-pressed="true"] { box-shadow: inset 0 0 0 1px currentColor; }
-.ui-button:focus-visible, .ui-text-action:focus-visible, .ui-card-action:focus-visible { box-shadow: 0 0 0 var(--ui-focus-offset) var(--ui-canvas); }
 .ui-text-action {
   appearance: none; display: inline-flex; align-items: center; justify-content: flex-start; gap: var(--ui-space-2);
   min-height: var(--ui-text-action-height); min-width: var(--ui-text-action-height); max-width: 100%;
@@ -121,7 +122,7 @@ button, input, textarea, select { font-family: var(--ui-font-sans); }
 .ui-select-content { z-index: var(--ui-z-modal-popup); overflow: hidden; min-width: var(--radix-select-trigger-width); max-width: min(36rem, calc(100vw - 2rem)); max-height: min(22rem, var(--radix-select-content-available-height)); background: var(--ui-canvas); color: var(--ui-ink); border: 1px solid var(--ui-control-border); border-radius: var(--ui-radius); box-shadow: var(--ui-shadow-menu); font: 400 var(--ui-field-type)/var(--ui-field-line) var(--ui-font-sans); }
 .ui-select-viewport { padding: var(--ui-space-1); }
 .ui-select-item { position: relative; display: flex; align-items: center; justify-content: space-between; gap: var(--ui-space-2); min-height: var(--ui-control-height); padding: var(--ui-field-padding-block) var(--ui-field-padding-inline); border: 1px solid transparent; border-radius: var(--ui-radius); outline: none; cursor: pointer; overflow-wrap: anywhere; }
-.ui-select-item[data-highlighted] { background: var(--ui-surface-hover); outline: 2px solid var(--ui-focus); outline-offset: -2px; }
+.ui-select-item[data-highlighted] { background: var(--ui-surface-hover); text-decoration: underline; text-underline-offset: 0.2em; }
 .ui-select-item[data-state="checked"] { background: var(--ui-surface-pressed); }
 .ui-select-item[data-disabled] { color: var(--ui-muted); cursor: not-allowed; }
 .ui-select-scroll { display: flex; align-items: center; justify-content: center; background: var(--ui-canvas); min-height: var(--ui-text-action-height); }
@@ -150,7 +151,7 @@ button, input, textarea, select { font-family: var(--ui-font-sans); }
 .ui-menu, .ui-tooltip { position: fixed; z-index: var(--ui-z-modal-popup); max-width: calc(100vw - 2rem); max-height: calc(100dvh - 2rem); overflow: auto; padding: var(--ui-space-1); border: 1px solid var(--ui-control-border); border-radius: var(--ui-radius); background: var(--ui-canvas); color: var(--ui-ink); box-shadow: var(--ui-shadow-menu); font: 400 var(--ui-control)/var(--ui-control-line) var(--ui-font-sans); }
 .ui-menu { min-width: 12rem; }
 .ui-menu-item { appearance: none; display: block; width: 100%; min-height: var(--ui-control-height); padding: var(--ui-button-padding-block) var(--ui-field-padding-inline); border: 1px solid transparent; border-radius: var(--ui-radius); background: transparent; color: var(--ui-ink); font: inherit; text-align: left; cursor: pointer; }
-.ui-menu-item:focus { background: var(--ui-surface-hover); outline-offset: -2px; }
+.ui-menu-item:focus { background: var(--ui-surface-hover); }
 .ui-menu-item:disabled { color: var(--ui-muted); cursor: not-allowed; }
 .ui-tooltip { z-index: var(--ui-z-tooltip); padding: var(--ui-space-2) var(--ui-space-3); max-width: min(22rem, calc(100vw - 2rem)); }
 .ui-disclosure { border-bottom: 1px solid var(--ui-line); }
@@ -214,6 +215,15 @@ details[open] > summary .ui-disclosure-icon { transform: rotate(180deg); }
   .ui-footer-compact .ui-footer-brand, .ui-footer-compact .ui-footer-support { grid-column: auto; }
   .ui-footer-compact .ui-footer-support { flex-direction: column; align-items: flex-start; gap: var(--ui-space-2); }
 }
+/* Shared by every app, including portaled controls. Keyboard focus stays visible
+   without adding an outline, shadow ring, or changing the control's geometry. */
+.ui-button:focus-visible:not(:active):not(:disabled):not([aria-disabled="true"]) { background: var(--ui-muted); color: var(--ui-on-ink); text-decoration: underline; text-underline-offset: 0.2em; }
+.ui-button-secondary:focus-visible:not(:active):not(:disabled):not([aria-disabled="true"]),
+.ui-button-ghost:focus-visible:not(:active):not(:disabled):not([aria-disabled="true"]) { background: var(--ui-surface-pressed); color: var(--ui-ink); }
+.ui-button-destructive:focus-visible:not(:active):not(:disabled):not([aria-disabled="true"]) { background: var(--ui-danger-hover); }
+.ui-input:focus:not(:disabled), .ui-textarea:focus:not(:disabled), .ui-select:focus-visible:not(:disabled) { background: var(--ui-surface-hover); }
+:is(.ui-text-action, .ui-card-action, .ui-tab, .ui-segment, .ui-menu-item):focus-visible:not(:disabled):not([aria-disabled="true"]) { background: var(--ui-surface-pressed); color: var(--ui-ink); text-decoration: underline; text-underline-offset: 0.2em; }
+.ui-check-field:has(input:focus-visible) { background: var(--ui-surface-pressed); text-decoration: underline; text-underline-offset: 0.2em; }
 @media (any-pointer: coarse) { .ui-button { min-width: var(--ui-control-height); } }
 @media (prefers-reduced-motion: reduce) { .ui-spinner { animation: none; border-right-color: currentColor; border-style: dotted; } .ui-button, .ui-disclosure-icon { transition: none; } }
 @media (forced-colors: active) {
@@ -221,4 +231,6 @@ details[open] > summary .ui-disclosure-icon { transform: rotate(180deg); }
   .ui-button:is(:disabled, [aria-disabled="true"]), .ui-input:disabled, .ui-select:disabled { color: GrayText; border-color: GrayText; }
   .ui-checkbox:checked, .ui-radio:checked, .ui-switch:checked { background: Highlight; color: HighlightText; forced-color-adjust: none; }
   :where(a, button, input, textarea, select, summary, [tabindex]):focus-visible { outline-color: Highlight; }
+  :is(.ui-button, .ui-text-action, .ui-card-action, .ui-tab, .ui-segment, .ui-menu-item, .ui-input, .ui-textarea, .ui-select):focus-visible:not(:disabled):not([aria-disabled="true"]),
+  .ui-check-field:has(input:focus-visible), .ui-select-item[data-highlighted] { background: Highlight; color: HighlightText; forced-color-adjust: none; }
 }

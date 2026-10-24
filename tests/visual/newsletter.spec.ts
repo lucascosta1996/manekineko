@@ -21,12 +21,27 @@ for (const route of ['/', '/rewards']) {
     });
   }
   for (const width of [390, 1440]) {
-    test(`launch signup validates, retries and confirms once ${route} ${width}`, async ({page}) => {
+    test(`launch signup validates, retries and confirms once ${route} ${width}`, async ({page, browserName}) => {
       await page.setViewportSize({width, height:844});await prepare(page);
       await page.goto(urls.landing + route);await ready(page);
       const form = page.getByRole('form', {name:'Launch notifications'});
       const email = form.getByRole('textbox', {name:'Email address'});
       const button = form.getByRole('button');
+      await email.scrollIntoViewIfNeeded();
+      const fieldBefore = await email.boundingBox();
+      const borderBefore = await email.evaluate(element => getComputedStyle(element).borderColor);
+      await email.click();
+      await expect(email).toBeFocused();
+      await expect(email).toHaveCSS('outline-style', 'none');
+      await expect(email).toHaveCSS('box-shadow', 'none');
+      await expect(email).toHaveCSS('border-color', borderBefore);
+      await expect(email).toHaveCSS('background-color', 'rgb(240, 240, 240)');
+      expect(await email.boundingBox()).toEqual(fieldBefore);
+      // Safari on macOS uses Option-Tab to include buttons in keyboard navigation.
+      await page.keyboard.press(browserName === 'webkit' && process.platform === 'darwin' ? 'Alt+Tab' : 'Tab');
+      await expect(button).toBeFocused();
+      await expect(button).toHaveCSS('outline-style', 'none');
+      await expect(button).toHaveCSS('text-decoration-line', 'underline');
       await button.click();await expect(email).toBeFocused();await expect(email).toHaveAttribute('aria-invalid', 'true');
       await email.fill('collector@example.invalid');
       let count = 0, release!: () => void;

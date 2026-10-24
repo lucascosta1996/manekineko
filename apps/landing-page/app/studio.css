@@ -4,7 +4,7 @@
 .studio-brand { display: inline-flex; align-items: center; min-height: 2.75rem; flex: none; }
 .studio-wordmark { width: var(--ui-brand-wordmark); height: auto; }
 .studio-eyebrow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ui-space-3); color: var(--ui-muted); font: 400 var(--ui-caption)/var(--ui-caption-line) var(--ui-font-mono); margin: 0 0 var(--ui-space-6); }
-.studio-hero { padding-block: var(--ui-space-16); text-align: center; }
+.studio-hero { padding-block: var(--ui-section-space); text-align: center; }
 .studio-hero-copy { max-width: 64rem; margin-inline: auto; }
 .studio-hero .studio-eyebrow { justify-content: center; }
 .studio h1 { max-width: none; font-size: var(--ui-hero); text-wrap: balance; }
@@ -57,7 +57,6 @@
 }
 @media (max-width: 759px) {
   .studio-thesis, .studio-feature { grid-template-columns: 1fr; }
-  .studio-hero { padding-block: var(--ui-space-16); }
   .studio-principles { grid-template-columns: 1fr; margin-top: var(--ui-space-10); }
   .studio-section-heading, .studio-closing { align-items: flex-start; flex-direction: column; }
   .studio-feature > .studio-art { order: 2; }
