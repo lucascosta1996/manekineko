@@ -6,7 +6,7 @@ import type { Anchor, CachedNft, MirrorCollection, MirrorSource, MintEvent } fro
 
 type Row = Record<string, any>;
 function collection(row: Row): MirrorCollection {
-  return {chainId:row.chain_id,address:row.address,controller:row.controller,roundId:row.round_id,
+  return {kind:row.kind,chainId:row.chain_id,address:row.address,controller:row.controller,roundId:row.round_id,
     name:row.name,seasonName:row.season_name,seasonId:row.season_id,color:row.color,textColor:row.text_color,
     renderer:row.renderer,deploymentBlock:Number(row.deployment_block),
     cursor:row.cursor_block === null ? null : {number:Number(row.cursor_block),hash:row.cursor_hash}};
@@ -61,9 +61,9 @@ export class MirrorStore {
   async discover(items: MirrorCollection[], to: Anchor, check: ()=>Promise<void>): Promise<void> {
     await this.transaction(async client => {
       for (const item of items) await client.query(`INSERT INTO manekineko_nft_mirror_collections
-        (chain_id,address,controller,round_id,name,season_name,season_id,color,text_color,renderer,deployment_block)
-        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) ON CONFLICT (chain_id,address) DO NOTHING`,
-        [item.chainId,item.address,item.controller,item.roundId,item.name,item.seasonName,item.seasonId,item.color,item.textColor,item.renderer,item.deploymentBlock]);
+        (chain_id,address,controller,round_id,name,season_name,season_id,color,text_color,renderer,deployment_block,kind)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) ON CONFLICT (chain_id,address) DO NOTHING`,
+        [item.chainId,item.address,item.controller,item.roundId,item.name,item.seasonName,item.seasonId,item.color,item.textColor,item.renderer,item.deploymentBlock,item.kind ?? 'paid']);
       await check();
       await client.query('UPDATE manekineko_nft_mirror_sources SET cursor_block=$3,cursor_hash=$4 WHERE chain_id=$1 AND controller=$2',
         [...this.key,to.number,to.hash]);
@@ -87,13 +87,13 @@ export class MirrorStore {
       const mints = events.filter(event=>!event.burned), burns = events.filter(event=>event.burned).map(event=>event.tokenId);
       if (mints.length) {
         const inserted = await client.query(`INSERT INTO manekineko_nft_mirror_tokens
-          (chain_id,collection_address,token_id,mint_block,mint_block_hash,mint_transaction)
-          SELECT $1,$2,e."tokenId",e.block,e."blockHash",e.transaction
+          (chain_id,collection_address,token_id,mint_block,mint_block_hash,mint_transaction,kind)
+          SELECT $1,$2,e."tokenId",e.block,e."blockHash",e.transaction,$4
           FROM jsonb_to_recordset($3::jsonb) AS e("tokenId" integer,block bigint,"blockHash" text,transaction text)
           ON CONFLICT (chain_id,collection_address,token_id) DO UPDATE SET token_id=excluded.token_id
           WHERE manekineko_nft_mirror_tokens.mint_block_hash=excluded.mint_block_hash
             AND manekineko_nft_mirror_tokens.mint_transaction=excluded.mint_transaction RETURNING token_id`,
-          [item.chainId,item.address,JSON.stringify(mints)]);
+          [item.chainId,item.address,JSON.stringify(mints),item.kind ?? 'paid']);
         ensure(inserted.rowCount === mints.length,'canonical_block_changed');
       }
       if (burns.length) {

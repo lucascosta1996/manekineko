@@ -25,8 +25,8 @@ test('mirror pins reject unsafe networks, unconfirmed indexing, duplicates and m
   const read = (values: unknown) => readMirrorConfigs({NFT_MIRROR_SOURCES_JSON:JSON.stringify(values)});
   assert.equal(read([config])[0].controller,config.controller);
   assert.deepEqual(readMirrorConfigs({}),[]);
-  assert.equal(read([{...config,version:14}])[0].version,14);
-  for (const value of [[config,config],[{...config,chainId:31337}],[{...config,fromBlock:-1}],[{...config,confirmations:0}],
+  assert.equal(read([{...config,version:14,genesisCodeHash:hash(14)}])[0].version,14);
+  for (const value of [[{...config,version:14}],[config,config],[{...config,chainId:31337}],[{...config,fromBlock:-1}],[{...config,confirmations:0}],
     [{...config,chainId:1,confirmations:2}],[{...config,version:11}],[{...config,rpcUrl:'http://private.invalid/secret'}],{}]) {
     assert.throws(()=>read(value),error=>error instanceof Error && error.message === 'invalid_nft_mirror_configuration');
   }
@@ -51,7 +51,7 @@ test('mirror SQL: leases, retries, atomic replay, reorgs and paginated database-
   try {
     await admin.query(`CREATE SCHEMA ${schema}`);
     pool=new pg.Pool({connectionString,max:8,options:`-c search_path=${schema},public`});
-    await pool.query(await readFile(new URL('../../../database/migrations/033_nft_mirror.sql',import.meta.url),'utf8'));
+    for(const file of ['033_nft_mirror.sql','034_genesis_v14_mirror.sql','035_genesis_nft_gallery.sql']) await pool.query(await readFile(new URL('../../../database/migrations/'+file,import.meta.url),'utf8'));
     const db=pool, query=(sql: string,values: unknown[])=>db.query(sql,values);
     const stores=Array.from({length:4},()=>new MirrorStore(db,config));
     const leases=await Promise.all(stores.map(s=>s.claim()));
@@ -81,6 +81,16 @@ test('mirror SQL: leases, retries, atomic replay, reorgs and paginated database-
     await store.verified(false);
     assert.equal(await queryGallery(query,[config],c.chainId,c.address,1),null);
     await store.verified(true);
+    const genesis: MirrorCollection={...c,kind:'genesis',address:'0x'+'4'.repeat(40),roundId:0,name:'Tincta Genesis',seasonName:'Before the first season'};
+    await store.discover([genesis],{number:20,hash:hash(20)},check);
+    await store.events(genesis,events,{number:20,hash:hash(20)},true,check);
+    for(const event of events) await store.cache(genesis,event.tokenId,event.blockHash,{...artwork(event.tokenId),numbers:[],code:null},check);
+    const mixed=await queryDirectory(query,[config],1);
+    assert.equal(mixed.total,1);assert.equal(mixed.genesis?.length,1);assert.equal(mixed.genesis?.[0].ready,49);
+    const genesisLast=(await queryGallery(query,[config],c.chainId,genesis.address,3))!;
+    assert.equal(genesisLast.collection.kind,'genesis');assert.deepEqual(genesisLast.tokens.map(t=>t.tokenId),[49]);assert.deepEqual(genesisLast.tokens[0].numbers,[]);
+    await assert.rejects(db.query("UPDATE manekineko_nft_mirror_tokens SET kind='paid' WHERE collection_address=$1",[genesis.address]));
+    await db.query('DELETE FROM manekineko_nft_mirror_collections WHERE address=$1',[genesis.address]);
     await store.release();
 
     await t.test('catch-up uses queued mints, retries artwork failures, preserves cache and removes reorged mints',async()=>{

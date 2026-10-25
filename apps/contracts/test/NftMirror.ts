@@ -22,17 +22,28 @@ describe('NFT mirror contract integration',()=>{
     await controller.appendCollections([{seasonId:ethers.id('Mirror test'),seasonName:'Mirror season',name:'Mirror collection',symbol:'MIRROR',color:'#330000',textColor:'#FFFFFF'}]);
     await credits.approveFactory(await controller.getAddress(),ethers.keccak256(await ethers.provider.getCode(await controller.getAddress())));
     await credits.sealFactories(); await controller.sealCatalog();
-    if(version===14) { const genesis=await ethers.getContractAt('ManekinekoGenesisV14',await controller.genesis()); await networkHelpers.time.increaseTo(await genesis.endsAt()); }
+    if(version===14) { const genesis=await ethers.getContractAt('ManekinekoGenesisV14',await controller.genesis()); await genesis.connect(buyer).mint(); await networkHelpers.time.increaseTo(await genesis.endsAt()); }
     await operator.sendTransaction({to:await controller.getAddress(),value:ethers.parseEther('1')});
     const prepared=await (await controller.prepareNext()).wait();
     const round=await ethers.getContractAt(`ManekinekoRoundV${version===14?13:version}`,await controller.rounds(1));
     const config={chainId:Number((await ethers.provider.getNetwork()).chainId),controller:(await controller.getAddress()).toLowerCase(),
       codeHash:ethers.keccak256(await ethers.provider.getCode(await controller.getAddress())),version,
-      rpcUrl:'http://local-test.invalid',fromBlock:(await controller.deploymentTransaction()!.wait())!.blockNumber,confirmations:2,blockRange:2000};
+      ...(version===14 ? {genesisCodeHash:ethers.keccak256(await ethers.provider.getCode(await controller.genesis()))} : {}),rpcUrl:'http://local-test.invalid',fromBlock:(await controller.deploymentTransaction()!.wait())!.blockNumber,confirmations:2,blockRange:2000};
     const chain=new RpcMirrorChain(ethers.provider as unknown as JsonRpcProvider,config);
     const discovery=await chain.block(prepared!.blockNumber);
     await chain.verify(discovery);
-    const [collection]=await chain.discover(prepared!.blockNumber,discovery);
+    const discovered=await chain.discover(prepared!.blockNumber,discovery);
+    const collection=discovered.find(item=>item.kind!=='genesis')!;
+    if(version===14) {
+      const genesis=discovered.find(item=>item.kind==='genesis')!;
+      assert.equal(genesis.roundId,0); assert.equal(genesis.name,'Tincta Genesis');
+      assert.deepEqual((await chain.events(genesis,config.fromBlock,discovery)).map(e=>e.tokenId),[1]);
+      const cached=await chain.artwork(genesis,1,discovery);
+      const g=await ethers.getContractAt('ManekinekoGenesisV14',genesis.address);
+      const minted=JSON.parse(Buffer.from((await g.tokenURI(1)).split(',')[1],'base64').toString());
+      assert.equal(cached.metadata.image,minted.image); assert.deepEqual(cached.numbers,[]); assert.equal(cached.code,null);
+      await assert.rejects(new RpcMirrorChain(ethers.provider as unknown as JsonRpcProvider,{...config,genesisCodeHash:ethers.ZeroHash}).discover(prepared!.blockNumber,discovery),/trust_mismatch/);
+    }
     assert.equal(collection.name,'Mirror collection');
     await networkHelpers.time.increaseTo(await round.saleStartAt());
     await round.connect(buyer).getFunction('mint')(buyer.address,3,{value:price*3n});

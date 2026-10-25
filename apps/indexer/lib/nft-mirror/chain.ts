@@ -1,5 +1,5 @@
-import { Contract, Interface, ZeroAddress, getAddress, keccak256, type JsonRpcProvider, type Log } from 'ethers';
-import { decodeOnChainMetadata } from '@manekineko/contract-abi/onchain-metadata';
+import { Contract, Interface, ZeroAddress, ZeroHash, getAddress, keccak256, type JsonRpcProvider, type Log } from 'ethers';
+import { decodeGenesisMetadata, decodeOnChainMetadata } from '@manekineko/contract-abi/onchain-metadata';
 import { derivePermanentCombinationKey, encodePermanentCombination } from '@manekineko/contract-abi/permanent-combinations';
 import { normalizeSeasonAppearance } from '@manekineko/contract-abi/season-appearance';
 import { ensure } from '../types.ts';
@@ -9,6 +9,7 @@ import type { Anchor, CachedNft, MirrorChain, MirrorCollection, MintEvent } from
 const controllerAbi = [
   'function CONTRACT_VERSION() view returns (string)', 'function rounds(uint256) view returns (address)',
   'function renderer() view returns (address)', 'function voting() view returns (address)',
+  'function genesis() view returns (address)',
   'event RoundCreated(uint256 indexed roundId,address indexed round,address indexed roundOwner)',
 ];
 const roundAbi = [
@@ -26,6 +27,9 @@ const rendererAbi = [
 const controllerInterface = new Interface(controllerAbi), roundInterface = new Interface(roundAbi);
 const lower = (value: string) => getAddress(value).toLowerCase();
 const ZERO_TOPIC = '0x' + '0'.repeat(64);
+const genesisAbi = ['function CONTRACT_VERSION() view returns (string)', 'function controller() view returns (address)',
+  'function voting() view returns (address)', 'function MAX_SUPPLY() view returns (uint256)',
+  'function MINT_DURATION() view returns (uint256)', 'function tokenURI(uint256) view returns (string)'];
 
 export class RpcMirrorChain implements MirrorChain {
   private controller: Contract;
@@ -65,6 +69,23 @@ export class RpcMirrorChain implements MirrorChain {
     ensure(logs.length <= 256,'collection_trust_mismatch');
     const output: MirrorCollection[] = [];
     const blockTag = to.number;
+    if (this.config.version === 14) {
+      const address = lower(await this.controller.genesis({blockTag}));
+      // Historical discovery can precede the one-time Genesis binding.
+      if (address !== ZeroAddress) {
+        const g = new Contract(address,genesisAbi,this.provider);
+        const [code,version,controller,voting,expectedVoting,supply,duration] = await Promise.all([
+          this.provider.getCode(address,blockTag),g.CONTRACT_VERSION({blockTag}),g.controller({blockTag}),
+          g.voting({blockTag}),this.controller.voting({blockTag}),g.MAX_SUPPLY({blockTag}),g.MINT_DURATION({blockTag}),
+        ]);
+        ensure(code !== '0x' && keccak256(code) === this.config.genesisCodeHash && version === 'genesis-v14'
+          && lower(controller) === this.config.controller && lower(voting) === lower(expectedVoting)
+          && supply === 1000n && duration === 86400n,'collection_trust_mismatch');
+        output.push({kind:'genesis',chainId:this.config.chainId,address,controller:this.config.controller,roundId:0,
+          name:'Tincta Genesis',seasonName:'Before the first season',seasonId:ZeroHash,color:'#FFFFFF',textColor:'#000000',
+          renderer:address,deploymentBlock:this.config.fromBlock,cursor:null});
+      }
+    }
     for (const log of logs) {
       const event = controllerInterface.parseLog(log)!;
       const address = lower(event.args.round), roundId = Number(event.args.roundId);
@@ -97,11 +118,16 @@ export class RpcMirrorChain implements MirrorChain {
     return logs.map(log => {
       const event = roundInterface.parseLog(log)!;
       const tokenId = Number(event.args.tokenId);
-      ensure(Number.isSafeInteger(tokenId) && tokenId > 0 && tokenId <= 65536,'mint_accounting_mismatch');
+      ensure(Number.isSafeInteger(tokenId) && tokenId > 0 && tokenId <= (collection.kind === 'genesis' ? 1000 : 65536),'mint_accounting_mismatch');
       return {tokenId,block:log.blockNumber,blockHash:log.blockHash.toLowerCase(),transaction:log.transactionHash.toLowerCase(),burned:lower(event.args.to) === ZeroAddress};
     });
   }
   async artwork(collection: MirrorCollection, tokenId: number, anchor: Anchor): Promise<CachedNft> {
+    if (collection.kind === 'genesis') {
+      ensure(this.config.version === 14 && keccak256(await this.provider.getCode(collection.address,anchor.number)) === this.config.genesisCodeHash,'collection_trust_mismatch');
+      const uri = await new Contract(collection.address,genesisAbi,this.provider).tokenURI(tokenId,{blockTag:anchor.number});
+      return {metadata:decodeGenesisMetadata(uri,tokenId),numbers:[],code:null};
+    }
     const round = new Contract(collection.address,roundAbi,this.provider);
     const [supply,key] = await Promise.all([round.maxSupply({blockTag:anchor.number}),round.combinationKey({blockTag:anchor.number})]);
     ensure(tokenId <= Number(supply) && key === derivePermanentCombinationKey({chainId:collection.chainId,

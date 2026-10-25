@@ -1,3 +1,4 @@
+import genesisArtwork from '../../../packages/ui/src/genesis-artwork.json';
 import { buildTinctaPermanentSvg } from '@manekineko/contract-abi/tincta-artwork';
 import { encodePermanentCombination } from '@manekineko/contract-abi/permanent-combinations';
 import type { CollectionGallery, GalleryCollection } from '../lib/nft-mirror/model';
@@ -17,5 +18,18 @@ export function mirrorFixtureGallery(page=1, state='loaded'): CollectionGallery 
       collectionColor:collection.color,textColor:'#FFFFFF',tokenId,numbers:identity.numbers,combinationCode:identity.combinationCode});
     // Isolated renderer fixture. Production always displays the stored contract response.
     return {tokenId,name:`${collection.name} #${tokenId}`,image:`data:image/svg+xml,${encodeURIComponent(svg)}`,numbers:identity.numbers,burned:tokenId===2};
+  })};
+}
+
+export const genesisFixtureCollection: GalleryCollection = {
+  ...mirrorFixtureCollection,kind:'genesis',address:'0x'+'5'.repeat(40),name:'Tincta Genesis',seasonName:'Before the first season',
+  color:'#FFFFFF',textColor:'#000000',minted:50,ready:50,cover:genesisArtwork.image,
+};
+export function genesisFixtureGallery(page=1,state='loaded'): CollectionGallery {
+  const collection={...genesisFixtureCollection,...(state.includes('empty')?{minted:0,ready:0,cover:null}:state.includes('syncing')?{ready:0,cover:null,catchingUp:true}:{})};
+  return {page,collection,tokens:Array.from({length:Math.max(0,Math.min(24,collection.ready-(page-1)*24))},(_,i)=>{
+    const tokenId=(page-1)*24+i+1;
+    const svg=atob(genesisArtwork.image.split(',')[1]).replace('#1 / 1000',`#${tokenId} / 1000`);
+    return {tokenId,name:`Tincta Genesis #${tokenId}`,image:'data:image/svg+xml;base64,'+btoa(svg),numbers:[],burned:false};
   })};
 }

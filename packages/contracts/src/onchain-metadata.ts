@@ -21,13 +21,13 @@ function decodeDataUri(value: unknown, prefix: string, maxBytes: number): string
 function validateArtworkPath(value: string): void {
   if (!value.length || value.length > 8192) fail();
   // SVG allows M320 and M 320. Coordinates themselves remain space-separated integers.
-  const commands = value.replace(/([MLCZ])(?=-?\d)/g, "$1 ");
-  if (!/^(?:[MLCZ]|-?\d+)(?: +(?:[MLCZ]|-?\d+))*$/.test(commands)) fail();
+  const commands = value.replace(/([MLCZHVhv])(?=-?\d)/g, " $1 ").trim().replace(/ +/g, " ");
+  if (!/^(?:[MLCZHVhv]|-?\d+)(?: +(?:[MLCZHVhv]|-?\d+))*$/.test(commands)) fail();
   const tokens = commands.split(/ +/);
   if (tokens[0] !== "M") fail();
   for (let i = 0; i < tokens.length;) {
     const command = tokens[i++];
-    const count = command === "M" || command === "L" ? 2 : command === "C" ? 6 : command === "Z" ? 0 : -1;
+    const count = command === "M" || command === "L" ? 2 : command === "C" ? 6 : ["H","V","h","v"].includes(command) ? 1 : command === "Z" ? 0 : -1;
     if (count < 0 || i + count > tokens.length) fail();
     for (let end = i + count; i < end; ++i) {
       if (!/^-?\d+$/.test(tokens[i]) || !Number.isSafeInteger(Number(tokens[i])) || Math.abs(Number(tokens[i])) > 65536) fail();
@@ -39,8 +39,8 @@ function validateArtworkPath(value: string): void {
 export function validateOnChainSvg(svg: string): void {
   if (svg.length > 65536 || /[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(svg)) fail();
   const stack: string[] = [];
-  const elements = new Set(["svg", "g", "rect", "text", "path"]);
-  const numeric = new Set(["width", "height", "x", "y", "rx", "font-size"]);
+  const elements = new Set(["svg", "g", "rect", "text", "path", "circle"]);
+  const numeric = new Set(["width", "height", "x", "y", "rx", "cx", "cy", "r", "font-size"]);
   let offset = 0, roots = 0;
   const tags = /<([^<>]*)>/g;
   for (let match; (match = tags.exec(svg));) {
@@ -58,7 +58,7 @@ export function validateOnChainSvg(svg: string): void {
     if (!parsed || !elements.has(parsed[1])) fail();
     const [, name, attributes, closing] = parsed!;
     if (!stack.length) { if (name !== "svg" || ++roots !== 1) fail(); }
-    else if (name === "svg" || stack.at(-1) === "text" || stack.at(-1) === "rect" || stack.at(-1) === "path") fail();
+    else if (name === "svg" || stack.at(-1) === "text" || stack.at(-1) === "rect" || stack.at(-1) === "path" || stack.at(-1) === "circle") fail();
     const attrs = new Set<string>();
     let cursor = 0;
     const pattern = /\s+([a-zA-Z-]+)="([^"<>]*)"/g;
@@ -116,5 +116,17 @@ export function decodeOnChainMetadata(tokenUri: unknown, contractVersion: "affil
       if (item.background_color !== appearance.collectionColor?.slice(1)) return fail();
     }
     return { name: item.name, description: item.description, image: item.image as string, attributes, ...appearance };
+  } catch { return fail(); }
+}
+
+/** Genesis has a token number and monochrome artwork, never paid-season attributes. */
+export function decodeGenesisMetadata(tokenUri: unknown, tokenId: number): DecodedMetadata {
+  try {
+    if (!Number.isInteger(tokenId) || tokenId<1 || tokenId>1000) return fail();
+    const item = JSON.parse(decodeDataUri(tokenUri,"data:application/json;base64,",131072));
+    if (!item || Object.keys(item).sort().join(',') !== 'description,image,name' || item.name !== `Tincta Genesis #${tokenId}`
+      || typeof item.description !== 'string' || item.description.length>4096) return fail();
+    validateOnChainSvg(decodeDataUri(item.image,"data:image/svg+xml;base64,",65536));
+    return {...item,attributes:[]};
   } catch { return fail(); }
 }

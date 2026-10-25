@@ -2,7 +2,7 @@
 
 /** Production components with isolated data. This module is never routed by apps/web. */
 import { CollectionDirectoryView, CollectionGalleryView } from "../components/nft-mirror/gallery";
-import { mirrorFixtureCollection, mirrorFixtureGallery } from "./nft-mirror-visual-data";
+import { mirrorFixtureCollection, mirrorFixtureGallery, genesisFixtureGallery } from "./nft-mirror-visual-data";
 import MirrorLoading from "../app/collections/loading";
 import MirrorError from "../app/collections/error";
 import MirrorNotFound from "../app/collections/not-found";
@@ -52,10 +52,10 @@ function ReviewControlsFixture() {
 export function WebVisualFixture({ path = "/", state = "loaded", page = 1 }: { path?: string; state?: string; page?: number }) {
   const [mirrorRecovered,setMirrorRecovered] = useState(false);
   if (path === "/collections" || path.startsWith("/collections/") || path.startsWith("/visual/collections/")) {
-    const data = mirrorFixtureGallery(page,state);
+    const data = path.endsWith('0x'+'5'.repeat(40)) ? genesisFixtureGallery(page,state) : mirrorFixtureGallery(page,state);
     const retry = () => setMirrorRecovered(true);
     return <SiteShell section="nfts">{path === "/visual/collections/loading" ? <MirrorLoading /> : path === "/visual/collections/error" && !mirrorRecovered ? <MirrorError retry={retry} /> : path === "/visual/collections/not-found" ? <MirrorNotFound /> : path === "/collections" || mirrorRecovered
-      ? <CollectionDirectoryView data={{configured:state!=="unconfigured",page:1,total:state==="empty" || state==="unconfigured"?0:3,collections:state==="empty" || state==="unconfigured"?[]:[{...mirrorFixtureCollection,cover:data.tokens[0]?.image ?? null},{...mirrorFixtureCollection,address:'0x'+'3'.repeat(40),name:'Quiet rhythm',cover:null,minted:0,ready:0},{...mirrorFixtureCollection,address:'0x'+'4'.repeat(40),name:'Maroon echo',cover:data.tokens[2]?.image ?? null}]}} />
+      ? <CollectionDirectoryView data={{genesis:state.startsWith("genesis") ? [genesisFixtureGallery(1,state).collection] : [],configured:state!=="unconfigured",page:1,total:state==="empty" || state==="unconfigured"?0:3,collections:state==="empty" || state==="unconfigured"?[]:[{...mirrorFixtureCollection,cover:data.tokens[0]?.image ?? null},{...mirrorFixtureCollection,address:'0x'+'3'.repeat(40),name:'Quiet rhythm',cover:null,minted:0,ready:0},{...mirrorFixtureCollection,address:'0x'+'4'.repeat(40),name:'Maroon echo',cover:data.tokens[2]?.image ?? null}]}} />
       : <CollectionGalleryView data={data} />}</SiteShell>;
   }
   if (["/", "/vote", "/claims", "/affiliates", "/holders", "/operations"].includes(path)) {

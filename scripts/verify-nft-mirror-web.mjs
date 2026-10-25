@@ -18,7 +18,7 @@ await admin.connect();
 try {
   await admin.query(`CREATE SCHEMA ${schema}`);
   pool=new pg.Pool({connectionString:endpoint.href,options:`-c search_path=${schema}`});
-  await pool.query(await readFile(new URL('../database/migrations/033_nft_mirror.sql',import.meta.url),'utf8'));
+  for(const file of ['033_nft_mirror.sql','034_genesis_v14_mirror.sql','035_genesis_nft_gallery.sql']) await pool.query(await readFile(new URL('../database/migrations/'+file,import.meta.url),'utf8'));
   const hash=`0x${'a'.repeat(64)}`,address=`0x${'2'.repeat(40)}`;
   const config={chainId:11155111,controller:`0x${'1'.repeat(40)}`,codeHash:hash,version:13,
     fromBlock:10,confirmations:2,blockRange:2000,rpcUrl:'https://must-not-be-called.invalid'};

@@ -1,14 +1,14 @@
 export const NFT_PAGE_SIZE = 24;
 export interface MirrorPin { chainId: number; controller: string; codeHash: string; version: 12 | 13 | 14 }
 export interface GalleryCollection {
-  chainId: number; address: string; name: string; seasonName: string;
+  kind?: 'paid' | 'genesis'; chainId: number; address: string; name: string; seasonName: string;
   color: string; textColor: string; minted: number; ready: number;
   cover: string | null; syncedAt: string | null; blockNumber: number | null; catchingUp: boolean;
 }
 export interface GalleryNft {
   tokenId: number; name: string; image: string; numbers: number[]; burned: boolean;
 }
-export interface CollectionDirectory { configured: boolean; page: number; total: number; collections: GalleryCollection[] }
+export interface CollectionDirectory { configured: boolean; page: number; total: number; collections: GalleryCollection[]; genesis?: GalleryCollection[] }
 export interface CollectionGallery { page: number; collection: GalleryCollection; tokens: GalleryNft[] }
 export function galleryPage(value: string | string[] | undefined): number {
   if (value === undefined) return 1;
