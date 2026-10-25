@@ -1,6 +1,6 @@
 # Tincta documentation
 
-The latest local protocol implementation is **V13**, pending public deployment. Start with [architecture](architecture.md) and [season holder rewards V13](season-holder-rewards-v13.md). Existing contracts retain their original versions and rules; source changes do not upgrade them.
+The latest protocol implementation is **V13**. Its [Sepolia graph is deployed and verified](sepolia-v13-release-2026-10-25.md), with zero prepared collections; Mainnet remains unconfigured. Start with [architecture](architecture.md) and [season holder rewards V13](season-holder-rewards-v13.md). Existing contracts retain their original versions and rules; source changes do not upgrade them.
 
 ## Current guides
 

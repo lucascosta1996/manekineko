@@ -1,0 +1,2120 @@
+{
+  "schemaVersion": 1,
+  "network": "sepolia",
+  "sourceCommit": "8f5ad3c7025ad99c2f5f25e8e13b8ae2996afa6d",
+  "scope": "Independent V13 test genesis. No historical registry migration, prepared collections, active season, or Mainnet deployment.",
+  "manifestHash": "0xce5d2b64b641e23dd390f2f3d16bf8d36d697487046b9c281bfafb93d3a23243",
+  "expected": {
+    "chainId": 11155111,
+    "controller": "0x479198a1dc89E4DDF856077d04AA49C661C197C4",
+    "controllerCodeHash": "0x1fb4313f5f28903f036d5aab85ce4a71838c61f83e92879286eea571a0ca0905",
+    "operator": "0x3b2571129c05bD71B6504596aB2ca52B3ffB7223",
+    "holderRewards": "0x0348fB2cd1cBD16C29fc270189f0408412203d29",
+    "holderRewardsCodeHash": "0x3b6c1576efa73a31a843047534d0c10ddea7922697bc60e172ae0f63f1790cdb",
+    "credits": "0x552972a6eabFD4fC2F0D592eA64863724189e305",
+    "previousRegistry": "0x0000000000000000000000000000000000000000",
+    "legacyMerkleRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "settings": {
+      "coordinator": "0x9DdfaCa8183c41ad55329BdeeD9F6A8d53168B1B",
+      "keyHash": "0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae",
+      "confirmations": 64,
+      "callbackGas": 200000,
+      "votingDuration": 3600,
+      "votingDelay": 60,
+      "randomnessBudget": "10000000000000000",
+      "sponsorshipBudget": "40000000000000000",
+      "bootstrapAllowed": true
+    },
+    "catalog": [
+      {
+        "seasonId": "0xdf3b80c2c7b93cdf304b349a2cb72a68ba433574bd76706dd1184e8cdf3ba7c1",
+        "seasonName": "Aster Study",
+        "name": "Aster Atlas",
+        "symbol": "STUDY101",
+        "color": "#330000",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xdf3b80c2c7b93cdf304b349a2cb72a68ba433574bd76706dd1184e8cdf3ba7c1",
+        "seasonName": "Aster Study",
+        "name": "Aster Beacon",
+        "symbol": "STUDY102",
+        "color": "#660000",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xdf3b80c2c7b93cdf304b349a2cb72a68ba433574bd76706dd1184e8cdf3ba7c1",
+        "seasonName": "Aster Study",
+        "name": "Aster Current",
+        "symbol": "STUDY103",
+        "color": "#990000",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xdf3b80c2c7b93cdf304b349a2cb72a68ba433574bd76706dd1184e8cdf3ba7c1",
+        "seasonName": "Aster Study",
+        "name": "Aster Drift",
+        "symbol": "STUDY104",
+        "color": "#CC0000",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xdf3b80c2c7b93cdf304b349a2cb72a68ba433574bd76706dd1184e8cdf3ba7c1",
+        "seasonName": "Aster Study",
+        "name": "Aster Ember",
+        "symbol": "STUDY105",
+        "color": "#FF0000",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xdf3b80c2c7b93cdf304b349a2cb72a68ba433574bd76706dd1184e8cdf3ba7c1",
+        "seasonName": "Aster Study",
+        "name": "Aster Fold",
+        "symbol": "STUDY106",
+        "color": "#663300",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xdf3b80c2c7b93cdf304b349a2cb72a68ba433574bd76706dd1184e8cdf3ba7c1",
+        "seasonName": "Aster Study",
+        "name": "Aster Glimmer",
+        "symbol": "STUDY107",
+        "color": "#993300",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xdf3b80c2c7b93cdf304b349a2cb72a68ba433574bd76706dd1184e8cdf3ba7c1",
+        "seasonName": "Aster Study",
+        "name": "Aster Haven",
+        "symbol": "STUDY108",
+        "color": "#CC3300",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xdf3b80c2c7b93cdf304b349a2cb72a68ba433574bd76706dd1184e8cdf3ba7c1",
+        "seasonName": "Aster Study",
+        "name": "Aster Islet",
+        "symbol": "STUDY109",
+        "color": "#FF3300",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xdf3b80c2c7b93cdf304b349a2cb72a68ba433574bd76706dd1184e8cdf3ba7c1",
+        "seasonName": "Aster Study",
+        "name": "Aster Journey",
+        "symbol": "STUDY110",
+        "color": "#FF6600",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xc47ab000587df536da66cdb738f5bb5608b90a827719051ab6d55109ae379807",
+        "seasonName": "Beryl Study",
+        "name": "Beryl Atlas",
+        "symbol": "STUDY201",
+        "color": "#996600",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xc47ab000587df536da66cdb738f5bb5608b90a827719051ab6d55109ae379807",
+        "seasonName": "Beryl Study",
+        "name": "Beryl Beacon",
+        "symbol": "STUDY202",
+        "color": "#CC6600",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xc47ab000587df536da66cdb738f5bb5608b90a827719051ab6d55109ae379807",
+        "seasonName": "Beryl Study",
+        "name": "Beryl Current",
+        "symbol": "STUDY203",
+        "color": "#CC9900",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xc47ab000587df536da66cdb738f5bb5608b90a827719051ab6d55109ae379807",
+        "seasonName": "Beryl Study",
+        "name": "Beryl Drift",
+        "symbol": "STUDY204",
+        "color": "#FF9900",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xc47ab000587df536da66cdb738f5bb5608b90a827719051ab6d55109ae379807",
+        "seasonName": "Beryl Study",
+        "name": "Beryl Ember",
+        "symbol": "STUDY205",
+        "color": "#FFCC00",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xc47ab000587df536da66cdb738f5bb5608b90a827719051ab6d55109ae379807",
+        "seasonName": "Beryl Study",
+        "name": "Beryl Fold",
+        "symbol": "STUDY206",
+        "color": "#663333",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xc47ab000587df536da66cdb738f5bb5608b90a827719051ab6d55109ae379807",
+        "seasonName": "Beryl Study",
+        "name": "Beryl Glimmer",
+        "symbol": "STUDY207",
+        "color": "#993333",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xc47ab000587df536da66cdb738f5bb5608b90a827719051ab6d55109ae379807",
+        "seasonName": "Beryl Study",
+        "name": "Beryl Haven",
+        "symbol": "STUDY208",
+        "color": "#CC3333",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xc47ab000587df536da66cdb738f5bb5608b90a827719051ab6d55109ae379807",
+        "seasonName": "Beryl Study",
+        "name": "Beryl Islet",
+        "symbol": "STUDY209",
+        "color": "#FF3333",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xc47ab000587df536da66cdb738f5bb5608b90a827719051ab6d55109ae379807",
+        "seasonName": "Beryl Study",
+        "name": "Beryl Journey",
+        "symbol": "STUDY210",
+        "color": "#996633",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x6bb686a14c8d8b39ae6dcad86dc76cf292a4456a31bcfd3dd0d0e04539a22e11",
+        "seasonName": "Cinder Study",
+        "name": "Cinder Atlas",
+        "symbol": "STUDY301",
+        "color": "#CC6633",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6bb686a14c8d8b39ae6dcad86dc76cf292a4456a31bcfd3dd0d0e04539a22e11",
+        "seasonName": "Cinder Study",
+        "name": "Cinder Beacon",
+        "symbol": "STUDY302",
+        "color": "#FF6633",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6bb686a14c8d8b39ae6dcad86dc76cf292a4456a31bcfd3dd0d0e04539a22e11",
+        "seasonName": "Cinder Study",
+        "name": "Cinder Current",
+        "symbol": "STUDY303",
+        "color": "#CC9933",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6bb686a14c8d8b39ae6dcad86dc76cf292a4456a31bcfd3dd0d0e04539a22e11",
+        "seasonName": "Cinder Study",
+        "name": "Cinder Drift",
+        "symbol": "STUDY304",
+        "color": "#FF9933",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6bb686a14c8d8b39ae6dcad86dc76cf292a4456a31bcfd3dd0d0e04539a22e11",
+        "seasonName": "Cinder Study",
+        "name": "Cinder Ember",
+        "symbol": "STUDY305",
+        "color": "#FFCC33",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6bb686a14c8d8b39ae6dcad86dc76cf292a4456a31bcfd3dd0d0e04539a22e11",
+        "seasonName": "Cinder Study",
+        "name": "Cinder Fold",
+        "symbol": "STUDY306",
+        "color": "#996666",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x6bb686a14c8d8b39ae6dcad86dc76cf292a4456a31bcfd3dd0d0e04539a22e11",
+        "seasonName": "Cinder Study",
+        "name": "Cinder Glimmer",
+        "symbol": "STUDY307",
+        "color": "#CC6666",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6bb686a14c8d8b39ae6dcad86dc76cf292a4456a31bcfd3dd0d0e04539a22e11",
+        "seasonName": "Cinder Study",
+        "name": "Cinder Haven",
+        "symbol": "STUDY308",
+        "color": "#FF6666",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6bb686a14c8d8b39ae6dcad86dc76cf292a4456a31bcfd3dd0d0e04539a22e11",
+        "seasonName": "Cinder Study",
+        "name": "Cinder Islet",
+        "symbol": "STUDY309",
+        "color": "#CC9966",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6bb686a14c8d8b39ae6dcad86dc76cf292a4456a31bcfd3dd0d0e04539a22e11",
+        "seasonName": "Cinder Study",
+        "name": "Cinder Journey",
+        "symbol": "STUDY310",
+        "color": "#FF9966",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6830649593431c35a04b2f1f3b5d90862b5840fb3731047acf09d9ddc59a6b81",
+        "seasonName": "Dew Study",
+        "name": "Dew Atlas",
+        "symbol": "STUDY401",
+        "color": "#FFFF00",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6830649593431c35a04b2f1f3b5d90862b5840fb3731047acf09d9ddc59a6b81",
+        "seasonName": "Dew Study",
+        "name": "Dew Beacon",
+        "symbol": "STUDY402",
+        "color": "#FFFF33",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6830649593431c35a04b2f1f3b5d90862b5840fb3731047acf09d9ddc59a6b81",
+        "seasonName": "Dew Study",
+        "name": "Dew Current",
+        "symbol": "STUDY403",
+        "color": "#FFFF66",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6830649593431c35a04b2f1f3b5d90862b5840fb3731047acf09d9ddc59a6b81",
+        "seasonName": "Dew Study",
+        "name": "Dew Drift",
+        "symbol": "STUDY404",
+        "color": "#FFFF99",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6830649593431c35a04b2f1f3b5d90862b5840fb3731047acf09d9ddc59a6b81",
+        "seasonName": "Dew Study",
+        "name": "Dew Ember",
+        "symbol": "STUDY405",
+        "color": "#FFFFCC",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6830649593431c35a04b2f1f3b5d90862b5840fb3731047acf09d9ddc59a6b81",
+        "seasonName": "Dew Study",
+        "name": "Dew Fold",
+        "symbol": "STUDY406",
+        "color": "#CCCC00",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6830649593431c35a04b2f1f3b5d90862b5840fb3731047acf09d9ddc59a6b81",
+        "seasonName": "Dew Study",
+        "name": "Dew Glimmer",
+        "symbol": "STUDY407",
+        "color": "#CCCC33",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6830649593431c35a04b2f1f3b5d90862b5840fb3731047acf09d9ddc59a6b81",
+        "seasonName": "Dew Study",
+        "name": "Dew Haven",
+        "symbol": "STUDY408",
+        "color": "#CCCC66",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6830649593431c35a04b2f1f3b5d90862b5840fb3731047acf09d9ddc59a6b81",
+        "seasonName": "Dew Study",
+        "name": "Dew Islet",
+        "symbol": "STUDY409",
+        "color": "#CCCC99",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6830649593431c35a04b2f1f3b5d90862b5840fb3731047acf09d9ddc59a6b81",
+        "seasonName": "Dew Study",
+        "name": "Dew Journey",
+        "symbol": "STUDY410",
+        "color": "#FFCC66",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x2896db1d9100a8a16b5dff6028bc0f119ba43ffbfd63e53e12567ee482871264",
+        "seasonName": "Elm Study",
+        "name": "Elm Atlas",
+        "symbol": "STUDY501",
+        "color": "#333300",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x2896db1d9100a8a16b5dff6028bc0f119ba43ffbfd63e53e12567ee482871264",
+        "seasonName": "Elm Study",
+        "name": "Elm Beacon",
+        "symbol": "STUDY502",
+        "color": "#666600",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x2896db1d9100a8a16b5dff6028bc0f119ba43ffbfd63e53e12567ee482871264",
+        "seasonName": "Elm Study",
+        "name": "Elm Current",
+        "symbol": "STUDY503",
+        "color": "#666633",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x2896db1d9100a8a16b5dff6028bc0f119ba43ffbfd63e53e12567ee482871264",
+        "seasonName": "Elm Study",
+        "name": "Elm Drift",
+        "symbol": "STUDY504",
+        "color": "#999900",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x2896db1d9100a8a16b5dff6028bc0f119ba43ffbfd63e53e12567ee482871264",
+        "seasonName": "Elm Study",
+        "name": "Elm Ember",
+        "symbol": "STUDY505",
+        "color": "#999933",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x2896db1d9100a8a16b5dff6028bc0f119ba43ffbfd63e53e12567ee482871264",
+        "seasonName": "Elm Study",
+        "name": "Elm Fold",
+        "symbol": "STUDY506",
+        "color": "#999966",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x2896db1d9100a8a16b5dff6028bc0f119ba43ffbfd63e53e12567ee482871264",
+        "seasonName": "Elm Study",
+        "name": "Elm Glimmer",
+        "symbol": "STUDY507",
+        "color": "#669900",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x2896db1d9100a8a16b5dff6028bc0f119ba43ffbfd63e53e12567ee482871264",
+        "seasonName": "Elm Study",
+        "name": "Elm Haven",
+        "symbol": "STUDY508",
+        "color": "#669933",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x2896db1d9100a8a16b5dff6028bc0f119ba43ffbfd63e53e12567ee482871264",
+        "seasonName": "Elm Study",
+        "name": "Elm Islet",
+        "symbol": "STUDY509",
+        "color": "#99CC00",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x2896db1d9100a8a16b5dff6028bc0f119ba43ffbfd63e53e12567ee482871264",
+        "seasonName": "Elm Study",
+        "name": "Elm Journey",
+        "symbol": "STUDY510",
+        "color": "#99CC33",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xc213856da98e7fa1611e7a41fdb4eb32ed3959c68bc8f25f0317c707578cd0c6",
+        "seasonName": "Fable Study",
+        "name": "Fable Atlas",
+        "symbol": "STUDY601",
+        "color": "#336600",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xc213856da98e7fa1611e7a41fdb4eb32ed3959c68bc8f25f0317c707578cd0c6",
+        "seasonName": "Fable Study",
+        "name": "Fable Beacon",
+        "symbol": "STUDY602",
+        "color": "#339900",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xc213856da98e7fa1611e7a41fdb4eb32ed3959c68bc8f25f0317c707578cd0c6",
+        "seasonName": "Fable Study",
+        "name": "Fable Current",
+        "symbol": "STUDY603",
+        "color": "#33CC00",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xc213856da98e7fa1611e7a41fdb4eb32ed3959c68bc8f25f0317c707578cd0c6",
+        "seasonName": "Fable Study",
+        "name": "Fable Drift",
+        "symbol": "STUDY604",
+        "color": "#33FF00",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xc213856da98e7fa1611e7a41fdb4eb32ed3959c68bc8f25f0317c707578cd0c6",
+        "seasonName": "Fable Study",
+        "name": "Fable Ember",
+        "symbol": "STUDY605",
+        "color": "#66CC00",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xc213856da98e7fa1611e7a41fdb4eb32ed3959c68bc8f25f0317c707578cd0c6",
+        "seasonName": "Fable Study",
+        "name": "Fable Fold",
+        "symbol": "STUDY606",
+        "color": "#66FF00",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xc213856da98e7fa1611e7a41fdb4eb32ed3959c68bc8f25f0317c707578cd0c6",
+        "seasonName": "Fable Study",
+        "name": "Fable Glimmer",
+        "symbol": "STUDY607",
+        "color": "#99FF00",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xc213856da98e7fa1611e7a41fdb4eb32ed3959c68bc8f25f0317c707578cd0c6",
+        "seasonName": "Fable Study",
+        "name": "Fable Haven",
+        "symbol": "STUDY608",
+        "color": "#99FF33",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xc213856da98e7fa1611e7a41fdb4eb32ed3959c68bc8f25f0317c707578cd0c6",
+        "seasonName": "Fable Study",
+        "name": "Fable Islet",
+        "symbol": "STUDY609",
+        "color": "#CCFF00",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xc213856da98e7fa1611e7a41fdb4eb32ed3959c68bc8f25f0317c707578cd0c6",
+        "seasonName": "Fable Study",
+        "name": "Fable Journey",
+        "symbol": "STUDY610",
+        "color": "#CCFF33",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x4f08da6ba5b8e437e8972c2841cecef1d3bf78f135b8947648e2635c6fd6ca0e",
+        "seasonName": "Gossamer Study",
+        "name": "Gossamer Atlas",
+        "symbol": "STUDY701",
+        "color": "#CCFF66",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x4f08da6ba5b8e437e8972c2841cecef1d3bf78f135b8947648e2635c6fd6ca0e",
+        "seasonName": "Gossamer Study",
+        "name": "Gossamer Beacon",
+        "symbol": "STUDY702",
+        "color": "#CCFF99",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x4f08da6ba5b8e437e8972c2841cecef1d3bf78f135b8947648e2635c6fd6ca0e",
+        "seasonName": "Gossamer Study",
+        "name": "Gossamer Current",
+        "symbol": "STUDY703",
+        "color": "#CCFFCC",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x4f08da6ba5b8e437e8972c2841cecef1d3bf78f135b8947648e2635c6fd6ca0e",
+        "seasonName": "Gossamer Study",
+        "name": "Gossamer Drift",
+        "symbol": "STUDY704",
+        "color": "#99CC66",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x4f08da6ba5b8e437e8972c2841cecef1d3bf78f135b8947648e2635c6fd6ca0e",
+        "seasonName": "Gossamer Study",
+        "name": "Gossamer Ember",
+        "symbol": "STUDY705",
+        "color": "#99CC99",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x4f08da6ba5b8e437e8972c2841cecef1d3bf78f135b8947648e2635c6fd6ca0e",
+        "seasonName": "Gossamer Study",
+        "name": "Gossamer Fold",
+        "symbol": "STUDY706",
+        "color": "#66CC33",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x4f08da6ba5b8e437e8972c2841cecef1d3bf78f135b8947648e2635c6fd6ca0e",
+        "seasonName": "Gossamer Study",
+        "name": "Gossamer Glimmer",
+        "symbol": "STUDY707",
+        "color": "#66CC66",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x4f08da6ba5b8e437e8972c2841cecef1d3bf78f135b8947648e2635c6fd6ca0e",
+        "seasonName": "Gossamer Study",
+        "name": "Gossamer Haven",
+        "symbol": "STUDY708",
+        "color": "#33CC33",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x4f08da6ba5b8e437e8972c2841cecef1d3bf78f135b8947648e2635c6fd6ca0e",
+        "seasonName": "Gossamer Study",
+        "name": "Gossamer Islet",
+        "symbol": "STUDY709",
+        "color": "#339933",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x4f08da6ba5b8e437e8972c2841cecef1d3bf78f135b8947648e2635c6fd6ca0e",
+        "seasonName": "Gossamer Study",
+        "name": "Gossamer Journey",
+        "symbol": "STUDY710",
+        "color": "#336633",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x835bdce657f4220ca531112801b15049c76a93c26847910e68047f5cded52d61",
+        "seasonName": "Hearth Study",
+        "name": "Hearth Atlas",
+        "symbol": "STUDY801",
+        "color": "#003300",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x835bdce657f4220ca531112801b15049c76a93c26847910e68047f5cded52d61",
+        "seasonName": "Hearth Study",
+        "name": "Hearth Beacon",
+        "symbol": "STUDY802",
+        "color": "#006600",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x835bdce657f4220ca531112801b15049c76a93c26847910e68047f5cded52d61",
+        "seasonName": "Hearth Study",
+        "name": "Hearth Current",
+        "symbol": "STUDY803",
+        "color": "#009900",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x835bdce657f4220ca531112801b15049c76a93c26847910e68047f5cded52d61",
+        "seasonName": "Hearth Study",
+        "name": "Hearth Drift",
+        "symbol": "STUDY804",
+        "color": "#00CC00",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x835bdce657f4220ca531112801b15049c76a93c26847910e68047f5cded52d61",
+        "seasonName": "Hearth Study",
+        "name": "Hearth Ember",
+        "symbol": "STUDY805",
+        "color": "#00FF00",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x835bdce657f4220ca531112801b15049c76a93c26847910e68047f5cded52d61",
+        "seasonName": "Hearth Study",
+        "name": "Hearth Fold",
+        "symbol": "STUDY806",
+        "color": "#003333",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x835bdce657f4220ca531112801b15049c76a93c26847910e68047f5cded52d61",
+        "seasonName": "Hearth Study",
+        "name": "Hearth Glimmer",
+        "symbol": "STUDY807",
+        "color": "#006633",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x835bdce657f4220ca531112801b15049c76a93c26847910e68047f5cded52d61",
+        "seasonName": "Hearth Study",
+        "name": "Hearth Haven",
+        "symbol": "STUDY808",
+        "color": "#009933",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x835bdce657f4220ca531112801b15049c76a93c26847910e68047f5cded52d61",
+        "seasonName": "Hearth Study",
+        "name": "Hearth Islet",
+        "symbol": "STUDY809",
+        "color": "#00CC33",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x835bdce657f4220ca531112801b15049c76a93c26847910e68047f5cded52d61",
+        "seasonName": "Hearth Study",
+        "name": "Hearth Journey",
+        "symbol": "STUDY810",
+        "color": "#00FF33",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6c2a0da4e8ae410125113abd8d31ff594779bb4f8c01e0fc347efab76f9a29b2",
+        "seasonName": "Indigo Study",
+        "name": "Indigo Atlas",
+        "symbol": "STUDY901",
+        "color": "#00FF66",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6c2a0da4e8ae410125113abd8d31ff594779bb4f8c01e0fc347efab76f9a29b2",
+        "seasonName": "Indigo Study",
+        "name": "Indigo Beacon",
+        "symbol": "STUDY902",
+        "color": "#00FF99",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6c2a0da4e8ae410125113abd8d31ff594779bb4f8c01e0fc347efab76f9a29b2",
+        "seasonName": "Indigo Study",
+        "name": "Indigo Current",
+        "symbol": "STUDY903",
+        "color": "#33FF66",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6c2a0da4e8ae410125113abd8d31ff594779bb4f8c01e0fc347efab76f9a29b2",
+        "seasonName": "Indigo Study",
+        "name": "Indigo Drift",
+        "symbol": "STUDY904",
+        "color": "#33FF99",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6c2a0da4e8ae410125113abd8d31ff594779bb4f8c01e0fc347efab76f9a29b2",
+        "seasonName": "Indigo Study",
+        "name": "Indigo Ember",
+        "symbol": "STUDY905",
+        "color": "#66FF66",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6c2a0da4e8ae410125113abd8d31ff594779bb4f8c01e0fc347efab76f9a29b2",
+        "seasonName": "Indigo Study",
+        "name": "Indigo Fold",
+        "symbol": "STUDY906",
+        "color": "#66FF99",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6c2a0da4e8ae410125113abd8d31ff594779bb4f8c01e0fc347efab76f9a29b2",
+        "seasonName": "Indigo Study",
+        "name": "Indigo Glimmer",
+        "symbol": "STUDY907",
+        "color": "#99FF66",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6c2a0da4e8ae410125113abd8d31ff594779bb4f8c01e0fc347efab76f9a29b2",
+        "seasonName": "Indigo Study",
+        "name": "Indigo Haven",
+        "symbol": "STUDY908",
+        "color": "#99FF99",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6c2a0da4e8ae410125113abd8d31ff594779bb4f8c01e0fc347efab76f9a29b2",
+        "seasonName": "Indigo Study",
+        "name": "Indigo Islet",
+        "symbol": "STUDY909",
+        "color": "#00CC66",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x6c2a0da4e8ae410125113abd8d31ff594779bb4f8c01e0fc347efab76f9a29b2",
+        "seasonName": "Indigo Study",
+        "name": "Indigo Journey",
+        "symbol": "STUDY910",
+        "color": "#33CC66",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xa6906d40a5ae9259274f5394691b952d8b0f22f66b6f2034a591865d00dbafd4",
+        "seasonName": "Juniper Study",
+        "name": "Juniper Atlas",
+        "symbol": "STUDY1001",
+        "color": "#003366",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xa6906d40a5ae9259274f5394691b952d8b0f22f66b6f2034a591865d00dbafd4",
+        "seasonName": "Juniper Study",
+        "name": "Juniper Beacon",
+        "symbol": "STUDY1002",
+        "color": "#006666",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xa6906d40a5ae9259274f5394691b952d8b0f22f66b6f2034a591865d00dbafd4",
+        "seasonName": "Juniper Study",
+        "name": "Juniper Current",
+        "symbol": "STUDY1003",
+        "color": "#006699",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xa6906d40a5ae9259274f5394691b952d8b0f22f66b6f2034a591865d00dbafd4",
+        "seasonName": "Juniper Study",
+        "name": "Juniper Drift",
+        "symbol": "STUDY1004",
+        "color": "#009966",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xa6906d40a5ae9259274f5394691b952d8b0f22f66b6f2034a591865d00dbafd4",
+        "seasonName": "Juniper Study",
+        "name": "Juniper Ember",
+        "symbol": "STUDY1005",
+        "color": "#009999",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xa6906d40a5ae9259274f5394691b952d8b0f22f66b6f2034a591865d00dbafd4",
+        "seasonName": "Juniper Study",
+        "name": "Juniper Fold",
+        "symbol": "STUDY1006",
+        "color": "#336666",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xa6906d40a5ae9259274f5394691b952d8b0f22f66b6f2034a591865d00dbafd4",
+        "seasonName": "Juniper Study",
+        "name": "Juniper Glimmer",
+        "symbol": "STUDY1007",
+        "color": "#339966",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xa6906d40a5ae9259274f5394691b952d8b0f22f66b6f2034a591865d00dbafd4",
+        "seasonName": "Juniper Study",
+        "name": "Juniper Haven",
+        "symbol": "STUDY1008",
+        "color": "#339999",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xa6906d40a5ae9259274f5394691b952d8b0f22f66b6f2034a591865d00dbafd4",
+        "seasonName": "Juniper Study",
+        "name": "Juniper Islet",
+        "symbol": "STUDY1009",
+        "color": "#003399",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xa6906d40a5ae9259274f5394691b952d8b0f22f66b6f2034a591865d00dbafd4",
+        "seasonName": "Juniper Study",
+        "name": "Juniper Journey",
+        "symbol": "STUDY1010",
+        "color": "#0033CC",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x994646abc51e8a774e851743f04b9313a12709c76c8ed0583c3a4ef2836e2f19",
+        "seasonName": "Kestrel Study",
+        "name": "Kestrel Atlas",
+        "symbol": "STUDY1101",
+        "color": "#00CC99",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x994646abc51e8a774e851743f04b9313a12709c76c8ed0583c3a4ef2836e2f19",
+        "seasonName": "Kestrel Study",
+        "name": "Kestrel Beacon",
+        "symbol": "STUDY1102",
+        "color": "#00CCCC",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x994646abc51e8a774e851743f04b9313a12709c76c8ed0583c3a4ef2836e2f19",
+        "seasonName": "Kestrel Study",
+        "name": "Kestrel Current",
+        "symbol": "STUDY1103",
+        "color": "#00CCFF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x994646abc51e8a774e851743f04b9313a12709c76c8ed0583c3a4ef2836e2f19",
+        "seasonName": "Kestrel Study",
+        "name": "Kestrel Drift",
+        "symbol": "STUDY1104",
+        "color": "#00FFCC",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x994646abc51e8a774e851743f04b9313a12709c76c8ed0583c3a4ef2836e2f19",
+        "seasonName": "Kestrel Study",
+        "name": "Kestrel Ember",
+        "symbol": "STUDY1105",
+        "color": "#00FFFF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x994646abc51e8a774e851743f04b9313a12709c76c8ed0583c3a4ef2836e2f19",
+        "seasonName": "Kestrel Study",
+        "name": "Kestrel Fold",
+        "symbol": "STUDY1106",
+        "color": "#33CCCC",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x994646abc51e8a774e851743f04b9313a12709c76c8ed0583c3a4ef2836e2f19",
+        "seasonName": "Kestrel Study",
+        "name": "Kestrel Glimmer",
+        "symbol": "STUDY1107",
+        "color": "#33CCFF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x994646abc51e8a774e851743f04b9313a12709c76c8ed0583c3a4ef2836e2f19",
+        "seasonName": "Kestrel Study",
+        "name": "Kestrel Haven",
+        "symbol": "STUDY1108",
+        "color": "#33FFCC",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x994646abc51e8a774e851743f04b9313a12709c76c8ed0583c3a4ef2836e2f19",
+        "seasonName": "Kestrel Study",
+        "name": "Kestrel Islet",
+        "symbol": "STUDY1109",
+        "color": "#33FFFF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x994646abc51e8a774e851743f04b9313a12709c76c8ed0583c3a4ef2836e2f19",
+        "seasonName": "Kestrel Study",
+        "name": "Kestrel Journey",
+        "symbol": "STUDY1110",
+        "color": "#66FFFF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xdaca8b663eef1e669be743d62e08414123377c054dd3808f52d49e8a0fd4a203",
+        "seasonName": "Lichen Study",
+        "name": "Lichen Atlas",
+        "symbol": "STUDY1201",
+        "color": "#66CCCC",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xdaca8b663eef1e669be743d62e08414123377c054dd3808f52d49e8a0fd4a203",
+        "seasonName": "Lichen Study",
+        "name": "Lichen Beacon",
+        "symbol": "STUDY1202",
+        "color": "#66CCFF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xdaca8b663eef1e669be743d62e08414123377c054dd3808f52d49e8a0fd4a203",
+        "seasonName": "Lichen Study",
+        "name": "Lichen Current",
+        "symbol": "STUDY1203",
+        "color": "#66FFCC",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xdaca8b663eef1e669be743d62e08414123377c054dd3808f52d49e8a0fd4a203",
+        "seasonName": "Lichen Study",
+        "name": "Lichen Drift",
+        "symbol": "STUDY1204",
+        "color": "#99CCCC",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xdaca8b663eef1e669be743d62e08414123377c054dd3808f52d49e8a0fd4a203",
+        "seasonName": "Lichen Study",
+        "name": "Lichen Ember",
+        "symbol": "STUDY1205",
+        "color": "#99CCFF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xdaca8b663eef1e669be743d62e08414123377c054dd3808f52d49e8a0fd4a203",
+        "seasonName": "Lichen Study",
+        "name": "Lichen Fold",
+        "symbol": "STUDY1206",
+        "color": "#99FFCC",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xdaca8b663eef1e669be743d62e08414123377c054dd3808f52d49e8a0fd4a203",
+        "seasonName": "Lichen Study",
+        "name": "Lichen Glimmer",
+        "symbol": "STUDY1207",
+        "color": "#99FFFF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xdaca8b663eef1e669be743d62e08414123377c054dd3808f52d49e8a0fd4a203",
+        "seasonName": "Lichen Study",
+        "name": "Lichen Haven",
+        "symbol": "STUDY1208",
+        "color": "#CCFFFF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xdaca8b663eef1e669be743d62e08414123377c054dd3808f52d49e8a0fd4a203",
+        "seasonName": "Lichen Study",
+        "name": "Lichen Islet",
+        "symbol": "STUDY1209",
+        "color": "#3399CC",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xdaca8b663eef1e669be743d62e08414123377c054dd3808f52d49e8a0fd4a203",
+        "seasonName": "Lichen Study",
+        "name": "Lichen Journey",
+        "symbol": "STUDY1210",
+        "color": "#336699",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xa9c653c4af83f93127762a5ef2df302329fa8e6b64414323ce667d2f4ca5b06d",
+        "seasonName": "Morrow Study",
+        "name": "Morrow Atlas",
+        "symbol": "STUDY1301",
+        "color": "#0066CC",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xa9c653c4af83f93127762a5ef2df302329fa8e6b64414323ce667d2f4ca5b06d",
+        "seasonName": "Morrow Study",
+        "name": "Morrow Beacon",
+        "symbol": "STUDY1302",
+        "color": "#0066FF",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xa9c653c4af83f93127762a5ef2df302329fa8e6b64414323ce667d2f4ca5b06d",
+        "seasonName": "Morrow Study",
+        "name": "Morrow Current",
+        "symbol": "STUDY1303",
+        "color": "#0099CC",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xa9c653c4af83f93127762a5ef2df302329fa8e6b64414323ce667d2f4ca5b06d",
+        "seasonName": "Morrow Study",
+        "name": "Morrow Drift",
+        "symbol": "STUDY1304",
+        "color": "#0099FF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xa9c653c4af83f93127762a5ef2df302329fa8e6b64414323ce667d2f4ca5b06d",
+        "seasonName": "Morrow Study",
+        "name": "Morrow Ember",
+        "symbol": "STUDY1305",
+        "color": "#3366CC",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xa9c653c4af83f93127762a5ef2df302329fa8e6b64414323ce667d2f4ca5b06d",
+        "seasonName": "Morrow Study",
+        "name": "Morrow Fold",
+        "symbol": "STUDY1306",
+        "color": "#3366FF",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xa9c653c4af83f93127762a5ef2df302329fa8e6b64414323ce667d2f4ca5b06d",
+        "seasonName": "Morrow Study",
+        "name": "Morrow Glimmer",
+        "symbol": "STUDY1307",
+        "color": "#3399FF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xa9c653c4af83f93127762a5ef2df302329fa8e6b64414323ce667d2f4ca5b06d",
+        "seasonName": "Morrow Study",
+        "name": "Morrow Haven",
+        "symbol": "STUDY1308",
+        "color": "#6699CC",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xa9c653c4af83f93127762a5ef2df302329fa8e6b64414323ce667d2f4ca5b06d",
+        "seasonName": "Morrow Study",
+        "name": "Morrow Islet",
+        "symbol": "STUDY1309",
+        "color": "#6699FF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xa9c653c4af83f93127762a5ef2df302329fa8e6b64414323ce667d2f4ca5b06d",
+        "seasonName": "Morrow Study",
+        "name": "Morrow Journey",
+        "symbol": "STUDY1310",
+        "color": "#666699",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x5c879df4f8404cbbc324c1a6a1ea58eecea406ead9766c09641052cf5982a1de",
+        "seasonName": "Nectar Study",
+        "name": "Nectar Atlas",
+        "symbol": "STUDY1401",
+        "color": "#000033",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x5c879df4f8404cbbc324c1a6a1ea58eecea406ead9766c09641052cf5982a1de",
+        "seasonName": "Nectar Study",
+        "name": "Nectar Beacon",
+        "symbol": "STUDY1402",
+        "color": "#000066",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x5c879df4f8404cbbc324c1a6a1ea58eecea406ead9766c09641052cf5982a1de",
+        "seasonName": "Nectar Study",
+        "name": "Nectar Current",
+        "symbol": "STUDY1403",
+        "color": "#000099",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x5c879df4f8404cbbc324c1a6a1ea58eecea406ead9766c09641052cf5982a1de",
+        "seasonName": "Nectar Study",
+        "name": "Nectar Drift",
+        "symbol": "STUDY1404",
+        "color": "#0000CC",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x5c879df4f8404cbbc324c1a6a1ea58eecea406ead9766c09641052cf5982a1de",
+        "seasonName": "Nectar Study",
+        "name": "Nectar Ember",
+        "symbol": "STUDY1405",
+        "color": "#0000FF",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x5c879df4f8404cbbc324c1a6a1ea58eecea406ead9766c09641052cf5982a1de",
+        "seasonName": "Nectar Study",
+        "name": "Nectar Fold",
+        "symbol": "STUDY1406",
+        "color": "#330033",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x5c879df4f8404cbbc324c1a6a1ea58eecea406ead9766c09641052cf5982a1de",
+        "seasonName": "Nectar Study",
+        "name": "Nectar Glimmer",
+        "symbol": "STUDY1407",
+        "color": "#330066",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x5c879df4f8404cbbc324c1a6a1ea58eecea406ead9766c09641052cf5982a1de",
+        "seasonName": "Nectar Study",
+        "name": "Nectar Haven",
+        "symbol": "STUDY1408",
+        "color": "#330099",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x5c879df4f8404cbbc324c1a6a1ea58eecea406ead9766c09641052cf5982a1de",
+        "seasonName": "Nectar Study",
+        "name": "Nectar Islet",
+        "symbol": "STUDY1409",
+        "color": "#3300CC",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x5c879df4f8404cbbc324c1a6a1ea58eecea406ead9766c09641052cf5982a1de",
+        "seasonName": "Nectar Study",
+        "name": "Nectar Journey",
+        "symbol": "STUDY1410",
+        "color": "#3300FF",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x14a94f6d3901d03e587d35daf61c0f93102111a56c67e9903402b9649eec813e",
+        "seasonName": "Oriel Study",
+        "name": "Oriel Atlas",
+        "symbol": "STUDY1501",
+        "color": "#0033FF",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x14a94f6d3901d03e587d35daf61c0f93102111a56c67e9903402b9649eec813e",
+        "seasonName": "Oriel Study",
+        "name": "Oriel Beacon",
+        "symbol": "STUDY1502",
+        "color": "#6666CC",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x14a94f6d3901d03e587d35daf61c0f93102111a56c67e9903402b9649eec813e",
+        "seasonName": "Oriel Study",
+        "name": "Oriel Current",
+        "symbol": "STUDY1503",
+        "color": "#6666FF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x14a94f6d3901d03e587d35daf61c0f93102111a56c67e9903402b9649eec813e",
+        "seasonName": "Oriel Study",
+        "name": "Oriel Drift",
+        "symbol": "STUDY1504",
+        "color": "#9999CC",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x14a94f6d3901d03e587d35daf61c0f93102111a56c67e9903402b9649eec813e",
+        "seasonName": "Oriel Study",
+        "name": "Oriel Ember",
+        "symbol": "STUDY1505",
+        "color": "#9999FF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x14a94f6d3901d03e587d35daf61c0f93102111a56c67e9903402b9649eec813e",
+        "seasonName": "Oriel Study",
+        "name": "Oriel Fold",
+        "symbol": "STUDY1506",
+        "color": "#CCCCFF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x14a94f6d3901d03e587d35daf61c0f93102111a56c67e9903402b9649eec813e",
+        "seasonName": "Oriel Study",
+        "name": "Oriel Glimmer",
+        "symbol": "STUDY1507",
+        "color": "#333366",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x14a94f6d3901d03e587d35daf61c0f93102111a56c67e9903402b9649eec813e",
+        "seasonName": "Oriel Study",
+        "name": "Oriel Haven",
+        "symbol": "STUDY1508",
+        "color": "#333399",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x14a94f6d3901d03e587d35daf61c0f93102111a56c67e9903402b9649eec813e",
+        "seasonName": "Oriel Study",
+        "name": "Oriel Islet",
+        "symbol": "STUDY1509",
+        "color": "#3333CC",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x14a94f6d3901d03e587d35daf61c0f93102111a56c67e9903402b9649eec813e",
+        "seasonName": "Oriel Study",
+        "name": "Oriel Journey",
+        "symbol": "STUDY1510",
+        "color": "#3333FF",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xcdf0005783194fb95d29b47aeefbd0be99043634e591ab94a7605fd03b112da5",
+        "seasonName": "Pollen Study",
+        "name": "Pollen Atlas",
+        "symbol": "STUDY1601",
+        "color": "#660033",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xcdf0005783194fb95d29b47aeefbd0be99043634e591ab94a7605fd03b112da5",
+        "seasonName": "Pollen Study",
+        "name": "Pollen Beacon",
+        "symbol": "STUDY1602",
+        "color": "#660066",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xcdf0005783194fb95d29b47aeefbd0be99043634e591ab94a7605fd03b112da5",
+        "seasonName": "Pollen Study",
+        "name": "Pollen Current",
+        "symbol": "STUDY1603",
+        "color": "#660099",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xcdf0005783194fb95d29b47aeefbd0be99043634e591ab94a7605fd03b112da5",
+        "seasonName": "Pollen Study",
+        "name": "Pollen Drift",
+        "symbol": "STUDY1604",
+        "color": "#6600CC",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xcdf0005783194fb95d29b47aeefbd0be99043634e591ab94a7605fd03b112da5",
+        "seasonName": "Pollen Study",
+        "name": "Pollen Ember",
+        "symbol": "STUDY1605",
+        "color": "#6600FF",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xcdf0005783194fb95d29b47aeefbd0be99043634e591ab94a7605fd03b112da5",
+        "seasonName": "Pollen Study",
+        "name": "Pollen Fold",
+        "symbol": "STUDY1606",
+        "color": "#990033",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xcdf0005783194fb95d29b47aeefbd0be99043634e591ab94a7605fd03b112da5",
+        "seasonName": "Pollen Study",
+        "name": "Pollen Glimmer",
+        "symbol": "STUDY1607",
+        "color": "#990066",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xcdf0005783194fb95d29b47aeefbd0be99043634e591ab94a7605fd03b112da5",
+        "seasonName": "Pollen Study",
+        "name": "Pollen Haven",
+        "symbol": "STUDY1608",
+        "color": "#990099",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xcdf0005783194fb95d29b47aeefbd0be99043634e591ab94a7605fd03b112da5",
+        "seasonName": "Pollen Study",
+        "name": "Pollen Islet",
+        "symbol": "STUDY1609",
+        "color": "#9900CC",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0xcdf0005783194fb95d29b47aeefbd0be99043634e591ab94a7605fd03b112da5",
+        "seasonName": "Pollen Study",
+        "name": "Pollen Journey",
+        "symbol": "STUDY1610",
+        "color": "#9900FF",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x4b1e7ba25ca328aad558f9452134914e06f095cce2dae59b6c24592b45671275",
+        "seasonName": "Quartz Study",
+        "name": "Quartz Atlas",
+        "symbol": "STUDY1701",
+        "color": "#CC0033",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x4b1e7ba25ca328aad558f9452134914e06f095cce2dae59b6c24592b45671275",
+        "seasonName": "Quartz Study",
+        "name": "Quartz Beacon",
+        "symbol": "STUDY1702",
+        "color": "#CC0066",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x4b1e7ba25ca328aad558f9452134914e06f095cce2dae59b6c24592b45671275",
+        "seasonName": "Quartz Study",
+        "name": "Quartz Current",
+        "symbol": "STUDY1703",
+        "color": "#CC0099",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x4b1e7ba25ca328aad558f9452134914e06f095cce2dae59b6c24592b45671275",
+        "seasonName": "Quartz Study",
+        "name": "Quartz Drift",
+        "symbol": "STUDY1704",
+        "color": "#CC00CC",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x4b1e7ba25ca328aad558f9452134914e06f095cce2dae59b6c24592b45671275",
+        "seasonName": "Quartz Study",
+        "name": "Quartz Ember",
+        "symbol": "STUDY1705",
+        "color": "#CC00FF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x4b1e7ba25ca328aad558f9452134914e06f095cce2dae59b6c24592b45671275",
+        "seasonName": "Quartz Study",
+        "name": "Quartz Fold",
+        "symbol": "STUDY1706",
+        "color": "#663366",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x4b1e7ba25ca328aad558f9452134914e06f095cce2dae59b6c24592b45671275",
+        "seasonName": "Quartz Study",
+        "name": "Quartz Glimmer",
+        "symbol": "STUDY1707",
+        "color": "#663399",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x4b1e7ba25ca328aad558f9452134914e06f095cce2dae59b6c24592b45671275",
+        "seasonName": "Quartz Study",
+        "name": "Quartz Haven",
+        "symbol": "STUDY1708",
+        "color": "#6633CC",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x4b1e7ba25ca328aad558f9452134914e06f095cce2dae59b6c24592b45671275",
+        "seasonName": "Quartz Study",
+        "name": "Quartz Islet",
+        "symbol": "STUDY1709",
+        "color": "#6633FF",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x4b1e7ba25ca328aad558f9452134914e06f095cce2dae59b6c24592b45671275",
+        "seasonName": "Quartz Study",
+        "name": "Quartz Journey",
+        "symbol": "STUDY1710",
+        "color": "#993366",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x8cb1d3f14ad2078c6a13fc3547eb7298dfdcb26a155e2f4418f11d0211bff29a",
+        "seasonName": "Reed Study",
+        "name": "Reed Atlas",
+        "symbol": "STUDY1801",
+        "color": "#993399",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x8cb1d3f14ad2078c6a13fc3547eb7298dfdcb26a155e2f4418f11d0211bff29a",
+        "seasonName": "Reed Study",
+        "name": "Reed Beacon",
+        "symbol": "STUDY1802",
+        "color": "#9933CC",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x8cb1d3f14ad2078c6a13fc3547eb7298dfdcb26a155e2f4418f11d0211bff29a",
+        "seasonName": "Reed Study",
+        "name": "Reed Current",
+        "symbol": "STUDY1803",
+        "color": "#9933FF",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x8cb1d3f14ad2078c6a13fc3547eb7298dfdcb26a155e2f4418f11d0211bff29a",
+        "seasonName": "Reed Study",
+        "name": "Reed Drift",
+        "symbol": "STUDY1804",
+        "color": "#CC3366",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x8cb1d3f14ad2078c6a13fc3547eb7298dfdcb26a155e2f4418f11d0211bff29a",
+        "seasonName": "Reed Study",
+        "name": "Reed Ember",
+        "symbol": "STUDY1805",
+        "color": "#CC3399",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x8cb1d3f14ad2078c6a13fc3547eb7298dfdcb26a155e2f4418f11d0211bff29a",
+        "seasonName": "Reed Study",
+        "name": "Reed Fold",
+        "symbol": "STUDY1806",
+        "color": "#CC33CC",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x8cb1d3f14ad2078c6a13fc3547eb7298dfdcb26a155e2f4418f11d0211bff29a",
+        "seasonName": "Reed Study",
+        "name": "Reed Glimmer",
+        "symbol": "STUDY1807",
+        "color": "#CC33FF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x8cb1d3f14ad2078c6a13fc3547eb7298dfdcb26a155e2f4418f11d0211bff29a",
+        "seasonName": "Reed Study",
+        "name": "Reed Haven",
+        "symbol": "STUDY1808",
+        "color": "#996699",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x8cb1d3f14ad2078c6a13fc3547eb7298dfdcb26a155e2f4418f11d0211bff29a",
+        "seasonName": "Reed Study",
+        "name": "Reed Islet",
+        "symbol": "STUDY1809",
+        "color": "#9966CC",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x8cb1d3f14ad2078c6a13fc3547eb7298dfdcb26a155e2f4418f11d0211bff29a",
+        "seasonName": "Reed Study",
+        "name": "Reed Journey",
+        "symbol": "STUDY1810",
+        "color": "#9966FF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xa6aedead34970180ec069e87b4db16d63a20b617c60a94df7a6eabf19104eeb0",
+        "seasonName": "Solace Study",
+        "name": "Solace Atlas",
+        "symbol": "STUDY1901",
+        "color": "#FF0033",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xa6aedead34970180ec069e87b4db16d63a20b617c60a94df7a6eabf19104eeb0",
+        "seasonName": "Solace Study",
+        "name": "Solace Beacon",
+        "symbol": "STUDY1902",
+        "color": "#FF0066",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xa6aedead34970180ec069e87b4db16d63a20b617c60a94df7a6eabf19104eeb0",
+        "seasonName": "Solace Study",
+        "name": "Solace Current",
+        "symbol": "STUDY1903",
+        "color": "#FF0099",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xa6aedead34970180ec069e87b4db16d63a20b617c60a94df7a6eabf19104eeb0",
+        "seasonName": "Solace Study",
+        "name": "Solace Drift",
+        "symbol": "STUDY1904",
+        "color": "#FF00CC",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xa6aedead34970180ec069e87b4db16d63a20b617c60a94df7a6eabf19104eeb0",
+        "seasonName": "Solace Study",
+        "name": "Solace Ember",
+        "symbol": "STUDY1905",
+        "color": "#FF00FF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xa6aedead34970180ec069e87b4db16d63a20b617c60a94df7a6eabf19104eeb0",
+        "seasonName": "Solace Study",
+        "name": "Solace Fold",
+        "symbol": "STUDY1906",
+        "color": "#FF3366",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xa6aedead34970180ec069e87b4db16d63a20b617c60a94df7a6eabf19104eeb0",
+        "seasonName": "Solace Study",
+        "name": "Solace Glimmer",
+        "symbol": "STUDY1907",
+        "color": "#FF3399",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xa6aedead34970180ec069e87b4db16d63a20b617c60a94df7a6eabf19104eeb0",
+        "seasonName": "Solace Study",
+        "name": "Solace Haven",
+        "symbol": "STUDY1908",
+        "color": "#FF33CC",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xa6aedead34970180ec069e87b4db16d63a20b617c60a94df7a6eabf19104eeb0",
+        "seasonName": "Solace Study",
+        "name": "Solace Islet",
+        "symbol": "STUDY1909",
+        "color": "#FF33FF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0xa6aedead34970180ec069e87b4db16d63a20b617c60a94df7a6eabf19104eeb0",
+        "seasonName": "Solace Study",
+        "name": "Solace Journey",
+        "symbol": "STUDY1910",
+        "color": "#CC6699",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x05b05d14b076dad249da1e8795d981f1e884348cefe54c35fb409ec5680c0804",
+        "seasonName": "Thistle Study",
+        "name": "Thistle Atlas",
+        "symbol": "STUDY2001",
+        "color": "#CC66CC",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x05b05d14b076dad249da1e8795d981f1e884348cefe54c35fb409ec5680c0804",
+        "seasonName": "Thistle Study",
+        "name": "Thistle Beacon",
+        "symbol": "STUDY2002",
+        "color": "#CC66FF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x05b05d14b076dad249da1e8795d981f1e884348cefe54c35fb409ec5680c0804",
+        "seasonName": "Thistle Study",
+        "name": "Thistle Current",
+        "symbol": "STUDY2003",
+        "color": "#FF6699",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x05b05d14b076dad249da1e8795d981f1e884348cefe54c35fb409ec5680c0804",
+        "seasonName": "Thistle Study",
+        "name": "Thistle Drift",
+        "symbol": "STUDY2004",
+        "color": "#FF66CC",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x05b05d14b076dad249da1e8795d981f1e884348cefe54c35fb409ec5680c0804",
+        "seasonName": "Thistle Study",
+        "name": "Thistle Ember",
+        "symbol": "STUDY2005",
+        "color": "#FF66FF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x05b05d14b076dad249da1e8795d981f1e884348cefe54c35fb409ec5680c0804",
+        "seasonName": "Thistle Study",
+        "name": "Thistle Fold",
+        "symbol": "STUDY2006",
+        "color": "#CC99CC",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x05b05d14b076dad249da1e8795d981f1e884348cefe54c35fb409ec5680c0804",
+        "seasonName": "Thistle Study",
+        "name": "Thistle Glimmer",
+        "symbol": "STUDY2007",
+        "color": "#CC99FF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x05b05d14b076dad249da1e8795d981f1e884348cefe54c35fb409ec5680c0804",
+        "seasonName": "Thistle Study",
+        "name": "Thistle Haven",
+        "symbol": "STUDY2008",
+        "color": "#FF99CC",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x05b05d14b076dad249da1e8795d981f1e884348cefe54c35fb409ec5680c0804",
+        "seasonName": "Thistle Study",
+        "name": "Thistle Islet",
+        "symbol": "STUDY2009",
+        "color": "#FF99FF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x05b05d14b076dad249da1e8795d981f1e884348cefe54c35fb409ec5680c0804",
+        "seasonName": "Thistle Study",
+        "name": "Thistle Journey",
+        "symbol": "STUDY2010",
+        "color": "#FFCCFF",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x75e25e8101d6678335d2cef9b3eefabc8017b4142f1995875560825e6dd9fe26",
+        "seasonName": "Umber Study",
+        "name": "Umber Atlas",
+        "symbol": "STUDY2101",
+        "color": "#669966",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x75e25e8101d6678335d2cef9b3eefabc8017b4142f1995875560825e6dd9fe26",
+        "seasonName": "Umber Study",
+        "name": "Umber Beacon",
+        "symbol": "STUDY2102",
+        "color": "#669999",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x75e25e8101d6678335d2cef9b3eefabc8017b4142f1995875560825e6dd9fe26",
+        "seasonName": "Umber Study",
+        "name": "Umber Current",
+        "symbol": "STUDY2103",
+        "color": "#CC9999",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x75e25e8101d6678335d2cef9b3eefabc8017b4142f1995875560825e6dd9fe26",
+        "seasonName": "Umber Study",
+        "name": "Umber Drift",
+        "symbol": "STUDY2104",
+        "color": "#FFCC99",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x75e25e8101d6678335d2cef9b3eefabc8017b4142f1995875560825e6dd9fe26",
+        "seasonName": "Umber Study",
+        "name": "Umber Ember",
+        "symbol": "STUDY2105",
+        "color": "#FFCCCC",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x75e25e8101d6678335d2cef9b3eefabc8017b4142f1995875560825e6dd9fe26",
+        "seasonName": "Umber Study",
+        "name": "Umber Fold",
+        "symbol": "STUDY2106",
+        "color": "#330011",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x75e25e8101d6678335d2cef9b3eefabc8017b4142f1995875560825e6dd9fe26",
+        "seasonName": "Umber Study",
+        "name": "Umber Glimmer",
+        "symbol": "STUDY2107",
+        "color": "#331100",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x75e25e8101d6678335d2cef9b3eefabc8017b4142f1995875560825e6dd9fe26",
+        "seasonName": "Umber Study",
+        "name": "Umber Haven",
+        "symbol": "STUDY2108",
+        "color": "#110033",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x75e25e8101d6678335d2cef9b3eefabc8017b4142f1995875560825e6dd9fe26",
+        "seasonName": "Umber Study",
+        "name": "Umber Islet",
+        "symbol": "STUDY2109",
+        "color": "#001133",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x75e25e8101d6678335d2cef9b3eefabc8017b4142f1995875560825e6dd9fe26",
+        "seasonName": "Umber Study",
+        "name": "Umber Journey",
+        "symbol": "STUDY2110",
+        "color": "#003311",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x955068f6c9d9bf8a3f2b7aeb8dbfe0359284a5ec87e01d7f50e71d6c698d04c8",
+        "seasonName": "Vale Study",
+        "name": "Vale Atlas",
+        "symbol": "STUDY2201",
+        "color": "#000000",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x955068f6c9d9bf8a3f2b7aeb8dbfe0359284a5ec87e01d7f50e71d6c698d04c8",
+        "seasonName": "Vale Study",
+        "name": "Vale Beacon",
+        "symbol": "STUDY2202",
+        "color": "#333333",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x955068f6c9d9bf8a3f2b7aeb8dbfe0359284a5ec87e01d7f50e71d6c698d04c8",
+        "seasonName": "Vale Study",
+        "name": "Vale Current",
+        "symbol": "STUDY2203",
+        "color": "#666666",
+        "textColor": "#FFFFFF"
+      },
+      {
+        "seasonId": "0x955068f6c9d9bf8a3f2b7aeb8dbfe0359284a5ec87e01d7f50e71d6c698d04c8",
+        "seasonName": "Vale Study",
+        "name": "Vale Drift",
+        "symbol": "STUDY2204",
+        "color": "#999999",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x955068f6c9d9bf8a3f2b7aeb8dbfe0359284a5ec87e01d7f50e71d6c698d04c8",
+        "seasonName": "Vale Study",
+        "name": "Vale Ember",
+        "symbol": "STUDY2205",
+        "color": "#CCCCCC",
+        "textColor": "#000000"
+      },
+      {
+        "seasonId": "0x955068f6c9d9bf8a3f2b7aeb8dbfe0359284a5ec87e01d7f50e71d6c698d04c8",
+        "seasonName": "Vale Study",
+        "name": "Vale Fold",
+        "symbol": "STUDY2206",
+        "color": "#FFFFFF",
+        "textColor": "#000000"
+      }
+    ],
+    "options": [
+      {
+        "supply": "1000",
+        "price": "10000000000000000",
+        "winners": "6",
+        "duration": "3600"
+      },
+      {
+        "supply": "2000",
+        "price": "20000000000000000",
+        "winners": "4",
+        "duration": "86400"
+      }
+    ],
+    "creditsDeploymentTx": "0x2befb0b12ce5b68ec12fe80b2150b7dae221fcb9fb487b3e957b48c1743bd9c1"
+  },
+  "checkedAt": "2026-10-25T13:31:02.066Z",
+  "status": "verified",
+  "independentRpcAgreement": true,
+  "lastSetupBlock": 11991073,
+  "verification": {
+    "status": "verified",
+    "chainId": 11155111,
+    "block": 11991095,
+    "blockHash": "0x1ef9faf18f196b99faab0f4f79fabe609451eaa677a38a7d270a1ce3213fa78b",
+    "controller": "0x479198a1dc89E4DDF856077d04AA49C661C197C4",
+    "buildHash": "0x4be7fea85b5c2eee2a78762d0c07b2269ed5ec8341293b2bea3ff1cab95cd189",
+    "deploymentHash": "0xe5d955269463d2c00003fc27b6dd9e035780649d519deee134f454ec40dfcaf7",
+    "preparedCollections": 0,
+    "catalogHash": "0xdb301f9e6c08d88fd82e8ab8639ca32ff31639a5191f589ae4eafb58a78bc135",
+    "contracts": [
+      {
+        "name": "ManekinekoSeasonControllerV13",
+        "address": "0x479198a1dc89E4DDF856077d04AA49C661C197C4",
+        "codeHash": "0x1fb4313f5f28903f036d5aab85ce4a71838c61f83e92879286eea571a0ca0905"
+      },
+      {
+        "name": "ManekinekoHolderRewardsV13",
+        "address": "0x0348fB2cd1cBD16C29fc270189f0408412203d29",
+        "codeHash": "0x3b6c1576efa73a31a843047534d0c10ddea7922697bc60e172ae0f63f1790cdb"
+      },
+      {
+        "name": "ManekinekoVotingV12",
+        "address": "0x84e6c608D9cd98C4fa4A36f770b06dF6A38AC547",
+        "codeHash": "0xac811a094237aaeebefa2b1c0452e3d8636f454e14edec5c4a36994e33904895"
+      },
+      {
+        "name": "ManekinekoRendererV11",
+        "address": "0x6e7bdbc038750fF55cF613183c3a2a076f4D0e72",
+        "codeHash": "0xcf174496cbeb250d999dd5fac1ceba38901ddb2d501f8ae4f8a2ce3b85d72954"
+      },
+      {
+        "name": "ManekinekoWinnerCreditsV9",
+        "address": "0x552972a6eabFD4fC2F0D592eA64863724189e305",
+        "codeHash": "0x3d539a2b0bedc96bce2e3587e127ba55bcf1c2a4f2749edb6617c169639d55fd"
+      },
+      {
+        "name": "ManekinekoRoundDeployerV13",
+        "address": "0xFE058d499ab0177D5f01C6Eb29F55c06fbF2467b",
+        "codeHash": "0x73afd55a9f10dd11d8a7b63fb99029cc2f2ae47cfc40c8de83c110dd6d69b69d"
+      },
+      {
+        "name": "ManekinekoV13CodePart",
+        "address": "0xb06764289a9203B576BA8C03993599119540704a",
+        "codeHash": "0x97d1e7bfa32e8389c803858a1e359205aa5729c7197e48dbcaa282afd41eeb69"
+      },
+      {
+        "name": "ManekinekoV13CodePart",
+        "address": "0x0f0cD036324cbF467aa20f3E91Aa6A47e5942381",
+        "codeHash": "0x410553ccd65d170ca21df476d208934b00a784bda0cff4af95915e878a5133df"
+      }
+    ]
+  },
+  "sourceVerification": [
+    {
+      "address": "0x552972a6eabFD4fC2F0D592eA64863724189e305",
+      "contractName": "project/contracts/ManekinekoWinnerCreditsV9.sol:ManekinekoWinnerCreditsV9",
+      "status": "verified",
+      "url": "https://sepolia.etherscan.io/address/0x552972a6eabFD4fC2F0D592eA64863724189e305#code"
+    },
+    {
+      "address": "0x479198a1dc89E4DDF856077d04AA49C661C197C4",
+      "contractName": "project/contracts/ManekinekoSeasonControllerV13.sol:ManekinekoSeasonControllerV13",
+      "status": "verified",
+      "url": "https://sepolia.etherscan.io/address/0x479198a1dc89E4DDF856077d04AA49C661C197C4#code"
+    },
+    {
+      "address": "0x0348fB2cd1cBD16C29fc270189f0408412203d29",
+      "contractName": "project/contracts/ManekinekoHolderRewardsV13.sol:ManekinekoHolderRewardsV13",
+      "status": "verified",
+      "url": "https://sepolia.etherscan.io/address/0x0348fB2cd1cBD16C29fc270189f0408412203d29#code"
+    },
+    {
+      "address": "0xFE058d499ab0177D5f01C6Eb29F55c06fbF2467b",
+      "contractName": "project/contracts/ManekinekoRoundDeployerV13.sol:ManekinekoRoundDeployerV13",
+      "status": "verified",
+      "url": "https://sepolia.etherscan.io/address/0xFE058d499ab0177D5f01C6Eb29F55c06fbF2467b#code"
+    },
+    {
+      "address": "0x84e6c608D9cd98C4fa4A36f770b06dF6A38AC547",
+      "contractName": "project/contracts/ManekinekoVotingV12.sol:ManekinekoVotingV12",
+      "status": "verified",
+      "url": "https://sepolia.etherscan.io/address/0x84e6c608D9cd98C4fa4A36f770b06dF6A38AC547#code"
+    },
+    {
+      "address": "0x6e7bdbc038750fF55cF613183c3a2a076f4D0e72",
+      "contractName": "project/contracts/ManekinekoRendererV11.sol:ManekinekoRendererV11",
+      "status": "verified",
+      "url": "https://sepolia.etherscan.io/address/0x6e7bdbc038750fF55cF613183c3a2a076f4D0e72#code"
+    }
+  ],
+  "deploymentGasWei": "44716566565656",
+  "transactions": [
+    {
+      "action": "deploy:ManekinekoWinnerCreditsV9",
+      "hash": "0x2befb0b12ce5b68ec12fe80b2150b7dae221fcb9fb487b3e957b48c1743bd9c1",
+      "blockNumber": 11990999,
+      "blockHash": "0xd514bab02542b116919697f20ebc31b013f90dc1df804023cc43a4c2fca6d771",
+      "gasUsed": "20797607",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "deploy:ManekinekoSeasonControllerV13",
+      "hash": "0xdb08c5f80da2a931cbb1973935b9f95e6d03533ccde2f8867b7663dd21e5f288",
+      "blockNumber": 11991001,
+      "blockHash": "0xed8e9c2134f468af342941181fdfff7fff89d240d4c775ba799a20f45a799180",
+      "gasUsed": "57900721",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "deploy:ManekinekoHolderRewardsV13",
+      "hash": "0xd0b491b1944570a12c89ffe1f4fb0de1386b991c28bbe36fc2c304c6ce37b72c",
+      "blockNumber": 11991004,
+      "blockHash": "0x87c313339029fe3d58b6e5f61c1c0759f967972d1edc034e2821d896e552a6d1",
+      "gasUsed": "6653949",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "bind-holder",
+      "hash": "0x8416f29c5a72726878a0b96ad7e0fb136b872fec7d9da9a405c328dd9b17c039",
+      "blockNumber": 11991006,
+      "blockHash": "0xb56d81aaf038f75154bc146cee1e53b1b32432ed43133c0a1aa59c41046394be",
+      "gasUsed": "133671",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "deploy:ManekinekoRoundDeployerV13",
+      "hash": "0xbdad3741e0b3058bdf300fd955fd504b1b3fd501dc78b08cbf2ba9c36f160965",
+      "blockNumber": 11991008,
+      "blockHash": "0x822cd2cacf064cb063f958b57dd3f3bb7d7f1b3ebd2a41ae020f7ab469ef1336",
+      "gasUsed": "46352209",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "bind-deployer",
+      "hash": "0x2d79f5e22dea43497c53fd60182d2c59313e26df5ba41c15b2db7680192cb3c0",
+      "blockNumber": 11991010,
+      "blockHash": "0xcf07dc12acc6d0d27536f88c3e89d88bb751848964a26f7c30e266c3e0ec9527",
+      "gasUsed": "131973",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "approve-controller",
+      "hash": "0xb1b68454ec75f73a5bcd947471821f2c9a459df8e0220d0ba3b132c4e493f52f",
+      "blockNumber": 11991012,
+      "blockHash": "0x88600e2026503aeea4456b85c2f0e0a604bc62f95177e9cf89d94797c4bc2990",
+      "gasUsed": "135635",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "seal-credits",
+      "hash": "0x10b68fe77a96f839e0af3c8cd09433f4c680c987d80f40014e8adfeed0ff5dd2",
+      "blockNumber": 11991015,
+      "blockHash": "0x04eef131da693ca9e868d842b26e11b9dcc4566647c8749e0b62d553852cbade",
+      "gasUsed": "128532",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "catalog:0",
+      "hash": "0xef86fe3b396c2ed4ae34bd9cbbb82f5165fb22c21116c7569d28d051d37ac8ef",
+      "blockNumber": 11991017,
+      "blockHash": "0x353779dd024679d06865abb82f06b0fc082e2f6555c35248d69f09442a182dae",
+      "gasUsed": "7427759",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "catalog:10",
+      "hash": "0x257b92290834876c73337fc616be8647b63368260486f997a26164a38e4810b6",
+      "blockNumber": 11991019,
+      "blockHash": "0x86f88f3ba993854ec76b5788ef7d0f543783dc82982e45870960f511cd7f3549",
+      "gasUsed": "7330009",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "catalog:20",
+      "hash": "0x657351f433ca616337fcf81f07c1ddaa6e0b28d90fcf03b8f1f3a7a83672736f",
+      "blockNumber": 11991021,
+      "blockHash": "0x469f36075b3e4cd0d6bb0bfef4e8560afce6293c143115014f1bbf7a5c510c45",
+      "gasUsed": "7336215",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "catalog:30",
+      "hash": "0xe6fa0c6a48c77f123b4f423db10f66d40998816aa041be77727afa0be69856a9",
+      "blockNumber": 11991023,
+      "blockHash": "0xbc7cac5716bcadda377aebbf23306e8ce64ce3d91ae7c34126e4f25621878efe",
+      "gasUsed": "7321060",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "catalog:40",
+      "hash": "0xb52020b22292530c67670c7e5e5fc7ce90914f56475505c8e2664d46d819109c",
+      "blockNumber": 11991025,
+      "blockHash": "0x99cb3979ecd82a99da12d7eaa291229c60b32d57e04242c06093be281b12094b",
+      "gasUsed": "7317721",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "catalog:50",
+      "hash": "0xdd4c29d8b4704142f50706772094496143f09327244b7a30c05fa5f92870c7f5",
+      "blockNumber": 11991027,
+      "blockHash": "0xe21e119f1bc2ead4147ac9c3b93af8f79863a720e57c0b93f14794a4792a399f",
+      "gasUsed": "7330535",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "catalog:60",
+      "hash": "0xdd448b4ac523701b0b1aa3ca9433fe571d6cfd9a8e6057d59fc66878f20a39f6",
+      "blockNumber": 11991029,
+      "blockHash": "0x6bcde8a006cff1cf3e432a1b26743981c407916c7c560b31a797042fbbc7463c",
+      "gasUsed": "7347923",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "catalog:70",
+      "hash": "0xa89d17fd0527524885be0d882847b0db7d92b9987ae7b4d1f36eece7f957c60a",
+      "blockNumber": 11991033,
+      "blockHash": "0x006777dcb7017fb0e6b4c62ba8af07bd0f49d63aae64399dd7f117af1a37210d",
+      "gasUsed": "7335258",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "catalog:80",
+      "hash": "0x3f38c2feaaad000f510d0706a6d7fcc755220181bd26b5b8d166712d5d1141e9",
+      "blockNumber": 11991035,
+      "blockHash": "0xe6acc388bb0295266f7436db4d00bdc9deee8e9b6a45e993c940440c4ecd77c1",
+      "gasUsed": "7336186",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "catalog:90",
+      "hash": "0x10df2ef213638081c3caed0a989ec0ee969f60dc7c546f7dc5a53e2a75d42288",
+      "blockNumber": 11991038,
+      "blockHash": "0x53be9445536c42b02c22a9eab6bdcc87f416a111cc53a78c50b1970d89c7f4d0",
+      "gasUsed": "7340474",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "catalog:100",
+      "hash": "0x6776cc1af471a997d352d97fff14e04121c94df8ec5f922bb05d47f9a4023b1d",
+      "blockNumber": 11991042,
+      "blockHash": "0x5b665a1cb199d817b54218cf6157a2036946bf4e8392af7dfda9d29f34ad3e09",
+      "gasUsed": "7343552",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "catalog:110",
+      "hash": "0xf55d44aca38050527fe5dbd196dc9edbec9ea0fda820b5a4276e1d0123f0adce",
+      "blockNumber": 11991044,
+      "blockHash": "0x5302f0b219484cda5209f9194211ec53a868bddfa635a18ee260cf7fb5f026ef",
+      "gasUsed": "7337727",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "catalog:120",
+      "hash": "0x8462f25ce51973daceada9158e81d1b03f97cd9ba6fc080a181847fb44a2b333",
+      "blockNumber": 11991047,
+      "blockHash": "0x4a4f44d0aebb821e13484a829312b14e7497caa653995a7e27960d9844f77138",
+      "gasUsed": "7336277",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "catalog:130",
+      "hash": "0x3480abb905d3805eb87291684e0b6529f92960fdc207cf39e7253e8f9342bece",
+      "blockNumber": 11991049,
+      "blockHash": "0x808de9b4926f843d6e2f0e91d5f23bbb06b8533ca640b87bb2952213c5e844cf",
+      "gasUsed": "7335552",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "catalog:140",
+      "hash": "0x15b89687459a9a82814770400e11738118552a246decdb7da3708b0d4a52e3e9",
+      "blockNumber": 11991051,
+      "blockHash": "0x7cb42085c0360e39604c25ba8c0df7c046cfc0531c4f9319f559bb4b7c3248da",
+      "gasUsed": "7330800",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "catalog:150",
+      "hash": "0x894dce8d3b09c9b84288fab4e730668a960c81f2341517f26d18e85bd5f3f4dd",
+      "blockNumber": 11991054,
+      "blockHash": "0xebd32aa8e4aaedf1aca33873a44cdbf044b3a7c8841dbd449cba066330e6462a",
+      "gasUsed": "7335432",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "catalog:160",
+      "hash": "0xac8d64cc2d55648050cce519d1e959f36e36733a7db95dba1ca2ca08bf2e62fd",
+      "blockNumber": 11991056,
+      "blockHash": "0x0f9d4f0c05ba0bfbde6c15ce29b2dac82a5f12db2f2a03cca01a3e11cf5fd977",
+      "gasUsed": "7336393",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "catalog:170",
+      "hash": "0x03c13429cb345e565e4db8f3c10159de90709071adc3fd5c1f2ecc5b9ac9079c",
+      "blockNumber": 11991058,
+      "blockHash": "0x8f94a09621b97736ea8e9dac0dd4a0b8b41e0c3252b50b8fcc113dbbfd03ed63",
+      "gasUsed": "7325091",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "catalog:180",
+      "hash": "0x18be3d00d37744c66bd21a656b9940abcfab8465daf632c3885f58ca91b42736",
+      "blockNumber": 11991060,
+      "blockHash": "0x5fab9c95fbc8772e1dab94a8eb75a456d2776ebb214c19ab69d18c617d9b5eb6",
+      "gasUsed": "7337002",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "catalog:190",
+      "hash": "0xa1da55b34a0d2a8cb59f843dc02b175f3820a1055829127bee87daf3e7d4399e",
+      "blockNumber": 11991062,
+      "blockHash": "0xbf7a0269145eea036a5e1cd78bd43c4e2e208d88adf6cd462d8408a7c1d93627",
+      "gasUsed": "7343726",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "catalog:200",
+      "hash": "0x75584d23c9b1ba11d3ae5c03bc27b4744f84a72aea5d6dd189ef9633f292f690",
+      "blockNumber": 11991065,
+      "blockHash": "0x4e5291746c67c8b0eb57b5e46cf53e1b4c71d3ccb3f9b0387727bf82e3846cd8",
+      "gasUsed": "7330075",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "catalog:210",
+      "hash": "0x6f89b7b5d9eb157945cb1003dc577cf8d409449d22775173c3971cc6064a9300",
+      "blockNumber": 11991068,
+      "blockHash": "0xc2877591f0a635018c201a1018698931fa2fd8ac142c4cdaef33a431903439de",
+      "gasUsed": "4583708",
+      "gasPrice": "153612"
+    },
+    {
+      "action": "seal-catalog",
+      "hash": "0xc2ae644aa192d22bdad128f315ae076c014db2c8c84277f2b4784b03b36ec5bd",
+      "blockNumber": 11991073,
+      "blockHash": "0x4e42301819fb6752dfcceecc966fbab2d1fee19959d0e2d0e6518f763f0fcec3",
+      "gasUsed": "167966",
+      "gasPrice": "153612"
+    }
+  ]
+}

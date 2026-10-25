@@ -1,8 +1,8 @@
 # V13 season holder rewards
 
-Local implementation, 2026-10-24. This is a new contract graph, not an upgrade of V12 or an existing season. No public-chain deployment, hosted release or live wallet claim is established by this record.
+Implemented locally on 2026-10-24; the revised 60/20/10/10 graph was [deployed and verified on Sepolia on 2026-10-25](sepolia-v13-release-2026-10-25.md). This is a separate test genesis, not an upgrade or migration of V12 or an existing season. No collection is prepared, no live V13 claim has run, and Mainnet remains unconfigured. The dated local verification sections below retain their original evidence boundaries.
 
-**Allocation revised 2026-10-25:** the user selected 60/20/10/10. The rules and examples below reflect that revision; holder coverage remains 5%. Earlier verification results below describe their dated source revision, not verification of this change. New compiled V13 runtime pins are required before any public deployment.
+**Allocation revised 2026-10-25:** the user selected 60/20/10/10. The rules and examples below reflect that revision; holder coverage remains 5%. Earlier verification results below describe their dated source revision, not verification of this change. The separate Sepolia release record supplies the newly compiled and independently verified runtime pins.
 
 ## Fixed allocation and coverage
 

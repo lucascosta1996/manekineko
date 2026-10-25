@@ -1,5 +1,10 @@
 # Tincta protocol architecture and agent handoff
 
+## 2026-10-25 V13 Sepolia deployment
+
+The user authorized a new Sepolia test graph with the revised **60/20/10/10** allocation. The complete 22-season/216-collection fictional catalog is sealed, the new credits registry approves only the V13 controller, and the holder/deployer bindings are fixed. Two independent RPCs verified all runtimes, immutable values, stored round creation code, catalog and economics at finalized block **11991095**. Six executable contracts are source-verified on Etherscan. **No collection is prepared and no season has started; Mainnet remains unconfigured.** This is an isolated test genesis, not a historical-registry migration. Read [the release record and exact public pins](sepolia-v13-release-2026-10-25.md) before operating it. Earlier local-only entries below are dated implementation evidence superseded by this deployment record.
+
+
 ## 2026-10-25 V13 allocation revision
 
 The undeployed V13 graph now allocates successful mint revenue **60% to prizes, 20% to qualified affiliates, 10% to season holders and 10% to the protocol treasury**. The round, holder vault, controller binding checks, client policy checks and full-graph verifier agree on 1,000 basis points for holders and the treasury. Landing examples, public guides, Web and Launch explanations use the revised amounts. The first-5% holder coverage, season unlock, ownership rules and full refunds are unchanged. Existing V12 and older contracts, frozen exports and runtime pins retain their actual terms. This is local source work; public deployment needs newly compiled and independently verified V13 runtime pins. See [the current V13 record](season-holder-rewards-v13.md).
