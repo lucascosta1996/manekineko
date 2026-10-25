@@ -52,7 +52,7 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 @media (prefers-reduced-motion: no-preference) {
   .rewards-hero-artwork,
   .rewards-hero-artwork path {
-    animation-duration: 8s;
+    animation-duration: 5s;
     animation-timing-function: ease-in-out;
     animation-iteration-count: infinite;
     animation-play-state: paused;
@@ -67,20 +67,20 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 }
 @keyframes rewards-open-float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-1.5%); }
+  50% { transform: translateY(-4%); }
 }
 @keyframes rewards-open-left {
   0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(-.6%, -.7%); }
+  50% { transform: translate(-2.5%, -2.5%); }
 }
 @keyframes rewards-open-right {
   0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(.6%, -.4%); }
+  50% { transform: translate(2.5%, -1.5%); }
 }
 @keyframes rewards-open-center {
   0%, 100% { transform: translate(0, 0); }
-  40% { transform: translate(.4%, -2.4%); }
-  75% { transform: translate(-.3%, -.6%); }
+  40% { transform: translate(1%, -6.5%); }
+  75% { transform: translate(-.8%, -2%); }
 }
 .reward-rail { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); border-block: 1px solid var(--ui-line); padding-block: var(--ui-space-8); gap: var(--ui-space-8); }
 .reward-metric { min-width: 0; }

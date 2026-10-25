@@ -260,6 +260,7 @@ for (const width of [320,390,768,1280,1440]) test(`Landing Open hero motion pres
  const original=await artwork.innerHTML();
  const cta=page.getByRole('link',{name:'Explore the rewards',exact:true});
  const layout=await cta.boundingBox();
+ const duration=await artwork.evaluate(svg=>Number(svg.getAnimations()[0].effect!.getTiming().duration));
  const frame=async (time:number) => artwork.evaluate((svg,time) => {
   for(const animation of svg.getAnimations({subtree:true})) { animation.pause();animation.currentTime=time; }
   return [...svg.querySelectorAll('path')].map(path=>{
@@ -268,11 +269,17 @@ for (const width of [320,390,768,1280,1440]) test(`Landing Open hero motion pres
   });
  },time);
  const initial=await frame(0);
- for(const time of [2000,4000,6000]) {
+ for(const time of [.25,.5,.75].map(progress=>progress*duration)) {
   const planes=await frame(time);
   expect(planes[0].y).toBeLessThan(initial[0].y);
   expect(planes[8].y-initial[8].y).toBeLessThan(planes[7].y-initial[7].y);
   const box=(await container.boundingBox())!;
+  if(time===duration/2) {
+   // The opening must read at phone size, not just register a subpixel change.
+   expect(initial[0].y-planes[0].y).toBeGreaterThan(box.width*.06);
+   expect(initial[8].y-planes[8].y).toBeGreaterThan(box.width*.085);
+   expect(planes[4].x-planes[0].x-(initial[4].x-initial[0].x)).toBeGreaterThan(box.width*.045);
+  }
   planes.forEach((plane,index)=>{
    expect(plane.fill).toBe(initial[index].fill);
    expect(plane.width).toBeCloseTo(initial[index].width,1);
@@ -285,7 +292,7 @@ for (const width of [320,390,768,1280,1440]) test(`Landing Open hero motion pres
   expect(await cta.boundingBox()).toEqual(layout);
   await page.screenshot({path:info.outputPath(`open-${width}-${time}.png`),animations:'allow'});
  }
- expect(await frame(8000)).toEqual(initial);
+ expect(await frame(duration)).toEqual(initial);
  expect(await artwork.innerHTML()).toBe(original);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth <= innerWidth)).toBe(true);
  // Reload before lifecycle checks: WAAPI scrubbing can retain script-owned
