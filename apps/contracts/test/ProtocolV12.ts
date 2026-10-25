@@ -248,30 +248,47 @@ describe("V12 deadline protocol and immutable economics", function () {
       codeHash: ethers.keccak256(await ethers.provider.getCode(address)),
       rpcUrl: "http://127.0.0.1",
     };
-    const snapshot = await readProtocol(
-      ethers.provider,
-      config,
-      0,
-      c.buyer.address
-    );
-    expect(snapshot.round?.price).eq(PRICE);
-    expect(snapshot.round?.remaining).eq(20);
-    expect(snapshot.round?.sponsorship).eq(PRICE * 2n);
-    expect(snapshot.canPrepare).eq(false);
-    expect(snapshot.round?.canFinalize).eq(false);
-    expect(snapshot.round?.operatorRemaining).eq(0);
-    const catalog = await readCatalog(ethers.provider, config, snapshot);
-    expect(catalog.seasons.flatMap((s) => s.collections).length).eq(3);
-    expect(catalog.seasons[0].collections[0].name).eq(snapshot.round?.name);
-    expect(await readCatalog(ethers.provider, config, snapshot)).eq(catalog);
+    // A restored fixture keeps its block time even when the full suite takes
+    // many minutes. Pin the reader's wall clock to that block, then prove the
+    // production freshness guard still rejects a genuinely stale observation.
+    const block = await ethers.provider.getBlock("latest");
+    const realNow = Date.now;
     try {
-      await readProtocol(ethers.provider, {
-        ...config,
-        codeHash: ethers.ZeroHash,
-      });
-      expect.fail("must reject unverified code");
-    } catch (e) {
-      expect(String(e)).includes("deployment could not be verified");
+      Date.now = () => block!.timestamp * 1000;
+      const snapshot = await readProtocol(
+        ethers.provider,
+        config,
+        0,
+        c.buyer.address
+      );
+      expect(snapshot.round?.price).eq(PRICE);
+      expect(snapshot.round?.remaining).eq(20);
+      expect(snapshot.round?.sponsorship).eq(PRICE * 2n);
+      expect(snapshot.canPrepare).eq(false);
+      expect(snapshot.round?.canFinalize).eq(false);
+      expect(snapshot.round?.operatorRemaining).eq(0);
+      const catalog = await readCatalog(ethers.provider, config, snapshot);
+      expect(catalog.seasons.flatMap((s) => s.collections).length).eq(3);
+      expect(catalog.seasons[0].collections[0].name).eq(snapshot.round?.name);
+      expect(await readCatalog(ethers.provider, config, snapshot)).eq(catalog);
+      try {
+        await readProtocol(ethers.provider, {
+          ...config,
+          codeHash: ethers.ZeroHash,
+        });
+        expect.fail("must reject unverified code");
+      } catch (e) {
+        expect(String(e)).includes("deployment could not be verified");
+      }
+      Date.now = () => (block!.timestamp + 181) * 1000;
+      try {
+        await readProtocol(ethers.provider, config);
+        expect.fail("must reject stale chain data");
+      } catch (e) {
+        expect(String(e)).includes("network data is out of date");
+      }
+    } finally {
+      Date.now = realNow;
     }
   });
   it("enforces the 1,000 supply and 0.01 ETH floors, fixed allocations and valid candidate packages", async () => {
