@@ -15,6 +15,8 @@ The approved run uses the existing encrypted bank and 50 buyer wallets, a fresh 
 
 These are acceptance criteria, not a claim that the live run has completed. The full rehearsal takes more than a day. Its durable journals permit a process restart without repeating confirmed actions. Source publication can delay progression. Public outside-wallet mints or unexpected ownership cause the run to stop for review.
 
+RPC requests use batches of at most ten, spaced by at least 500 ms per provider. Provider quota errors retry using the other independently verified endpoint; actual contract reverts still stop the run. The initial live wallet read encountered a 50-request-per-second provider limit before any transaction was signed. A fresh frozen runtime adds this pacing; the untouched 20 ETH bank and original recovery destination are preserved.
+
 ## Funds and recovery
 
 The user funded bank `0xC51c9c66997740523F8c85D0336267919F32539C` with 20 Sepolia ETH in transaction `0xc0729edc730366827416b4f3f5a200933f8c7e6b4319653b026fe38040922d4b`. The original remaining 10 ETH was not transferred to this rehearsal. The funding proof checks sender, recipient, value, successful receipt, canonical block and finality through two independent RPCs.

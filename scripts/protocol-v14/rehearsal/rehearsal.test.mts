@@ -8,7 +8,34 @@ import { makePlan, validatePlan, RECOVERY, canonicalHash } from './plan.mts';
 import { approvalFor, type State } from './engine.mts';
 import { loadBundle, verifyFunding } from './sepolia.mts';
 import { buildRehearsal } from './build.mts';
+import { rehearsalProvider, retryableRpcError } from './rpc.mts';
+import { createServer } from 'node:http';
 const expected = { genesis: "0x" + "7".repeat(40), genesisCodeHash: "0x" + "8".repeat(64), ...JSON.parse(await readFile(new URL('../../../docs/deployments/sepolia-v13-2026-10-25.json', import.meta.url), 'utf8')).expected };
+
+test('51 concurrent wallet reads stay below a 50-request-per-second RPC quota', async () => {
+  const arrivals: number[] = []; let maxBatch = 0, quotaErrors = 0;
+  const server = createServer(async (req, res) => {
+    let body = ''; for await (const chunk of req) body += chunk;
+    const input = JSON.parse(body), batch = Array.isArray(input) ? input : [input];
+    maxBatch = Math.max(maxBatch, batch.length);
+    const replies = batch.map(call => {
+      const now = Date.now(); arrivals.push(now);
+      const limited = arrivals.filter(at => now - at < 1000).length > 50;
+      if (limited) quotaErrors++;
+      return { jsonrpc: '2.0', id: call.id, ...(limited ? {error:{code:-32007,message:'50/second request limit reached'}} : {result:call.method === 'eth_chainId' ? '0xaa36a7' : '0x0'}) };
+    });
+    res.setHeader('content-type','application/json'); res.end(JSON.stringify(Array.isArray(input) ? replies : replies[0]));
+  });
+  await new Promise<void>(resolve => server.listen(0,'127.0.0.1',resolve));
+  const provider = rehearsalProvider(`http://127.0.0.1:${(server.address() as {port:number}).port}`);
+  try {
+    const balances = await Promise.all(Array.from({length:51},(_,i)=>provider.getBalance(`0x${(i+1).toString(16).padStart(40,'0')}`)));
+    assert.equal(balances.length,51); assert.ok(balances.every(n=>n===0n));
+    assert.ok(maxBatch<=10); assert.equal(quotaErrors,0);
+    assert.equal(retryableRpcError({code:'CALL_EXCEPTION',info:{error:{code:-32007,message:'50/second request limit reached'}}}),true);
+    assert.equal(retryableRpcError({code:'CALL_EXCEPTION',info:{error:{code:3,message:'execution reverted'}}}),false);
+  } finally { provider.destroy(); await new Promise<void>(resolve=>server.close(()=>resolve())); }
+});
 
 test('fixed plan protects chain, destination, 30 ETH funding ceiling, gas and season boundary', () => {
   const plan = makePlan(expected); validatePlan(plan);

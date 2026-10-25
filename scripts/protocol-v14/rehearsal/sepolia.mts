@@ -1,7 +1,8 @@
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { Contract, FetchRequest, JsonRpcProvider, Wallet, Transaction, getAddress, parseEther, type Provider } from 'ethers';
+import { Contract, Wallet, Transaction, getAddress, parseEther, type Provider } from 'ethers';
+import { rehearsalProvider, retryableRpcError } from './rpc.mts';
 import { publicationCurrent } from '../publication-report.mts';
 import { makeEngine, approvalFor, type State } from './engine.mts';
 import { assertSepolia, hash, canonicalHash, validatePlan, PROFILE, type Plan } from './plan.mts';
@@ -44,7 +45,7 @@ export async function main() {
   }
   const urls = [process.env.V14_REHEARSAL_RPC_URL, process.env.V14_REHEARSAL_SECONDARY_RPC_URL];
   if (urls.some(url => !url || new URL(url).protocol !== 'https:') || new URL(urls[0]!).hostname === new URL(urls[1]!).hostname) throw new Error('Two independent HTTPS Sepolia RPC hosts are required.');
-  const providers = urls.map(url => { const req = new FetchRequest(url!); req.timeout = 20000; return new JsonRpcProvider(req); });
+  const providers = urls.map(url => rehearsalProvider(url!));
   let release: (() => Promise<void>) | undefined, operatorRelease: (() => Promise<void>) | undefined;
   try {
     for (const p of providers) { assertSepolia((await p.getNetwork()).chainId); const head = await p.getBlock('latest'); if (!head || Math.abs(Date.now() / 1000 - head.timestamp) > 180) throw new Error('Stale Sepolia RPC.'); }
@@ -138,7 +139,7 @@ export async function main() {
         }
       } catch (error) {
         if (error instanceof ChainPendingError) console.log(JSON.stringify({ status: 'confirming', action: error.action, hash: error.hash }));
-        else if (['NETWORK_ERROR', 'SERVER_ERROR', 'TIMEOUT'].includes(String((error as any)?.code))) {
+        else if (retryableRpcError(error)) {
           activeProvider = 1 - activeProvider; engine = createEngine();
           console.log(JSON.stringify({ status: 'rpc-retry', provider: activeProvider, note: 'Saved transactions keep their original nonce and hash.' }));
         } else throw error;
