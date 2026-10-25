@@ -43,3 +43,5 @@ Local validation is recorded in [the allocation revision](season-holder-rewards-
 The first GitHub Checks run exposed an older V12 fixture-clock dependency: after the long suite, its restored block could be more than 180 wall-clock seconds old. Commit `a5fb577` pins only that test's clock to its fixture block and explicitly verifies rejection at 181 seconds; the production freshness guard is unchanged. All 37 V12 cases and the contracts typecheck passed, and Checks was retriggered.
 
 Full [Visual UI contracts CI](https://github.com/lucascosta1996/manekineko/actions/runs/40195112919) is **not green**: 699 passed, 176 skipped and 10 failed. Eight screenshot cases also failed on the preceding `544d65d` main revision; two Firefox interaction assertions timed out. Both Firefox cases passed when rerun locally against the production fixtures. This is separate from the passing focused allocation checks and live browser verification; no broad CI pass is claimed.
+
+The subsequent [test-readiness follow-up](sepolia-v13-test-readiness-2026-10-25.md) records the funded test wallet, V13 worker repairs, corrected social previews and wallet connection checks.

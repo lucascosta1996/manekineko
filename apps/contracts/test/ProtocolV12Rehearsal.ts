@@ -37,7 +37,10 @@ describe('V12 frozen two-season Sepolia rehearsal', function () {
     expect(await readFile(new URL('../contracts/ManekinekoV12Policy.sol', import.meta.url), 'utf8')).includes('RANDOMNESS_TIMEOUT = 3 days');
     await connection.close();
   });
-  it('runs all twenty collections, varied votes, sponsored mints, equal affiliates, claims, refunds and restart recovery', async () => {
+  it('runs all twenty collections, varied votes, sponsored mints, equal affiliates, claims, refunds and restart recovery', async function () {
+    // CI reaches the final collections after 15 minutes. Preserve the complete
+    // bounded 20-collection exercise and receipt checks on slower runners.
+    this.timeout(1_800_000);
     const connection = await network.create('hardhatV12Rehearsal');
     const { ethers, networkHelpers: helpers } = connection;
     const mock = await ethers.deployContract('VRFCoordinatorV2Mock');

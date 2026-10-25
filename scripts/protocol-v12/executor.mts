@@ -3,10 +3,11 @@ import { Contract, FetchRequest, JsonRpcProvider, Transaction, Wallet, getAddres
 import { mkdir, open, readFile, rename, unlink, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { controllerAbi, roundAbi } from '../../packages/protocol/src/chain.ts';
 import { verifyDeployment } from './verify-deployment.mts';
+import { verifyDeployment as verifyV13Deployment } from '../protocol-v13/verify-deployment.mts';
+import { runtimeVersion, workerRuntime, verifyWorkerRound, type RuntimeConfig } from './runtime.ts';
 
-export type ExecutorConfig = { chainId: number; controller: string; codeHash: string; maxFeePerGas: bigint; maxGasLimit?: bigint; maxSubsidyPerRound?: bigint; vrfFundingTarget?: bigint };
+export type ExecutorConfig = RuntimeConfig & { maxFeePerGas: bigint; maxGasLimit?: bigint; maxSubsidyPerRound?: bigint; vrfFundingTarget?: bigint };
 type Intent = { raw: string; hash: string; controller: string; wallet: string; chainId: number };
 type Ledger = { binding: string; spent: Record<string, string>; receipts: Record<string, boolean> };
 async function saveLedger(path: string, ledger: Ledger) {
@@ -30,13 +31,13 @@ export async function executeOnce(provider: Provider, config: ExecutorConfig, wa
   if (Number((await provider.getNetwork()).chainId) !== config.chainId) throw new Error('Executor network mismatch.');
   const block = await provider.getBlock('latest');
   if (!block || Date.now() / 1000 - block.timestamp > 180) return { status: 'stale' };
-  if (keccak256(await provider.getCode(config.controller, block.number)).toLowerCase() !== config.codeHash.toLowerCase()) throw new Error('Controller pin mismatch.');
-  const c = new Contract(config.controller, controllerAbi, provider), at = { blockTag: block.number };
+  const runtime = await workerRuntime(provider, config, block.number);
+  const c = runtime.controller, roundAbi = runtime.roundAbi, at = { blockTag: block.number };
   if (!(await c.catalogSealed(at))) return { status: 'idle' };
   const count = await c.roundCount(at);
   if (count === 0n) return { status: 'idle' };
   const address = getAddress(await c.rounds(count, at)), r = new Contract(address, roundAbi, provider);
-  if (getAddress(await r.voting(at)) !== getAddress(await c.voting(at)) || await r.CONTRACT_VERSION(at) !== 'affiliate-v12') throw new Error('Round binding mismatch.');
+  await verifyWorkerRound(r, runtime, block.number);
   if (!wallet) { const phase = Number(await r.phase(at)); return { status: phase === 4 ? 'ready' : phase === 2 ? 'request-recovery' : 'idle', round: address, reward: String(await r.executionReserve(at)) }; }
 
   await mkdir(dirname(journal), { recursive: true, mode: 0o700 });
@@ -60,6 +61,7 @@ export async function executeOnce(provider: Provider, config: ExecutorConfig, wa
         tx.chainId !== BigInt(config.chainId) || (funding ? tx.value <= 0n || tx.value > fundingTarget : tx.value !== 0n) || tx.type !== 2 || tx.gasLimit > gasLimit || (tx.maxFeePerGas ?? 0n) > config.maxFeePerGas ||
         getAddress(await c.rounds(await previous.roundId(at), at)) !== getAddress(tx.to!) ||
         ![r.interface.encodeFunctionData('finalizeDrawAndClaim', [wallet.address]), r.interface.encodeFunctionData('requestRandomness'), r.interface.encodeFunctionData('fundRandomness')].includes(tx.data)) throw new Error('Executor journal mismatch.');
+      await verifyWorkerRound(previous, runtime, block.number);
       const receipt = await provider.getTransactionReceipt(intent.hash);
       if (receipt) {
         const canonical = await provider.getBlock(receipt.blockNumber), finalized = await provider.getBlock('finalized');
@@ -134,16 +136,18 @@ export async function executeOnce(provider: Provider, config: ExecutorConfig, wa
   } finally { await lock.close(); await unlink(`${journal}.lock`); }
 }
 
-async function main() {
+export async function main(requiredVersion?: 12 | 13) {
   const [configPath, journal, mode = '--inspect'] = process.argv.slice(2);
   if (!configPath || !journal || !['--inspect', '--once', '--watch'].includes(mode)) throw new Error('Usage: executor.mts config.json private-journal.json [--inspect|--once|--watch]');
   const input = JSON.parse(await readFile(configPath, 'utf8'));
+  const version = runtimeVersion(input);
+  if (requiredVersion && version !== requiredVersion) throw new Error('Explicit worker version required.');
   if (![1, 11155111].includes(input.chainId)) throw new Error('Choose Ethereum Mainnet or Sepolia.');
   const urls: string[] = input.rpcUrls ?? [input.rpcUrl];
   if (!urls.length || urls.length > 3 || urls.some(url => typeof url !== 'string' || new URL(url).protocol !== 'https:')) throw new Error('Configure one to three HTTPS RPC endpoints.');
   const providers = urls.map(url => { const request = new FetchRequest(url); request.timeout = 15_000; return new JsonRpcProvider(request); });
   let providerIndex = 0;
-  const config = { chainId: input.chainId, controller: getAddress(input.controller), codeHash: input.codeHash, maxFeePerGas: parseUnits(input.maxFeeGwei, 'gwei'), maxGasLimit: BigInt(input.maxGasLimit ?? 2_000_000), maxSubsidyPerRound: parseUnits(input.maxSubsidyEthPerRound ?? '0', 'ether'), vrfFundingTarget: parseUnits(input.vrfFundingTargetEth ?? '0', 'ether') };
+  const config = { version, holderRewardsCodeHash: input.holderRewardsCodeHash, chainId: input.chainId, controller: getAddress(input.controller), codeHash: input.codeHash, maxFeePerGas: parseUnits(input.maxFeeGwei, 'gwei'), maxGasLimit: BigInt(input.maxGasLimit ?? 2_000_000), maxSubsidyPerRound: parseUnits(input.maxSubsidyEthPerRound ?? '0', 'ether'), vrfFundingTarget: parseUnits(input.vrfFundingTargetEth ?? '0', 'ether') };
   // Use a dedicated gas wallet with an explicitly bounded subsidy; it needs no operator permissions.
   const wallet = mode === '--inspect' ? null : new Wallet(process.env.TINCTA_EXECUTOR_PRIVATE_KEY ?? '');
   let failures = 0;
@@ -152,13 +156,17 @@ async function main() {
       if (!input.expectationFile || !input.wallet || getAddress(input.wallet) !== wallet.address || config.maxSubsidyPerRound <= 0n || config.vrfFundingTarget <= 0n || config.vrfFundingTarget > config.maxSubsidyPerRound)
         throw new Error('Signing requires a reviewed deployment manifest, pinned gas wallet and explicit recovery subsidy.');
       if (urls.length < 2 || new URL(urls[0]).hostname === new URL(urls[1]).hostname) throw new Error('The first two signing RPC endpoints must have independent hosts.');
-      const expected = JSON.parse(await readFile(input.expectationFile, 'utf8'));
+      const manifest = JSON.parse(await readFile(input.expectationFile, 'utf8'));
+      const expected = manifest.expected ?? manifest;
+      if (version === 13 ? !expected.holderRewards || expected.holderRewardsCodeHash?.toLowerCase() !== config.holderRewardsCodeHash?.toLowerCase() : expected.holderRewards)
+        throw new Error('Executor manifest version or holder pool mismatch.');
       if (expected.chainId !== config.chainId || getAddress(expected.controller) !== config.controller || expected.controllerCodeHash.toLowerCase() !== config.codeHash.toLowerCase() || getAddress(expected.operator) === wallet.address)
         throw new Error('Executor manifest mismatch or operator key supplied.');
       const heads = await Promise.all(providers.slice(0, 2).map(provider => provider.getBlock('finalized')));
       if (heads.some(head => !head)) throw new Error('Finalized state unavailable.');
       const block = Math.min(...heads.map(head => head!.number));
-      const verified = await Promise.all(providers.slice(0, 2).map(provider => verifyDeployment(provider, expected, block)));
+      const verify = version === 13 ? verifyV13Deployment : verifyDeployment;
+      const verified = await Promise.all(providers.slice(0, 2).map(provider => verify(provider, expected, block)));
       if (JSON.stringify(verified[0]) !== JSON.stringify(verified[1])) throw new Error('Independent RPC deployment checks disagree.');
       if (await providers[0].getBalance(wallet.address) < config.maxGasLimit * config.maxFeePerGas + config.vrfFundingTarget)
         throw new Error('Executor needs gas for one maximum-cost transaction plus its VRF recovery target.');

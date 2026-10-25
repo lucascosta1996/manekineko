@@ -4,6 +4,11 @@ import { artifacts, network } from "hardhat";
 import { readProtocol } from "../../../packages/protocol/src/chain.js";
 import { verifyDeployment } from "../../../scripts/protocol-v13/verify-deployment.mjs";
 import { holderClaimTransaction } from "../../../packages/protocol/src/holder-rewards.js";
+import { executeOnce } from "../../../scripts/protocol-v12/executor.mjs";
+import { observe } from "../../../scripts/protocol-v12/social.js";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 const { ethers, networkHelpers } = await network.create();
 const { time, loadFixture } = networkHelpers;
 const price = ethers.parseEther("0.01");
@@ -153,6 +158,38 @@ async function nonWinner(c: Context) {
 }
 describe("V13 protected season holder rewards", function () {
   this.timeout(120000);
+  it("binds social observations and bounded execution to V13 including the holder pool", async () => {
+    const c = await loadFixture(fixture);
+    const config = { version: 13 as const, chainId: 31337, controller: await c.controller.getAddress(),
+      codeHash: ethers.keccak256(await ethers.provider.getCode(await c.controller.getAddress())),
+      holderRewardsCodeHash: ethers.keccak256(await ethers.provider.getCode(await c.pool.getAddress())),
+      maxFeePerGas: ethers.parseUnits('100', 'gwei'), maxSubsidyPerRound: ethers.parseEther('1') };
+    const executor = new ethers.Wallet(ethers.Wallet.createRandom().privateKey, ethers.provider);
+    await networkHelpers.setBalance(executor.address, ethers.parseEther('1'));
+    const directory = await mkdtemp(join(tmpdir(), 'tincta-v13-executor-')), journal = join(directory, 'intent.json');
+    const realNow = Date.now;
+    try {
+      const block = await ethers.provider.getBlock('latest');
+      Date.now = () => block!.timestamp * 1000;
+      const social = { ...config, controllerCodeHash: config.codeHash, rpcUrl: '', appUrl: 'https://app.tincta.xyz', xAccountId: 'fixture' };
+      const events = await observe(social, ethers.provider);
+      expect(events.find(e => e.key.endsWith(':opening'))!.image!.detail).contains('10% season holders');
+      expect(events.every(e => e.text.includes('https://app.tincta.xyz/?collection=1'))).eq(true);
+      await assert.rejects(observe({ ...social, version: 12, holderRewardsCodeHash: undefined }, ethers.provider), /Controller version mismatch/);
+      await assert.rejects(executeOnce(ethers.provider, { ...config, holderRewardsCodeHash: ethers.ZeroHash }, executor, journal), /holder rewards contract could not be verified/);
+      await assert.rejects(executeOnce(ethers.provider, { ...config, version: 12, holderRewardsCodeHash: undefined }, executor, journal), /Controller version mismatch/);
+      expect(await ethers.provider.getTransactionCount(executor.address)).eq(0);
+      expect((await executeOnce(ethers.provider, config, null, journal)).status).eq('idle');
+      await c.vrf.fulfillRequest(await c.round.requestId(), 0);
+      expect((await executeOnce(ethers.provider, config, null, journal)).status).eq('ready');
+      expect((await executeOnce(ethers.provider, config, executor, journal)).status).eq('submitted');
+      expect((await executeOnce(ethers.provider, config, executor, journal)).status).eq('confirmed');
+      expect((await executeOnce(ethers.provider, config, executor, journal)).status).eq('idle');
+      expect(await c.round.executionRecipient()).eq(executor.address);
+      expect(await ethers.provider.getBalance(await c.pool.getAddress())).eq(ethers.parseEther('1'));
+      expect(await ethers.provider.getTransactionCount(executor.address)).eq(1);
+    } finally { Date.now = realNow; await rm(directory, { recursive: true, force: true }); }
+  });
   it("keeps 100% reserved until a successful draw, then funds exactly 60/20/10/10", async () => {
     const c = await loadFixture(fixture);
     const allocations = await Promise.all([

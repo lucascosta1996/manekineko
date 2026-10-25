@@ -27,7 +27,9 @@ export function WebWalletMenu({ modal, open, onClose, origin, invalidate, synchr
   useEffect(() => {
     mounted.current = true;
     const update = () => refresh(value => value + 1);
-    const stops = [modal.subscribeConnections(update), modal.subscribeAccount(update, "eip155"), modal.subscribeNetwork(update), modal.subscribeRemoteFeatures(update), ConnectorController.subscribeKey("activeConnectorIds", update)];
+    // The SDK's public subscription opens a warning when its multi-wallet
+    // feature is disabled. Observe the existing session store in both modes.
+    const stops = [ConnectionController.subscribe(update), modal.subscribeAccount(update, "eip155"), modal.subscribeNetwork(update), modal.subscribeRemoteFeatures(update), ConnectorController.subscribeKey("activeConnectorIds", update)];
     return () => { mounted.current = false; stops.forEach(stop => stop()); };
   }, [modal]);
   useEffect(() => { if (open) { setNotice(""); handoff.current = false; } }, [open]);

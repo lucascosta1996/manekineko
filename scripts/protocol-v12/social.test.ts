@@ -6,7 +6,7 @@ const base = {
   prefix: '[Sepolia testnet] ',
   name: 'Fictional one',
   id: 1,
-  link: 'https://app.tincta.xyz/collections',
+  link: 'https://app.tincta.xyz/',
   now: 10n,
   voteStart: 20n,
   saleStart: 30n,
@@ -109,4 +109,30 @@ test('only ambiguous post delivery needs reconciliation; explicit rejection rema
   assert.equal(deliveryFailureStatus(new AmbiguousDelivery(), true), 'uncertain');
   assert.equal(deliveryFailureStatus(new AmbiguousDelivery('Server', 503), true), 'uncertain');
   assert.equal(deliveryFailureStatus(new Error('Could not persist successful POST'), true), 'uncertain');
+});
+
+test('V13 cards state all four allocations while historical V12 cards retain their terms', async () => {
+  const { socialImage } = await import('./social-content.ts');
+  const { renderSeasonSocialSvg } = await import('../season-runner/social-image.ts');
+  const common = { chainId: 11155111 as const, stage: 'opening' as const, timestamp: 1792627200, text: 'Preview',
+    season: { id: '0x' + '11'.repeat(32), number: 1, name: 'Fictional season', colors: ['#330000'] },
+    collection: { id: 'test', number: 1, name: 'Fictional collection', color: '#330000', supply: 1000, mintPriceEth: '0.01', winnerCount: 6, prizePerWinnerEth: '1' } };
+  const image = socialImage({ ...common, version: 13 });
+  assert.equal(image.detail, '60% prizes · 20% affiliates · 10% season holders · 10% protocol treasury.');
+  assert.match(image.alt, /10% season holders/);
+  assert.match(renderSeasonSocialSvg(image, { preview: true }), /10% protocol treasury/);
+  assert.match(socialImage(common).detail!, /20% operator/);
+  for (const message of lifecycleMessages({ ...base, version: 13, now: 300n, sold: true, randomnessReceived: true, revealed: true, paid: true })) {
+    assert.match(message.text, /https:\/\/app\.tincta\.xyz\/\?collection=1/);
+    assert(!message.text.includes('/collections'));
+  }
+});
+
+test('worker version selection requires an explicit V13 holder pin', async () => {
+  const { runtimeVersion } = await import('./runtime.ts');
+  assert.equal(runtimeVersion({}), 12);
+  assert.equal(runtimeVersion({ version: 13, holderRewardsCodeHash: '0x' + '11'.repeat(32) }), 13);
+  assert.throws(() => runtimeVersion({ version: 13 }), /holder rewards runtime pin/);
+  assert.throws(() => runtimeVersion({ holderRewardsCodeHash: '0x' + '11'.repeat(32) }), /explicit version 13/);
+  assert.throws(() => runtimeVersion({ version: 14 as 13 }), /Unsupported/);
 });

@@ -1,19 +1,20 @@
 /** One-way projection: no signer, database authority or protocol writes. */
-import { Contract, JsonRpcProvider, getAddress, keccak256 } from 'ethers';
+import { Contract, JsonRpcProvider, getAddress, type Provider } from 'ethers';
 import { readFile, writeFile, rename, open, unlink } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { dirname } from 'node:path';
-import controllerAbi from '../../packages/contracts/src/ManekinekoSeasonControllerV12.json' with { type: 'json' };
-import roundAbi from '../../packages/contracts/src/ManekinekoRoundV12.json' with { type: 'json' };
 import votingAbi from '../../packages/contracts/src/ManekinekoVotingV12.json' with { type: 'json' };
 import { createXPost, verifyXPost, uploadXMedia, getXMediaStatus, setXMediaAltText, XApiError, AmbiguousDelivery, type XCredentials } from '../season-runner/social.ts';
 import { renderSeasonSocialImage } from '../season-runner/social-image.ts';
 import { lifecycleMessages, socialImage, STAGES, SOCIAL_TEMPLATE_VERSION } from './social-content.ts';
 import type { SeasonSocialMessage } from '../../packages/contracts/src/season-social.ts';
+import { runtimeVersion, workerRuntime, verifyWorkerRound } from './runtime.ts';
 export { lifecycleMessages } from './social-content.ts';
 export type Observation = { key: string; text: string; block: number; blockHash: string; image?: SeasonSocialMessage };
 export type Delivery = Observation & { status: 'pending' | 'intent' | 'sent' | 'uncertain'; postId?: string; mediaId?: string; mediaExpiresAt?: number; imageHash?: string };
 export type Config = {
+  version?: 12 | 13;
+  holderRewardsCodeHash?: string;
   chainId: number;
   controller: string;
   controllerCodeHash: string;
@@ -36,23 +37,19 @@ export function mergeObservations(existing: Delivery[], observations: Observatio
     return Number(left.at(-2)) - Number(right.at(-2)) || STAGES.indexOf(left.at(-1) as typeof STAGES[number]) - STAGES.indexOf(right.at(-1) as typeof STAGES[number]);
   });
 }
-export async function observe(config: Config): Promise<Observation[]> {
-  if (![1, 11155111].includes(config.chainId)) throw new Error('Unsupported social network.');
+export async function observe(config: Config, suppliedProvider?: Provider): Promise<Observation[]> {
+  if (![1, 11155111].includes(config.chainId) && !(suppliedProvider && config.chainId === 31337)) throw new Error('Unsupported social network.');
   const app = new URL(config.appUrl);
   if (app.protocol !== 'https:' || app.username || app.password || app.search || app.hash)
     throw new Error('Invalid public app URL.');
-  const provider = new JsonRpcProvider(config.rpcUrl);
+  const provider = suppliedProvider ?? new JsonRpcProvider(config.rpcUrl);
   try {
     if (Number((await provider.getNetwork()).chainId) !== config.chainId)
       throw new Error('Social network mismatch.');
     const block = await provider.getBlock('finalized');
     if (!block?.hash || Date.now() / 1000 - block.timestamp > 3600) throw new Error('Fresh finalized chain state unavailable.');
-    if (
-      keccak256(await provider.getCode(config.controller, block.number)).toLowerCase() !==
-      config.controllerCodeHash.toLowerCase()
-    )
-      throw new Error('Controller pin mismatch.');
-    const c = new Contract(getAddress(config.controller), controllerAbi, provider),
+    const runtime = await workerRuntime(provider, { ...config, codeHash: config.controllerCodeHash }, block.number);
+    const c = runtime.controller,
       at = { blockTag: block.number };
     if (!(await c.catalogSealed(at))) return [];
     const count = Number(await c.roundCount(at));
@@ -65,8 +62,9 @@ export async function observe(config: Config): Promise<Observation[]> {
       observations: Observation[] = [];
     for (let id = 1; id <= count; id++) {
       const address = await c.rounds(id, at),
-        r = new Contract(address, roundAbi, provider);
-      const [name, saleStart, deadline, sold, revealed, paid, ballot, randomnessDeadline, randomnessReceived, version, boundVoting] = await Promise.all([
+        r = new Contract(address, runtime.roundAbi, provider);
+      await verifyWorkerRound(r, runtime, block.number);
+      const [name, saleStart, deadline, sold, revealed, paid, ballot, randomnessDeadline, randomnessReceived] = await Promise.all([
         r.name(at),
         r.saleStartAt(at),
         r.mintDeadline(at),
@@ -76,19 +74,17 @@ export async function observe(config: Config): Promise<Observation[]> {
         v.ballots(address, at),
         r.randomnessDeadline(at),
         r.randomnessReceived(at),
-        r.CONTRACT_VERSION(at),
-        r.voting(at),
       ]);
-      if (version !== 'affiliate-v12' || getAddress(boundVoting) !== getAddress(await v.getAddress())) throw new Error('Social round binding mismatch.');
       const plan = plans[id - 1], seasonPlans = plans.filter(p => p.seasonId === plan.seasonId);
       const season = { id: plan.seasonId, number: seasonIds.indexOf(plan.seasonId) + 1, name: plan.seasonName, colors: seasonPlans.map(p => p.color) };
       // The image only uses immutable identity. Mutable ballot economics are not advertised as final.
       const collection = { id: address, number: seasonPlans.indexOf(plan) + 1, name, color: plan.color, supply: 0, mintPriceEth: '0', winnerCount: 0, prizePerWinnerEth: '0' };
       const messages = lifecycleMessages({
+        version: runtime.version,
         prefix: config.chainId === 11155111 ? '[Sepolia testnet] ' : '',
         name,
         id,
-        link: `${app.origin}/collections`,
+        link: `${app.origin}/`,
         now: BigInt(block.timestamp),
         voteStart: ballot.startsAt,
         saleStart,
@@ -105,13 +101,13 @@ export async function observe(config: Config): Promise<Observation[]> {
           key: `${config.chainId}:${config.controller.toLowerCase()}:${e.key}`,
           block: block.number,
           blockHash: block.hash!,
-          image: socialImage({ chainId: config.chainId as 1 | 11155111, stage: e.stage, season, collection, timestamp: Number(ballot.startsAt), text: e.text }),
+          image: socialImage({ version: runtime.version, chainId: config.chainId === 1 ? 1 : 11155111, stage: e.stage, season, collection, timestamp: Number(ballot.startsAt), text: e.text }),
         }))
       );
     }
     return observations;
   } finally {
-    provider.destroy();
+    if (!suppliedProvider) (provider as JsonRpcProvider).destroy();
   }
 }
 export function assertPublishable(entries: Delivery[]) {
@@ -123,13 +119,15 @@ export function deliveryFailureStatus(error: unknown, writeStarted: boolean): 'p
   // Network/5xx/malformed-success ambiguity and persistence failure after a send require reconciliation.
   return !writeStarted || (error instanceof XApiError && !(error instanceof AmbiguousDelivery)) ? 'pending' : 'uncertain';
 }
-async function run() {
+export async function run(requiredVersion?: 12 | 13) {
   const [configFile, stateFile, mode = '--observe', eventKey, postId] = process.argv.slice(2);
   if (!configFile || !stateFile || !['--observe', '--publish', '--reconcile'].includes(mode))
     throw new Error(
       'Usage: social.ts config.json state.json [--observe|--publish|--reconcile eventKey postId]'
     );
   const config: Config = JSON.parse(await readFile(configFile, 'utf8'));
+  const version = runtimeVersion(config);
+  if (requiredVersion && version !== requiredVersion) throw new Error('Explicit worker version required.');
   const binding = `${config.chainId}:${getAddress(
     config.controller
   )}:${config.controllerCodeHash.toLowerCase()}:${config.xAccountId}`;
@@ -163,7 +161,7 @@ async function run() {
       return;
     }
     const prefix =
-      config.chainId === 1 ? 'V12_MAINNET_X_' : config.chainId === 11155111 ? 'V12_SEPOLIA_X_' : '';
+      config.chainId === 1 ? `V${version}_MAINNET_X_` : config.chainId === 11155111 ? `V${version}_SEPOLIA_X_` : '';
     if (!prefix) throw new Error('Unsupported network.');
     const credentials: XCredentials = {
       apiKey: process.env[prefix + 'API_KEY'] ?? '',
@@ -230,7 +228,7 @@ async function run() {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href)
   run().catch(() => {
     console.error(
-      'V12 social operation failed. Inspect the local outbox; do not retry an unresolved delivery.'
+      'Social operation failed. Inspect the local outbox; do not retry an unresolved delivery.'
     );
     process.exitCode = 1;
   });

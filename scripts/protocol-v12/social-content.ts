@@ -1,11 +1,11 @@
-/** V12 content only. The existing renderer supplies the approved Ligature/Open visual identity. */
+/** Versioned lifecycle copy using the approved Ligature/Open visual identity. */
 import { assertSocialText } from '../../packages/contracts/src/season-social.ts';
 import type { SeasonSocialMessage, SeasonSocialIdentity, SeasonSocialCollection } from '../../packages/contracts/src/season-social.ts';
-export const SOCIAL_TEMPLATE_VERSION = 'v12-ligature-open-2';
+export const SOCIAL_TEMPLATE_VERSION = 'v12-v13-ligature-open-3';
 export const STAGES = ['prepared', 'voting', 'opening', 'soldout', 'draw-ready', 'draw-refunds', 'refunds', 'revealed', 'paid'] as const;
 export type Stage = typeof STAGES[number];
 export type LifecycleInput = {
-  prefix: string; name: string; id: number; link: string; now: bigint; voteStart: bigint; saleStart: bigint;
+  version?: 12 | 13; prefix: string; name: string; id: number; link: string; now: bigint; voteStart: bigint; saleStart: bigint;
   deadline: bigint; sold: boolean; revealed: boolean; paid: boolean; randomnessDeadline: bigint; randomnessReceived: boolean;
 };
 const copy: Record<Stage, { text: string; header: string; headline: string[]; detail: string }> = {
@@ -19,6 +19,12 @@ const copy: Record<Stage, { text: string; header: string; headline: string[]; de
   revealed: { text: 'Results finalized. Winning NFT holders and qualified affiliates can claim their allocated rewards.', header: 'RESULTS FINALIZED', headline: ['Results', 'finalized.'], detail: 'Winning NFTs share 60% equally; qualified affiliates share 20% equally.' },
   paid: { text: 'All winning ticket prizes have been claimed. Affiliate claims have their own status.', header: 'PRIZES CLAIMED', headline: ['Prizes', 'claimed.'], detail: 'All winning ticket prizes were claimed onchain.' },
 };
+function stageCopy(stage: Stage, version: 12 | 13 = 12) {
+  if (version !== 12 && version !== 13) throw new Error('Unsupported social protocol version.');
+  if (version === 13 && stage === 'opening') return { ...copy[stage], detail: '60% prizes · 20% affiliates · 10% season holders · 10% protocol treasury.' };
+  if (version === 13 && stage === 'draw-refunds') return { ...copy[stage], detail: 'No reward allocations. Mint funds back full mint-price refunds.' };
+  return copy[stage];
+}
 export function lifecycleMessages(input: LifecycleInput) {
   const { prefix, name, id, link, now, voteStart, saleStart, deadline, sold, revealed, paid, randomnessDeadline, randomnessReceived } = input;
   const ready: Record<Stage, boolean> = {
@@ -29,20 +35,20 @@ export function lifecycleMessages(input: LifecycleInput) {
   };
   return STAGES.filter(stage => ready[stage]).map(stage => ({
     key: `${id}:${stage}`, stage,
-    text: assertSocialText(`Tincta Rewards${prefix ? ' · Sepolia testnet' : ''}\n${name}\n${copy[stage].text}\nCurrent status: ${link}?collection=${id}`),
+    text: assertSocialText(`Tincta Rewards${prefix ? ' · Sepolia testnet' : ''}\n${name}\n${stageCopy(stage, input.version).text}\nCurrent status: ${link}?collection=${id}`),
   }));
 }
 export function socialImage(input: {
-  chainId: 1 | 11155111; stage: Stage; season: SeasonSocialIdentity; collection: SeasonSocialCollection; timestamp: number; text: string;
+  version?: 12 | 13; chainId: 1 | 11155111; stage: Stage; season: SeasonSocialIdentity; collection: SeasonSocialCollection; timestamp: number; text: string;
 }): SeasonSocialMessage {
-  const content = copy[input.stage];
+  const content = stageCopy(input.stage, input.version);
   return {
-    // This selects the existing collection layout; lifecycle content is V12-specific above.
+    // This selects the existing collection layout; copy follows the verified version.
     event: 'collection-live', chainId: input.chainId, season: input.season, collection: input.collection,
     generatedAt: new Date(input.timestamp * 1000).toISOString(), validUntil: null,
     post: input.text, replies: [], replyKeys: [], metrics: [],
     header: content.header, headline: content.headline, detail: content.detail,
     footer: 'View current status on Tincta Rewards.',
-    alt: `${input.chainId === 11155111 ? 'Sepolia testnet, test ETH. ' : ''}Tincta Rewards. ${input.season.name}. ${input.collection.name}. ${content.header}. ${content.text}`,
+    alt: `${input.chainId === 11155111 ? 'Sepolia testnet, test ETH. ' : ''}Tincta Rewards. ${input.season.name}. ${input.collection.name}. ${content.header}. ${content.text} ${content.detail}`,
   };
 }

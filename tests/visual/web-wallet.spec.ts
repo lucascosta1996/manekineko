@@ -79,9 +79,12 @@ test('account and network changes cancel old reviews and block mismatched transa
 });
 
 test('Reown exposes WalletConnect and canceling the selector never connects or signs', async ({ page }) => {
-  await prepare(page); await rpc(page, 1); await page.clock.resume(); await page.goto(urls.web);
+  await prepare(page); await rpc(page, 1);
+  await page.route('**/appkit/v1/config?*', route => route.fulfill({ json: { features: [{ id: 'multi_wallet', isEnabled: false, config: false }] } }));
+  await page.clock.resume(); await page.goto(urls.web);
   await page.getByRole('button', { name: 'Connect wallet', exact: true }).click();
   await expect(page.getByText('WalletConnect', { exact: true })).toBeVisible();
+  await expect(page.getByText('Multi-Wallet Not Enabled', { exact: true })).toHaveCount(0);
   await page.screenshot({ path: 'test-results/header-wallet-reown.png' });
   await page.keyboard.press('Escape');
   await expect(page.getByRole('button', { name: 'Connect wallet', exact: true })).toBeVisible();

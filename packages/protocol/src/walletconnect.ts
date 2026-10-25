@@ -8,8 +8,8 @@ export const walletConnectConfigured = () => !!process.env.NEXT_PUBLIC_WALLETCON
 async function kit(chainId?: number): Promise<AppKit> {
   if (!walletConnectConfigured()) throw new Error("Mobile wallet connections are not configured for this site. Use an installed wallet or its in-app browser.");
   if (!appKit) appKit = (async () => {
-    const [{ createAppKit }, { mainnet, sepolia }] = await Promise.all([import("@reown/appkit"), import("@reown/appkit/networks")]);
-    const modal = createAppKit({ projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!.trim(), networks: [mainnet, sepolia], defaultNetwork: chainId === 11155111 ? sepolia : mainnet,
+    const [{ createAppKit }, { EthersAdapter }, { mainnet, sepolia }] = await Promise.all([import("@reown/appkit"), import("@reown/appkit-adapter-ethers"), import("@reown/appkit/networks")]);
+    const modal = createAppKit({ projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!.trim(), adapters: [new EthersAdapter()], networks: [mainnet, sepolia], defaultNetwork: chainId === 11155111 ? sepolia : mainnet,
       metadata: { name: "Tincta", description: "Tincta NFT collections and rewards", url: window.location.origin, icons: [`${window.location.origin}/icon.svg`] },
       enableInjected: false, enableEIP6963: false, enableCoinbase: false, enableBaseAccount: false,
       defaultAccountTypes: { eip155: "eoa" }, features: { analytics: false, email: false, socials: [], swaps: false, onramp: false, send: false }, themeMode: "light", themeVariables: { "--w3m-border-radius-master": "1px", "--w3m-accent": "#171717", "--w3m-font-family": "Arial, sans-serif" } });

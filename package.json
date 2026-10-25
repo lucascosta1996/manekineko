@@ -85,7 +85,11 @@
     "protocol:v12:audit-bundle": "npm run contracts:compile && node scripts/protocol-v12/audit-bundle.mjs",
     "protocol:v12:rehearsal:build": "npm run contracts:compile && node --import tsx scripts/protocol-v12/rehearsal/build.mts",
     "protocol:v12:rehearsal:test": "npm run test --workspace @manekineko/contracts -- test/ProtocolV12Rehearsal.ts",
-    "protocol:v13:verify": "npm run contracts:compile && node --import tsx scripts/protocol-v13/verify-deployment.mts"
+    "protocol:v13:verify": "npm run contracts:compile && node --import tsx scripts/protocol-v13/verify-deployment.mts",
+    "protocol:v13:social": "node --import tsx scripts/protocol-v13/social.ts",
+    "protocol:v13:executor": "node --import tsx scripts/protocol-v13/executor.mts",
+    "protocol:v13:previews": "node --import tsx scripts/protocol-v12/preview-social.mts --v13",
+    "protocol:workers:typecheck": "tsc --noEmit --target es2022 --module esnext --moduleResolution bundler --allowImportingTsExtensions --resolveJsonModule --esModuleInterop --skipLibCheck scripts/protocol-v12/runtime.ts scripts/protocol-v12/executor.mts scripts/protocol-v12/social.ts scripts/protocol-v12/preview-social.mts scripts/protocol-v13/executor.mts scripts/protocol-v13/social.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.11.1",

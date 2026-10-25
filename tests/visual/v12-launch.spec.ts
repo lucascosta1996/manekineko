@@ -183,3 +183,15 @@ for (const width of [390,1440]) test(`Launch randomness deadline and timeout ref
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.screenshot({path:`test-results/v12-draw-refunds-${width}.png`,fullPage:true});
 });
+test('Launch offers mobile wallet connections and closes the selector without signing', async ({ page }) => {
+  await prepare(page); await rpc(page, 1); await page.clock.resume();
+  await page.route('**/appkit/v1/config?*', route => route.fulfill({ json: { features: [] } }));
+  await page.goto(urls.launch + '/dashboard');
+  await page.getByRole('button', { name: 'Connect wallet', exact: true }).click();
+  await page.getByRole('button', { name: 'WalletConnect · mobile wallet', exact: true }).click();
+  await expect(page.getByText('WalletConnect', { exact: true })).toBeVisible();
+  await expect(page.getByText('Multi-Wallet Not Enabled', { exact: true })).toHaveCount(0);
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('button', { name: 'WalletConnect · mobile wallet', exact: true })).toBeEnabled();
+  await expect(page.getByText('Wallet connection was canceled. Nothing was signed.', { exact: true })).toBeVisible();
+});

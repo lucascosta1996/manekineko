@@ -1,5 +1,9 @@
 # Tincta protocol architecture and agent handoff
 
+## 2026-10-25 V13 test preparation follow-up
+
+The reviewed test wallet may perform permissionless preparation and participant actions; the immutable treasury operator is unchanged. V13 social/executor entry points now select explicit versions and validate the holder pool; the signing executor uses the full V13 graph verifier across two independent RPC hosts. V13 cards show 60/20/10/10 and link to the participant route. Web removes the disabled multi-wallet warning and Launch configures the actual Ethers WalletConnect adapter. See [test readiness, wallet roles and verification boundaries](sepolia-v13-test-readiness-2026-10-25.md). These repairs do not start a collection or enable X delivery.
+
 ## 2026-10-25 V13 Sepolia deployment
 
 The user authorized a new Sepolia test graph with the revised **60/20/10/10** allocation. The complete 22-season/216-collection fictional catalog is sealed, the new credits registry approves only the V13 controller, and the holder/deployer bindings are fixed. Two independent RPCs verified all runtimes, immutable values, stored round creation code, catalog and economics at finalized block **11991095**. Six executable contracts are source-verified on Etherscan. **No collection is prepared and no season has started; Mainnet remains unconfigured.** This is an isolated test genesis, not a historical-registry migration. Read [the release record and exact public pins](sepolia-v13-release-2026-10-25.md) before operating it. Earlier local-only entries below are dated implementation evidence superseded by this deployment record.

@@ -1,0 +1,15 @@
+{
+  "version": 13,
+  "chainId": 11155111,
+  "controller": "0x479198a1dc89E4DDF856077d04AA49C661C197C4",
+  "codeHash": "0x1fb4313f5f28903f036d5aab85ce4a71838c61f83e92879286eea571a0ca0905",
+  "holderRewardsCodeHash": "0x3b6c1576efa73a31a843047534d0c10ddea7922697bc60e172ae0f63f1790cdb",
+  "rpcUrls": [
+    "https://ethereum-sepolia-rpc.publicnode.com"
+  ],
+  "maxFeeGwei": "5",
+  "maxGasLimit": 2000000,
+  "maxSubsidyEthPerRound": "0",
+  "vrfFundingTargetEth": "0",
+  "expectationFile": "docs/deployments/sepolia-v13-2026-10-25.json"
+}

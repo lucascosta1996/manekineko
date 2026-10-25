@@ -11,6 +11,8 @@ for (const app of apps) {
   await cp(resolve(`apps/${app === 'landing' ? 'landing-page' : app}/public`), `${directory}/public`, { recursive: true });
   const env = Object.fromEntries(['PATH','HOME','TMPDIR','SYSTEMROOT','CI'].filter(k => process.env[k]).map(k => [k, process.env[k]]));
   Object.assign(env, { NODE_ENV: 'production', NEXT_TELEMETRY_DISABLED: '1', NEXT_PUBLIC_WEB_URL: 'http://127.0.0.1:4312', NEXT_PUBLIC_LANDING_URL: 'http://127.0.0.1:4311' });
+  // Synthetic public identifier; browser fixtures intercept all external requests.
+  if (app === 'launch') env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID = '11111111111111111111111111111111';
   await new Promise((done, fail) => {
     const child = spawn(process.execPath, ['--require', resolve('scripts/visual/fixed-date.cjs'), resolve('node_modules/next/dist/bin/next'), 'build', directory], { env, stdio: 'inherit' });
     child.on('exit', code => code === 0 ? done() : fail(new Error(`${app} fixture build failed: ${code}`)));
