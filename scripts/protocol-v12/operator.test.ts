@@ -51,9 +51,13 @@ test('timers distinguish randomness cutoff, recorded entropy and both refund rea
   const expired=collectionTiming({...round!,phase},201); assert.equal(expired.value,'00:00:00'); assert.match(expired.detail,/Checking the contract/);
  }
  for(const phase of [4,5,6]){const t=collectionTiming({...round!,phase},210);assert.equal(t.label,'Time since sellout');assert.match(t.detail,/refunds unavailable/);}
- assert.equal(collectionTiming({...round!,phase:7},210).value,'00:00:10');
+ assert.equal(collectionTiming({...round!,phase:7},210).value,'No expiration');
  assert.match(collectionTiming({...round!,phase:7},210).detail,/No randomness was recorded/);
- assert.equal(collectionTiming({...round!,phase:7,soldOutAt:0n},110).value,'00:00:10');
+ for(const soldOutAt of [0n,90n]) for(const now of [210,210+10*365*86400]) {
+  const refund=collectionTiming({...round!,phase:7,soldOutAt},now);
+  assert.equal(refund.label,'Refunds available');assert.equal(refund.value,'No expiration');
+  assert.match(refund.detail,/no claim deadline/);
+ }
  assert.equal(collectionTiming(round!,99,true).value,'—');
  assert.equal(collectionTiming({...round!,phase:0},4).label,'Voting opens in');
  assert.equal(collectionTiming({...round!,phase:0},6).label,'Minting opens in');

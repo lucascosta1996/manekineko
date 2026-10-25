@@ -4,6 +4,7 @@ import { mkdir, open, readFile, rename, unlink, writeFile } from 'node:fs/promis
 import { dirname } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { verifyDeployment } from './verify-deployment.mts';
+import { verifyDeployment as verifyV14Deployment } from '../protocol-v14/verify-deployment.mts';
 import { verifyDeployment as verifyV13Deployment } from '../protocol-v13/verify-deployment.mts';
 import { runtimeVersion, workerRuntime, verifyWorkerRound, type RuntimeConfig } from './runtime.ts';
 
@@ -136,7 +137,7 @@ export async function executeOnce(provider: Provider, config: ExecutorConfig, wa
   } finally { await lock.close(); await unlink(`${journal}.lock`); }
 }
 
-export async function main(requiredVersion?: 12 | 13) {
+export async function main(requiredVersion?: 12 | 13 | 14) {
   const [configPath, journal, mode = '--inspect'] = process.argv.slice(2);
   if (!configPath || !journal || !['--inspect', '--once', '--watch'].includes(mode)) throw new Error('Usage: executor.mts config.json private-journal.json [--inspect|--once|--watch]');
   const input = JSON.parse(await readFile(configPath, 'utf8'));
@@ -147,7 +148,7 @@ export async function main(requiredVersion?: 12 | 13) {
   if (!urls.length || urls.length > 3 || urls.some(url => typeof url !== 'string' || new URL(url).protocol !== 'https:')) throw new Error('Configure one to three HTTPS RPC endpoints.');
   const providers = urls.map(url => { const request = new FetchRequest(url); request.timeout = 15_000; return new JsonRpcProvider(request); });
   let providerIndex = 0;
-  const config = { version, holderRewardsCodeHash: input.holderRewardsCodeHash, chainId: input.chainId, controller: getAddress(input.controller), codeHash: input.codeHash, maxFeePerGas: parseUnits(input.maxFeeGwei, 'gwei'), maxGasLimit: BigInt(input.maxGasLimit ?? 2_000_000), maxSubsidyPerRound: parseUnits(input.maxSubsidyEthPerRound ?? '0', 'ether'), vrfFundingTarget: parseUnits(input.vrfFundingTargetEth ?? '0', 'ether') };
+  const config = { version, holderRewardsCodeHash: input.holderRewardsCodeHash, genesisCodeHash: input.genesisCodeHash, chainId: input.chainId, controller: getAddress(input.controller), codeHash: input.codeHash, maxFeePerGas: parseUnits(input.maxFeeGwei, 'gwei'), maxGasLimit: BigInt(input.maxGasLimit ?? 2_000_000), maxSubsidyPerRound: parseUnits(input.maxSubsidyEthPerRound ?? '0', 'ether'), vrfFundingTarget: parseUnits(input.vrfFundingTargetEth ?? '0', 'ether') };
   // Use a dedicated gas wallet with an explicitly bounded subsidy; it needs no operator permissions.
   const wallet = mode === '--inspect' ? null : new Wallet(process.env.TINCTA_EXECUTOR_PRIVATE_KEY ?? '');
   let failures = 0;
@@ -158,14 +159,15 @@ export async function main(requiredVersion?: 12 | 13) {
       if (urls.length < 2 || new URL(urls[0]).hostname === new URL(urls[1]).hostname) throw new Error('The first two signing RPC endpoints must have independent hosts.');
       const manifest = JSON.parse(await readFile(input.expectationFile, 'utf8'));
       const expected = manifest.expected ?? manifest;
-      if (version === 13 ? !expected.holderRewards || expected.holderRewardsCodeHash?.toLowerCase() !== config.holderRewardsCodeHash?.toLowerCase() : expected.holderRewards)
+      if (version >= 13 ? !expected.holderRewards || expected.holderRewardsCodeHash?.toLowerCase() !== config.holderRewardsCodeHash?.toLowerCase() : expected.holderRewards)
         throw new Error('Executor manifest version or holder pool mismatch.');
       if (expected.chainId !== config.chainId || getAddress(expected.controller) !== config.controller || expected.controllerCodeHash.toLowerCase() !== config.codeHash.toLowerCase() || getAddress(expected.operator) === wallet.address)
         throw new Error('Executor manifest mismatch or operator key supplied.');
       const heads = await Promise.all(providers.slice(0, 2).map(provider => provider.getBlock('finalized')));
       if (heads.some(head => !head)) throw new Error('Finalized state unavailable.');
       const block = Math.min(...heads.map(head => head!.number));
-      const verify = version === 13 ? verifyV13Deployment : verifyDeployment;
+      if (version === 14 && expected.genesisCodeHash?.toLowerCase() !== config.genesisCodeHash?.toLowerCase()) throw new Error('Executor Genesis pin mismatch.');
+      const verify = version === 14 ? verifyV14Deployment : version === 13 ? verifyV13Deployment : verifyDeployment;
       const verified = await Promise.all(providers.slice(0, 2).map(provider => verify(provider, expected, block)));
       if (JSON.stringify(verified[0]) !== JSON.stringify(verified[1])) throw new Error('Independent RPC deployment checks disagree.');
       if (await providers[0].getBalance(wallet.address) < config.maxGasLimit * config.maxFeePerGas + config.vrfFundingTarget)

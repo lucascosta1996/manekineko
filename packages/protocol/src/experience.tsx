@@ -1,5 +1,7 @@
 "use client";
 
+import { genesisMintTransaction, readGenesis } from './genesis';
+import { GenesisArtwork } from "@manekineko/ui/genesis-artwork";
 import {
   Suspense,
   useCallback,
@@ -19,7 +21,7 @@ import {
   parseEther,
   type TransactionRequest,
 } from "ethers";
-import { Button } from "@manekineko/ui/button";
+import { Button, textActionClassName } from "@manekineko/ui/button";
 import { Disclosure } from "@manekineko/ui/components";
 import {
   PublicWorkspace,
@@ -345,6 +347,11 @@ function Experience({
         throw new Error(
           "The wallet and display providers disagree about this collection."
         );
+      if (fresh.genesis) {
+        const walletGenesis = await readGenesis(session.provider, config, fresh.block, fresh.timestamp, fresh.voting, session.address);
+        if (walletGenesis.address !== fresh.genesis.address || walletGenesis.walletMinted !== fresh.genesis.walletMinted)
+          throw new Error("The wallet and display providers disagree about the free mint.");
+      }
       const tx = await build(fresh, session.address);
       if (fresh.holders) {
         const pool = await verifyHolderPool(session.provider, config);
@@ -391,6 +398,7 @@ function Experience({
           fresh.credits,
           fresh.round?.address,
           fresh.holders?.address,
+          fresh.genesis?.address,
         ].some((a) => a?.toLowerCase() === String(tx.to).toLowerCase())
       ) {
         if (
@@ -514,6 +522,30 @@ function Experience({
     `https://${
       config?.chainId === 11155111 ? "sepolia." : ""
     }etherscan.io/address/${address}`;
+  const genesisPanel = state?.genesis && !r && (
+    <section className="protocol-panel genesis-panel" aria-labelledby="genesis-title">
+      <GenesisArtwork />
+      <div className="genesis-details">
+      <h2 id="genesis-title">Tincta Genesis</h2>
+      <p>Hold this free NFT at the first ballot’s ownership snapshot to vote on the first paid collection.</p>
+      <p className="genesis-voting-rule"><strong>Only for the first vote.</strong> For future votes, you’ll need NFTs from successfully revealed paid season collections.</p>
+      <dl className="genesis-terms">
+        <div><dt>Mint price</dt><dd>0 ETH + network gas</dd></div>
+        <div><dt>Minted</dt><dd>{String(state.genesis.minted)} / {String(state.genesis.supply)}</dd></div>
+        <div><dt>Wallet limit</dt><dd>1 mint per wallet, for life</dd></div>
+        <div><dt>Mint window</dt><dd>{state.genesis.start ? `${date(state.genesis.start)} – ${date(state.genesis.end)}` : "24 hours, opening with the sealed catalog"}</dd></div>
+      </dl>
+      <p>{!state.genesis.start ? "The free mint has not opened yet." : state.timestamp >= Number(state.genesis.end) ? "The free mint has ended. The first paid ballot is next." : state.genesis.minted === state.genesis.supply ? "All free NFTs have been minted. The first paid ballot can be prepared after the 24-hour window ends." : "The free mint is open. The first paid ballot follows this 24-hour window."}</p>
+      {!wallet.session && <p>Connect your wallet to check and mint your free NFT.</p>}
+      {state.genesis.walletMinted && <p>Your wallet has used its free mint. Voting power belongs to the NFT holder at the first ballot’s snapshot.</p>}
+      <Button disabled={disabled || !state.genesis.open || state.genesis.walletMinted !== false} onClick={() => void submit("Mint free NFT", "Mint one Tincta Genesis NFT for 0 ETH plus network gas. It votes only on the first paid collection and has no prize, affiliate, sponsored mint or holder reward entitlement.", genesisMintTransaction)}>
+        {state.genesis.walletMinted ? "Free NFT minted" : "Mint free NFT"}
+      </Button>
+      <p className="protocol-note">No prizes, affiliate eligibility, sponsored mints or season holder rewards. Transferring this NFT does not restore your free mint.</p>
+      <a className={textActionClassName()} href={`${explorer(state.genesis.address)}#code`} target="_blank" rel="noreferrer">Read free mint contract</a>
+      </div>
+    </section>
+  );
   const votePanel = r && state && (
     <>
       <section className="protocol-panel">
@@ -611,7 +643,7 @@ function Experience({
             Minting then opens without another operator signature.
           </p>
           <p>
-            Only NFTs from successfully revealed collections qualify. A transfer
+            {state.genesis && r.id === 1 ? "Tincta Genesis NFTs qualify for this first paid ballot only. " : "Only NFTs from successfully revealed paid collections qualify. "}A transfer
             after the snapshot does not create another vote. Votes cannot be
             changed.
           </p>
@@ -1119,7 +1151,7 @@ function Experience({
           {wallet.notice}
         </p>
       )}
-      {wallet.managed && !wallet.account && <p className="protocol-note">Connect your wallet in the header to participate.</p>}
+      {wallet.managed && !wallet.account && !state?.genesis && <p className="protocol-note">Connect your wallet in the header to participate.</p>}
       {wallet.managed && wallet.account && wallet.account.chainId !== config.chainId && <p className="protocol-note" role="status">Switch your wallet to {config.chainId === 1 ? "Ethereum" : "Sepolia testnet"} using the header to continue.</p>}
       {error && (
         <div className="protocol-panel" role="alert">
@@ -1149,7 +1181,7 @@ function Experience({
         </div>
       )}
       {!state && !error && (
-        <p role="status">Reading the collection contracts…</p>
+        <p className="protocol-loading" role="status">Reading the collection contracts…</p>
       )}
       {message && (
         <p className="protocol-feedback" role="status">
@@ -1217,6 +1249,7 @@ function Experience({
           url.searchParams.delete("affiliate");
           window.history.replaceState(null, "", url);
         }}
+        genesis={genesisPanel}
         vote={votePanel}
         mint={mintPanel}
         affiliates={affiliatePanel}

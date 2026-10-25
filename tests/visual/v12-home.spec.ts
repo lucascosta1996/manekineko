@@ -21,7 +21,7 @@ for (const width of [320, 390, 768, 1280, 1440]) {
     }, info) => {
       // Main engine covers all sizes; both other engines cover the critical narrow/wide views.
       test.skip(
-        info.project.name !== "chromium" && ![390, 1440].includes(width),
+        !["chromium", "opera"].includes(info.project.name) && ![390, 1440].includes(width),
         "Secondary engine viewport sample"
       );
       await page.setViewportSize({ width, height: 900 });
@@ -33,6 +33,11 @@ for (const width of [320, 390, 768, 1280, 1440]) {
         page.getByRole("heading", { name: heading, exact: true })
       ).toBeVisible();
       await ready(page);
+      if (phase === 7) {
+        await expect(page.locator('.public-timing').getByText('No expiration', {exact:true})).toBeVisible();
+        await expect(page.locator('.public-timing').getByRole('timer')).toHaveCount(0);
+        await expect(page.getByText('Refunds available for', {exact:true})).toHaveCount(0);
+      }
       expect(
         await page.evaluate(
           () => document.documentElement.scrollWidth <= innerWidth
@@ -283,6 +288,8 @@ test("live action reflows with enlarged text, keyboard navigation and coarse tar
   await expect(
     page.getByRole("heading", { name: "Cast your vote" })
   ).toBeVisible();
+  test.skip(test.info().project.name === "opera" && !(await page.evaluate(() => matchMedia("(any-pointer: coarse)").matches)),
+    "Desktop Opera ignores Playwright touch emulation; coarse-pointer and device acceptance remain unverified.");
   const m = await metrics(page, ".header-wallet .ui-button:visible");
   expect(m.height).toBeGreaterThanOrEqual(44);
   expect(m.width).toBeGreaterThanOrEqual(44);

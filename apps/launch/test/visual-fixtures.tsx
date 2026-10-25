@@ -13,5 +13,5 @@ export function LaunchVisualFixture({ path, state, chainId = 11155111 }: { path:
   if (path === '/not-found') return <NotFound />;
   if (path === '/loading') return <Loading />;
   if (path === '/error') return <LaunchError error={new Error('Fixture failure')} retry={() => window.location.reload()} />;
-  return <OperatorShell chainId={chainId}><ProtocolExperience key={chainId} view="operations" catalog={chainId === 1 ? mainnet : sepolia} config={state === 'unconfigured' ? null : { chainId, controller: '0x1111111111111111111111111111111111111111', codeHash: keccak256('0x6000'), rpcUrl: 'https://v12.fixture.invalid' }} /></OperatorShell>;
+  return <OperatorShell chainId={chainId}><ProtocolExperience key={chainId} view="operations" catalog={chainId === 1 ? mainnet : sepolia} config={state === 'unconfigured' ? null : { chainId, controller: '0x1111111111111111111111111111111111111111', codeHash: keccak256('0x6000'), rpcUrl: 'https://v12.fixture.invalid', ...(state === 'v14' ? { version: 14 as const, holderRewardsCodeHash: keccak256('0x6000'), genesisCodeHash: keccak256('0x6000') } : {}) }} /></OperatorShell>;
 }

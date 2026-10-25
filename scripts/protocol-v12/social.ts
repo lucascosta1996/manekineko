@@ -13,8 +13,9 @@ export { lifecycleMessages } from './social-content.ts';
 export type Observation = { key: string; text: string; block: number; blockHash: string; image?: SeasonSocialMessage };
 export type Delivery = Observation & { status: 'pending' | 'intent' | 'sent' | 'uncertain'; postId?: string; mediaId?: string; mediaExpiresAt?: number; imageHash?: string };
 export type Config = {
-  version?: 12 | 13;
+  version?: 12 | 13 | 14;
   holderRewardsCodeHash?: string;
+  genesisCodeHash?: string;
   chainId: number;
   controller: string;
   controllerCodeHash: string;
@@ -119,7 +120,7 @@ export function deliveryFailureStatus(error: unknown, writeStarted: boolean): 'p
   // Network/5xx/malformed-success ambiguity and persistence failure after a send require reconciliation.
   return !writeStarted || (error instanceof XApiError && !(error instanceof AmbiguousDelivery)) ? 'pending' : 'uncertain';
 }
-export async function run(requiredVersion?: 12 | 13) {
+export async function run(requiredVersion?: 12 | 13 | 14) {
   const [configFile, stateFile, mode = '--observe', eventKey, postId] = process.argv.slice(2);
   if (!configFile || !stateFile || !['--observe', '--publish', '--reconcile'].includes(mode))
     throw new Error(

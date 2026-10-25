@@ -134,5 +134,13 @@ test('worker version selection requires an explicit V13 holder pin', async () =>
   assert.equal(runtimeVersion({ version: 13, holderRewardsCodeHash: '0x' + '11'.repeat(32) }), 13);
   assert.throws(() => runtimeVersion({ version: 13 }), /holder rewards runtime pin/);
   assert.throws(() => runtimeVersion({ holderRewardsCodeHash: '0x' + '11'.repeat(32) }), /explicit version 13/);
-  assert.throws(() => runtimeVersion({ version: 14 as 13 }), /Unsupported/);
+  assert.throws(() => runtimeVersion({ version: 15 as 13 }), /Unsupported/);
+});
+
+test('V14 workers require explicit Genesis pins', async () => {
+  const { runtimeVersion } = await import('./runtime.ts');
+  const pin = '0x' + '22'.repeat(32);
+  assert.equal(runtimeVersion({ version: 14, holderRewardsCodeHash: pin, genesisCodeHash: pin }), 14);
+  assert.throws(() => runtimeVersion({ version: 14, holderRewardsCodeHash: pin }), /Genesis runtime pin/);
+  assert.throws(() => runtimeVersion({ version: 13, holderRewardsCodeHash: pin, genesisCodeHash: pin }), /explicit version 14/);
 });

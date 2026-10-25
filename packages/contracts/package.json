@@ -136,7 +136,13 @@
     "./holder-rewards-v13-source": "./src/ManekinekoHolderRewardsV13.source.json",
     "./winner-credits-v9": "./src/ManekinekoWinnerCreditsV9.json",
     "./winner-credits-v9-source": "./src/ManekinekoWinnerCreditsV9.source.json",
-    "./onchain-metadata": "./src/onchain-metadata.ts"
+    "./onchain-metadata": "./src/onchain-metadata.ts",
+    "./season-controller-v14": "./src/ManekinekoSeasonControllerV14.json",
+    "./season-controller-v14-source": "./src/ManekinekoSeasonControllerV14.source.json",
+    "./voting-v14": "./src/ManekinekoVotingV14.json",
+    "./voting-v14-source": "./src/ManekinekoVotingV14.source.json",
+    "./genesis-v14": "./src/ManekinekoGenesisV14.json",
+    "./genesis-v14-source": "./src/ManekinekoGenesisV14.source.json"
   },
   "dependencies": {
     "ethers": "6.17.0"

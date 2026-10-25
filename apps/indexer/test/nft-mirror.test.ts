@@ -25,6 +25,7 @@ test('mirror pins reject unsafe networks, unconfirmed indexing, duplicates and m
   const read = (values: unknown) => readMirrorConfigs({NFT_MIRROR_SOURCES_JSON:JSON.stringify(values)});
   assert.equal(read([config])[0].controller,config.controller);
   assert.deepEqual(readMirrorConfigs({}),[]);
+  assert.equal(read([{...config,version:14}])[0].version,14);
   for (const value of [[config,config],[{...config,chainId:31337}],[{...config,fromBlock:-1}],[{...config,confirmations:0}],
     [{...config,chainId:1,confirmations:2}],[{...config,version:11}],[{...config,rpcUrl:'http://private.invalid/secret'}],{}]) {
     assert.throws(()=>read(value),error=>error instanceof Error && error.message === 'invalid_nft_mirror_configuration');

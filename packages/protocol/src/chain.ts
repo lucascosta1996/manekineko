@@ -1,4 +1,6 @@
 import { Contract, getAddress, keccak256, type Provider } from 'ethers';
+import controllerV14Abi from '@manekineko/contract-abi/season-controller-v14' with { type: 'json' };
+import { readGenesis, type GenesisState } from './genesis.ts';
 import controllerAbi from '@manekineko/contract-abi/season-controller-v12' with { type: 'json' };
 import roundAbi from '@manekineko/contract-abi/round-v12' with { type: 'json' };
 import votingAbi from '@manekineko/contract-abi/voting-v12' with { type: 'json' };
@@ -43,6 +45,7 @@ export type RoundState = {
 };
 export type Snapshot = {
   holders?: HolderSeason;
+  genesis?: GenesisState;
   block: number;
   timestamp: number;
   operator: string;
@@ -67,7 +70,7 @@ export async function verifyController(provider: Provider, config: ProtocolConfi
   const code = await provider.getCode(config.controller, blockTag);
   if (code === '0x' || keccak256(code).toLowerCase() !== config.codeHash.toLowerCase())
     throw new Error('The deployment could not be verified. Signing is disabled.');
-  return new Contract(config.controller, controllerAbi, provider);
+  return new Contract(config.controller, config.version === 14 ? controllerV14Abi : controllerAbi, provider);
 }
 /** Every value belongs to one block. Failed reads never turn into zero balances. */
 export async function readProtocol(
@@ -106,6 +109,8 @@ export async function readProtocol(
   const id = selectedId || count;
   if (id < 0 || id > count) throw new Error('This collection has not been prepared.');
   let canPrepare = sealed && count < catalogCount;
+  const genesis = config.version === 14 ? await readGenesis(provider, config, block.number, block.timestamp, voting, wallet) : undefined;
+  if (genesis && count === 0) canPrepare &&= genesis.end > 0n && BigInt(block.timestamp) >= genesis.end;
   let latestPhase: number | null = null;
   if (count) {
     const last = new Contract(await c.rounds(count, at), roundAbi, provider);
@@ -128,7 +133,8 @@ export async function readProtocol(
     canPrepare,
     latestPhase,
     legacy,
-    sourceCount: count + legacy.length,
+    sourceCount: count + legacy.length + (genesis && id === 1 ? 1 : 0),
+    ...(genesis ? { genesis } : {}),
   };
   if (!id) return { ...base, sources: [], round: null };
   const address = getAddress(await c.rounds(id, at)),
@@ -154,7 +160,7 @@ export async function readProtocol(
     r.growthReserveBalance(at),
     r.nextAvailableAffiliateId(at),
   ]);
-  if (version !== `affiliate-v${config.version ?? 12}` || getAddress(boundVoting) !== getAddress(voting))
+  if (version !== `affiliate-v${config.version === 14 ? 13 : config.version ?? 12}` || getAddress(boundVoting) !== getAddress(voting))
     throw new Error('Collection verification failed.');
   const [
     name,
@@ -217,7 +223,8 @@ export async function readProtocol(
   );
   const sources = await Promise.all(
     sourceIndices.map(async (index) => {
-      const source = index < count ? await c.rounds(index + 1, at) : legacy[index - count];
+      const paidIndex = index - (genesis && id === 1 ? 1 : 0);
+      const source = paidIndex < 0 ? genesis!.address : paidIndex < count ? await c.rounds(paidIndex + 1, at) : legacy[paidIndex - count];
       const power =
         wallet && block.timestamp >= Number(ballot.startsAt)
           ? await v.votingPower(address, wallet, source, at)
@@ -227,7 +234,7 @@ export async function readProtocol(
   );
   return {
     ...base,
-    ...(config.version === 13 ? { holders: await readHolderSeason(provider, config, address, block.number) } : {}),
+    ...((config.version === 13 || config.version === 14) ? { holders: await readHolderSeason(provider, config, address, block.number) } : {}),
     sources,
     round: {
       address,

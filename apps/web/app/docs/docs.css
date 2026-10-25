@@ -146,3 +146,7 @@
 .docs-prose .docs-allocation-items > li { margin: 0; padding: 0; }
 .docs-allocation-items strong span { display: block; font-size: var(--ui-section); line-height: 1.25; margin-bottom: var(--ui-space-1); font-variant-numeric: tabular-nums; }
 @media (forced-colors: active) { .docs-allocation-bar span { border: 1px solid CanvasText; } }
+
+.docs-genesis-preview { max-width: 32rem; margin: var(--ui-space-6) auto; }
+.docs-genesis-preview figure { margin: 0; }
+.docs-genesis-preview figcaption { text-align: center; color: var(--ui-muted); font-size: var(--ui-caption); }

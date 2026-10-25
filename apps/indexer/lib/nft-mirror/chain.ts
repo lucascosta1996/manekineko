@@ -75,7 +75,7 @@ export class RpcMirrorChain implements MirrorChain {
         round.name({blockTag}),round.seasonName({blockTag}),round.seasonId({blockTag}),round.collectionColor({blockTag}),round.textColor({blockTag}),
       ]);
       ensure(roundId > 0 && roundId <= 256 && Number(id) === roundId && lower(registered) === address
-        && version === `affiliate-v${this.config.version}` && lower(voting) === lower(expectedVoting)
+        && version === `affiliate-v${this.config.version === 14 ? 13 : this.config.version}` && lower(voting) === lower(expectedVoting)
         && lower(renderer) === lower(expectedRenderer) && typeof name === 'string' && name.length > 0
         && new TextEncoder().encode(name).length <= 80, 'collection_trust_mismatch');
       const appearance = normalizeSeasonAppearance({seasonId,seasonName,collectionColor:color,textColor});

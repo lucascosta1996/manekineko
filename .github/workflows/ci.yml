@@ -16,8 +16,11 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm run protocol:v12:test
+      - run: node --import tsx --test scripts/protocol-v13/rehearsal/rehearsal.test.mts
+      - run: node --import tsx --test scripts/protocol-v14/rehearsal/rehearsal.test.mts
       - run: npm run protocol:workers:typecheck
       - run: npm run season:typecheck
       - run: node --import tsx --test --test-concurrency=1 scripts/season-runner/*.test.ts
       - run: npm run contracts:export
+      - run: npm run protocol:v14:sources:test
       - run: git diff --exit-code -- packages/contracts/src

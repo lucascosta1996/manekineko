@@ -1,5 +1,5 @@
 export const NFT_PAGE_SIZE = 24;
-export interface MirrorPin { chainId: number; controller: string; codeHash: string; version: 12 | 13 }
+export interface MirrorPin { chainId: number; controller: string; codeHash: string; version: 12 | 13 | 14 }
 export interface GalleryCollection {
   chainId: number; address: string; name: string; seasonName: string;
   color: string; textColor: string; minted: number; ready: number;

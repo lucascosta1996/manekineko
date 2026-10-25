@@ -311,7 +311,7 @@ describe("V13 protected season holder rewards", function () {
     ).revertedWithCustomError(c.pool, "ClaimsExhausted");
     expect((await c.pool.summary(ethers.id("Other season"))).funded).equal(0);
   });
-  it("excludes refundable NFTs and keeps every refund fully backed", async () => {
+  it("excludes refundable NFTs and keeps refunds fully backed without expiration", async () => {
     const c = await loadFixture(endedFixture);
     await expect(
       c.pool
@@ -319,6 +319,8 @@ describe("V13 protected season holder rewards", function () {
         .claim(await c.failed.getAddress(), 1, c.buyer.address)
     ).revertedWithCustomError(c.pool, "InvalidCollection");
     expect(await c.failed.operatorAllocation()).equal(0);
+    await time.increase(10 * 365 * 24 * 60 * 60);
+    expect(await c.failed.refundsAvailable()).equal(true);
     await expect(
       c.failed.connect(c.buyer).refund(1, c.buyer.address)
     ).changeEtherBalance(ethers, c.buyer, price);
@@ -330,6 +332,8 @@ describe("V13 protected season holder rewards", function () {
     expect(await c.round.refundsAvailable()).equal(true);
     expect(await c.round.operatorWithdrawable()).equal(0);
     expect((await c.pool.summary(season)).funded).equal(0);
+    await time.increase(10 * 365 * 24 * 60 * 60);
+    expect(await c.round.refundsAvailable()).equal(true);
     await expect(
       c.round.connect(c.buyer).refund(1, c.buyer.address)
     ).changeEtherBalance(ethers, c.buyer, price);

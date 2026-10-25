@@ -1,3 +1,4 @@
+import { GenesisArtwork } from "@manekineko/ui/genesis-artwork";
 import { LinkButton } from "@manekineko/ui/button";
 import { Icon } from "@manekineko/ui/icons";
 import { ResearchArt } from "../components/research-art";
@@ -44,13 +45,14 @@ export default function LandingPage() {
           <section className="studio-section" id="projects" aria-labelledby="projects-title">
             <div className="studio-section-heading"><div><p className="studio-eyebrow">02 / Projects</p><h2 id="projects-title">Immutable rules. Open possibilities.</h2></div><p>Each project explores what people can create, coordinate, and claim through rules fixed at publication.</p></div>
             <article className="studio-feature">
-              <figure className="studio-art studio-project-art"><ResearchArt kind="rewards" /></figure>
+              <GenesisArtwork className="studio-genesis-art" />
               <div>
                 <div className="studio-project-name">Tincta Rewards</div>
                 <h3>Rewards governed by immutable terms.</h3>
                 <p>Eligible NFT holders vote on each collection’s mint price, supply, winner count and mint duration. The selected terms become final when voting ends.</p>
                 <p>Tincta allocates successful mint revenue to prizes (60%), qualified affiliates (20%), season holder rewards (10%) and the protocol treasury (10%) for infrastructure costs, future functionality and Tincta projects. Holder claims open at season end for the first 5% of eligible NFTs to claim, with equal payouts calculated from that season’s actual pool.</p>
-                <p>Season holder rewards are planned for launch.</p>
+                <p><strong>Tincta Genesis: the first vote.</strong> A free collection of 1,000 onchain NFTs, with one lifetime mint per wallet and a 24-hour window. Holders pay network gas. Genesis votes apply only to the first paid collection; future votes require NFTs from successfully revealed paid season collections.</p>
+                <p>Genesis has no financial reward entitlement. Sepolia testing is underway; Mainnet minting has not launched.</p>
                 <LinkButton href="/rewards" variant="secondary" icon={<Icon name="arrow" />}>Explore Tincta Rewards</LinkButton>
                 <div className="studio-feature-meta"><span>Community-voted terms</span><span>Direct contract claims</span></div>
               </div>

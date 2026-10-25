@@ -12,7 +12,7 @@ export type HolderSeason = {
 };
 
 export async function verifyHolderPool(provider: Provider, config: ProtocolConfig, blockTag?: number) {
-  if (config.version !== 13 || !config.holderRewardsCodeHash) throw new Error('This deployment has no season holder pool.');
+  if ((config.version !== 13 && config.version !== 14) || !config.holderRewardsCodeHash) throw new Error('This deployment has no season holder pool.');
   const at = blockTag === undefined ? {} : { blockTag };
   const controller = new Contract(config.controller, controllerAbi, provider);
   const address = getAddress(await controller.holderRewards(at));
@@ -36,7 +36,7 @@ export async function readHolderSeason(provider: Provider, config: ProtocolConfi
 /** Built again after review. Contract execution, not a browser quote, reserves a slot. */
 export async function holderClaimTransaction(provider: Provider, config: ProtocolConfig, state: Snapshot, tokenId: bigint, wallet: string, expectedReward: bigint) {
   const h = state.holders, r = state.round;
-  if (!h || !r || config.version !== 13) throw new Error('Select a collection with season holder rewards.');
+  if (!h || !r || (config.version !== 13 && config.version !== 14)) throw new Error('Select a collection with season holder rewards.');
   if (!h.unlocked) throw new Error('This season is still locked.');
   if (h.claims >= h.claimLimit || h.rewardPerNft === 0n) throw new Error('All holder reward claims have been taken.');
   if (h.rewardPerNft !== expectedReward) throw new Error('The reward changed. Refresh and review it again.');

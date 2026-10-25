@@ -1,5 +1,32 @@
 # Tincta protocol architecture and agent handoff
 
+## 2026-10-26 V14 Sepolia release and Genesis-first rehearsal
+
+The fresh V14 graph is deployed on Sepolia, with the approved Genesis artwork shared by the mint app, public voting guide and both landing pages. See the [release evidence](sepolia-v14-release-2026-10-26.md) and [public manifest](deployments/sepolia-v14-2026-10-26.json) for finalized two-RPC checks, addresses, exact source proofs and deployment receipts. Genesis closes **2026-10-26 17:08:24 UTC / October 27 01:08:24 Asia/Shanghai**. No paid ballot can open before then. Mainnet remains unconfigured.
+
+The user authorized the [fresh V14 rehearsal](sepolia-v14-buyer-rehearsal.md): 50 Genesis minters, first-ballot Genesis votes, later paid-NFT votes, eight sellouts, two refund collections and end-of-season holder claims. It uses a fresh frozen runtime and journal, adopts only the previously unused encrypted wallets, and returns recoverable funds to the original fixed user address. The old V13 run remains paused. Paid preparations require source-publication reports before buyer participation; the funding helper must also be published before receiving buyer capital. No X delivery is enabled. Intended scenarios are not live completion evidence.
+
+Eligible paid refunds **never expire**. The public app and Launch now show “No expiration” instead of the misleading elapsed-time label “Refunds available for”. Both unsold and missing-randomness refunds were exercised ten years after eligibility in local regression tests, without changing deployed financial source. Migration 034 admits V14 in the paid NFT mirror while preserving the actual V13 paid-round lineage.
+
+## 2026-10-26 stable participation view and public contract source
+
+The participation region now reserves at least one viewport through loading, errors and populated states, with a centered loading message. The Genesis mint panel previews the actual Solidity-generated monochrome artwork and explicitly limits the free NFT to the first vote; later voting requires successfully revealed paid-season NFTs. New V14 Solidity includes reading-order and function comments; historical V13 bytecode/source remains unchanged.
+
+The V14 release CLI now requires both independent runtime verification and Etherscan source/ABI readback for all seven executable components and every prepared paid collection. Submission or a similar-contract match alone cannot pass. Etherscan Similar Matches additionally require exact Sourcify creation/runtime, source and constructor proof; reports identify each verification method. A separate source publisher discovers future collections without any signer. See [the release and source-publication procedure](genesis-free-mint-v14.md#source-publication-is-a-release-gate). The dated release record above supersedes the earlier local-only boundary.
+
+The previously unverified [V13 Aster Atlas collection](https://sepolia.etherscan.io/address/0x210c13D0bc8300236d865E8A6987650725C8caaA#code) was source-verified on 2026-10-26 (Asia/Shanghai). Its original runtime graph was checked through two independent RPCs at finalized block **11991917**, then its exact compiler input, constructor arguments and ABI were confirmed publicly readable through Etherscan. This offchain publication sent no blockchain transaction and did not resume the paused rehearsal.
+
+## 2026-10-25 V14 Genesis implementation and V13 pause
+
+The user stopped the V13 buyer rehearsal before its first transaction and selected a new free collection before the paid seasons: **one primary mint per wallet, 1,000 NFTs, 24 hours, first paid ballot only**. V14 adds a controller, voting checkpoints and Genesis NFT, while retaining actual V13 paid-round/deployer/holder templates, Credits V9 and Renderer V11. Genesis is outside all season accounting and has no financial reward entitlement. Paid preparation waits the entire free window; votes never renew at later season starts. See [V14 architecture, operations and verification boundaries](genesis-free-mint-v14.md).
+
+**Historical implementation snapshot (superseded by the October 26 release above):** apps, docs, ABI exports, read-only graph verification and local tests initially supported this graph without a deployment or authorized run. Existing V13 pins and contracts remain unchanged. The paused rehearsal bank held 20 Sepolia ETH with nonce 0 at block 11991768; its private journal had no transactions. V13 has no onchain pause function, so the already prepared collection's fixed deadlines continue. Do not restart its worker or reuse its frozen buyer bundle for V14.
+
+
+## 2026-10-25 V13 buyer simulation and capital recovery
+
+The separate Sepolia-only [buyer rehearsal](sepolia-v13-buyer-rehearsal.md) binds the existing V13 graph to 50 encrypted buyer wallets and a dedicated bank. It plans eight sellouts, two three-mint refund collections, actual voting/affiliate/prize transactions and 400 end-of-season holder claims. Twenty ETH of initial capital is recycled within a 30 ETH funding ceiling. All recoverable funds return to the user's fixed address; gas, Chainlink costs and wallet dust are separately reconciled. The original operator balance is protected, preparation uses exact top-ups, and execution stops after the first season without preparing collection 11. Recovery mode starts no new collections and reports any contract-locked holder funds. Local rehearsal tests do not establish a live Sepolia run.
+
 ## 2026-10-25 V13 test preparation follow-up
 
 The reviewed test wallet may perform permissionless preparation and participant actions; the immutable treasury operator is unchanged. V13 social/executor entry points now select explicit versions and validate the holder pool; the signing executor uses the full V13 graph verifier across two independent RPC hosts. V13 cards show 60/20/10/10 and link to the participant route. Web removes the disabled multi-wallet warning and Launch configures the actual Ethers WalletConnect adapter. See [test readiness, wallet roles and verification boundaries](sepolia-v13-test-readiness-2026-10-25.md). These repairs do not start a collection or enable X delivery.

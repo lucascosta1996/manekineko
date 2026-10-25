@@ -12,7 +12,9 @@ export default defineConfig({
   snapshotPathTemplate: '{testDir}/baselines/{platform}/{projectName}/{testFilePath}/{arg}{ext}',
   reporter: [['list'], ['html', { open: 'never' }], ['json', { outputFile: 'test-results/visual/results.json' }]],
   use: { serviceWorkers: 'block', locale: 'en-US', timezoneId: 'UTC', deviceScaleFactor: 1, colorScheme: 'light', contextOptions: { reducedMotion: 'reduce' }, screenshot: 'only-on-failure', trace: 'retain-on-failure', video: 'retain-on-failure' },
-  projects: [
+  projects: process.env.UI_BROWSER === 'opera' ? [
+    { name: 'opera', use: { browserName: 'chromium', viewport: { width: 1440, height: 900 }, launchOptions: { executablePath: '/Applications/Opera.app/Contents/MacOS/Opera' } } },
+  ] : [
     { name: 'chromium', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },
     // These isolated fixtures use loopback only. Ignore the host's system proxy,
     // which can reject Firefox's localhost requests before any app code runs.

@@ -4,6 +4,79 @@
   font-size: var(--ui-body);
   line-height: 1.6;
 }
+/* Reserve the first viewport through loading, failure and populated states.
+   Longer content can grow naturally without clipping or nested scrolling. */
+.public-primary {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.public-primary > .public-heading,
+.public-primary > .public-steps {
+  width: 100%;
+}
+.public-live-region {
+  flex: 1;
+  width: 100%;
+}
+.public-session .protocol-loading {
+  text-align: center;
+  color: var(--ui-muted);
+  padding-block: var(--ui-space-8);
+  margin: 0;
+}
+.public-workspace .protocol-panel.genesis-panel {
+  max-width: 54rem;
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+  align-items: start;
+  gap: var(--ui-space-8);
+}
+.genesis-artwork { margin: 0; }
+.genesis-artwork img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+}
+.genesis-artwork figcaption {
+  color: var(--ui-muted);
+  font-size: var(--ui-caption);
+  text-align: center;
+  margin-top: var(--ui-space-3);
+}
+.genesis-details {
+  display: grid;
+  gap: var(--ui-space-4);
+  min-width: 0;
+}
+.genesis-panel .genesis-details > h2,
+.genesis-panel .genesis-details > p,
+.genesis-panel .genesis-details > dl { margin: 0; }
+.genesis-panel .genesis-terms {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--ui-space-4);
+}
+.genesis-terms > div:last-child { grid-column: 1 / -1; }
+.genesis-panel .genesis-terms dd { margin: 0; }
+.genesis-voting-rule {
+  padding-block: var(--ui-space-4);
+  border-block: 1px solid var(--ui-line);
+}
+@media (max-width: 759px) {
+  .genesis-panel .genesis-terms { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .public-workspace .protocol-panel.genesis-panel {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--ui-space-6);
+  }
+  .genesis-artwork {
+    width: min(100%, 18rem);
+    margin-inline: auto;
+  }
+}
 .public-heading {
   text-align: center;
   max-width: 42rem;

@@ -1,0 +1,246 @@
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.37;
+
+import {ManekinekoGenesisV14} from "./ManekinekoGenesisV14.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {ManekinekoV12Policy} from "./ManekinekoV12Policy.sol";
+import {ManekinekoRoundV13} from "./ManekinekoRoundV13.sol";
+import {ManekinekoRoundDeployerV13} from "./ManekinekoRoundDeployerV13.sol";
+import {ManekinekoRendererV11} from "./ManekinekoRendererV11.sol";
+import {ManekinekoVotingV14} from "./ManekinekoVotingV14.sol";
+import {ManekinekoWinnerCreditsV9} from "./ManekinekoWinnerCreditsV9.sol";
+import {ManekinekoHolderRewardsV13} from "./ManekinekoHolderRewardsV13.sol";
+
+/// @title Tincta seasons with a free Genesis collection before paid voting
+/// @dev Reading order: constructor -> bind dependencies -> append catalog -> sealCatalog.
+/// Sealing opens Genesis; after 24 hours anyone may prepare paid collection one.
+/// Each paid round then owns its sales, randomness, claims and refunds. This controller
+/// cannot edit those rounds. Paid rounds retain their V13 source/version and split:
+/// 60% prizes, 20% qualified affiliates, 10% season holders, 10% protocol treasury.
+/// @notice Immutable season order, deadline openings and a bounded permissionless preparation step.
+/// The operator publishes/seals the catalog once. No account can pause or rewrite a live collection.
+/// Preparation/funding occurs BETWEEN sales; no database, X post or operator activation gates minting.
+contract ManekinekoSeasonControllerV14 is ReentrancyGuard {
+    struct CollectionPlan {
+        bytes32 seasonId;
+        string seasonName;
+        string name;
+        string symbol;
+        string color;
+        string textColor;
+    }
+    /// @dev Operating budgets fund randomness/sponsored mints separately from participant payments.
+    struct Settings {
+        address operator;
+        address coordinator;
+        address credits;
+        bytes32 keyHash;
+        uint16 confirmations;
+        uint32 callbackGas;
+        uint48 votingDuration;
+        uint48 votingDelay;
+        uint256 randomnessBudget;
+        uint256 sponsorshipBudget;
+        bool bootstrapAllowed;
+    }
+    string public constant CONTRACT_VERSION = "season-controller-v14";
+    address public immutable operator;
+    ManekinekoVotingV14 public immutable voting;
+    ManekinekoRendererV11 public immutable renderer;
+    ManekinekoWinnerCreditsV9 public immutable credits;
+    ManekinekoRoundDeployerV13 public deployer;
+    ManekinekoHolderRewardsV13 public holderRewards;
+    ManekinekoGenesisV14 public genesis;
+    Settings public settings;
+    CollectionPlan[] private catalog;
+    ManekinekoVotingV14.Terms[] private choices;
+    mapping(bytes32 => uint256) public seasonCollectionCount;
+    mapping(bytes32 => uint256) public seasonFirstRound;
+    mapping(bytes32 => uint256) public seasonLastRound;
+    mapping(bytes32 => bytes32) public seasonNameHash;
+    mapping(uint256 => address) public rounds;
+    uint256 public roundCount;
+    bool public catalogSealed;
+    uint256 public constant AFFILIATE_POSITIONS = 10;
+    event CatalogCollectionAdded(uint256 indexed index, bytes32 indexed seasonId, string name);
+    event CatalogSealed(uint256 collectionCount, bytes32 optionsHash);
+    event RoundCreated(uint256 indexed roundId, address indexed round, address indexed roundOwner);
+    event SeasonCollectionCreated(bytes32 indexed seasonId, uint256 indexed roundId, address indexed round, uint256 seasonPosition, string seasonName);
+    event CollectionPrepared(uint256 indexed roundId, address indexed round, uint48 voteStart, uint48 voteEnd);
+    event OperatingFundsReceived(address indexed funder, uint256 amount);
+    event CollectionSettled(uint256 indexed roundId, address indexed round, uint256 operatorProceeds, address nextRound);
+    error Unauthorized();
+    error InvalidConfiguration();
+    error CatalogLocked();
+    error SaleStillOpen();
+    error GenesisStillOpen();
+    error InsufficientOperatingFunds();
+    error CatalogComplete();
+    error CollectionChanged();
+    error OperatorProceedsChanged();
+    error InvalidOperatingTopUp();
+    error DrawNeedsProgress();
+
+    constructor(Settings memory config, ManekinekoVotingV14.Terms[] memory candidates) {
+        if (config.operator == address(0) || config.credits.code.length == 0 || config.coordinator.code.length == 0 ||
+            config.votingDuration < 1 hours || config.votingDuration > 7 days || config.votingDelay < 60 ||
+            config.votingDelay > 1 days || config.randomnessBudget == 0 || candidates.length == 0 || candidates.length > 8)
+            revert InvalidConfiguration();
+        operator = config.operator;
+        settings = config;
+        credits = ManekinekoWinnerCreditsV9(config.credits);
+        if (keccak256(bytes(credits.WINNER_CREDITS_VERSION())) != keccak256("winner-credits-v9") || credits.owner() != config.operator)
+            revert InvalidConfiguration();
+        if (config.bootstrapAllowed && (address(credits.previousRegistry()) != address(0) ||
+            credits.legacyMerkleRoot() != bytes32(0))) revert InvalidConfiguration();
+        voting = new ManekinekoVotingV14(address(this), config.bootstrapAllowed);
+        renderer = new ManekinekoRendererV11();
+        for (uint256 i; i < candidates.length; ++i) {
+            voting.validateTerms(candidates[i]);
+            for (uint256 j; j < i; ++j) if (keccak256(abi.encode(candidates[i])) == keccak256(abi.encode(candidates[j]))) revert InvalidConfiguration();
+            choices.push(candidates[i]);
+        }
+    }
+    modifier onlyOperator() { if (msg.sender != operator) revert Unauthorized(); _; }
+    receive() external payable { emit OperatingFundsReceived(msg.sender, msg.value); }
+    function catalogCount() external view returns (uint256) { return catalog.length; }
+    function collectionPlan(uint256 index) external view returns (CollectionPlan memory) { return catalog[index]; }
+    function optionCount() external view returns (uint256) { return choices.length; }
+    function option(uint256 index) external view returns (ManekinekoVotingV14.Terms memory) { return choices[index]; }
+    /// @notice ETH required to prepare one paid collection; this is not its NFT mint price.
+    function preparationCost() public view returns (uint256) { return settings.randomnessBudget + settings.sponsorshipBudget + ManekinekoV12Policy.EXECUTION_REWARD; }
+    /// @notice Bind the paid-round creation template once, before the catalog becomes immutable.
+    function bindDeployer(address candidate) external onlyOperator {
+        if (catalogSealed || address(deployer) != address(0) || candidate.code.length == 0 ||
+            ManekinekoRoundDeployerV13(candidate).factory() != address(this)) revert InvalidConfiguration();
+        deployer = ManekinekoRoundDeployerV13(candidate);
+    }
+    /// @notice Bind the free collection and its voting source together, before either opens.
+    function bindGenesis(address candidate) external onlyOperator {
+        if (catalogSealed || address(genesis) != address(0) || candidate.code.length == 0) revert InvalidConfiguration();
+        ManekinekoGenesisV14 g = ManekinekoGenesisV14(candidate);
+        if (g.controller() != address(this) || address(g.voting()) != address(voting) ||
+            g.MAX_SUPPLY() != 1000 || g.MINT_DURATION() != 24 hours || g.startsAt() != 0 ||
+            keccak256(bytes(g.CONTRACT_VERSION())) != keccak256("genesis-v14")) revert InvalidConfiguration();
+        genesis = g;
+        voting.bindGenesis(candidate);
+    }
+    /// @notice Bind a vault with the fixed 10% allocation and first-5%-of-NFTs claim coverage.
+    function bindHolderRewards(address candidate) external onlyOperator {
+        if (catalogSealed || address(holderRewards) != address(0) || candidate.code.length == 0 ||
+            address(ManekinekoHolderRewardsV13(candidate).controller()) != address(this) ||
+            ManekinekoHolderRewardsV13(candidate).COVERAGE_BPS() != 500 ||
+            ManekinekoHolderRewardsV13(candidate).HOLDER_BPS() != 1000) revert InvalidConfiguration();
+        holderRewards = ManekinekoHolderRewardsV13(candidate);
+    }
+    /// @notice Batch uploads preserve the exact submitted identities/order. Immutable after sealing.
+    function appendCollections(CollectionPlan[] calldata plans) external onlyOperator {
+        if (catalogSealed) revert CatalogLocked();
+        if (plans.length == 0 || plans.length > 10 || catalog.length + plans.length > 256) revert InvalidConfiguration();
+        for (uint256 i; i < plans.length; ++i) {
+            CollectionPlan calldata p = plans[i];
+            if (p.seasonId == bytes32(0) || bytes(p.symbol).length == 0 || bytes(p.symbol).length > 16 || seasonCollectionCount[p.seasonId] >= 10)
+                revert InvalidConfiguration();
+            renderer.validateAppearance(p.seasonName, p.name, p.color, p.textColor);
+            bytes32 nameHash = keccak256(bytes(p.seasonName));
+            if (seasonCollectionCount[p.seasonId] != 0 && (seasonNameHash[p.seasonId] != nameHash || catalog[catalog.length - 1].seasonId != p.seasonId))
+                revert InvalidConfiguration();
+            seasonNameHash[p.seasonId] = nameHash;
+            ++seasonCollectionCount[p.seasonId];
+            if (seasonFirstRound[p.seasonId] == 0) seasonFirstRound[p.seasonId] = catalog.length + 1;
+            seasonLastRound[p.seasonId] = catalog.length + 1;
+            catalog.push(p);
+            emit CatalogCollectionAdded(catalog.length - 1, p.seasonId, p.name);
+        }
+    }
+    /// @notice Historical sources must already be registered in the compatible credits registry.
+    /// Import is setup-only and disables any assumption of a fresh first-season eligibility exemption.
+    function importVotingSource(address source) external onlyOperator {
+        if (catalogSealed || settings.bootstrapAllowed) revert CatalogLocked();
+        (address factory, uint256 id, uint256 sequence,, bytes32 codeHash,) = credits.collections(source);
+        if (sequence == 0 || source.codehash != codeHash || credits.approvedFactoryCodeHash(factory) != factory.codehash) revert InvalidConfiguration();
+        (bool ok, bytes memory result) = factory.staticcall(abi.encodeWithSignature("rounds(uint256)", id));
+        if (!ok || abi.decode(result, (address)) != source) revert InvalidConfiguration();
+        voting.registerLegacySource(source);
+    }
+    /// @notice Freeze all catalog identities/options and open the free mint in the same transaction.
+    /// @dev Finish setup and explorer publication before calling this: the 24-hour clock cannot pause.
+    function sealCatalog() external onlyOperator {
+        if (catalogSealed || catalog.length == 0 || address(deployer) == address(0) || address(holderRewards) == address(0) || address(genesis) == address(0) || !credits.factoriesSealed() ||
+            credits.approvedFactoryCodeHash(address(this)) != address(this).codehash)
+            revert InvalidConfiguration();
+        if (settings.bootstrapAllowed && credits.collectionCount() != 0) revert InvalidConfiguration();
+        catalogSealed = true;
+        genesis.open();
+        emit CatalogSealed(catalog.length, keccak256(abi.encode(choices)));
+    }
+    /// @notice Anyone can prepare the next predetermined collection after the preceding sale closes.
+    /// It deploys/registers/funds atomically before publishing a vote deadline. No authority remains to delay opening.
+    function prepareNext() external payable nonReentrant returns (address round) {
+        if (msg.value != 0) emit OperatingFundsReceived(msg.sender, msg.value);
+        return _prepareNext();
+    }
+    /// @notice One operator transaction settles the latest outcome and prepares the next ballot.
+    /// All steps revert together. Expected identity/proceeds prevent a stale approval from settling another round.
+    /// The exact optional top-up is separate from the full 10% payment and every protected mint liability.
+    function settleAndPrepare(uint256 expectedRoundId, uint256 expectedOperatorProceeds)
+        external payable onlyOperator nonReentrant returns (address nextRound)
+    {
+        if (!catalogSealed) revert CatalogLocked();
+        if (expectedRoundId == 0 || expectedRoundId != roundCount) revert CollectionChanged();
+        ManekinekoRoundV13 previous = ManekinekoRoundV13(rounds[expectedRoundId]);
+        bool successful = previous.soldOut() && !previous.refundsAvailable();
+        if (!successful && !previous.refundsAvailable()) revert SaleStillOpen();
+        uint256 needed = roundCount < catalog.length ? preparationCost() : 0;
+        uint256 balanceBefore = address(this).balance - msg.value;
+        uint256 shortfall = needed > balanceBefore ? needed - balanceBefore : 0;
+        if (msg.value != shortfall) revert InvalidOperatingTopUp();
+        if (msg.value != 0) emit OperatingFundsReceived(msg.sender, msg.value);
+        if (successful && !previous.revealed()) {
+            previous.finalizeDraw(previous.MAX_DRAW_ATTEMPTS());
+            // Permissionless finalizeDraw remains available to persist a rejected batch's progress.
+            if (!previous.revealed()) revert DrawNeedsProgress();
+        }
+        uint256 proceeds = previous.operatorWithdrawable();
+        if (proceeds != expectedOperatorProceeds) revert OperatorProceedsChanged();
+        if (proceeds != 0 || (previous.executionRecipient() == operator && previous.executionReserve() != 0))
+            previous.withdrawOperatorToOperator();
+        if (roundCount < catalog.length) nextRound = _prepareNext();
+        emit CollectionSettled(expectedRoundId, address(previous), proceeds, nextRound);
+    }
+    // Genesis never becomes a paid catalog entry. roundCount is global across seasons,
+    // so its voting exception applies once, not again at the start of each season.
+    function _prepareNext() private returns (address round) {
+        if (!catalogSealed) revert CatalogLocked();
+        if (roundCount == catalog.length) revert CatalogComplete();
+        if (roundCount == 0 && block.timestamp < genesis.endsAt()) revert GenesisStillOpen();
+        if (roundCount != 0) {
+            ManekinekoRoundV13 previous = ManekinekoRoundV13(rounds[roundCount]);
+            if (!previous.readyForNextRound() && !previous.refundsAvailable()) revert SaleStillOpen();
+        }
+        if (address(this).balance < preparationCost()) revert InsufficientOperatingFunds();
+        CollectionPlan storage p = catalog[roundCount];
+        uint48 start = uint48(block.timestamp) + settings.votingDelay;
+        uint48 end = start + settings.votingDuration;
+        ManekinekoRoundV13.Config memory config = ManekinekoRoundV13.Config(p.name, p.symbol, p.seasonId, p.seasonName, p.color, p.textColor,
+            roundCount + 1, operator, address(voting), address(holderRewards), settings.coordinator, settings.keyHash, settings.confirmations, settings.callbackGas, AFFILIATE_POSITIONS, end);
+        round = deployer.deploy(config, address(renderer));
+        rounds[++roundCount] = round;
+        voting.openBallot(round, choices, start, end, roundCount);
+        credits.registerCollection(address(this), roundCount);
+        ManekinekoRoundV13(round).fundRandomness{value: settings.randomnessBudget}();
+        ManekinekoRoundV13(round).fundExecution{value: ManekinekoV12Policy.EXECUTION_REWARD}();
+        if (settings.sponsorshipBudget != 0) credits.fundCollection{value: settings.sponsorshipBudget}(round);
+        uint256 position;
+        for (uint256 i = roundCount; i != 0 && catalog[i - 1].seasonId == p.seasonId; --i) ++position;
+        emit RoundCreated(roundCount, round, operator);
+        emit SeasonCollectionCreated(p.seasonId, roundCount, round, position, p.seasonName);
+        emit CollectionPrepared(roundCount, round, start, end);
+    }
+    /// @notice Recover only unused controller operating funds, never any collection's liabilities.
+    function withdrawOperatingFunds(uint256 amount) external onlyOperator nonReentrant {
+        if (roundCount != catalog.length || amount == 0 || amount > address(this).balance) revert InvalidConfiguration();
+        (bool ok,) = payable(operator).call{value: amount}("");
+        if (!ok) revert InvalidConfiguration();
+    }
+}

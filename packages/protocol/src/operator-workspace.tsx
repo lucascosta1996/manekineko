@@ -34,10 +34,11 @@ export function OperatorWorkspace({ state, catalog, disabled, operator, actions,
   return <div className="operator-workspace">
     <section className="operator-position" aria-labelledby="position-title">
       <p className="protocol-eyebrow" id="position-title">Current onchain position</p>
-      <h2>{state ? active?.name ?? (state.count ? 'Loading catalog…' : 'Ready for the first collection') : 'Deployment not connected'}</h2>
+      <h2>{state ? active?.name ?? (state.count ? 'Loading catalog…' : state.genesis && !state.canPrepare ? 'Genesis free mint' : 'Ready for the first collection') : 'Deployment not connected'}</h2>
       <p>{state ? `${current?.name ?? 'Catalog'} · ${state.count ? phaseLabel[state.latestPhase ?? 0] : state.sealed ? 'Catalog sealed' : 'Catalog setup required'}` : 'The catalog below is a preparation plan. It does not represent live collections or pending wallet approvals.'}</p>
       {state && <dl className="operator-metrics"><div><dt>Collections prepared</dt><dd>{state.count} / {state.catalogCount}</dd></div><div><dt>Operating funds</dt><dd>{formatEther(state.operatingBalance)} ETH</dd></div><div><dt>Next preparation</dt><dd>{formatEther(state.cost)} ETH + gas</dd></div></dl>}
     </section>
+    {state?.genesis && !state.count && <section className="protocol-panel"><h2>Before the first season</h2><p>Tincta Genesis · {String(state.genesis.minted)} / 1,000 minted · one free mint per wallet.</p><p>{state.genesis.end ? `Free mint ends ${new Date(Number(state.genesis.end) * 1000).toLocaleString()}.` : "The 24-hour free mint opens when the catalog is sealed."} The first paid collection can be prepared after this window ends, including if the free mint sells out early.</p><p className="protocol-note">Genesis NFTs vote only on the first paid ballot. They are outside the season catalog and holder pool.</p></section>}
     <div className="operator-columns">
       <section className="operator-queue" aria-labelledby="signatures-title">
         <div className="operator-section-heading"><h2 id="signatures-title">Pending signatures</h2><span>{state ? primary.length : '—'}</span></div>

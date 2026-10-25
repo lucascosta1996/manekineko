@@ -4,9 +4,13 @@ import { visualNow } from '../../apps/web/test/visual-data';
 import ca from '../../packages/contracts/src/ManekinekoSeasonControllerV12.json';
 import ra from '../../packages/contracts/src/ManekinekoRoundV12.json';
 import va from '../../packages/contracts/src/ManekinekoVotingV12.json';
+import ca14 from '../../packages/contracts/src/ManekinekoSeasonControllerV14.json';
+import ga from '../../packages/contracts/src/ManekinekoGenesisV14.json';
+import va14 from '../../packages/contracts/src/ManekinekoVotingV14.json';
 import ca13 from '../../packages/contracts/src/ManekinekoSeasonControllerV13.json';
 import ha from '../../packages/contracts/src/ManekinekoHolderRewardsV13.json';
 import wa from '../../packages/contracts/src/ManekinekoWinnerCreditsV8.json';
+export const G = '0x' + '99'.repeat(20);
 export const C = '0x' + '11'.repeat(20),
   V = '0x' + '22'.repeat(20),
   W = '0x' + '33'.repeat(20),
@@ -15,11 +19,11 @@ export const C = '0x' + '11'.repeat(20),
   T = '0x' + '66'.repeat(20),
   P = '0x' + '88'.repeat(20),
   H = '0x' + '77'.repeat(32);
-export async function rpc(page: Page, phase = 0, badPin = false, settings: { deadline?: number; canFinalize?: boolean; operatingBalance?: string; randomnessDeadline?: number; drawTimeout?: boolean; duration?: number; affiliateId?: number; claimed?: boolean; legacy?: boolean; count?: number; holderState?: "locked" | "open" | "exhausted" | "empty"; holderClaimed?: boolean; holderOwner?: string; holderBadPin?: boolean; holderAllocationBps?: number } = {}) {
+export async function rpc(page: Page, phase = 0, badPin = false, settings: { genesis?: "open" | "closed" | "full" | "ballot"; genesisMinted?: boolean; genesisBadPin?: boolean; deadline?: number; canFinalize?: boolean; operatingBalance?: string; randomnessDeadline?: number; drawTimeout?: boolean; duration?: number; affiliateId?: number; claimed?: boolean; legacy?: boolean; count?: number; holderState?: "locked" | "open" | "exhausted" | "empty"; holderClaimed?: boolean; holderOwner?: string; holderBadPin?: boolean; holderAllocationBps?: number } = {}) {
   const now = Math.floor(Date.parse(visualNow) / 1000),
     start = phase === 0 ? now + 3600 : now - 3600,
     deadline = settings.deadline ?? (phase === 7 ? now - 60 : now + 80000);
-  const interfaces = [new Interface(ca), new Interface(ra), new Interface(va), new Interface(wa), new Interface(ca13), new Interface(ha)];
+  const interfaces = [new Interface(ca), new Interface(ra), new Interface(va), new Interface(wa), new Interface(ca13), new Interface(ha), new Interface(ca14), new Interface(ga), new Interface(va14)];
   await page.route('https://v12.fixture.invalid/**', async (route) => {
     const raw = route.request().postDataJSON();
     const answer = (q: any) => {
@@ -27,7 +31,7 @@ export async function rpc(page: Page, phase = 0, badPin = false, settings: { dea
       if (q.method === 'eth_getTransactionCount') result = '0x0';
       else if (q.method === 'eth_getTransactionByHash') result = null;
       else if (q.method === 'eth_chainId') result = '0xaa36a7';
-      else if (q.method === 'eth_getCode') result = badPin || (settings.holderBadPin && q.params[0].toLowerCase() === P.toLowerCase()) ? '0x6001' : '0x6000';
+      else if (q.method === 'eth_getCode') result = badPin || (settings.genesisBadPin && q.params[0].toLowerCase() === G.toLowerCase()) || (settings.holderBadPin && q.params[0].toLowerCase() === P.toLowerCase()) ? '0x6001' : '0x6000';
       else if (q.method === 'eth_getBalance') result = toQuantity(parseEther(settings.operatingBalance ?? '1'));
       else if (q.method === 'eth_blockNumber') result = '0x10';
       else if (q.method === 'eth_getBlockByNumber')
@@ -60,14 +64,15 @@ export async function rpc(page: Page, phase = 0, badPin = false, settings: { dea
             voting: [V],
             credits: [W],
             catalogSealed: [true],
-            roundCount: [settings.count ?? (settings.holderState ? settings.holderState === 'locked' ? 8 : 10 : 2)],
+            roundCount: [settings.count ?? (settings.genesis ? settings.genesis === "ballot" ? 1 : 0 : undefined) ?? (settings.holderState ? settings.holderState === 'locked' ? 8 : 10 : 2)],
             catalogCount: [settings.holderState ? 10 : 3],
             preparationCost: [parseEther('0.04')],
             bootstrapAllowed: [false],
             legacySourceCount: [settings.legacy ? 1 : 0],
             legacySources: [R],
             rounds: [call.args.length > 0 && call.args[0] === 1n ? R : T],
-            CONTRACT_VERSION: [settings.holderState ? q.params[0].to.toLowerCase() === P.toLowerCase() ? 'holder-rewards-v13' : 'affiliate-v13' : 'affiliate-v12'],
+            CONTRACT_VERSION: [settings.genesis ? q.params[0].to.toLowerCase() === G.toLowerCase() ? 'genesis-v14' : q.params[0].to.toLowerCase() === P.toLowerCase() ? 'holder-rewards-v13' : 'affiliate-v13' : settings.holderState ? q.params[0].to.toLowerCase() === P.toLowerCase() ? 'holder-rewards-v13' : 'affiliate-v13' : 'affiliate-v12'],
+            genesis: [G], MAX_SUPPLY: [1000], MINT_DURATION: [86400], startsAt: [settings.genesis === 'closed' || settings.genesis === 'ballot' ? now - 86500 : now - 3600], endsAt: [settings.genesis === 'closed' || settings.genesis === 'ballot' ? now - 100 : now + 82800], mintOpen: [settings.genesis === 'open'], hasMinted: [settings.genesisMinted ?? false],
             holderRewards: [P], controller: [C], HOLDER_BPS: [settings.holderAllocationBps ?? 1000], COVERAGE_BPS: [500], seasonId: [H],
             fundedCollection: [settings.holderState !== 'empty'], claimed: [settings.holderClaimed ?? false],
             summary: [[settings.holderState === 'empty' ? 0 : parseEther('10'), settings.holderState === 'empty' ? 0 : 10000, settings.holderState === 'empty' ? 0 : 500, settings.holderState === 'empty' ? 0 : parseEther('0.02'), settings.holderState === 'exhausted' ? 500 : settings.holderState === 'open' ? 123 : 0, settings.holderState === 'exhausted' ? parseEther('10') : settings.holderState === 'open' ? parseEther('2.46') : 0, 10, settings.holderState === 'locked' ? 7 : 10, settings.holderState !== 'locked']],
@@ -78,7 +83,7 @@ export async function rpc(page: Page, phase = 0, badPin = false, settings: { dea
             maxSupply: [1000],
             mintPrice: [parseEther('0.01')],
             winnerCount: [6],
-            totalMinted: [phase === 0 ? 0 : (phase >= 2 && phase <= 6) || settings.drawTimeout ? 1000 : 250],
+            totalMinted: [settings.genesis && q.params[0].to.toLowerCase() === G.toLowerCase() ? settings.genesis === "full" ? 1000 : 128 : phase === 0 ? 0 : (phase >= 2 && phase <= 6) || settings.drawTimeout ? 1000 : 250],
             soldOutAt: [settings.drawTimeout ? now - 259260 : phase >= 2 && phase <= 6 ? now - 120 : 0],
             randomnessDeadline: [settings.randomnessDeadline ?? (settings.drawTimeout ? now - 60 : phase >= 2 && phase <= 6 ? now + 259080 : 0)],
             executionReserve: [parseEther('0.01')],

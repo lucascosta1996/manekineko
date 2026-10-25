@@ -1,4 +1,5 @@
 export type DocBlock =
+  | { type: "genesis-artwork"; caption: string }
   | { type: "paragraph"; text: string }
   | { type: "list"; ordered?: boolean; items: string[] }
   | { type: "callout"; title: string; text: string }
@@ -31,6 +32,7 @@ export const docHref = (slug: string) => slug === "overview" ? "/docs" : `/docs/
 export function docSearchEntry(page: DocPage): DocSearchEntry {
   const text = page.sections.flatMap(section => [section.title, ...section.blocks.flatMap(block => {
     switch (block.type) {
+      case "genesis-artwork": return ["Tincta Genesis", block.caption];
       case "paragraph": return [block.text];
       case "callout": return [block.title, block.text];
       case "list": return block.items;

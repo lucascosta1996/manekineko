@@ -272,3 +272,12 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 .holder-calculation strong { font-weight: 500; }
 @media (max-width: 959px) { .holder-section { column-gap: var(--ui-space-8); } }
 @media (max-width: 759px) { .holder-section { grid-template-columns: minmax(0,1fr); } }
+
+.genesis-intro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: var(--ui-space-8); padding-block: var(--ui-section-space); border-top: 1px solid var(--ui-line); }
+.genesis-intro figure { margin: 0; }
+.genesis-intro figcaption { text-align: center; color: var(--ui-muted); font-size: var(--ui-caption); }
+.genesis-intro-copy { display: grid; gap: var(--ui-space-5); }
+.genesis-intro-copy h2, .genesis-intro-copy p { margin: 0; }
+.genesis-intro-copy .genesis-note { color: var(--ui-muted); font-size: var(--ui-caption); }
+.genesis-intro-copy .ui-button { justify-self: start; }
+@media (max-width: 720px) { .genesis-intro { grid-template-columns: 1fr; } }

@@ -41,7 +41,7 @@ const stageDescriptions = [
   "Randomness is recorded. The results are fixed; anyone can complete the draw to make rewards claimable.",
   "The draw is complete. See every winning ticket and claim any rewards belonging to your wallet.",
   "Every ticket prize has been claimed. View the results or check for an unclaimed affiliate reward.",
-  "The collection is refundable. The current NFT holder can return a ticket for its full mint price.",
+  "The collection is refundable. The current NFT holder can return a ticket for its full mint price at any time. Refunds do not expire.",
 ];
 
 export function PublicWorkspace({
@@ -52,6 +52,7 @@ export function PublicWorkspace({
   status,
   onSelect,
   vote,
+  genesis,
   mint,
   affiliates,
   awards,
@@ -70,6 +71,7 @@ export function PublicWorkspace({
   status: ReactNode;
   onSelect: (id: number) => void;
   vote: ReactNode;
+  genesis?: ReactNode;
   mint: ReactNode;
   affiliates: ReactNode;
   awards: ReactNode;
@@ -79,7 +81,7 @@ export function PublicWorkspace({
   explorer: (address: string) => string;
   controller?: string;
   holders?: ReactNode;
-  protocolVersion?: 12 | 13;
+  protocolVersion?: 12 | 13 | 14;
 }) {
   const r = state?.round;
   const step = r
@@ -95,6 +97,7 @@ export function PublicWorkspace({
   const query = r ? `?collection=${r.id}` : "";
   return (
     <div className="protocol-page public-workspace" data-view={view}>
+      <div className="public-primary">
       <header className="public-heading">
         <p className="protocol-eyebrow">
           {r
@@ -106,23 +109,23 @@ export function PublicWorkspace({
             ? "Your rewards."
             : view === "affiliates"
             ? "Grow the collection."
-            : r?.name ?? "Your next move, onchain."}
+            : r?.name ?? (state?.genesis ? "The first vote starts here." : "Your next move, onchain.")}
         </h1>
         <p>
-          {view === "holders" ? (protocolVersion === 13 ? "Follow the season pool. At season end, the first 5% of eligible NFTs to claim share the rewards equally." : "This collection does not include season holder rewards. Check its prize and affiliate rewards instead.") : view === "claims"
+          {view === "holders" ? (protocolVersion >= 13 ? "Follow the season pool. At season end, the first 5% of eligible NFTs to claim share the rewards equally." : "This collection does not include season holder rewards. Check its prize and affiliate rewards instead.") : view === "claims"
             ? "See the winners. Claim prizes and refunds directly from the collection."
             : view === "affiliates"
             ? "Enroll, share your link and claim your equal share of the affiliate pool."
             : r
             ? beforeVote
               ? "The next collection is prepared. Voting begins at its onchain opening time."
-              : protocolVersion === 13 && [5, 6].includes(r.phase)
+              : protocolVersion >= 13 && [5, 6].includes(r.phase)
               ? "The draw is complete. Check winning-ticket and affiliate claims now; season holder claims open after every collection settles, while slots remain."
               : stageDescriptions[r.phase]
-            : "Vote on the next collection. Mint a ticket. Follow the draw. Everything starts here."}
+            : state?.genesis ? "Start with a free NFT. Help choose the first paid collection." : "Vote on the next collection. Mint a ticket. Follow the draw. Everything starts here."}
         </p>
       </header>
-      {view === "home" && (
+      {view === "home" && !(state?.genesis && !r) && (
         <ol className="public-steps" aria-label="Collection lifecycle">
           {["Vote", "Mint", "Draw", r?.phase === 7 ? "Refund" : "Claim"].map(
             (label, i) => (
@@ -138,6 +141,7 @@ export function PublicWorkspace({
           )}
         </ol>
       )}
+      <div className="public-live-region">
       <div className="public-session">{status}</div>
       {!configured && (
         <section className="public-empty">
@@ -160,7 +164,9 @@ export function PublicWorkspace({
           </Link>
         </section>
       )}
-      {state && !r && (
+      {view === "home" && state?.genesis && !r && genesis}
+      {view !== "home" && state?.genesis && !r && <section className="public-empty"><h2>The free mint comes first.</h2><p>Genesis NFTs vote only on the first paid collection. They have no prize, affiliate or holder reward entitlement.</p><Link className={buttonClassName({ variant: "secondary" })} href="/">View free mint</Link></section>}
+      {state && !r && !state.genesis && (
         <section className="public-empty">
           <h2>The first collection is next.</h2>
           <p>
@@ -330,6 +336,7 @@ export function PublicWorkspace({
           {view === "holders" && holders}
         </>
       )}
+      </div>
       <nav className="public-shortcuts" aria-label="Your collection actions">
         {view !== "holders" && <Link className={buttonClassName({ variant: "secondary" })} href={`/holders${query}`}>Season holder rewards</Link>}
         {view !== "home" && (
@@ -354,31 +361,33 @@ export function PublicWorkspace({
           </Link>
         )}
       </nav>
+      </div>
       <section className="public-explainer" aria-label="How a collection works">
+        {state?.genesis && !r && <p className="protocol-note">Paid season allocations · Genesis NFTs have no reward entitlement.</p>}
         <dl className="public-allocation-grid">
           <div><dt>60% · Winning tickets</dt><dd>Equal prizes for the winning NFTs after a successful draw.</dd></div>
           <div><dt>20% · Qualified affiliates</dt><dd>Shared equally by affiliates with at least one paid referral.</dd></div>
-          {protocolVersion === 13 && <div><dt>10% · Holder rewards</dt><dd>A season pool for the first 5% of eligible NFTs to claim.</dd></div>}
-          <div><dt>{protocolVersion === 13 ? "10%" : "20%"} · Protocol treasury</dt><dd>For infrastructure costs, future functionality and Tincta projects.</dd></div>
+          {protocolVersion >= 13 && <div><dt>10% · Holder rewards</dt><dd>A season pool for the first 5% of eligible NFTs to claim.</dd></div>}
+          <div><dt>{protocolVersion >= 13 ? "10%" : "20%"} · Protocol treasury</dt><dd>For infrastructure costs, future functionality and Tincta projects.</dd></div>
         </dl>
         {!configured && <p className="public-explainer-note">Planned for Tincta seasons. Check the selected collection’s published terms before participating.</p>}
         <Disclosure title="How it works · Voting, prizes and refunds">
           <div className="public-rules-grid">
-            <section><h3>1. Vote &amp; mint</h3><p>Voting selects the collection’s price, supply, winner count and mint duration. Mint price is always at least 0.01 ETH. Voted supply is 1,000–65,536 NFTs, with up to 20 primary mints per recipient.</p><p>Voting opens at the scheduled time; its deadline opens minting without another operator signature. The next collection needs a preparation transaction after this collection’s outcome. No one can pause a live collection.</p></section>
+            <section><h3>1. Vote &amp; mint</h3><p>Voting selects the collection’s price, supply, winner count and mint duration. Paid collection mint prices are at least 0.01 ETH. Voted supply is 1,000–65,536 NFTs, with up to 20 primary mints per recipient.</p><p>Voting opens at the scheduled time; its deadline opens minting without another operator signature. The next collection needs a preparation transaction after this collection’s outcome. No one can pause a live collection.</p></section>
             <section><h3>2. Follow the draw</h3><p>After sellout, verified randomness selects the winning NFTs. Their current holders claim equal shares of the 60% prize pool directly from the contract.</p><p>Prize, earned affiliate and refund obligations stay protected.</p><Link className={textActionClassName()} href="/docs/prizes">Read the prize rules</Link></section>
             <section><h3>3. Check refund eligibility</h3><p>If the collection is still unsold at its mint deadline, holders can burn their NFT to receive its full original mint price.</p><p>A sold-out collection becomes refundable if no randomness is recorded within 72 hours of sellout. On-time recorded randomness commits the draw permanently. A timer alone never grants a refund. Gas and secondary-market price differences are excluded.</p><Link className={textActionClassName()} href="/docs/refunds">Read the refund rules</Link></section>
             <section><h3>Affiliate rewards</h3><p>Affiliates need at least one paid referral. The 20% affiliate pool is shared equally among those who qualify, after draw finalization. With no qualified affiliates, the unused pool follows the contract’s operator recovery rule.</p><Link className={textActionClassName()} href="/docs/affiliates">Read the affiliate rules</Link></section>
-            {protocolVersion === 13 && <section className="public-rules-holder"><h3>Season holder rewards</h3><p>Each successful draw sends 10% of actual mint revenue to its season’s holder pool. Voting selects prices and supplies, so pool totals and ETH rewards vary by season. The allocation percentages stay fixed.</p><p>Holder claims unlock when every planned collection in the season has drawn or become refundable. Only NFTs from successful draws qualify, including winners. The first 5% of eligible NFTs to claim, rounded down, share the final pool equally. Each NFT can claim once through its current owner, in onchain execution order. Transfers do not reset a used claim. The operator cannot withdraw this pool.</p><Link className={textActionClassName()} href="/docs/holder-rewards">Read the holder reward rules</Link></section>}
+            {protocolVersion >= 13 && <section className="public-rules-holder"><h3>Season holder rewards</h3><p>Each successful draw sends 10% of actual mint revenue to its season’s holder pool. Voting selects prices and supplies, so pool totals and ETH rewards vary by season. The allocation percentages stay fixed.</p><p>Holder claims unlock when every planned collection in the season has drawn or become refundable. Only NFTs from successful draws qualify, including winners. The first 5% of eligible NFTs to claim, rounded down, share the final pool equally. Each NFT can claim once through its current owner, in onchain execution order. Transfers do not reset a used claim. The operator cannot withdraw this pool.</p><Link className={textActionClassName()} href="/docs/holder-rewards">Read the holder reward rules</Link></section>}
           </div>
           <Link className={textActionClassName()} href="/docs">Read the full rules</Link>
         </Disclosure>
       </section>
       {state && controller && (
         <p className="public-verification protocol-note">
-          {stale ? "Last verified" : "Verified"} at block {state.block}.{" "}
+          {stale ? "Last contract state check" : "Contract state checked"} at block {state.block}.{" "}
           <a
             className={textActionClassName({ inline: true })}
-            href={explorer(controller)}
+            href={`${explorer(controller)}#code`}
             target="_blank"
             rel="noreferrer"
           >
@@ -390,7 +399,7 @@ export function PublicWorkspace({
               ·{" "}
               <a
                 className={textActionClassName({ inline: true })}
-                href={explorer(r.address)}
+                href={`${explorer(r.address)}#code`}
                 target="_blank"
                 rel="noreferrer"
               >

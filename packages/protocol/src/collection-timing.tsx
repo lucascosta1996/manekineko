@@ -37,14 +37,14 @@ export function CollectionTiming({
         aria-label={`Collection timing: ${r.name}`}
       >
         <p className="protocol-note">{timing.label}</p>
-        <p className="public-timer" role="timer" aria-live="off">
+        <p className="public-timer" role={r.phase === 7 ? undefined : "timer"} aria-live="off">
           {timing.value}
         </p>
         <p>{timing.detail}</p>
-        <p className="protocol-note">
+        {r.phase !== 7 && <p className="protocol-note">
           Estimated from the latest verified block. The contract determines
           availability.
-        </p>
+        </p>}
       </section>
     );
   return (
@@ -55,11 +55,11 @@ export function CollectionTiming({
       <p className="protocol-note">
         {r.name} · {timing.label}
       </p>
-      <p className="operator-timing-value" role="timer" aria-live="off">
+      <p className="operator-timing-value" role={r.phase === 7 ? undefined : "timer"} aria-live="off">
         {timing.value}
       </p>
       <p>{timing.detail}</p>
-      {!timing.unavailable && r.randomnessDeadline > 0n && (
+      {!timing.unavailable && r.phase !== 7 && r.randomnessDeadline > 0n && (
         <p className="protocol-note">
           Randomness cutoff:{" "}
           {new Date(Number(r.randomnessDeadline) * 1000)
@@ -75,7 +75,7 @@ export function CollectionTiming({
           separately from mint receipts.
         </p>
       )}
-      {!timing.unavailable && (
+      {!timing.unavailable && r.phase !== 7 && (
         <p className="protocol-note">
           Timing estimated from verified block {state.block}. Contract state
           determines availability.

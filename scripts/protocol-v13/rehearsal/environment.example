@@ -1,0 +1,8 @@
+# Store the real environment outside Git, mode 600. Never put keys in chat.
+V13_REHEARSAL_RPC_URL=https://FIRST_INDEPENDENT_SEPOLIA_RPC
+V13_REHEARSAL_SECONDARY_RPC_URL=https://SECOND_INDEPENDENT_SEPOLIA_RPC
+V13_REHEARSAL_VAULT_KEY=64_HEX_CHARACTERS_FROM_32_RANDOM_BYTES
+# Existing immutable V13 operator; not the user's Opera funding wallet.
+V13_REHEARSAL_OPERATOR_KEY=PRIVATE_OPERATOR_KEY
+# Absolute mode-700 private directory, shared by every run for this operator.
+V13_REHEARSAL_OPERATOR_LOCK=/ABSOLUTE/PRIVATE/DIRECTORY/v13-operator.lock

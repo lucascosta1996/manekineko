@@ -89,12 +89,23 @@ export const docPages: DocPage[] = withDocVisuals([
     "minutes": 3,
     "sections": [
       {
+        "id": "genesis",
+        "title": "The free mint before the first season",
+        "blocks": [
+          { "type": "genesis-artwork", "caption": "The first vote. A minimal geometric identity generated and stored entirely onchain. Each NFT carries its own token number." },
+          { "type": "paragraph", "text": "The planned launch introduces Tincta Genesis before any paid collection: 1,000 free NFTs, one lifetime primary mint per wallet, and a fixed 24-hour window. The mint price is 0 ETH; holders pay network gas. Transferring an NFT does not reset the sender’s mint limit. Genesis is a separate collection outside the paid season catalog." },
+          { "type": "paragraph", "text": "The first paid ballot can be prepared only after the full free-mint window ends, even if all free NFTs mint early. Each Genesis NFT held at that ballot’s ownership snapshot grants one vote. A transfer after the snapshot creates no extra vote. Genesis votes expire after this first paid ballot, including unused votes; they do not renew at the start of another season." },
+          { "type": "paragraph", "text": "Genesis NFTs receive no prize, affiliate eligibility, sponsored mint credit or season holder reward entitlement. Later voting uses NFTs from successfully revealed paid collections. The first paid collection’s separately configured no-NFT affiliate enrollment exception is unchanged. An empty free mint or a ballot with no votes still uses the published fallback option." },
+          { "type": "paragraph", "text": "Genesis is being tested on Sepolia. Mainnet minting has not launched. Existing contracts keep their original rules and cannot gain Genesis eligibility. Check the app’s configured network and contract before participating." }
+        ]
+      },
+      {
         "id": "vote",
         "title": "One eligible NFT, one vote",
         "blocks": [
           {
             "type": "paragraph",
-            "text": "Voting power is the number of eligible NFTs you held immediately before voting opened. Only previously successful, revealed and fully backed official collections qualify. Transferring an NFT after that snapshot does not give its recipient another vote."
+            "text": "Voting power is the number of eligible NFTs you held immediately before voting opened. Genesis NFTs qualify only for the first paid ballot. Otherwise, only previously successful, revealed and fully backed official paid collections qualify. Transferring an NFT after that snapshot does not give its recipient another vote."
           },
           {
             "type": "paragraph",
@@ -102,7 +113,7 @@ export const docPages: DocPage[] = withDocVisuals([
           },
           {
             "type": "paragraph",
-            "text": "Mint price is at least 0.01 ETH. Supply is 1,000–65,536 NFTs and remains fixed once minting opens. Mint duration is 1–24 hours. Equal winning NFTs number 1–10, excluding 7 and 9 because the prize allocation must divide exactly."
+            "text": "For paid collections, mint price is at least 0.01 ETH. Supply is 1,000–65,536 NFTs and remains fixed once minting opens. Mint duration is 1–24 hours. Equal winning NFTs number 1–10, excluding 7 and 9 because the prize allocation must divide exactly."
           },
           {
             "type": "paragraph",
@@ -276,18 +287,18 @@ export const docPages: DocPage[] = withDocVisuals([
   },
   {
     "slug": "refunds",
-    "title": "Refund an expired ticket",
-    "description": "Full mint-price refunds for unsold collections or the fixed randomness timeout.",
+    "title": "Claim a refund",
+    "description": "Full mint-price refunds with no claim deadline once the collection becomes refundable.",
     "group": "Participate",
     "minutes": 3,
     "sections": [
       {
         "id": "deadline",
-        "title": "Refunds begin at the deadline",
+        "title": "Refunds begin at the deadline and never expire",
         "blocks": [
           {
             "type": "paragraph",
-            "text": "If the mint deadline is reached without sellout, the current NFT holder can claim the full mint price by burning that ticket. No operator cancellation or approval is required. The holder pays transaction gas."
+            "text": "If the mint deadline is reached without sellout, the current NFT holder can claim the full mint price by burning that ticket. Once available, refunds never expire: there is no claim deadline, including after later collections or seasons begin. No operator cancellation or approval is required. The holder pays transaction gas."
           },
           {
             "type": "paragraph",

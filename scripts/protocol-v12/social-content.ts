@@ -5,7 +5,7 @@ export const SOCIAL_TEMPLATE_VERSION = 'v12-v13-ligature-open-3';
 export const STAGES = ['prepared', 'voting', 'opening', 'soldout', 'draw-ready', 'draw-refunds', 'refunds', 'revealed', 'paid'] as const;
 export type Stage = typeof STAGES[number];
 export type LifecycleInput = {
-  version?: 12 | 13; prefix: string; name: string; id: number; link: string; now: bigint; voteStart: bigint; saleStart: bigint;
+  version?: 12 | 13 | 14; prefix: string; name: string; id: number; link: string; now: bigint; voteStart: bigint; saleStart: bigint;
   deadline: bigint; sold: boolean; revealed: boolean; paid: boolean; randomnessDeadline: bigint; randomnessReceived: boolean;
 };
 const copy: Record<Stage, { text: string; header: string; headline: string[]; detail: string }> = {
@@ -19,10 +19,10 @@ const copy: Record<Stage, { text: string; header: string; headline: string[]; de
   revealed: { text: 'Results finalized. Winning NFT holders and qualified affiliates can claim their allocated rewards.', header: 'RESULTS FINALIZED', headline: ['Results', 'finalized.'], detail: 'Winning NFTs share 60% equally; qualified affiliates share 20% equally.' },
   paid: { text: 'All winning ticket prizes have been claimed. Affiliate claims have their own status.', header: 'PRIZES CLAIMED', headline: ['Prizes', 'claimed.'], detail: 'All winning ticket prizes were claimed onchain.' },
 };
-function stageCopy(stage: Stage, version: 12 | 13 = 12) {
-  if (version !== 12 && version !== 13) throw new Error('Unsupported social protocol version.');
-  if (version === 13 && stage === 'opening') return { ...copy[stage], detail: '60% prizes · 20% affiliates · 10% season holders · 10% protocol treasury.' };
-  if (version === 13 && stage === 'draw-refunds') return { ...copy[stage], detail: 'No reward allocations. Mint funds back full mint-price refunds.' };
+function stageCopy(stage: Stage, version: 12 | 13 | 14 = 12) {
+  if (version !== 12 && version !== 13 && version !== 14) throw new Error('Unsupported social protocol version.');
+  if (version >= 13 && stage === 'opening') return { ...copy[stage], detail: '60% prizes · 20% affiliates · 10% season holders · 10% protocol treasury.' };
+  if (version >= 13 && stage === 'draw-refunds') return { ...copy[stage], detail: 'No reward allocations. Mint funds back full mint-price refunds.' };
   return copy[stage];
 }
 export function lifecycleMessages(input: LifecycleInput) {
@@ -39,7 +39,7 @@ export function lifecycleMessages(input: LifecycleInput) {
   }));
 }
 export function socialImage(input: {
-  version?: 12 | 13; chainId: 1 | 11155111; stage: Stage; season: SeasonSocialIdentity; collection: SeasonSocialCollection; timestamp: number; text: string;
+  version?: 12 | 13 | 14; chainId: 1 | 11155111; stage: Stage; season: SeasonSocialIdentity; collection: SeasonSocialCollection; timestamp: number; text: string;
 }): SeasonSocialMessage {
   const content = stageCopy(input.stage, input.version);
   return {

@@ -69,3 +69,6 @@
   .studio-wordmark { width: var(--ui-brand-wordmark); }
 }
 @media (prefers-reduced-motion: reduce) { html:has(.studio) { scroll-behavior: auto; } }
+
+.studio-genesis-art { margin: 0; }
+.studio-genesis-art figcaption { text-align: center; color: var(--ui-muted); font-size: var(--ui-caption); }

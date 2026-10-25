@@ -18,7 +18,8 @@
     "./rewards-brand": "./src/rewards-brand.tsx",
     "./rewards-artwork": "./src/rewards-artwork.tsx",
     "./links": "./src/links.ts",
-    "./styles.css": "./src/styles.css"
+    "./styles.css": "./src/styles.css",
+    "./genesis-artwork": "./src/genesis-artwork.tsx"
   },
   "peerDependencies": {
     "react": "^19.0.0",

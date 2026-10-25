@@ -134,7 +134,9 @@ test('Launch countdown reaches zero without inventing refunds from a cached live
   await expect(page.getByText(/Mint deadline reached\. Checking whether/)).toBeVisible();
   await expect(page.getByText('Refunds available',{exact:true})).toHaveCount(0);
   await rpc(page,7);await page.clock.runFor(12000);
-  await expect(page.getByText('Fictional voting study · Refunds available for',{exact:true})).toBeVisible();
+  await expect(page.getByText('Fictional voting study · Refunds available',{exact:true})).toBeVisible();
+  await expect(page.locator('.operator-timing').getByText('No expiration',{exact:true})).toBeVisible();
+  await expect(page.locator('.operator-timing').getByRole('timer')).toHaveCount(0);
 });
 test('Launch shows progress fallback and disables stale timing',async({page})=>{
   await prepare(page);await rpc(page,4,false,{canFinalize:false});await page.clock.resume();

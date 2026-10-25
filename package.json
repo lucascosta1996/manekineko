@@ -89,7 +89,19 @@
     "protocol:v13:social": "node --import tsx scripts/protocol-v13/social.ts",
     "protocol:v13:executor": "node --import tsx scripts/protocol-v13/executor.mts",
     "protocol:v13:previews": "node --import tsx scripts/protocol-v12/preview-social.mts --v13",
-    "protocol:workers:typecheck": "tsc --noEmit --target es2022 --module esnext --moduleResolution bundler --allowImportingTsExtensions --resolveJsonModule --esModuleInterop --skipLibCheck scripts/protocol-v12/runtime.ts scripts/protocol-v12/executor.mts scripts/protocol-v12/social.ts scripts/protocol-v12/preview-social.mts scripts/protocol-v13/executor.mts scripts/protocol-v13/social.ts"
+    "protocol:workers:typecheck": "tsc --noEmit --target es2022 --module esnext --moduleResolution bundler --allowImportingTsExtensions --resolveJsonModule --esModuleInterop --skipLibCheck scripts/protocol-v12/runtime.ts scripts/protocol-v12/executor.mts scripts/protocol-v12/social.ts scripts/protocol-v12/preview-social.mts scripts/protocol-v13/executor.mts scripts/protocol-v13/social.ts scripts/protocol-v13/rehearsal/*.mts scripts/protocol-v14/*.mts scripts/protocol-v14/social.ts scripts/protocol-v14/rehearsal/*.mts",
+    "protocol:v13:rehearsal:build": "npm run contracts:compile && node --import tsx scripts/protocol-v13/rehearsal/build.mts",
+    "protocol:v13:rehearsal:test": "node --import tsx --test scripts/protocol-v13/rehearsal/rehearsal.test.mts && npm run test --workspace @manekineko/contracts -- test/ProtocolV13Rehearsal.ts",
+    "protocol:v14:verify": "npm run contracts:compile && node --import tsx scripts/protocol-v14/verify-deployment.mts",
+    "protocol:v14:test": "npm run test --workspace @manekineko/contracts -- test/ProtocolV14.ts",
+    "protocol:v14:executor": "node --import tsx scripts/protocol-v14/executor.mts",
+    "protocol:v14:social": "node --import tsx scripts/protocol-v14/social.ts",
+    "protocol:v14:release-check": "npm run contracts:compile && node --import tsx scripts/protocol-v14/verify-deployment.mts",
+    "protocol:v14:sources:test": "node --import tsx --test scripts/protocol-v14/source-publication.test.mts",
+    "protocol:v14:sources": "node --import tsx scripts/protocol-v14/watch-sources.mts",
+    "protocol:v14:rehearsal:build": "npm run contracts:compile && node --import tsx scripts/protocol-v14/rehearsal/build.mts",
+    "protocol:v14:rehearsal:test": "node --import tsx --test scripts/protocol-v14/rehearsal/rehearsal.test.mts && npm run test --workspace @manekineko/contracts -- test/ProtocolV14Rehearsal.ts",
+    "protocol:v14:deploy:sepolia": "npm run contracts:compile && node --import tsx scripts/protocol-v14/deploy-sepolia.mts"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.11.1",
@@ -97,7 +109,8 @@
     "esbuild": "0.28.2",
     "playwright-core": "1.58.2",
     "postcss": "8.5.6",
-    "turbo": "2.10.12"
+    "turbo": "2.10.12",
+    "undici": "6.28.1"
   },
   "overrides": {
     "solc": {

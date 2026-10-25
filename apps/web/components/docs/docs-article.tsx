@@ -1,3 +1,4 @@
+import { GenesisArtwork } from "@manekineko/ui/genesis-artwork";
 import { Icon } from "@manekineko/ui/icons";
 import Link from "next/link";
 import { docPages } from "../../lib/docs/content";
@@ -7,6 +8,7 @@ import { DocsVisual } from "./docs-visual";
 
 function Block({ block, sectionTitle }: { block: DocBlock; sectionTitle: string }) {
   switch (block.type) {
+    case "genesis-artwork": return <div className="docs-genesis-preview"><GenesisArtwork /><p>{block.caption}</p></div>;
     case "flow": case "formula": case "allocation": return <DocsVisual block={block} />;
     case "paragraph": return <p>{block.text}</p>;
     case "list": {
