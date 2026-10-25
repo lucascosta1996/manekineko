@@ -4,7 +4,7 @@ The latest local protocol implementation is **V13**, pending public deployment. 
 
 ## Current guides
 
-- [V13 allocations, dynamic season amounts and holder claims](season-holder-rewards-v13.md): 60/20/8/12, first-5% coverage, settlement unlock, current-owner claims and verification boundaries
+- [V13 allocations, dynamic season amounts and holder claims](season-holder-rewards-v13.md): 60/20/10/10, first-5% coverage, settlement unlock, current-owner claims and verification boundaries
 - [V12 governance](deadline-governance-v12.md): inherited voting, deadlines, mint limits and refunds; its 60/20/20 allocation applies only to V12
 - [Versioned contract behavior](contracts.md) and [permanent NFT identity](permanent-combinations-v10.md)
 - Participant guides are authored in [Web documentation content](../apps/web/lib/docs/content.ts) and served at `/docs`, including `/docs/holder-rewards`.

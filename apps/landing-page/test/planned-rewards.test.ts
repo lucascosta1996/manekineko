@@ -13,10 +13,10 @@ test("catalog example applies a 20% affiliate pool to every collection", () => {
     winningNftCount: 1296,
     prizePoolEth: "1296",
     affiliatePoolEth: "432",
-    holderPoolEth: "172.8",
+    holderPoolEth: "216",
     holderClaimSlots: 10800,
-    holderRewardEth: "0.016",
-    communityPoolEth: "1900.8",
+    holderRewardEth: "0.02",
+    communityPoolEth: "1944",
   });
   assert.deepEqual(JSON.parse(JSON.stringify(plannedRewards)), plannedRewards);
 });
@@ -30,10 +30,10 @@ test("the six-collection final season contributes only its actual editions", () 
     winningNftCount: 36,
     prizePoolEth: "36",
     affiliatePoolEth: "12",
-    holderPoolEth: "4.8",
+    holderPoolEth: "6",
     holderClaimSlots: 300,
-    holderRewardEth: "0.016",
-    communityPoolEth: "52.8",
+    holderRewardEth: "0.02",
+    communityPoolEth: "54",
   });
 });
 
@@ -48,9 +48,9 @@ test("the fixed pool does not change after the pilot seasons", () => {
 test("ten-collection holder illustration preserves the separate season calculation", () => {
   const example = summarizePlannedRewards([seasons[0]!]);
   assert.equal(example.collectionCount, 10);
-  assert.equal(example.holderPoolEth, "8");
+  assert.equal(example.holderPoolEth, "10");
   assert.equal(example.holderClaimSlots, 500);
-  assert.equal(example.holderRewardEth, "0.016");
+  assert.equal(example.holderRewardEth, "0.02");
 });
 test("an empty example has no holder slots or invented reward", () => {
   const empty = summarizePlannedRewards([]);

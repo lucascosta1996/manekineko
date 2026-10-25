@@ -74,7 +74,7 @@ test("current guides preserve economic floors, holder claims and deployment boun
   const text = (slug: string) => docSearchEntry(docPages.find(page => page.slug === slug)!).text;
   assert.match(text("onchain-voting"), /0.01 ETH/);
   assert.match(text("onchain-voting"), /1,000–65,536/);
-  assert.match(text("onchain-voting"), /treasury allocation stays 12%/);
+  assert.match(text("onchain-voting"), /treasury allocation stays 10%/);
   assert.match(text("onchain-voting"), /infrastructure costs, future functionality and Tincta projects/);
   assert.match(text("overview"), /unconfigured deployment is not a live sale/);
   assert.match(text("prizes"), /Only the current holder can claim/);
@@ -91,6 +91,7 @@ test("diagrams and formulas are included in search and explain the draw's bounda
   assert.doesNotMatch(entries.map(entry => entry.text + entry.description).join(' '), /\bV\d+\b/);
   const allocation = docPages[0].sections.flatMap(section => section.blocks).find(block => block.type === 'allocation');
   assert.ok(allocation?.type === 'allocation');
+  assert.deepEqual(allocation.items.map(item => item.share), [60, 20, 10, 10]);
   assert.equal(allocation.items.reduce((sum, item) => sum + item.share, 0), 100);
   const holders = entries.find(entry => entry.slug === 'holder-rewards')!.text;
   assert.match(holders, /L is greater than zero/);

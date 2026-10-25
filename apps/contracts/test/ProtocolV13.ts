@@ -153,8 +153,15 @@ async function nonWinner(c: Context) {
 }
 describe("V13 protected season holder rewards", function () {
   this.timeout(120000);
-  it("keeps 100% reserved until a successful draw, then funds exactly 60/20/8/12", async () => {
+  it("keeps 100% reserved until a successful draw, then funds exactly 60/20/10/10", async () => {
     const c = await loadFixture(fixture);
+    const allocations = await Promise.all([
+      c.round.prizeBps(), c.round.affiliatePoolBps(),
+      c.round.holderPoolBps(), c.round.operatorBps(),
+    ]);
+    expect(allocations).deep.equal([6000n, 2000n, 1000n, 1000n]);
+    expect(allocations.reduce((sum, share) => sum + share, 0n)).equal(10000n);
+    expect(await c.pool.HOLDER_BPS()).equal(allocations[2]);
     expect(await c.round.protectedBalance()).equal(price * 1000n + price);
     expect((await c.pool.summary(season)).funded).equal(0);
     expect(await c.round.operatorWithdrawable()).equal(0);
@@ -162,15 +169,15 @@ describe("V13 protected season holder rewards", function () {
     expect(await c.round.prizeAmount()).equal(ethers.parseEther("6"));
     expect(await c.round.affiliateClaimable(1)).equal(ethers.parseEther("2"));
     expect(await c.round.operatorWithdrawable()).equal(
-      ethers.parseEther("1.2")
+      ethers.parseEther("1")
     );
     expect(await ethers.provider.getBalance(await c.pool.getAddress())).equal(
-      ethers.parseEther("0.8")
+      ethers.parseEther("1")
     );
     expect(await c.round.protectedBalance()).equal(ethers.parseEther("8"));
     await c.round.withdrawOperator(
       c.operator.address,
-      ethers.parseEther("1.2")
+      ethers.parseEther("1")
     );
     await expect(
       c.round.withdrawOperator(c.operator.address, 1)
@@ -206,7 +213,7 @@ describe("V13 protected season holder rewards", function () {
     expect(state.settledCollections).equal(2);
     expect(state.eligibleNfts).equal(1000);
     expect(state.claimLimit).equal(50);
-    expect(state.rewardPerNft).equal(ethers.parseEther("0.016"));
+    expect(state.rewardPerNft).equal(ethers.parseEther("0.02"));
     expect(await c.round.claimedAwardCount()).equal(0);
     expect(await c.controller.roundCount()).equal(2);
   });
@@ -226,7 +233,7 @@ describe("V13 protected season holder rewards", function () {
     ).revertedWithCustomError(c.pool, "NotTokenHolder");
     await expect(
       c.pool.connect(c.other).claim(address, token, c.other.address)
-    ).changeEtherBalance(ethers, c.other, ethers.parseEther("0.016"));
+    ).changeEtherBalance(ethers, c.other, ethers.parseEther("0.02"));
     await c.round
       .connect(c.other)
       .transferFrom(c.other.address, c.buyer.address, token);
@@ -356,10 +363,10 @@ describe("V13 protected season holder rewards", function () {
     await second.finalizeDraw(8);
     const final = await c.pool.summary(season);
     expect(final.unlocked).equal(true);
-    expect(final.funded).equal(ethers.parseEther("1.6"));
+    expect(final.funded).equal(ethers.parseEther("2"));
     expect(final.eligibleNfts).equal(2000);
     expect(final.claimLimit).equal(100);
-    expect(final.rewardPerNft).equal(ethers.parseEther("0.016"));
+    expect(final.rewardPerNft).equal(ethers.parseEther("0.02"));
     await c.controller.prepareNext();
     expect((await c.pool.summary(ethers.id("Other season"))).unlocked).equal(
       false
@@ -388,10 +395,10 @@ describe("V13 protected season holder rewards", function () {
     const provisional = (await readProtocol(ethers.provider, config, 1))
       .holders!;
     expect(provisional.unlocked).equal(false);
-    expect(provisional.funded).equal(ethers.parseEther("0.8"));
+    expect(provisional.funded).equal(ethers.parseEther("1"));
     expect(provisional.eligibleNfts).equal(1000);
     expect(provisional.claimLimit).equal(50);
-    expect(provisional.rewardPerNft).equal(ethers.parseEther("0.016"));
+    expect(provisional.rewardPerNft).equal(ethers.parseEther("0.02"));
 
     async function prepareVotedCollection(id: number, choice: number) {
       await c.controller.prepareNext();
@@ -436,12 +443,12 @@ describe("V13 protected season holder rewards", function () {
     expect(await second.totalMintRevenue()).equal(ethers.parseEther("40"));
     expect(await second.prizeAmountForRank(1)).equal(ethers.parseEther("6"));
     expect(await second.affiliatePoolAmount()).equal(ethers.parseEther("8"));
-    expect(await second.operatorWithdrawable()).equal(ethers.parseEther("4.8"));
+    expect(await second.operatorWithdrawable()).equal(ethers.parseEther("4"));
     const firstSeason = (await readProtocol(ethers.provider, config, 2))
       .holders!;
-    const firstPayout = ethers.parseEther("4") / 150n;
+    const firstPayout = ethers.parseEther("5") / 150n;
     expect(firstSeason.unlocked).equal(true);
-    expect(firstSeason.funded).equal(ethers.parseEther("4"));
+    expect(firstSeason.funded).equal(ethers.parseEther("5"));
     expect(firstSeason.eligibleNfts).equal(3000);
     expect(firstSeason.claimLimit).equal(150);
     expect(firstSeason.rewardPerNft).equal(firstPayout);
@@ -468,7 +475,7 @@ describe("V13 protected season holder rewards", function () {
     expect(await third.totalMintRevenue()).equal(ethers.parseEther("30"));
     expect(await third.prizeAmountForRank(1)).equal(ethers.parseEther("1.8"));
     expect(await third.affiliatePoolAmount()).equal(ethers.parseEther("6"));
-    expect(await third.operatorWithdrawable()).equal(ethers.parseEther("3.6"));
+    expect(await third.operatorWithdrawable()).equal(ethers.parseEther("3"));
     const next = await readProtocol(
       ethers.provider,
       config,
@@ -476,22 +483,22 @@ describe("V13 protected season holder rewards", function () {
       c.buyer.address
     );
     expect(next.holders!.unlocked).equal(true);
-    expect(next.holders!.funded).equal(ethers.parseEther("2.4"));
+    expect(next.holders!.funded).equal(ethers.parseEther("3"));
     expect(next.holders!.eligibleNfts).equal(1000);
     expect(next.holders!.claimLimit).equal(50);
-    expect(next.holders!.rewardPerNft).equal(ethers.parseEther("0.048"));
+    expect(next.holders!.rewardPerNft).equal(ethers.parseEther("0.06"));
     const tx = await holderClaimTransaction(
       ethers.provider,
       config,
       next,
       1n,
       c.buyer.address,
-      ethers.parseEther("0.048")
+      ethers.parseEther("0.06")
     );
     await expect(c.buyer.sendTransaction(tx)).changeEtherBalance(
       ethers,
       c.buyer,
-      ethers.parseEther("0.048")
+      ethers.parseEther("0.06")
     );
     const previous = (await readProtocol(ethers.provider, config, 1)).holders!;
     expect(previous.funded).equal(firstSeason.funded);
@@ -499,7 +506,7 @@ describe("V13 protected season holder rewards", function () {
     expect(previous.claims).equal(2);
     expect(previous.paid).equal(firstPayout * 2n);
     expect(await ethers.provider.getBalance(await c.pool.getAddress())).equal(
-      ethers.parseEther("6.4") - firstPayout * 2n - ethers.parseEther("0.048")
+      ethers.parseEther("8") - firstPayout * 2n - ethers.parseEther("0.06")
     );
   });
   it("rounds coverage and payouts down and retains protected wei dust", async () => {
@@ -547,16 +554,19 @@ describe("V13 protected season holder rewards", function () {
         .claim(await c.round.getAddress(), 1, c.buyer.address)
     ).revertedWithCustomError(c.pool, "InvalidCollection");
   });
-  it("atomically settles the 12% treasury while preserving the 8% holder allocation", async () => {
+  it("atomically settles the 10% treasury while preserving the 10% holder allocation", async () => {
     const c = await loadFixture(fixture);
     await c.vrf.fulfillRequest(await c.round.requestId(), 0);
     await expect(
       c.controller.settleAndPrepare(1, ethers.parseEther("2"))
     ).revertedWithCustomError(c.controller, "OperatorProceedsChanged");
-    await c.controller.settleAndPrepare(1, ethers.parseEther("1.2"));
-    expect(await c.round.operatorWithdrawn()).equal(ethers.parseEther("1.2"));
+    await expect(
+      c.controller.settleAndPrepare(1, ethers.parseEther("1.2"))
+    ).revertedWithCustomError(c.controller, "OperatorProceedsChanged");
+    await c.controller.settleAndPrepare(1, ethers.parseEther("1"));
+    expect(await c.round.operatorWithdrawn()).equal(ethers.parseEther("1"));
     expect((await c.pool.summary(season)).funded).equal(
-      ethers.parseEther("0.8")
+      ethers.parseEther("1")
     );
     expect(await c.controller.roundCount()).equal(2);
   });
@@ -588,7 +598,7 @@ describe("V13 protected season holder rewards", function () {
       state,
       1n,
       c.buyer.address,
-      ethers.parseEther("0.016")
+      ethers.parseEther("0.02")
     );
     expect(tx.to).equal(await c.pool.getAddress());
     await c.buyer.sendTransaction(tx);
@@ -606,7 +616,7 @@ describe("V13 protected season holder rewards", function () {
         after,
         1n,
         c.buyer.address,
-        ethers.parseEther("0.016")
+        ethers.parseEther("0.02")
       ),
       /already claimed/
     );
@@ -617,7 +627,7 @@ describe("V13 protected season holder rewards", function () {
         after,
         2n,
         c.other.address,
-        ethers.parseEther("0.016")
+        ethers.parseEther("0.02")
       ),
       /current owner/
     );

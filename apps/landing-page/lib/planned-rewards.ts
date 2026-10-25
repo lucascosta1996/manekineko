@@ -23,7 +23,7 @@ const COLLECTION_SUPPLY = 1_000n;
 const PRIZE_BPS = 6_000n;
 const AFFILIATE_BPS = 2_000n;
 const WINNERS_PER_COLLECTION = 6;
-const HOLDER_BPS = 800n;
+const HOLDER_BPS = 1000n;
 const HOLDER_COVERAGE_BPS = 500n;
 
 function formatEth(wei: bigint): string {
@@ -35,7 +35,7 @@ function formatEth(wei: bigint): string {
 }
 
 /** Minimum-term sellout illustration (1,000 NFTs at 0.01 ETH). Not collected funds.
- * Current seasons use 60/20/8/12 allocations. Voting chooses actual terms. */
+ * Current seasons use 60/20/10/10 allocations. Voting chooses actual terms. */
 export function summarizePlannedRewards(
   catalog: readonly PlannedSeason[],
 ): PlannedRewards {

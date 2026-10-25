@@ -10,7 +10,7 @@ The wallet account menu composes the shared Radix dialog, buttons, icons, badges
 
 Public Landing, Web, page metadata and all nine documentation guides describe the current Tincta design without release-number labels. Holder rewards remain honestly marked as planned for launch. Existing deployments still render their actual allocation and capabilities. Internal identifiers, environment variables, contract exports, retired components and historical engineering records retain their real versions.
 
-The guides now contain server-rendered, selectable and searchable diagrams for voting, mint review, collection outcomes, affiliates, holder claims, refunds and verification. Formula panels explain the 60/20/8/12 allocation, equal prizes, vote ties, affiliate division, season holder pool and claim slots, ordered winner sampling with rejection, and permanent four-number identities. Equations define their symbols, rounding and assumptions. The draw description distinguishes winner sampling from the deterministic losing-ticket order, and permanent identity from VRF scores.
+The guides now contain server-rendered, selectable and searchable diagrams for voting, mint review, collection outcomes, affiliates, holder claims, refunds and verification. Formula panels explain the allocation (updated to 60/20/10/10 on 2026-10-25), equal prizes, vote ties, affiliate division, season holder pool and claim slots, ordered winner sampling with rejection, and permanent four-number identities. Equations define their symbols, rounding and assumptions. The draw description distinguishes winner sampling from the deterministic losing-ticket order, and permanent identity from VRF scores.
 
 ## Implementation anchors
 

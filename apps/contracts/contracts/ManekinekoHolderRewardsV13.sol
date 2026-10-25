@@ -23,7 +23,7 @@ interface IHolderRoundV13 {
 /// No administrator, withdrawal, pause, deadline extension or replacement pool.
 contract ManekinekoHolderRewardsV13 is ReentrancyGuard {
     string public constant CONTRACT_VERSION = "holder-rewards-v13";
-    uint256 public constant HOLDER_BPS = 800;
+    uint256 public constant HOLDER_BPS = 1000;
     uint256 public constant COVERAGE_BPS = 500;
     uint256 public constant BPS_DENOMINATOR = 10_000;
     IHolderControllerV13 public immutable controller;

@@ -6,8 +6,8 @@ const visuals: Record<string, Record<string, DocBlock[]>> = {
     items: [
       { label: "Winning NFTs", share: 60, text: "Equal prizes, claimed by each winning NFT’s current holder." },
       { label: "Qualified affiliates", share: 20, text: "Equal shares for enrolled affiliates with a paid referral." },
-      { label: "Season holders", share: 8, text: "A separate pool, locked until the whole season settles." },
-      { label: "Protocol treasury", share: 12, text: "For infrastructure costs, future functionality and Tincta projects." },
+      { label: "Season holders", share: 10, text: "A separate pool, locked until the whole season settles." },
+      { label: "Protocol treasury", share: 10, text: "For infrastructure costs, future functionality and Tincta projects." },
     ], caption: "This allocation applies after a successful draw. Before finalization, mint receipts stay reserved; refundable collections return the full mint price. Holder rewards are planned for launch.",
   }] },
   "onchain-voting": { vote: [{
@@ -55,12 +55,12 @@ const visuals: Record<string, Record<string, DocBlock[]>> = {
     note: "With no qualifiers, no affiliate share is payable. An unused pool or division dust stays in the separate unused affiliate reserve; it is not an earned commission.",
   }] },
   "holder-rewards": { "dynamic-amounts": [{
-    type: "formula", title: "From season contributions to equal claims", equations: ["P = Σ (Rᵢ × 8%)", "E = Σ Nᵢ", "L = ⌊ E × 5% ⌋", "Reward per NFT = ⌊ P ÷ L ⌋"],
+    type: "formula", title: "From season contributions to equal claims", equations: ["P = Σ (Rᵢ × 10%)", "E = Σ Nᵢ", "L = ⌊ E × 5% ⌋", "Reward per NFT = ⌊ P ÷ L ⌋"],
     definitions: [{ symbol: "Rᵢ, Nᵢ", meaning: "Mint revenue in wei and minted NFT count for each successfully drawn collection in this season." }, { symbol: "P, E", meaning: "The final funded pool and total eligible NFTs. Refundable collections add neither." }, { symbol: "L", meaning: "The fixed number of successful claim slots, counting NFTs rather than wallets." }, { symbol: "Σ, ⌊x⌋", meaning: "Add the successful collections; round down to an integer. ETH payouts round down to whole wei." }],
     note: "Only calculate a payout when L is greater than zero. An entirely refundable season has no claims. After unlock, claims reduce the remaining slots and ETH without changing the reward per NFT. Rounding dust stays in the pool.",
   }], claims: [{
     type: "flow", title: "The season holder claim path", steps: [
-      { title: "Successful draws contribute", text: "Each successful collection adds 8% of mint revenue and its NFTs to the season’s pool accounting." },
+      { title: "Successful draws contribute", text: "Each successful collection adds 10% of mint revenue and its NFTs to the season’s pool accounting." },
       { title: "Every collection settles", text: "Each planned collection must finish its draw or become refundable. Outstanding prize or refund claims do not delay unlock." },
       { title: "The current owner claims", text: "The contract verifies an eligible NFT, unused claim and remaining slot before paying the equal amount." },
     ], caption: "First come means onchain execution order. Ownership, a website review or a pending transaction does not reserve a claim slot.",

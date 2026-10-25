@@ -20,7 +20,7 @@ export const docPages: DocPage[] = withDocVisuals([
           },
           {
             "type": "paragraph",
-            "text": "Tincta seasons allocate 60% of mint revenue to winning NFTs, 20% to qualified affiliates, 8% to season holder rewards and 12% to the protocol treasury for infrastructure costs, future functionality and Tincta projects. These rules are planned for launch. Always review the terms of the selected collection before participating. These percentages cannot be voted away. Actual ETH allocations vary with the community-selected mint prices and supplies and the revenue received. All mint funds stay reserved until finalization. Unsold expiry or missing randomness at the fixed cutoff allows full mint-price refunds."
+            "text": "Tincta seasons allocate 60% of mint revenue to winning NFTs, 20% to qualified affiliates, 10% to season holder rewards and 10% to the protocol treasury for infrastructure costs, future functionality and Tincta projects. These rules are planned for launch. Always review the terms of the selected collection before participating. These percentages cannot be voted away. Actual ETH allocations vary with the community-selected mint prices and supplies and the revenue received. All mint funds stay reserved until finalization. Unsold expiry or missing randomness at the fixed cutoff allows full mint-price refunds."
           },
           {
             "type": "paragraph",
@@ -51,25 +51,25 @@ export const docPages: DocPage[] = withDocVisuals([
   {
     "slug": "holder-rewards",
     "title": "Season holder rewards",
-    "description": "The 8% season pool, 5% NFT coverage and first-come claims.",
+    "description": "The 10% season pool, 5% NFT coverage and first-come claims.",
     "group": "The protocol",
     "minutes": 5,
     "sections": [
       { "id": "pool", "title": "Not a winner, but still a holder?", "blocks": [
-        { "type": "paragraph", "text": "Tincta collections automatically send 8% of mint receipts to a separate season holder pool when a draw finalizes. This contract has no operator withdrawal. The 12% treasury allocation funds infrastructure costs, future functionality and Tincta projects. Season holder rewards are planned for launch. Check the selected collection’s terms and pool availability before participating." },
+        { "type": "paragraph", "text": "Tincta collections automatically send 10% of mint receipts to a separate season holder pool when a draw finalizes. This contract has no operator withdrawal. The 10% treasury allocation funds infrastructure costs, future functionality and Tincta projects. Season holder rewards are planned for launch. Check the selected collection’s terms and pool availability before participating." },
         { "type": "paragraph", "text": "The pool is locked until every collection in its sealed season has completed a successful draw or become refundable. Unpaid prizes and refunds do not delay the unlock. No calendar timer, website switch or operator approval releases the pool. Before completion, the page shows accumulated ETH, settled collections and provisional claim estimates. A season has at most ten collections. Preparing the next season is not required to unlock this one." }
       ]},
       { "id": "dynamic-amounts", "title": "Different seasons, different amounts", "blocks": [
-        { "type": "paragraph", "text": "The allocation percentages and 5% coverage are fixed. Voting selects each collection’s price and supply; successful mints determine the actual revenue and eligible NFT count. Each season adds its successful collections’ 8% contributions into its own pool. Pending and refundable collections do not inflate the funded balance." },
+        { "type": "paragraph", "text": "The allocation percentages and 5% coverage are fixed. Voting selects each collection’s price and supply; successful mints determine the actual revenue and eligible NFT count. Each season adds its successful collections’ 10% contributions into its own pool. Pending and refundable collections do not inflate the funded balance." },
         { "type": "paragraph", "text": "Claim slots equal 5% of the season’s eligible NFTs, rounded down. The ETH per claim equals the final pool divided by those slots, rounded down to whole wei. Estimates may change while collections are unsettled. Once the season ends, every successful claim receives the same final amount, even if individual NFTs had different mint prices. Claims reduce the remaining slots and available ETH; they do not change the amount paid to later claimants." },
         { "type": "table", "columns": ["Illustrative successful mints", "Result for that season"], "rows": [
-          ["1,000 at 0.01 ETH + 2,000 at 0.02 ETH", "4 ETH pool · 150 claim slots · 4 ETH ÷ 150 per claim, rounded down to wei"],
-          ["A separate season: 1,000 at 0.03 ETH", "2.4 ETH pool · 50 claim slots · 0.048 ETH per claim"]
+          ["1,000 at 0.01 ETH + 2,000 at 0.02 ETH", "5 ETH pool · 150 claim slots · 5 ETH ÷ 150 per claim, rounded down to wei"],
+          ["A separate season: 1,000 at 0.03 ETH", "3 ETH pool · 50 claim slots · 0.06 ETH per claim"]
         ] }
       ]},
       { "id": "claims", "title": "Equal rewards for the first 5%", "blocks": [
         { "type": "paragraph", "text": "Only NFTs from successfully drawn collections qualify, including winning NFTs. The first 5% of eligible NFTs to claim receive equal rewards. Claims are paid in onchain execution order until the fixed slots run out; a pending transaction reserves nothing. Eligible ownership does not guarantee a payment. There is no per-wallet claim limit." },
-        { "type": "paragraph", "text": "Claim slots equal the total eligible NFT count multiplied by 5%, rounded down. Each payout equals the final funded pool divided by the slots, rounded down to whole wei. For 10,000 eligible NFTs and an 8 ETH pool, the first 500 NFT claims each receive 0.016 ETH. This is an example, not a fixed payout. Any rounding dust stays in the pool." },
+        { "type": "paragraph", "text": "Claim slots equal the total eligible NFT count multiplied by 5%, rounded down. Each payout equals the final funded pool divided by the slots, rounded down to whole wei. For 10,000 eligible NFTs and a 10 ETH pool, the first 500 NFT claims each receive 0.02 ETH. This is an example, not a fixed payout. Any rounding dust stays in the pool." },
         { "type": "paragraph", "text": "The current owner submits the claim, once per NFT. Transfers carry any unclaimed opportunity; they never reset a completed claim. Approved NFT operators cannot claim on an owner’s behalf. Unclaimed winning NFTs remain transfer-locked until their ticket prize is claimed. Holder rewards do not consume a winning-ticket prize, affiliate claim or lifetime sponsored-mint benefit." },
         { "type": "paragraph", "text": "There is no claim expiry. At /holders, select a prepared collection, enter an NFT token ID and connect its current owner. Review the exact amount, network, collection and recipient before signing. The website checks current ownership, used claims and remaining slots again after review; the contract enforces them at execution." }
       ]},
@@ -106,7 +106,7 @@ export const docPages: DocPage[] = withDocVisuals([
           },
           {
             "type": "paragraph",
-            "text": "For illustration, a successful collection of 1,000 NFTs at 0.01 ETH collects 10 ETH: 6 ETH for prizes, 2 ETH for affiliates, 0.8 ETH for season holders and 1.2 ETH for the treasury. The treasury allocation stays 12%, intended to fund infrastructure costs, future functionality and Tincta projects."
+            "text": "For illustration, a successful collection of 1,000 NFTs at 0.01 ETH collects 10 ETH: 6 ETH for prizes, 2 ETH for affiliates, 1 ETH for season holders and 1 ETH for the treasury. The treasury allocation stays 10%, intended to fund infrastructure costs, future functionality and Tincta projects."
           },
           {
             "type": "paragraph",
@@ -332,7 +332,7 @@ export const docPages: DocPage[] = withDocVisuals([
           },
           {
             "type": "paragraph",
-            "text": "For settlement read phase, randomnessDeadline, randomnessReceived, executionReserve, executionRecipient, winningTokenIds, prizeClaimed, affiliateClaimable, refundsAvailable, operatorWithdrawable and protectedBalance. For permanent NFT identity read combination, tokenIdForCombination and tokenURI; score and scoreCombination require the finalized draw. Read holderRewards on the controller and collection to locate the pool. Its summary(seasonId) reports funded ETH, eligibleNfts, claimLimit, rewardPerNft, claims, paid, collections, settledCollections and unlocked. Check fundedCollection, claimed(collection, tokenId) and the NFT’s ownerOf before a holder claim. HOLDER_BPS is 800 and COVERAGE_BPS is 500; neither fixes an ETH amount."
+            "text": "For settlement read phase, randomnessDeadline, randomnessReceived, executionReserve, executionRecipient, winningTokenIds, prizeClaimed, affiliateClaimable, refundsAvailable, operatorWithdrawable and protectedBalance. For permanent NFT identity read combination, tokenIdForCombination and tokenURI; score and scoreCombination require the finalized draw. Read holderRewards on the controller and collection to locate the pool. Its summary(seasonId) reports funded ETH, eligibleNfts, claimLimit, rewardPerNft, claims, paid, collections, settledCollections and unlocked. Check fundedCollection, claimed(collection, tokenId) and the NFT’s ownerOf before a holder claim. HOLDER_BPS is 1000 and COVERAGE_BPS is 500; neither fixes an ETH amount."
           }
         ]
       },

@@ -31,7 +31,7 @@ const faqs = (plannedRewards: PlannedRewards) => [
   {
     question: "What is the protocol treasury for?",
     answer:
-      "For Tincta seasons, after a successful draw, 12% of mint revenue is allocated to the protocol treasury to fund infrastructure costs, future functionality and Tincta projects. Prize, earned affiliate and refund obligations remain protected. Another 8% funds a locked season holder pool for the first 5% of eligible NFTs to claim after season end. Season holder rewards are planned for launch. Refundable collections create no treasury or holder allocation from mint revenue.",
+      "For Tincta seasons, after a successful draw, 10% of mint revenue is allocated to the protocol treasury to fund infrastructure costs, future functionality and Tincta projects. Prize, earned affiliate and refund obligations remain protected. Another 10% funds a locked season holder pool for the first 5% of eligible NFTs to claim after season end. Season holder rewards are planned for launch. Refundable collections create no treasury or holder allocation from mint revenue.",
   },
   {
     question: "Can the team withdraw prizes, commissions or holder rewards?",
@@ -41,7 +41,7 @@ const faqs = (plannedRewards: PlannedRewards) => [
   {
     question: "How are season holder rewards calculated?",
     answer:
-      "Tincta reserves 8% of actual mint revenue from successfully drawn collections for that season. Claim slots equal 5% of the eligible NFTs, rounded down. The final pool divided by those slots gives the equal ETH payout, rounded down to whole wei. Voting changes mint prices and supplies, so neither the pool nor the payout is a fixed ETH amount. Estimates can change until every planned collection has drawn or become refundable. Each season has its own pool.",
+      "Tincta reserves 10% of actual mint revenue from successfully drawn collections for that season. Claim slots equal 5% of the eligible NFTs, rounded down. The final pool divided by those slots gives the equal ETH payout, rounded down to whole wei. Voting changes mint prices and supplies, so neither the pool nor the payout is a fixed ETH amount. Estimates can change until every planned collection has drawn or become refundable. Each season has its own pool.",
   },
   {
     question: "Who can claim from the holder pool?",
@@ -61,7 +61,7 @@ const faqs = (plannedRewards: PlannedRewards) => [
   {
     question: "How does community voting change the prizes?",
     answer:
-      "Eligible NFT holders vote for a published package of mint price, NFT supply, winner count, and mint duration. The option with the most votes sets the collection’s terms; ties and no-vote outcomes use the published fallback rules. After sellout and a successful draw, 60% of mint revenue is divided equally among the winning NFTs. A higher price or supply grows the pool; more winners divide it into smaller prizes. The 1 ETH illustration is neither a minimum nor a maximum. The 8% holder pool also follows actual successful mint revenue across the season; its 5% claim count and equal payout are calculated from the final eligible NFT count and pool. Voting changes these amounts, not the fixed allocation percentages. Review the final voted terms before minting.",
+      "Eligible NFT holders vote for a published package of mint price, NFT supply, winner count, and mint duration. The option with the most votes sets the collection’s terms; ties and no-vote outcomes use the published fallback rules. After sellout and a successful draw, 60% of mint revenue is divided equally among the winning NFTs. A higher price or supply grows the pool; more winners divide it into smaller prizes. The 1 ETH illustration is neither a minimum nor a maximum. The 10% holder pool also follows actual successful mint revenue across the season; its 5% claim count and equal payout are calculated from the final eligible NFT count and pool. Voting changes these amounts, not the fixed allocation percentages. Review the final voted terms before minting.",
   },
   {
     question: "How do I win a prize?",
@@ -271,7 +271,7 @@ export function LandingExperience({
             <div className="reward-metric holder-metric">
               <div className="metric-top"><Icon name="layers" /><span>HOLDER POOL EXAMPLE</span></div>
               <div className="metric-number">{plannedRewards.holderPoolEth} <span>ETH</span></div>
-              <p>8% across separate season pools. Example: {plannedRewards.holderClaimSlots.toLocaleString("en-US")} claims at <strong>{plannedRewards.holderRewardEth} ETH each.</strong></p>
+              <p>10% across separate season pools. Example: {plannedRewards.holderClaimSlots.toLocaleString("en-US")} claims at <strong>{plannedRewards.holderRewardEth} ETH each.</strong></p>
               <a className="ui-text-action" href="#holder-rewards">See holder calculations <Icon name="down" /></a>
             </div>
           </div>
@@ -440,7 +440,7 @@ export function LandingExperience({
               Eligible NFT holders vote on published packages of price, supply,
               winner count, and mint duration. The winning package becomes fixed
               when voting ends. For Tincta seasons: 60% for prizes,
-              20% for affiliates, 8% for season holder rewards, and 12% for the protocol treasury after a successful draw.
+              20% for affiliates, 10% for season holder rewards, and 10% for the protocol treasury after a successful draw.
               The treasury funds infrastructure costs, future functionality and Tincta projects.
               The holder pool unlocks at season end for the first 5% of eligible NFTs to claim. Season holder rewards are planned for launch. Funds owed as prizes, holder rewards or earned commissions remain protected.
             </p>
@@ -829,7 +829,7 @@ export function LandingExperience({
           <div className="holder-copy">
             <h2 id="holders-title">Not a winner,<br /><span className="muted-heading">but still a holder?</span></h2>
             <div className="holder-explanation">
-              <p>8% of actual mint revenue from successful draws builds a season pool. Voting changes prices and supplies, so the pool and ETH per claim vary by season. Once every collection has drawn or become refundable, the first 5% of eligible NFTs to claim share the final pool equally. Only NFTs from successful draws qualify, including winners. One claim per NFT, while slots remain.</p>
+              <p>10% of actual mint revenue from successful draws builds a season pool. Voting changes prices and supplies, so the pool and ETH per claim vary by season. Once every collection has drawn or become refundable, the first 5% of eligible NFTs to claim share the final pool equally. Only NFTs from successful draws qualify, including winners. One claim per NFT, while slots remain.</p>
               <LinkButton href={footerLinks.app ? `${footerLinks.app.replace(/\/$/, "")}/holders` : undefined}>Explore holder rewards <Icon name="diagonal" /></LinkButton>
             </div>
           </div>
@@ -838,9 +838,9 @@ export function LandingExperience({
             <p>Example only: each collection sells 1,000 NFTs at 0.01 ETH. All ten draws succeed.</p>
             <dl className="holder-calculation">
               <div><dt>Season mint revenue</dt><dd>10 × 1,000 × 0.01 = <strong>100 ETH</strong></dd></div>
-              <div><dt>Holder pool · 8%</dt><dd>100 × 8% = <strong>8 ETH</strong></dd></div>
+              <div><dt>Holder pool · 10%</dt><dd>100 × 10% = <strong>10 ETH</strong></dd></div>
               <div><dt>Claim slots · first 5%</dt><dd>10,000 × 5% = <strong>500 NFTs</strong></dd></div>
-              <div><dt>Equal reward per claim</dt><dd>8 ÷ 500 = <strong>{plannedRewards.holderRewardEth} ETH</strong></dd></div>
+              <div><dt>Equal reward per claim</dt><dd>10 ÷ 500 = <strong>{plannedRewards.holderRewardEth} ETH</strong></dd></div>
             </dl>
             <p>Winners also qualify. The current owner claims once per eligible NFT, in onchain order, while slots remain. Refundable collections add neither funds nor eligible NFTs.</p>
           </div>

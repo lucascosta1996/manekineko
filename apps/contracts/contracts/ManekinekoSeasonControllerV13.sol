@@ -107,7 +107,7 @@ contract ManekinekoSeasonControllerV13 is ReentrancyGuard {
         if (catalogSealed || address(holderRewards) != address(0) || candidate.code.length == 0 ||
             address(ManekinekoHolderRewardsV13(candidate).controller()) != address(this) ||
             ManekinekoHolderRewardsV13(candidate).COVERAGE_BPS() != 500 ||
-            ManekinekoHolderRewardsV13(candidate).HOLDER_BPS() != 800) revert InvalidConfiguration();
+            ManekinekoHolderRewardsV13(candidate).HOLDER_BPS() != 1000) revert InvalidConfiguration();
         holderRewards = ManekinekoHolderRewardsV13(candidate);
     }
     /// @notice Batch uploads preserve the exact submitted identities/order. Immutable after sealing.
@@ -156,7 +156,7 @@ contract ManekinekoSeasonControllerV13 is ReentrancyGuard {
     }
     /// @notice One operator transaction settles the latest outcome and prepares the next ballot.
     /// All steps revert together. Expected identity/proceeds prevent a stale approval from settling another round.
-    /// The exact optional top-up is separate from the full 12% payment and every protected mint liability.
+    /// The exact optional top-up is separate from the full 10% payment and every protected mint liability.
     function settleAndPrepare(uint256 expectedRoundId, uint256 expectedOperatorProceeds)
         external payable onlyOperator nonReentrant returns (address nextRound)
     {

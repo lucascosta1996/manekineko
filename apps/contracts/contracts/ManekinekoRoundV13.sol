@@ -61,8 +61,8 @@ contract ManekinekoRoundV13 is ERC721, ReentrancyGuard {
     address public immutable operator;
     ManekinekoVotingV12 public immutable voting;
     ManekinekoHolderRewardsV13 public immutable holderRewards;
-    uint256 public constant holderPoolBps = 800;
-    uint256 public constant operatorBps = 1200;
+    uint256 public constant holderPoolBps = 1000;
+    uint256 public constant operatorBps = 1000;
     uint256 public operatorWithdrawn;
     uint256 public immutable roundId;
     bytes32 public immutable seasonId;
@@ -558,7 +558,7 @@ contract ManekinekoRoundV13 is ERC721, ReentrancyGuard {
         emit Refunded(tokenId, msg.sender, recipient, mintPrice());
     }
 
-    /// @notice Exactly 12% of successful mint receipts, available after reveal. Never refund principal.
+    /// @notice Exactly 10% of successful mint receipts, available after reveal. Never refund principal.
     function operatorAllocation() public view returns (uint256) { return soldOut() && !refundsAvailable() ? (totalMintRevenue / BPS_DENOMINATOR) * operatorBps : 0; }
     function operatorWithdrawable() public view returns (uint256) {
         if (!revealed) return 0;

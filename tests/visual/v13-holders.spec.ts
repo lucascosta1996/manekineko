@@ -22,7 +22,7 @@ for (const [width, height] of widths)
       );
       await ready(page);
       await expect(page.locator(".holder-total")).toHaveText(
-        "8.0 ETH accumulated"
+        "10.0 ETH accumulated"
       );
       await expect(
         page.getByRole("progressbar", { name: "Season progress" })
@@ -35,7 +35,7 @@ for (const [width, height] of widths)
       ).toBeDisabled();
       await expect(page.locator(".public-allocation-grid dt")).toHaveText([
         "60% · Winning tickets", "20% · Qualified affiliates",
-        "8% · Holder rewards", "12% · Protocol treasury",
+        "10% · Holder rewards", "10% · Protocol treasury",
       ]);
       expect(
         await page.evaluate(
@@ -95,6 +95,14 @@ test("V13 pending, pool verification error and recovery never expose an unsafe c
     "holder rewards contract could not be verified"
   );
   await page.unroute("https://v12.fixture.invalid/**");
+  await rpc(page, 5, false, { holderState: "open", holderAllocationBps: 800 });
+  await page.getByRole("button", { name: "Retry network read" }).click();
+  await expect(page.locator(".protocol-page [role=alert]")).toContainText(
+    "Holder rewards policy verification failed"
+  );
+  await expect(page.locator(".holder-total")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Review holder claim" })).toHaveCount(0);
+  await page.unroute("https://v12.fixture.invalid/**");
   await rpc(page, 5, false, { holderState: "open" });
   await page.getByRole("button", { name: "Retry network read" }).click();
   await expect(page.locator(".holder-state")).toHaveText("Claims open");
@@ -116,7 +124,7 @@ for (const width of [390, 1440])
       .getByRole("button", { name: "Review holder claim", exact: true })
       .click();
     await expect(page.getByRole("alertdialog")).toContainText(
-      "Claim 0.016 ETH for NFT #2"
+      "Claim 0.02 ETH for NFT #2"
     );
     await expect(page.getByRole("alertdialog")).toContainText(
       "does not reserve a slot"

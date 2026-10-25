@@ -341,7 +341,7 @@ export async function verifyDeployment(
   );
   ensure(
     (await pool.COVERAGE_BPS(at)) === 500n &&
-      (await pool.HOLDER_BPS(at)) === 800n,
+      (await pool.HOLDER_BPS(at)) === 1000n,
     "Unexpected holder pool economics."
   );
   const v = await check("ManekinekoVotingV12", voting, {
@@ -504,13 +504,13 @@ export async function verifyDeployment(
       "Round holder funding mismatch."
     );
     ensure(
-      (await r.operatorBps(at)) === 1200n &&
-        (await r.holderPoolBps(at)) === 800n,
+      (await r.operatorBps(at)) === 1000n &&
+        (await r.holderPoolBps(at)) === 1000n,
       "Unexpected round allocation."
     );
     if (revealed) {
       const total = totals.get(plan.seasonId) ?? { funded: 0n, eligible: 0n };
-      total.funded += ((await r.totalMintRevenue(at)) / 10000n) * 800n;
+      total.funded += ((await r.totalMintRevenue(at)) / 10000n) * 1000n;
       total.eligible += await r.totalMinted(at);
       totals.set(plan.seasonId, total);
     }

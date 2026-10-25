@@ -38,8 +38,8 @@ for (const width of [390, 1440]) {
     expect(separation).toBeGreaterThanOrEqual(width < 600 ? 64 : 96);
     const metrics = page.locator('.reward-metric');
     await expect(metrics).toHaveCount(3);
-    for (const [index, amount] of ['1,296', '432', '172.8'].entries()) await expect(metrics.nth(index).locator('.metric-number')).toContainText(amount);
-    await expect(page.locator('.holder-metric')).toContainText('10,800 claims at 0.016 ETH each');
+    for (const [index, amount] of ['1,296', '432', '216'].entries()) await expect(metrics.nth(index).locator('.metric-number')).toContainText(amount);
+    await expect(page.locator('.holder-metric')).toContainText('10,800 claims at 0.02 ETH each');
     await expect(page.locator('#refunds + #holder-rewards')).toHaveCount(1);
     const holderTitle = await page.locator('#holders-title').boundingBox();
     const exampleTitle = await page.locator('.holder-example h3').boundingBox();
@@ -52,7 +52,7 @@ for (const width of [390, 1440]) {
       expect(exampleTitle!.y).toBeGreaterThan(explanation!.y + explanation!.height);
     }
     expect(await page.locator('#reward-details').evaluate(el => !!(el.compareDocumentPosition(document.querySelector('#manifesto-title')!) & Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
-    await expect(page.locator('.holder-calculation')).toContainText('8 ÷ 500 = 0.016 ETH');
+    await expect(page.locator('.holder-calculation')).toContainText('10 ÷ 500 = 0.02 ETH');
     await expect(page.locator('.terms-note')).toContainText('These are not funded balances.');
     for (const selector of ['.reward-rail', '#holder-rewards', 'footer']) await page.locator(selector).screenshot({ path: info.outputPath(`${selector.replace(/\W/g, '')}-${width}.png`) });
     expect((await new AxeBuilder({ page }).include('#main').analyze()).violations).toEqual([]);

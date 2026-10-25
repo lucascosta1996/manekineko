@@ -55,7 +55,7 @@ export function HolderRewardsPanel({
           </span>
         </div>
         <p className="protocol-note">
-          8% of this season’s actual mint revenue from successful draws accumulates here.
+          10% of this season’s actual mint revenue from successful draws accumulates here.
         </p>
         <p className="holder-total">
           <strong>{formatEther(h.funded)}</strong> <span>ETH accumulated</span>

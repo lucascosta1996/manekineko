@@ -15,7 +15,7 @@ export const C = '0x' + '11'.repeat(20),
   T = '0x' + '66'.repeat(20),
   P = '0x' + '88'.repeat(20),
   H = '0x' + '77'.repeat(32);
-export async function rpc(page: Page, phase = 0, badPin = false, settings: { deadline?: number; canFinalize?: boolean; operatingBalance?: string; randomnessDeadline?: number; drawTimeout?: boolean; duration?: number; affiliateId?: number; claimed?: boolean; legacy?: boolean; count?: number; holderState?: "locked" | "open" | "exhausted" | "empty"; holderClaimed?: boolean; holderOwner?: string; holderBadPin?: boolean } = {}) {
+export async function rpc(page: Page, phase = 0, badPin = false, settings: { deadline?: number; canFinalize?: boolean; operatingBalance?: string; randomnessDeadline?: number; drawTimeout?: boolean; duration?: number; affiliateId?: number; claimed?: boolean; legacy?: boolean; count?: number; holderState?: "locked" | "open" | "exhausted" | "empty"; holderClaimed?: boolean; holderOwner?: string; holderBadPin?: boolean; holderAllocationBps?: number } = {}) {
   const now = Math.floor(Date.parse(visualNow) / 1000),
     start = phase === 0 ? now + 3600 : now - 3600,
     deadline = settings.deadline ?? (phase === 7 ? now - 60 : now + 80000);
@@ -68,9 +68,9 @@ export async function rpc(page: Page, phase = 0, badPin = false, settings: { dea
             legacySources: [R],
             rounds: [call.args.length > 0 && call.args[0] === 1n ? R : T],
             CONTRACT_VERSION: [settings.holderState ? q.params[0].to.toLowerCase() === P.toLowerCase() ? 'holder-rewards-v13' : 'affiliate-v13' : 'affiliate-v12'],
-            holderRewards: [P], controller: [C], HOLDER_BPS: [800], COVERAGE_BPS: [500], seasonId: [H],
+            holderRewards: [P], controller: [C], HOLDER_BPS: [settings.holderAllocationBps ?? 1000], COVERAGE_BPS: [500], seasonId: [H],
             fundedCollection: [settings.holderState !== 'empty'], claimed: [settings.holderClaimed ?? false],
-            summary: [[settings.holderState === 'empty' ? 0 : parseEther('8'), settings.holderState === 'empty' ? 0 : 10000, settings.holderState === 'empty' ? 0 : 500, settings.holderState === 'empty' ? 0 : parseEther('0.016'), settings.holderState === 'exhausted' ? 500 : settings.holderState === 'open' ? 123 : 0, settings.holderState === 'exhausted' ? parseEther('8') : settings.holderState === 'open' ? parseEther('1.968') : 0, 10, settings.holderState === 'locked' ? 7 : 10, settings.holderState !== 'locked']],
+            summary: [[settings.holderState === 'empty' ? 0 : parseEther('10'), settings.holderState === 'empty' ? 0 : 10000, settings.holderState === 'empty' ? 0 : 500, settings.holderState === 'empty' ? 0 : parseEther('0.02'), settings.holderState === 'exhausted' ? 500 : settings.holderState === 'open' ? 123 : 0, settings.holderState === 'exhausted' ? parseEther('10') : settings.holderState === 'open' ? parseEther('2.46') : 0, 10, settings.holderState === 'locked' ? 7 : 10, settings.holderState !== 'locked']],
             name: ['Fictional voting study'],
             seasonName: ['Rehearsal season'],
             collectionColor: ['#330000'],
@@ -88,8 +88,8 @@ export async function rpc(page: Page, phase = 0, badPin = false, settings: { dea
             termsHash: [H],
             ballots: [now - 120, start, 3, 2],
             optionCount: [2],
-            operatorWithdrawable: [phase === 5 ? parseEther('2') : 0],
-            operatorAllocation: [phase >= 2 && phase <= 6 ? parseEther('2') : 0],
+            operatorWithdrawable: [phase === 5 ? parseEther(settings.holderState ? '1' : '2') : 0],
+            operatorAllocation: [phase >= 2 && phase <= 6 ? parseEther(settings.holderState ? '1' : '2') : 0],
             operatorWithdrawn: [0],
             canFinalizeDraw: [settings.canFinalize ?? true],
             protectedBalance: [parseEther('2.5')],
