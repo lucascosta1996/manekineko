@@ -31,3 +31,12 @@ test('consumer layout and unrelated siblings remain app-owned', () => {
   for (const source of ['.dashboard .ui-select { width: 180px; flex: none; }', '.ui-input { width: 100%; flex: 1; }', '.ui-button + p { font-size: 15px; }', '.ui-disclosure summary > span { font-size: 12px; }']) assert.deepEqual(css(source), [], source);
   assert.notEqual(css(':root { --ui-control-height:24px }').length, 0);
 });
+test('protocol consumers cannot fork controls or add action margins', () => {
+  for (const file of ['apps/web/app/example.css', 'packages/protocol/src/example.css']) {
+    for (const rule of ['.panel > .ui-button { padding: 8px; }', '.panel > .ui-button { margin-inline-end: 8px; }', '.ui-text-action { margin-top: 16px; }']) {
+      assert.notEqual(inspectSource(file, rule).length, 0, `${file}: ${rule}`);
+    }
+    assert.deepEqual(inspectSource(file, '.actions { gap: var(--ui-space-3); } .ui-button { width: 100%; }'), []);
+  }
+  assert.deepEqual(inspectSource('packages/ui/src/styles.css', '.ui-button { padding: 6px 12px; margin: 0; }'), []);
+});

@@ -2,11 +2,11 @@
   width: 100%;
   overflow-wrap: anywhere;
   margin: 0 auto;
-  padding: var(--ui-space-12) 0;
+  padding: var(--ui-section-space) 0;
 }
 .protocol-page :where(h1, h2, h3) { font-weight: 500; }
-.protocol-page :where(h2) { font-size: var(--ui-section); }
-.protocol-page :where(h3) { font-size: var(--ui-subheading); }
+.protocol-page :where(h2) { font: 500 var(--ui-section)/1.25 var(--ui-font-sans); letter-spacing: -.025em; }
+.protocol-page :where(h3) { font: 500 var(--ui-subheading)/1.35 var(--ui-font-sans); letter-spacing: -.01em; }
 .protocol-intro {
   max-width: 46rem;
   margin-bottom: var(--ui-space-8);
@@ -19,15 +19,11 @@
 }
 .protocol-intro > p:last-child {
   color: var(--ui-muted);
-  line-height: 1.6;
+  line-height: var(--ui-body-line);
   font-size: var(--ui-body);
 }
-.protocol-eyebrow,
-.protocol-note {
-  font-size: var(--ui-control);
-  color: var(--ui-muted);
-  line-height: 1.6;
-}
+.protocol-eyebrow { font: 500 var(--ui-label)/var(--ui-control-line) var(--ui-font-sans); color: var(--ui-muted); }
+.protocol-note { font: 400 var(--ui-body)/var(--ui-body-line) var(--ui-font-sans); color: var(--ui-muted); }
 .protocol-tabs {
   display: flex;
   flex-wrap: wrap;
@@ -91,7 +87,7 @@
 .protocol-rules {
   padding: var(--ui-space-4) 0;
   font-size: var(--ui-control);
-  line-height: 1.6;
+  line-height: var(--ui-body-line);
 }
 .protocol-grid {
   display: grid;
@@ -101,7 +97,10 @@
 .protocol-panel {
   border: 1px solid var(--ui-line);
   border-radius: var(--ui-radius);
-  padding: var(--ui-space-6);
+  padding: var(--ui-card-padding);
+  display: grid;
+  gap: var(--ui-space-4);
+  justify-items: start;
   margin-bottom: var(--ui-space-6);
   min-width: 0;
 }
@@ -109,16 +108,15 @@
   margin-bottom: 0;
 }
 .protocol-panel h2 {
-  margin: 0 0 var(--ui-space-4);
+  margin: 0;
   font-size: var(--ui-section);
 }
-.protocol-panel p {
-  line-height: 1.6;
-}
+.protocol-panel p { line-height: var(--ui-body-line); }
+.protocol-panel > :where(p, dl, .ui-field) { margin: 0; }
+.protocol-panel > :where(.ui-field, .ui-disclosure, .protocol-options, .protocol-award) { width: 100%; }
+.protocol-details { display: grid; gap: var(--ui-space-4); }
+.protocol-details > :where(p, .ui-field) { margin: 0; }
 .protocol-panel > a { max-width: 100%; white-space: normal; }
-.protocol-panel .ui-field {
-  margin: var(--ui-space-4) 0;
-}
 .protocol-options {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
@@ -160,14 +158,11 @@
 }
 @media (max-width: 700px) {
   .protocol-page {
-    padding: var(--ui-space-8) 0;
+    padding: var(--ui-section-space) 0;
   }
   .protocol-grid,
   .protocol-overview {
     grid-template-columns: 1fr;
-  }
-  .protocol-panel {
-    padding: var(--ui-space-4);
   }
   .protocol-stats {
     gap: var(--ui-space-3);
@@ -177,24 +172,23 @@
   }
 }
 
-.protocol-panel > .ui-button { margin-inline-end: var(--ui-space-2); margin-block-end: var(--ui-space-2); }
 .operator-position { padding: var(--ui-space-6) 0; border-block: 1px solid var(--ui-line); margin-block: var(--ui-space-6) var(--ui-space-8); }
 .operator-position h2 { font-size: var(--ui-section); margin: var(--ui-space-3) 0; letter-spacing: -.025em; }
-.operator-position > p { line-height: 1.6; }
+.operator-position > p { line-height: var(--ui-body-line); }
 .operator-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--ui-space-6); }
 .operator-metrics dd { font-size: var(--ui-section); }
 .operator-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: var(--ui-space-12); align-items: start; }
 .operator-section-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--ui-space-3); align-items: baseline; }
 .operator-section-heading h2 { font-size: var(--ui-section); margin: 0; }
 .operator-section-heading > span { font-size: var(--ui-control); color: var(--ui-muted); }
-.operator-queue p { line-height: 1.6; }
+.operator-queue p { line-height: var(--ui-body-line); }
 .operator-timing { padding: var(--ui-space-4); margin-block: var(--ui-space-5); border: 1px solid var(--ui-line); border-radius: var(--ui-radius); }
 .operator-timing > p { margin: var(--ui-space-2) 0; }
-.operator-timing .operator-timing-value { font-size: var(--ui-section); font-variant-numeric: tabular-nums; line-height: 1.3; color: var(--ui-ink); }
+.operator-timing .operator-timing-value { font-size: var(--ui-section); font-variant-numeric: tabular-nums; line-height: 1.25; color: var(--ui-ink); }
 .operator-action-list, .operator-season-list, .operator-collection-list { list-style: none; padding: 0; margin: var(--ui-space-5) 0; }
 .operator-action-list > li { padding: var(--ui-space-6) 0; border-top: 1px solid var(--ui-line); }
 .operator-action-list h3 { margin: 0; font-size: var(--ui-subheading); }
-.operator-action-list p { font-size: var(--ui-control); }
+.operator-action-list p { font-size: var(--ui-body); }
 .operator-tree > .ui-field { margin-top: var(--ui-space-5); }
 .operator-season-list > li { margin-bottom: var(--ui-space-3); }
 .operator-season-title { display: flex; flex-direction: column; gap: var(--ui-space-2); text-align: left; }
@@ -207,9 +201,9 @@
 .operator-collection-list > li:not(:last-child)::after { content: ''; position: absolute; left: .2rem; top: calc(50% + .4rem); bottom: calc(-50% + .4rem); border-left: 1px solid var(--ui-line); }
 @media (max-width: 900px) { .operator-columns { grid-template-columns: 1fr; gap: var(--ui-space-8); } }
 @media (max-width: 520px) { .operator-metrics { grid-template-columns: 1fr; gap: var(--ui-space-2); } }
-.protocol-page .affiliate-wallet-picker { display: grid; gap: var(--ui-space-4); margin-block: var(--ui-space-6); padding: var(--ui-space-6); border: 1px solid var(--ui-line); border-radius: var(--ui-radius); }
+.protocol-page .affiliate-wallet-picker { display: grid; gap: var(--ui-space-4); margin-block: var(--ui-space-6); padding: var(--ui-card-padding); border: 1px solid var(--ui-line); border-radius: var(--ui-radius); }
 .protocol-page .affiliate-wallet-picker h2 { margin: 0; font-size: var(--ui-section); }
-.protocol-page .affiliate-wallet-picker p { margin: 0; line-height: 1.6; }
+.protocol-page .affiliate-wallet-picker p { margin: 0; line-height: var(--ui-body-line); }
 .protocol-page .affiliate-wallet-options { display: grid; gap: var(--ui-space-3); }
 .protocol-page .affiliate-wallet-picker-actions { display: flex; flex-wrap: wrap; gap: var(--ui-space-3); }
 .protocol-page .affiliate-account-option strong { overflow-wrap: anywhere; font-size: var(--ui-label); font-weight: 400; }

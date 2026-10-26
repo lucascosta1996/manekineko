@@ -41,7 +41,7 @@ function Navigation({ entries, pathname }: { entries: DocSearchEntry[]; pathname
     }
   }}>
     <Button variant="ghost" className="docs-mobile-toggle" ref={toggle} type="button" aria-expanded={open} aria-controls="docs-navigation-panel" onClick={() => setOpen(value => !value)}>
-      <span><span className="docs-mobile-label">How It Works</span>{current?.title ?? "Browse topics"}</span><Icon name={open ? "minus" : "plus"} />
+      <span>{current?.title ?? "Browse topics"}</span><Icon name={open ? "minus" : "plus"} />
     </Button>
     <div className="docs-navigation-panel" id="docs-navigation-panel">
       <Link className="docs-sidebar-title" href="/docs">How It Works <span>01 / TINCTA</span></Link>

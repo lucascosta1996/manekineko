@@ -1,5 +1,5 @@
 {
-  "standard": "docs/design/visual-identity.md v1.0",
+  "standard": "docs/design/visual-identity.md v1.1",
   "landing": {
     "routes": [
       "/",

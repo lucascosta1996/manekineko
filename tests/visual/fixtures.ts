@@ -15,6 +15,13 @@ export async function prepare(page: Page, state = 'loaded') {
  // Deny external requests, and never fall through a first-party API or mutation.
  await page.context().route('**/*', async route => {
   const request = route.request(), url = new URL(request.url());
+  // Reown reads these during initialization even when no wallet is connected.
+  // Return local fixtures instead of a rejected promise that WebKit can surface
+  // as an unrelated page error. No request reaches the vendor.
+  if (request.method() === 'GET' && url.origin === 'https://api.web3modal.org' && ['/appkit/v1/config', '/appkit/v1/project-limits'].includes(url.pathname)) return route.fulfill({
+   headers: { 'access-control-allow-origin': '*' },
+   json: { features: [], planLimits: { tier: 'starter', isAboveMauLimit: false, isAboveRpcLimit: false } },
+  });
   if (!Object.values(urls).includes(url.origin)) return route.abort('blockedbyclient');
   if (!['GET','HEAD'].includes(request.method())) return route.fulfill({status:409,json:{error:'Visual fixture: write intercepted.'}});
   if (!url.pathname.startsWith('/api/')) return route.continue();

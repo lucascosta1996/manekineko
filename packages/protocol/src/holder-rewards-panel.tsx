@@ -2,7 +2,6 @@
 import { formatEther } from "ethers";
 import { Button, textActionClassName } from "@manekineko/ui/button";
 import { Field, Input } from "@manekineko/ui/forms";
-import { Disclosure } from "@manekineko/ui/components";
 import type { Snapshot } from "./chain";
 
 export function HolderRewardsPanel({
@@ -75,7 +74,7 @@ export function HolderRewardsPanel({
         />
         <p className="protocol-note">
           {!h.unlocked
-            ? "Unlocks when every collection in this season has completed its draw or become refundable. Pending prize claims do not delay the unlock."
+            ? "Unlocks after every collection draws or becomes refundable."
             : "This season has ended. Its reward amount and claim limit are final."}
         </p>
         <dl className="holder-stats">
@@ -157,8 +156,7 @@ export function HolderRewardsPanel({
             </Button>
             {!connected && (
               <p className="protocol-note">
-                Connect your wallet above to claim. Ownership and previous
-                claims are checked before review.
+                Connect your wallet to check eligibility.
               </p>
             )}
           </>
@@ -169,32 +167,7 @@ export function HolderRewardsPanel({
           does not guarantee a payout.
         </p>
       </section>
-      <Disclosure title="Eligibility, transfers & the 5% limit">
-        <p>
-          Only NFTs minted in successfully drawn collections in this season
-          qualify. The claim limit is 5% of their total number, rounded down.
-          The pool is divided equally across those slots, rounded down to whole
-          wei.
-        </p>
-        <p>
-          Voting selects each collection’s price and supply. Those terms and
-          actual successful mints determine the season pool, eligible NFT count
-          and ETH per claim. The percentages are fixed; the ETH amounts vary
-          by season. Once the season ends, every successful claim receives the
-          same final amount, regardless of that NFT’s mint price.
-        </p>
-        <p>
-          There is no per-wallet limit. Transferring an NFT transfers its
-          unclaimed opportunity, but never resets a completed claim. These
-          rewards are separate from winning-ticket prizes and affiliate
-          earnings.
-        </p>
-        <p>
-          There is no claim deadline. Rewards stay available until every slot is
-          taken. The operator cannot withdraw the holder pool; any rounding dust
-          stays in the contract.
-        </p>
-      </Disclosure>
+
     </div>
   );
 }

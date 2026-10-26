@@ -29,13 +29,13 @@ for (const width of [390, 1440]) {
       const style = getComputedStyle(element);
       return [parseFloat(style.paddingTop), parseFloat(style.paddingBottom)];
     }));
-    for (const padding of sections) expect(padding).toEqual(width < 600 ? [32, 32] : [48, 48]);
+    for (const padding of sections) expect(padding).toEqual(width < 600 ? [48, 48] : [80, 80]);
     const separation = await page.locator('#holder-rewards').evaluate(element => {
       const bottom = Math.max(...Array.from(element.children).map(child => child.getBoundingClientRect().bottom));
       const nextTop = Math.min(...Array.from(document.querySelector('#questions')!.children).map(child => child.getBoundingClientRect().top));
       return nextTop - bottom;
     });
-    expect(separation).toBeGreaterThanOrEqual(width < 600 ? 64 : 96);
+    expect(separation).toBeGreaterThanOrEqual(width < 600 ? 96 : 160);
     const metrics = page.locator('.reward-metric');
     await expect(metrics).toHaveCount(3);
     for (const [index, amount] of ['1,296', '432', '216'].entries()) await expect(metrics.nth(index).locator('.metric-number')).toContainText(amount);
@@ -57,15 +57,15 @@ for (const width of [390, 1440]) {
     for (const selector of ['.reward-rail', '#holder-rewards', 'footer']) await page.locator(selector).screenshot({ path: info.outputPath(`${selector.replace(/\W/g, '')}-${width}.png`) });
     expect((await new AxeBuilder({ page }).include('#main').analyze()).violations).toEqual([]);
   });
-  test(`Public rules remain grouped and readable ${width}`, async ({ page }, info) => {
+  test(`Public overview points to the full documentation ${width}`, async ({ page }, info) => {
     await prepare(page); await page.clock.resume();
     await page.route('https://api.web3modal.org/appkit/v1/**', route => route.fulfill({ headers: { 'access-control-allow-origin': '*' }, json: { features: [], planLimits: { tier: 'starter', isAboveMauLimit: false, isAboveRpcLimit: false } } }));
     await page.setViewportSize({ width, height: 900 });
     await page.goto(urls.web + '/?state=unconfigured'); await ready(page);
     await expect(page.locator('.public-allocation-grid > div')).toHaveCount(4);
-    await page.getByText('How it works · Voting, prizes and refunds', { exact: true }).click();
-    await expect(page.locator('.public-rules-grid > section')).toHaveCount(5);
-    await expect(page.locator('.public-rules-grid h3')).toHaveText(['1. Vote & mint', '2. Follow the draw', '3. Check refund eligibility', 'Affiliate rewards', 'Season holder rewards']);
+    await expect(page.locator('.public-rules-grid')).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Explore the documentation', exact: true })).toHaveAttribute('href', '/docs');
+    await expect(page.locator('.public-explainer')).toContainText('Shared rewards.');
     await page.locator('.public-explainer').screenshot({ path: info.outputPath(`public-rules-${width}.png`) });
     expect((await new AxeBuilder({ page }).include('.public-explainer').analyze()).violations).toEqual([]);
     await page.addStyleTag({ content: 'html { font-size: 200%; }' });

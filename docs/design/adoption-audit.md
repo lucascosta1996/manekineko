@@ -1,5 +1,7 @@
 # Visual-system adoption audit
 
+**2026-10-27 consistency update:** The mounted Landing, Web/docs/gallery and Launch surfaces now share stricter control/card metrics, more section space and shorter public copy with contextual guide links. See [the component review](consistency-review-2026-10-27.md) for component scope, regression checks and local verification boundaries. The historical findings below are not the current metric specification; use [visual standard v1.1](visual-identity.md).
+
 **2026-10-24 compact Web update:** Smaller header branding, the first-party wallet account menu and versionless illustrated guides are documented in [the scoped verification record](compact-navigation-docs-2026-10-24.md). Its 317 passing browser checks are local evidence; deployment and real-wallet acceptance remain separate.
 
 **Implementation follow-up:** The local source migration and browser/CI harness are recorded in [the implementation and verification record](implementation-2026-09-28.md). The findings below preserve the initial source evidence; they are not a claim that the former defects remain unchanged. Read the follow-up for actual results and open verification boundaries.

@@ -7,9 +7,9 @@ import { NewsletterSignup } from "./newsletter-signup";
 import "./studio.css";
 
 const principles = [
-  ["01", "Immutable by design", "The governing contract is fixed when published. Its code cannot be edited afterward, including by its creators."],
-  ["02", "Open to inspection", "Published onchain, the rules can be inspected independently before anyone chooses to participate."],
-  ["03", "Shaped by participation", "People shape outcomes through the actions and decision rights established in the contract."],
+  ["01", "Immutable by design", "Published contracts stay fixed, including for their creators."],
+  ["02", "Open to inspection", "Read the rules onchain before you participate."],
+  ["03", "Shaped by participation", "Your actions shape outcomes within the published rules."],
 ];
 const concepts = [
   { name: "Morph", kind: "morph" as const, focus: "Adaptive collections", headline: "A collection shaped by the people who move it.", description: "Exploring collections that evolve through participant activity, with the rules of that evolution fixed in immutable code.", question: "How can ownership patterns, transfers, and collective milestones influence a collection’s evolution under fixed rules that distinguish sustained participation from artificial activity?" },
@@ -35,8 +35,7 @@ export default function LandingPage() {
             <div className="studio-thesis">
               <div><p className="studio-eyebrow">01 / Our thesis</p><h2 id="research-title">Rules that cannot be rewritten.</h2></div>
               <div className="studio-copy">
-                <p>We publish immutable contracts so participants can inspect the rules before they act. Once deployed, that code cannot be edited by us or anyone else.</p>
-                <p>Participants shape outcomes through actions the contract already allows. Our research asks what becomes possible when shared activity rests on rules that remain fixed.</p>
+                <p>We publish contracts with fixed rules and room for collective action. Read the code, understand your rights, and shape what comes next.</p>
                 <a className="ui-text-action" href="/whitepaper">Read the TAS-1 whitepaper<Icon name="arrow" /></a>
               </div>
             </div>
@@ -49,10 +48,9 @@ export default function LandingPage() {
               <div>
                 <div className="studio-project-name">Tincta Rewards</div>
                 <h3>Rewards governed by immutable terms.</h3>
-                <p>Eligible NFT holders vote on each collection’s mint price, supply, winner count and mint duration. The selected terms become final when voting ends.</p>
-                <p>Tincta allocates successful mint revenue to prizes (60%), qualified affiliates (20%), season holder rewards (10%) and the protocol treasury (10%) for infrastructure costs, future functionality and Tincta projects. Holder claims open at season end for the first 5% of eligible NFTs to claim, with equal payouts calculated from that season’s actual pool.</p>
-                <p><strong>Tincta Genesis: the first vote.</strong> A free collection of 1,000 onchain NFTs, with one lifetime mint per wallet and a 24-hour window. Holders pay network gas. Genesis votes apply only to the first paid collection; future votes require NFTs from successfully revealed paid season collections.</p>
-                <p>Genesis has no financial reward entitlement. Sepolia testing is underway; Mainnet minting has not launched.</p>
+                <p>Vote on collection terms. Mint original onchain artwork. Claim ETH rewards under published rules.</p>
+                <p><strong>Tincta Genesis: the first vote.</strong> A free NFT for the first paid ballot only. One lifetime mint per wallet, plus network gas. No financial reward entitlement.</p>
+                <p>Sepolia testing is underway. Mainnet minting has not launched.</p>
                 <LinkButton href="/rewards" variant="secondary" icon={<Icon name="arrow" />}>Explore Tincta Rewards</LinkButton>
                 <div className="studio-feature-meta"><span>Community-voted terms</span><span>Direct contract claims</span></div>
               </div>

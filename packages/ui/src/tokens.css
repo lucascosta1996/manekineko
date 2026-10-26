@@ -57,7 +57,7 @@
   --ui-space: var(--ui-space-2);
   --ui-brand-wordmark: 4.5rem;
   --ui-footer-gap: var(--ui-space-24);
-  --ui-section-space: var(--ui-space-12);
+  --ui-section-space: var(--ui-space-20);
   --ui-page-gutter: max(var(--ui-space-4), 2.5vw);
   --ui-page-width: calc(100% - 2 * var(--ui-page-gutter));
   --ui-control-height: 2rem;
@@ -92,7 +92,7 @@
   --ui-z-tooltip: 190;
 }
 @media (min-width: 600px) { :root { --ui-card-padding: var(--ui-space-5); } }
-@media (max-width: 599px) { :root { --ui-brand-wordmark: 4rem; --ui-footer-gap: var(--ui-space-16); --ui-section-space: var(--ui-space-8); } }
+@media (max-width: 599px) { :root { --ui-brand-wordmark: 4rem; --ui-footer-gap: var(--ui-space-16); --ui-section-space: var(--ui-space-12); } }
 @media (any-pointer: coarse) {
   :root {
     --ui-control-height: 2.75rem;

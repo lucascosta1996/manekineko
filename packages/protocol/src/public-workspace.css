@@ -1,8 +1,8 @@
 /* Public composition only. Control, disclosure, and brand geometry stay in packages/ui. */
 .public-workspace {
-  padding: var(--ui-space-8) 0;
+  padding: var(--ui-section-space) 0;
   font-size: var(--ui-body);
-  line-height: 1.6;
+  line-height: var(--ui-body-line);
 }
 /* Reserve the first viewport through loading, failure and populated states.
    Longer content can grow naturally without clipping or nested scrolling. */
@@ -19,7 +19,12 @@
 .public-live-region {
   flex: 1;
   width: 100%;
+  display: grid;
+  align-content: center;
+  gap: var(--ui-space-6);
+  padding-block: var(--ui-space-8);
 }
+.public-session:empty { display: none; }
 .public-session .protocol-loading {
   text-align: center;
   color: var(--ui-muted);
@@ -79,6 +84,7 @@
 }
 .public-heading {
   text-align: center;
+  width: 100%;
   max-width: 42rem;
   margin: 0 auto var(--ui-space-6);
 }
@@ -120,6 +126,7 @@
   font-variant-numeric: tabular-nums;
 }
 .public-session {
+  width: 100%;
   max-width: 44rem;
   margin-inline: auto;
 }
@@ -132,6 +139,7 @@
   gap: var(--ui-space-4);
 }
 .public-stage {
+  width: 100%;
   max-width: 44rem;
   margin: auto;
 }
@@ -165,18 +173,12 @@
 }
 .public-workspace .protocol-panel {
   margin: 0;
-  padding: var(--ui-space-6);
+  padding: var(--ui-card-padding);
   background: var(--ui-canvas);
 }
 .public-stage .protocol-panel > h2 {
   text-align: center;
   font-size: var(--ui-section);
-  margin-bottom: var(--ui-space-3);
-}
-.public-stage .protocol-panel > p {
-  margin-block: var(--ui-space-4);
-}
-.public-workspace .protocol-panel > .ui-button {
   margin: 0;
 }
 .public-stage[data-phase="1"] .protocol-panel > .ui-button,
@@ -242,6 +244,7 @@
   color: var(--ui-muted);
 }
 .public-secondary-form {
+  width: 100%;
   max-width: 44rem;
   margin: var(--ui-space-4) auto 0;
 }
@@ -250,39 +253,22 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: var(--ui-space-3);
-  margin: var(--ui-space-8) 0 var(--ui-space-12);
+  margin: 0;
+  padding-block: var(--ui-space-6);
 }
 .public-explainer {
   border-top: 1px solid var(--ui-line);
-  padding-top: var(--ui-space-8);
-}
-.public-explainer > h2 {
+  padding-block: var(--ui-section-space);
   text-align: center;
-}
-.public-explainer-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--ui-space-8);
-  margin-block: var(--ui-space-8);
+  justify-items: center;
+  gap: var(--ui-space-6);
 }
-.public-explainer-grid h3 {
-  font-size: var(--ui-body);
-  font-weight: 500;
-  margin-bottom: var(--ui-space-2);
-}
-.public-explainer-grid p {
-  color: var(--ui-muted);
-}
-.public-allocation {
-  text-align: center;
-  font-size: var(--ui-label);
-  margin-bottom: var(--ui-space-6);
-}
-.public-explainer .ui-disclosure p + p {
-  margin-top: var(--ui-space-4);
-}
+.public-explainer > h2 { margin: 0; }
+.public-explainer > p { max-width: 55ch; margin: 0; color: var(--ui-muted); }
 .public-selection,
 .public-previous {
+  width: 100%;
   max-width: 44rem;
   margin: var(--ui-space-6) auto;
   display: grid;
@@ -290,8 +276,11 @@
 }
 .public-claim-content,
 .public-affiliate-content {
+  width: 100%;
   max-width: 44rem;
   margin: auto;
+  display: grid;
+  gap: var(--ui-space-6);
 }
 .public-workspace .protocol-award {
   border-top: 1px solid var(--ui-line);
@@ -309,7 +298,7 @@
 }
 .public-holder {
   display: inline-block;
-  font: 400 var(--ui-label) / 1.6 var(--ui-font-mono);
+  font: 400 var(--ui-label) / var(--ui-caption-line) var(--ui-font-mono);
   overflow-wrap: anywhere;
   text-decoration: underline;
   text-underline-offset: 0.2em;
@@ -323,27 +312,14 @@
   margin-top: var(--ui-space-8);
 }
 @media (max-width: 599px) {
-  .public-workspace {
-    padding-top: var(--ui-space-8);
-  }
-  .public-workspace .protocol-panel {
-    padding: var(--ui-space-4);
-  }
   .public-heading {
     margin-bottom: var(--ui-space-6);
-  }
-  .public-explainer-grid {
-    grid-template-columns: 1fr;
-    gap: var(--ui-space-5);
   }
   .public-terms {
     gap: var(--ui-space-2);
   }
   .public-terms dd {
     font-size: var(--ui-subheading);
-  }
-  .public-shortcuts > a {
-    flex: 1 1 auto;
   }
 }
 @media (forced-colors: active) {
@@ -352,14 +328,8 @@
   }
 }
 
-.public-workspace .ui-disclosure-content p + p {
-  margin-top: var(--ui-space-4);
-}
-.public-stage[data-phase="0"] .protocol-panel > .ui-disclosure {
-  margin-top: var(--ui-space-4);
-}
-
 .holder-rewards {
+  width: 100%;
   max-width: 44rem;
   margin: auto;
   display: grid;
@@ -368,7 +338,7 @@
 .holder-pool {
   border: 1px solid var(--ui-line);
   border-radius: var(--ui-radius);
-  padding: var(--ui-space-6);
+  padding: var(--ui-card-padding);
 }
 .holder-pool-heading,
 .holder-progress-label {
@@ -431,7 +401,6 @@
 .holder-claim { display: grid; gap: var(--ui-space-4); }
 .holder-claim > p { margin: 0; }
 @media (max-width: 599px) {
-  .holder-pool { padding: var(--ui-space-4); }
   .holder-stats { grid-template-columns: 1fr; }
   .holder-stats > div { display: flex; gap: var(--ui-space-3); justify-content: space-between; align-items: baseline; }
   .holder-stats dd { text-align: right; }
@@ -440,13 +409,6 @@
   .holder-progress { appearance: auto; }
 }
 
-.public-allocation-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,14rem),1fr)); gap: var(--ui-space-6); margin: 0 0 var(--ui-space-6); }
+.public-allocation-grid { width: 100%; display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,14rem),1fr)); gap: var(--ui-space-8); margin: 0; padding-block: var(--ui-space-6); }
 .public-allocation-grid dt { font-weight: 500; margin-bottom: var(--ui-space-2); }
-.public-allocation-grid dd { margin: 0; color: var(--ui-muted); max-width: 45ch; }
-.public-explainer-note { color: var(--ui-muted); max-width: 68ch; margin-bottom: var(--ui-space-6); }
-.public-rules-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: var(--ui-space-8); padding-block: var(--ui-space-4) var(--ui-space-6); }
-.public-rules-grid > section { min-width: 0; border-top: 1px solid var(--ui-line); padding-top: var(--ui-space-4); }
-.public-rules-grid h3 { font-size: var(--ui-subheading); font-weight: 500; margin: 0 0 var(--ui-space-3); }
-.public-rules-grid p { max-width: 68ch; margin: 0; color: var(--ui-muted); }
-.public-rules-grid a { margin-top: var(--ui-space-3); }
-@media (max-width: 700px) { .public-rules-grid { grid-template-columns: minmax(0,1fr); } }
+.public-allocation-grid dd { margin: 0 auto; color: var(--ui-muted); max-width: 32ch; }

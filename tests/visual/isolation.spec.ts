@@ -12,6 +12,9 @@ test('fixture boundary blocks non-API writes and unapproved origins', async ({ p
   return outcomes;
  });
  expect(writes).toEqual([[409,'Visual fixture: write intercepted.'],[409,'Visual fixture: write intercepted.']]);
+ const sdkConfig = 'https://api.web3modal.org/appkit/v1/config?projectId=fixture-only';
+ expect(await page.evaluate(url => fetch(url).then(r => r.json()), sdkConfig)).toEqual({features:[],planLimits:{tier:'starter',isAboveMauLimit:false,isAboveRpcLimit:false}});
+ expect(await page.evaluate(url => fetch(url, {method:'POST', body:'fixture-only'}).then(() => false, () => true), sdkConfig)).toBe(true);
  for (const target of ['https://fixture-external.invalid/', 'http://127.0.0.1:4999/']) {
   expect(await page.evaluate(url => fetch(url).then(() => false, () => true), target)).toBe(true);
  }

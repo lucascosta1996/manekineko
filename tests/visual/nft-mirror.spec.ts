@@ -77,13 +77,13 @@ for(const width of [390,1440]) test(`Genesis directory and minted gallery ${widt
   await page.goto(urls.web+'/collections?state=genesis'); await ready(page);
   await expect(page.getByRole('heading',{name:'Tincta Genesis',exact:true})).toBeVisible();
   await expect(page.getByText('50 / 1,000 minted',{exact:true})).toBeVisible();
-  await expect(page.locator('.mirror-genesis-intro')).toContainText('Future votes require NFTs');
+  await expect(page.locator('.mirror-genesis-intro')).toContainText('first paid vote only');
   await page.screenshot({path:`test-results/genesis-directory-${width}.png`,fullPage:true});
   await page.getByRole('link',{name:/View Genesis NFTs/}).click(); await ready(page);
   await expect(page.locator('.mirror-nft')).toHaveCount(24);
   await expect(page.locator('.mirror-numbers')).toHaveCount(0);
   await expect(page.locator('.mirror-nft img').first()).toHaveAttribute('alt','Tincta Genesis #1. The first vote.');
-  await expect(page.locator('.mirror-heading')).toContainText('No prize, affiliate, sponsored mint or season holder rewards.');
+  await expect(page.locator('.mirror-heading')).toContainText('No financial reward entitlement.');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   expect((await new AxeBuilder({page}).include('main').analyze()).violations).toEqual([]);
   await page.screenshot({path:`test-results/genesis-gallery-${width}.png`,fullPage:true});
@@ -92,11 +92,9 @@ for(const width of [390,1440]) test(`Genesis directory and minted gallery ${widt
   await page.getByRole('link',{name:'Next',exact:true}).click(); await ready(page);
   await expect(page.locator('.mirror-nft')).toHaveCount(2);
 });
-test('Genesis pending artwork and empty mints remain distinct',async({page})=>{
+for (const state of ['genesis-empty','genesis-syncing']) test(`Genesis artwork state: ${state}`,async({page})=>{
   await prepare(page); await page.clock.resume();
-  for(const state of ['genesis-empty','genesis-syncing']){
-    await page.goto(urls.web+'/collections?state='+state); await ready(page);
-    await expect(page.getByText('Onchain artwork · NFT #1 preview',{exact:true})).toBeVisible();
-    await expect(page.getByText(state==='genesis-empty'?'0 / 1,000 minted':'50 / 1,000 minted · Artwork syncing',{exact:true})).toBeVisible();
-  }
+  await page.goto(urls.web+'/collections?state='+state); await ready(page);
+  await expect(page.getByText('Onchain artwork · NFT #1 preview',{exact:true})).toBeVisible();
+  await expect(page.getByText(state==='genesis-empty'?'0 / 1,000 minted':'50 / 1,000 minted · Artwork syncing',{exact:true})).toBeVisible();
 });

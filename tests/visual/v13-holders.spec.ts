@@ -33,10 +33,8 @@ for (const [width, height] of widths)
           exact: true,
         })
       ).toBeDisabled();
-      await expect(page.locator(".public-allocation-grid dt")).toHaveText([
-        "60% · Winning tickets", "20% · Qualified affiliates",
-        "10% · Holder rewards", "10% · Protocol treasury",
-      ]);
+      await expect(page.locator('.public-allocation-grid')).toHaveCount(0);
+      await expect(page.getByRole('link', { name: 'Read the holder reward rules' })).toHaveAttribute('href', '/docs/holder-rewards');
       expect(
         await page.evaluate(
           () => document.documentElement.scrollWidth <= innerWidth
@@ -179,14 +177,11 @@ test("V13 first paint, keyboard, text reflow and stale refresh", async ({
   release();
   await page.clock.resume();
   await expect(page.locator(".holder-state")).toHaveText("Claims open");
-  await page
-    .locator("summary")
-    .filter({ hasText: "Eligibility, transfers & the 5% limit" })
-    .focus();
-  await page.keyboard.press("Enter");
-  await expect(
-    page.getByText("There is no per-wallet limit.", { exact: false })
-  ).toBeVisible();
+  const guide = page.getByRole('link', { name: 'Read the holder reward rules' });
+  await guide.focus();
+  await expect(guide).toBeFocused();
+  await expect(guide).toHaveAttribute('href', '/docs/holder-rewards');
+  await expect(page.getByText('A pending transaction does not reserve a slot.', { exact: false })).toBeVisible();
   await page.addStyleTag({
     content:
       "html{font-size:200%} p{line-height:1.5!important;letter-spacing:.12em!important;word-spacing:.16em!important}",

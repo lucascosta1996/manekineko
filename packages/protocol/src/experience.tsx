@@ -527,7 +527,7 @@ function Experience({
       <GenesisArtwork />
       <div className="genesis-details">
       <h2 id="genesis-title">Tincta Genesis</h2>
-      <p>Hold this free NFT at the first ballot’s ownership snapshot to vote on the first paid collection.</p>
+      <p>A free onchain NFT for the community’s first ballot.</p>
       <p className="genesis-voting-rule"><strong>Only for the first vote.</strong> For future votes, you’ll need NFTs from successfully revealed paid season collections.</p>
       <dl className="genesis-terms">
         <div><dt>Mint price</dt><dd>0 ETH + network gas</dd></div>
@@ -535,7 +535,7 @@ function Experience({
         <div><dt>Wallet limit</dt><dd>1 mint per wallet, for life</dd></div>
         <div><dt>Mint window</dt><dd>{state.genesis.start ? `${date(state.genesis.start)} – ${date(state.genesis.end)}` : "24 hours, opening with the sealed catalog"}</dd></div>
       </dl>
-      <p>{!state.genesis.start ? "The free mint has not opened yet." : state.timestamp >= Number(state.genesis.end) ? "The free mint has ended. The first paid ballot is next." : state.genesis.minted === state.genesis.supply ? "All free NFTs have been minted. The first paid ballot can be prepared after the 24-hour window ends." : "The free mint is open. The first paid ballot follows this 24-hour window."}</p>
+      <p>{!state.genesis.start ? "The free mint has not opened yet." : state.timestamp >= Number(state.genesis.end) ? "The free mint has ended. The first paid ballot is next." : state.genesis.minted === state.genesis.supply ? "All free NFTs have been minted. The first paid ballot can be prepared after the 24-hour window ends." : "The free mint is open."}</p>
       {!wallet.session && <p>Connect your wallet to check and mint your free NFT.</p>}
       {state.genesis.walletMinted && <p>Your wallet has used its free mint. Voting power belongs to the NFT holder at the first ballot’s snapshot.</p>}
       <Button disabled={disabled || !state.genesis.open || state.genesis.walletMinted !== false} onClick={() => void submit("Mint free NFT", "Mint one Tincta Genesis NFT for 0 ETH plus network gas. It votes only on the first paid collection and has no prize, affiliate, sponsored mint or holder reward entitlement.", genesisMintTransaction)}>
@@ -638,6 +638,7 @@ function Experience({
           Vote for option {choice + 1}
         </Button>
         <Disclosure title="Voting eligibility & rules">
+          <div className="protocol-details">
           <p>
             Snapshot: {date(r.voteStart - 1n)}. Voting closes: {date(r.start)}.
             Minting then opens without another operator signature.
@@ -651,6 +652,7 @@ function Experience({
             No votes: option 1 wins. Ties: the lowest numbered tied option wins.
             All choices are published before voting opens.
           </p>
+          </div>
         </Disclosure>
       </section>
     </>
@@ -746,7 +748,6 @@ function Experience({
       </p>
       <Field
         label="Number of tickets"
-        hint="Choose 1–20, within your remaining mint allowance."
         error={
           !/^([1-9]|1[0-9]|20)$/.test(quantity)
             ? "Enter a whole number from 1 to 20."
@@ -774,12 +775,14 @@ function Experience({
             : `Affiliate position ${affiliate} applied`
         }
       >
+        <div className="protocol-details">
         {field(
           "Affiliate position",
           affiliate,
           setAffiliate,
           "Your referral link fills this in. Use 0 for a direct mint."
         )}
+        </div>
       </Disclosure>
       <p>
         Total, before network fees:{" "}
@@ -830,18 +833,15 @@ function Experience({
     <section className="protocol-panel">
       <h2>Invite people. Share the rewards.</h2>
       <p>
-        20% of mint funds is shared equally among qualified affiliates after a
-        successful draw. With three qualified affiliates, each receives one
-        third of that pool. Unfilled positions do not dilute your share.
+        Bring at least one paid referral. Share the 20% affiliate pool equally
+        with other qualified affiliates after a successful draw.
       </p>
       {r.affiliateId > 0n ? (
         <>
           <p>
-            Your position: {String(r.affiliateId)}. At least one paid referral
-            qualifies you for an equal share of the 20% affiliate pool after the
-            draw is finalized.
+            Your affiliate position: {String(r.affiliateId)}.
           </p>
-          <a href={`/?collection=${r.id}&affiliate=${r.affiliateId}`}>
+          <a className={textActionClassName()} href={`/?collection=${r.id}&affiliate=${r.affiliateId}`}>
             Your referral link
           </a>
           <div className="protocol-actions">
@@ -867,10 +867,7 @@ function Experience({
             </Button>
           </div>
           <p>Claimable: {eth(r.affiliateAvailable)}</p>
-          <p className="protocol-note">
-            Equal shares become claimable after draw finalization. Until then,
-            all mint receipts remain reserved for a possible refund.
-          </p>
+
           <Button
             disabled={disabled || r.affiliateAvailable === 0n}
             onClick={() =>
@@ -893,7 +890,6 @@ function Experience({
               : r.nextSlot === 0n
               ? "All affiliate positions are filled."
               : `Enrollment is open. Position ${r.nextSlot} is available until minting opens.`}{" "}
-            At least one paid referral is required to qualify.
           </p>
           {canVote && r.nextSlot > 0n && !(state.bootstrap && r.id === 1) && (
             <>
@@ -932,9 +928,8 @@ function Experience({
     <section className="protocol-panel">
       <h2 id="winning-tickets">Winning tickets</h2>
       <p>
-        All winning NFTs and their current holder addresses. Only the current
-        holder can claim an unclaimed prize. An address shown after a transfer
-        may differ from the wallet that received an earlier payment.
+        Only the current NFT holder can claim an unpaid prize. Current holders
+        may differ from past prize recipients.
       </p>
       {r.phase === 2 && (
         <Button
@@ -1151,7 +1146,6 @@ function Experience({
           {wallet.notice}
         </p>
       )}
-      {wallet.managed && !wallet.account && !state?.genesis && <p className="protocol-note">Connect your wallet in the header to participate.</p>}
       {wallet.managed && wallet.account && wallet.account.chainId !== config.chainId && <p className="protocol-note" role="status">Switch your wallet to {config.chainId === 1 ? "Ethereum" : "Sepolia testnet"} using the header to continue.</p>}
       {error && (
         <div className="protocol-panel" role="alert">

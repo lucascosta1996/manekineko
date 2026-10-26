@@ -73,7 +73,8 @@ function subject(selector) {
 export function inspectSource(file, text) {
   const errors = [];
   const report = (line, rule) => errors.push(`${file}:${line}: ${rule}`);
-  const application = !file.startsWith('packages/');
+  // Protocol contains consuming pages too; only packages/ui authors controls.
+  const application = !file.startsWith('packages/ui/');
   if (/\.tsx?$/.test(file)) {
     const tree = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
     function visit(node) {
@@ -111,10 +112,12 @@ export function inspectSource(file, text) {
     tree.walkRules(rule => {
       if (/\[class\s*[*^$]=/.test(rule.selector)) report(rule.source.start.line, 'VI-02 class-name substring styling');
       const owned = rule.selectors.some(selector => ownedClass.test(subject(selector)) || (/^summary(?:\W|$)/.test(subject(selector)) && /\.ui-disclosure(?:[^\w-]|$)/.test(selector)));
+      const action = rule.selectors.some(selector => /\.ui-(?:button(?:-[\w-]+)?|icon-button|text-action(?:-[\w-]+)?)(?![\w-])/.test(subject(selector)));
       rule.walkDecls(decl => {
         if (decl.important) report(decl.source.start.line, 'VI-02 important cascade override');
         if (application && decl.prop.startsWith('--ui-')) report(decl.source.start.line, 'VI-02 shared tokens are authored only in packages/ui');
         if (application && owned && ownedProperty.test(decl.prop)) report(decl.source.start.line, 'VI-03 app overrides shared control internals');
+        if (application && action && /^margin(?:-|$)/.test(decl.prop)) report(decl.source.start.line, 'VI-03 action spacing belongs to its parent');
       });
     });
   }

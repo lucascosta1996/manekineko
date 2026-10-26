@@ -36,15 +36,11 @@ export function CollectionTiming({
         className="public-timing"
         aria-label={`Collection timing: ${r.name}`}
       >
-        <p className="protocol-note">{timing.label}</p>
+        <p className="protocol-note">{timing.label}{r.phase !== 7 && !timing.unavailable ? " · Estimated" : ""}</p>
         <p className="public-timer" role={r.phase === 7 ? undefined : "timer"} aria-live="off">
           {timing.value}
         </p>
         <p>{timing.detail}</p>
-        {r.phase !== 7 && <p className="protocol-note">
-          Estimated from the latest verified block. The contract determines
-          availability.
-        </p>}
       </section>
     );
   return (

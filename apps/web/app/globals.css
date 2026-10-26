@@ -830,11 +830,11 @@ img {
   letter-spacing: 0;
 }
 .route-message {
-  max-width: 640px;
-  margin: 100px 0 140px;
+  max-width: 44rem;
+  margin: var(--ui-section-space) auto;
 }
 .route-message h1 {
-  margin: 18px 0;
+  margin: 0;
   font-size: var(--ui-page);
   line-height: 1.15;
   font-weight: 500;
@@ -842,9 +842,9 @@ img {
 }
 .route-message > p:not(.eyebrow) {
   color: var(--muted);
-  margin-bottom: 30px;
+  margin: 0;
   font-size: var(--ui-body);
-  line-height: 1.6;
+  line-height: var(--ui-body-line);
   font-weight: 400;
   letter-spacing: 0;
 }
@@ -1816,7 +1816,7 @@ img {
     border-top: 1px solid var(--line);
   }
   .mint-header .site-navigation[data-open="true"] nav { display: flex; }
-  .mint-header .site-navigation nav a { min-height: var(--ui-space-12); height: auto; font-size: var(--ui-label); line-height: 1.538462; font-weight: 500; letter-spacing: 0; }
+  .mint-header .site-navigation nav a { min-height: var(--ui-space-12); height: auto; font-size: var(--ui-label); line-height: var(--ui-control-line); font-weight: 500; letter-spacing: 0; }
   .mint-header .site-navigation nav a + a { border-top: 1px solid var(--line); }
   .mint-header .site-navigation nav a[aria-current="page"] { font-weight: 500; }
   .mint-header .site-navigation nav a[aria-current="page"]::after { display: none; }
@@ -1876,7 +1876,7 @@ img {
 .quantity-control { gap: .25rem; padding: 0; border: 0; }
 .quantity-control input { width: 4rem; text-align: center; }
 .preview-controls { border: 0; background: transparent; padding: 0; gap: .25rem; flex-wrap: wrap; }
-.route-message { display: flex; flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+.route-message { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--ui-space-6); }
 .route-message p { max-width: 55ch; }
 .route-message h1 {
   font-size: var(--ui-page);
