@@ -15,6 +15,7 @@ import { Icon } from "@manekineko/ui/icons";
 import { RewardsArtwork } from "@manekineko/ui/rewards-artwork";
 import type { Snapshot } from "./chain";
 import { CollectionTiming } from "./collection-timing";
+import { GenesisLaunchRules } from "./genesis-launch-rules";
 import "./public-workspace.css";
 
 export type PublicView = "home" | "claims" | "affiliates" | "holders";
@@ -149,7 +150,7 @@ export function PublicWorkspace({
           <RewardsArtwork className="public-empty-art" />
           <h2>Onchain seasons are being prepared.</h2>
           <p>
-            No collection is open here yet. Return when voting begins.
+            No collection is open here yet. The planned launch begins with Genesis.
           </p>
           <p className="protocol-note">
             Existing NFTs and claims keep their rights in their original
@@ -164,7 +165,7 @@ export function PublicWorkspace({
         </section>
       )}
       {view === "home" && state?.genesis && !r && genesis}
-      {view !== "home" && state?.genesis && !r && <section className="public-empty"><h2>The free mint comes first.</h2><p>Genesis NFTs vote only on the first paid collection. They have no prize, affiliate or holder reward entitlement.</p><Link className={buttonClassName({ variant: "secondary" })} href="/">View free mint</Link></section>}
+      {view !== "home" && state?.genesis && !r && <section className="public-empty"><h2>The free mint comes first.</h2><p>This connected test collection grants first-ballot voting only. Its original rules do not include Genesis affiliate eligibility.</p><Link className={buttonClassName({ variant: "secondary" })} href="/">View test collection</Link></section>}
       {state && !r && !state.genesis && (
         <section className="public-empty">
           <h2>The first collection is next.</h2>
@@ -342,9 +343,10 @@ export function PublicWorkspace({
         </Link>
       </nav>
       </div>
+      {(view === "home" || view === "affiliates") && <GenesisLaunchRules />}
       {view === "home" && <section className="public-explainer" aria-label="How a collection works">
         <h2>Every collection. Shared rewards.</h2>
-        <p>{state?.genesis && !r ? "Paid season allocations. Genesis NFTs have no reward entitlement." : "Mint revenue is allocated after a successful draw."}</p>
+        <p>{state?.genesis && !r ? "Paid season allocations. Genesis itself has no prize or season holder reward entitlement." : "Mint revenue is allocated after a successful draw."}</p>
         <dl className="public-allocation-grid">
           <div><dt>60% · Winning tickets</dt><dd>Equal prizes for winning NFT holders.</dd></div>
           <div><dt>20% · Qualified affiliates</dt><dd>Equal shares with at least one paid referral.</dd></div>

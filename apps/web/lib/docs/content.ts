@@ -20,6 +20,10 @@ export const docPages: DocPage[] = withDocVisuals([
           },
           {
             "type": "paragraph",
+            "text": "The planned launch begins with Genesis: 1,000 free NFTs, up to two lifetime primary mints per wallet, and no mint deadline. The first season starts only after all 1,000 mint. Genesis holders alone can enroll as affiliates in the first collection; later collections and seasons also accept eligible paid NFTs. These revised rules await deployment. The connected Sepolia test retains its original terms."
+          },
+          {
+            "type": "paragraph",
             "text": "Tincta seasons allocate 60% of mint revenue to winning NFTs, 20% to qualified affiliates, 10% to season holder rewards and 10% to the protocol treasury for infrastructure costs, future functionality and Tincta projects. These rules are planned for launch. Always review the terms of the selected collection before participating. These percentages cannot be voted away. Actual ETH allocations vary with the community-selected mint prices and supplies and the revenue received. All mint funds stay reserved until finalization. Unsold expiry or missing randomness at the fixed cutoff allows full mint-price refunds."
           },
           {
@@ -93,10 +97,10 @@ export const docPages: DocPage[] = withDocVisuals([
         "title": "The free mint before the first season",
         "blocks": [
           { "type": "genesis-artwork", "caption": "The first vote. A minimal geometric identity generated and stored entirely onchain. Each NFT carries its own token number." },
-          { "type": "paragraph", "text": "The planned launch introduces Tincta Genesis before any paid collection: 1,000 free NFTs, one lifetime primary mint per wallet, and a fixed 24-hour window. The mint price is 0 ETH; holders pay network gas. Transferring an NFT does not reset the sender’s mint limit. Genesis is a separate collection outside the paid season catalog." },
-          { "type": "paragraph", "text": "The first paid ballot can be prepared only after the full free-mint window ends, even if all free NFTs mint early. Each Genesis NFT held at that ballot’s ownership snapshot grants one vote. A transfer after the snapshot creates no extra vote. Genesis votes expire after this first paid ballot, including unused votes; they do not renew at the start of another season." },
-          { "type": "paragraph", "text": "Genesis NFTs receive no prize, affiliate eligibility, sponsored mint credit or season holder reward entitlement. Later voting uses NFTs from successfully revealed paid collections. The first paid collection’s separately configured no-NFT affiliate enrollment exception is unchanged. An empty free mint or a ballot with no votes still uses the published fallback option." },
-          { "type": "paragraph", "text": "Genesis is being tested on Sepolia. Mainnet minting has not launched. Existing contracts keep their original rules and cannot gain Genesis eligibility. Check the app’s configured network and contract before participating." }
+          { "type": "paragraph", "text": "The planned launch introduces Tincta Genesis before any paid collection: 1,000 free NFTs, up to two lifetime primary mints per wallet, and no mint deadline. The mint price is 0 ETH; holders pay network gas. Transferring an NFT does not reset the sender’s mint limit. Genesis is a separate edition outside the paid season catalog, sharing the new protocol’s single NFT contract. Selling out requires at least 500 minting wallets, not necessarily 500 distinct people or current holders." },
+          { "type": "paragraph", "text": "The first season cannot start until all 1,000 Genesis NFTs have minted. If Genesis never sells out, the first season never starts. The final mint opens the first ballot for its full voting duration; no elapsed-time fallback exists. Each Genesis NFT gives its current owner one vote in that ballot. An unused vote follows a transfer; a used vote never resets. Genesis votes expire after this first paid ballot, including unused votes; they do not renew at the start of another season." },
+          { "type": "paragraph", "text": "Genesis holders can enroll as affiliates throughout all collections and seasons. The first collection requires a Genesis NFT; later collections accept Genesis or an eligible NFT from an earlier successfully revealed paid collection. Enrollment still requires an available position, and rewards require a qualifying paid referral and a successful draw. Genesis grants no prize, sponsored mint credit or season holder reward entitlement. Later voting still requires successfully revealed paid NFTs." },
+          { "type": "paragraph", "text": "These revised launch terms await a new deployment. The current Sepolia test retains its earlier one-mint limit, fixed window and voting-only Genesis rights. Mainnet minting has not launched. Existing contracts keep their original rules; check the app’s configured network and contract before participating." }
         ]
       },
       {
@@ -105,7 +109,7 @@ export const docPages: DocPage[] = withDocVisuals([
         "blocks": [
           {
             "type": "paragraph",
-            "text": "Voting power is the number of eligible NFTs you held immediately before voting opened. Genesis NFTs qualify only for the first paid ballot. Otherwise, only previously successful, revealed and fully backed official paid collections qualify. Transferring an NFT after that snapshot does not give its recipient another vote."
+            "text": "Genesis NFTs qualify only for the first paid ballot, using the current-owner, once-per-NFT rule above. Later voting power is the number of eligible paid NFTs you held immediately before voting opened. Only previously successful, revealed and fully backed official paid collections qualify. Transferring a paid NFT after that snapshot does not give its recipient another vote."
           },
           {
             "type": "paragraph",
@@ -121,7 +125,7 @@ export const docPages: DocPage[] = withDocVisuals([
           },
           {
             "type": "paragraph",
-            "text": "Vote in source groups of up to 16 collections. Each source balance can be consumed once per ballot. Eligible historical NFTs need to be deposited into the voting vault before the snapshot because their original contracts lack ownership checkpoints. They can be withdrawn at any time."
+            "text": "Paid votes use source groups of up to 16 collections. Each source balance can be consumed once per ballot. The planned single-contract launch does not automatically import NFTs from older deployments. Earlier releases retain their own voting-vault and historical eligibility rules."
           }
         ]
       },
@@ -164,7 +168,7 @@ export const docPages: DocPage[] = withDocVisuals([
           },
           {
             "type": "paragraph",
-            "text": "Each recipient can receive at most 20 primary mints per collection across paid, referral and sponsored paths. A batch can contain at most 20 tickets. Transfers and refunds do not restore that allowance."
+            "text": "Each recipient can receive at most 20 primary mints per paid collection across paid, referral and sponsored paths. A batch can contain at most 20 tickets. Transfers and refunds do not restore that allowance. The planned Genesis launch has a separate limit of two lifetime primary mints per wallet and no mint deadline; existing test contracts retain their original limits."
           },
           {
             "type": "paragraph",
@@ -185,6 +189,10 @@ export const docPages: DocPage[] = withDocVisuals([
         "id": "progress",
         "title": "A published sequence",
         "blocks": [
+          {
+            "type": "paragraph",
+            "text": "For the planned launch, Genesis must sell out before the first season starts. Its 1,000 free NFTs have no mint deadline and allow up to two lifetime primary mints per wallet. The final mint opens the first paid ballot for its full voting duration. If Genesis never sells out, no deadline or operator action can start the first season. Existing Sepolia test contracts retain their original timing."
+          },
           {
             "type": "paragraph",
             "text": "Season names, collection names, order and geometric artwork are planned before the catalog is sealed. The next collection can be prepared after the previous draw is finalized with all liabilities funded, or refunds become available after unsold expiry or the randomness timeout. Old unpaid prizes and refunds remain reserved. Each successful draw also funds its season’s holder pool. The pool unlocks only when every planned collection in that season has drawn or become refundable; unpaid prizes and refunds do not delay it. The Holders page shows settled-collection progress before and after unlock."
@@ -257,11 +265,11 @@ export const docPages: DocPage[] = withDocVisuals([
         "blocks": [
           {
             "type": "paragraph",
-            "text": "Affiliate enrollment is open during the collection’s voting window, subject to an available position and onchain eligibility. Ordinarily you must hold an eligible NFT from an earlier successful official collection. A fresh protocol’s explicitly configured first collection can allow the initial no-NFT enrollment exception."
+            "text": "Under the planned launch rules, the first paid collection requires a Genesis NFT. Every later collection, including new seasons, accepts Genesis or an eligible NFT from an earlier successfully revealed paid collection. Enrollment is open during voting, subject to one of ten available positions and one enrollment per wallet per collection. These revised rules await deployment; existing tests retain their original eligibility rules."
           },
           {
             "type": "paragraph",
-            "text": "Enrollment uses your wallet and an onchain eligibility source. No server-issued admission permit is required. Keep the referral link shown after enrollment."
+            "text": "You must own the qualifying NFT when you enroll. Each NFT can qualify one wallet per target collection; transferring it cannot qualify another wallet for that same collection. It can qualify again in another collection or season. A Genesis vote does not consume affiliate eligibility. Enrollment and earned commissions remain with the enrolling wallet after an NFT transfer. No server-issued admission permit is required. Keep the referral link shown after enrollment."
           }
         ]
       },

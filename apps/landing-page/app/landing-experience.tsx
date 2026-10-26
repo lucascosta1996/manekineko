@@ -62,7 +62,7 @@ const faqs = (plannedRewards: PlannedRewards) => [
   {
     question: "How can I vote before the first paid collection?",
     answer:
-      "The planned launch begins with Tincta Genesis: 1,000 free NFTs, one lifetime free mint per wallet, and a 24-hour mint window. You pay network gas. Hold a Genesis NFT at the first paid ballot’s snapshot to vote on that collection only. These votes expire after that ballot and do not renew each season. Genesis NFTs have no prizes, affiliate eligibility, sponsored mint credit or season holder rewards. Genesis is being tested on Sepolia. Mainnet minting has not launched.",
+      "The planned launch begins with Tincta Genesis: 1,000 free NFTs, up to two lifetime primary mints per wallet, and no mint deadline. You pay network gas. The first season waits until all 1,000 are minted; the final mint opens its first ballot. Each Genesis NFT gives its current holder one vote in that ballot only. Holders can also enroll as affiliates throughout all collections and seasons, subject to available positions. The first collection requires Genesis; later collections also accept eligible paid NFTs. Affiliate rewards require a paid referral and a successful draw. These revised terms await deployment; the current Sepolia test retains its earlier rules.",
   },
   {
     question: "How does community voting change the prizes?",
@@ -82,7 +82,7 @@ const faqs = (plannedRewards: PlannedRewards) => [
   {
     question: "How do affiliate rewards work?",
     answer:
-      "Eligible holders enroll during voting, subject to an available position and onchain eligibility. One attributed paid referral qualifies an affiliate. Sellout fixes equal shares of the 20% affiliate pool, claimable after successful draw finalization. Three qualifiers each receive one third, regardless of referral count. Division dust or a pool with no qualifiers remains a separate reserve. Refundable collections create no affiliate payout.",
+      "For the planned launch, the first collection’s affiliates must hold Genesis. Later collections accept Genesis or an eligible NFT from an earlier successful paid collection. Holders enroll during voting, subject to one of ten available positions. Each NFT can qualify one wallet per collection; transferring it does not reset that use. One attributed paid referral qualifies an affiliate. Sellout fixes equal shares of the 20% affiliate pool, claimable after successful draw finalization. Three qualifiers each receive one third, regardless of referral count. Division dust or a pool with no qualifiers remains a separate reserve. Refundable collections create no affiliate payout.",
   },
   {
     question: "What if a collection doesn’t sell out?",
@@ -254,9 +254,10 @@ export function LandingExperience({
             <h2 id="genesis-heading">It starts with your vote.</h2>
             <p>A free onchain NFT for the community that shapes the first paid collection.</p>
             <p><strong>Only for the first vote.</strong> For future votes, you’ll need NFTs from successfully revealed paid season collections.</p>
-            <p>1,000 NFTs. One lifetime mint per wallet. A 24-hour mint window. 0 ETH + network gas.</p>
-            <p className="genesis-note">Genesis carries no prize, affiliate, sponsored mint or season holder reward entitlement. Sepolia testing is underway; Mainnet minting has not launched.</p>
-            <LinkButton href={`${footerLinks.app ?? "https://app.tincta.xyz"}?chainId=11155111`} variant="secondary">View Genesis on Sepolia<Icon name="arrow" /></LinkButton>
+            <p>1,000 NFTs. Up to two lifetime mints per wallet. No mint deadline. 0 ETH + network gas.</p>
+            <p>The first season starts only after Genesis sells out. Affiliate enrollment requires Genesis for the first collection; later collections and seasons accept Genesis or eligible paid NFTs. Positions are limited, and rewards require a paid referral and a successful draw.</p>
+            <p className="genesis-note">Genesis has no prize, sponsored mint or season holder reward entitlement. These are the planned launch terms; the current Sepolia test uses earlier rules. Mainnet minting has not launched.</p>
+            <LinkButton href={`${footerLinks.docs ?? "https://app.tincta.xyz/docs"}/onchain-voting#genesis`} variant="secondary">Read Genesis rules<Icon name="arrow" /></LinkButton>
           </div>
         </section>
 

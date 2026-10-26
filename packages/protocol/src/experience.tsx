@@ -527,7 +527,7 @@ function Experience({
       <GenesisArtwork />
       <div className="genesis-details">
       <h2 id="genesis-title">Tincta Genesis</h2>
-      <p>A free onchain NFT for the community’s first ballot.</p>
+      <p>Connected test collection · original rules. These terms apply to the existing test NFT.</p>
       <p className="genesis-voting-rule"><strong>Only for the first vote.</strong> For future votes, you’ll need NFTs from successfully revealed paid season collections.</p>
       <dl className="genesis-terms">
         <div><dt>Mint price</dt><dd>0 ETH + network gas</dd></div>
@@ -541,7 +541,7 @@ function Experience({
       <Button disabled={disabled || !state.genesis.open || state.genesis.walletMinted !== false} onClick={() => void submit("Mint free NFT", "Mint one Tincta Genesis NFT for 0 ETH plus network gas. It votes only on the first paid collection and has no prize, affiliate, sponsored mint or holder reward entitlement.", genesisMintTransaction)}>
         {state.genesis.walletMinted ? "Free NFT minted" : "Mint free NFT"}
       </Button>
-      <p className="protocol-note">No prizes, affiliate eligibility, sponsored mints or season holder rewards. Transferring this NFT does not restore your free mint.</p>
+      <p className="protocol-note">This test collection has no prizes, affiliate eligibility, sponsored mints or season holder rewards. Transferring this NFT does not restore your free mint.</p>
       <a className={textActionClassName()} href={`${explorer(state.genesis.address)}#code`} target="_blank" rel="noreferrer">Read free mint contract</a>
       </div>
     </section>
@@ -836,6 +836,7 @@ function Experience({
         Bring at least one paid referral. Share the 20% affiliate pool equally
         with other qualified affiliates after a successful draw.
       </p>
+      <p className="protocol-note">Enrollment here follows this connected collection’s original contract rules. The planned launch adds Genesis eligibility as explained below.</p>
       {r.affiliateId > 0n ? (
         <>
           <p>

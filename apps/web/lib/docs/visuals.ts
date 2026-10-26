@@ -11,12 +11,12 @@ const visuals: Record<string, Record<string, DocBlock[]>> = {
     ], caption: "This allocation applies after a successful draw. Before finalization, mint receipts stay reserved; refundable collections return the full mint price. Holder rewards are planned for launch.",
   }] },
   "onchain-voting": { vote: [{
-    type: "flow", title: "From NFT ownership to final mint terms",
+    type: "flow", title: "From paid NFT ownership to final mint terms",
     steps: [
       { title: "Snapshot eligible ownership", text: "The contract uses the eligible NFTs held immediately before voting opens." },
       { title: "Vote for a published package", text: "Each eligible NFT adds one vote. A package includes price, supply, winner count and duration." },
       { title: "The voting deadline arrives", text: "The winning package becomes final and minting opens. No activation signature is needed." },
-    ], caption: "A transfer after the snapshot cannot create another vote. Fixed allocation percentages are outside the ballot.",
+    ], caption: "Paid NFTs use ownership snapshots. Genesis uses one current-owner vote per NFT in the first ballot only. Fixed allocation percentages are outside the ballot.",
   }, {
     type: "formula", title: "Selecting the winning package", equations: ["j* = min { j : vⱼ = max(v₁, …, vₘ) }"],
     definitions: [{ symbol: "vⱼ", meaning: "Total eligible NFT votes for published option j." }, { symbol: "j*", meaning: "The winning option, using 1-based option order here." }],
