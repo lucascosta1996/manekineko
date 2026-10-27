@@ -86,7 +86,7 @@ for (const width of [390, 1440]) test(`V14 documentation and landing explain fir
   await page.screenshot({ path: `test-results/v14-docs-${width}-${info.project.name}.png`, fullPage: true });
   await page.goto(`${urls.landing}/rewards`); await ready(page);
   await page.getByText('How can I vote before the first paid collection?', { exact: true }).click();
-  await expect(page.getByText(/The planned launch begins with Tincta Genesis/)).toBeVisible();
+  await expect(page.getByText(/Tincta Genesis has two utilities/)).toBeVisible();
   await expect(page.locator('#genesis .genesis-artwork img')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   expect((await new AxeBuilder({ page }).include('#questions').analyze()).violations).toEqual([]);

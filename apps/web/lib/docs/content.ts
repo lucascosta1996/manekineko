@@ -24,7 +24,7 @@ export const docPages: DocPage[] = withDocVisuals([
           },
           {
             "type": "paragraph",
-            "text": "Tincta seasons allocate 60% of mint revenue to winning NFTs, 20% to qualified affiliates, 10% to season holder rewards and 10% to the protocol treasury for infrastructure costs, future functionality and Tincta projects. These rules are planned for launch. Always review the terms of the selected collection before participating. These percentages cannot be voted away. Actual ETH allocations vary with the community-selected mint prices and supplies and the revenue received. All mint funds stay reserved until finalization. Unsold expiry or missing randomness at the fixed cutoff allows full mint-price refunds."
+            "text": "Tincta seasons allocate 60% of mint revenue to winning NFTs, 20% to qualified affiliates, 10% to season holder rewards and 10% to the protocol treasury for infrastructure costs, future functionality and Tincta projects. If no affiliate qualifies through a paid referral, the full 20% affiliate allocation joins the operator’s 10% protocol treasury after a successful draw, making 30% withdrawable by the operator. Prizes keep 60% and season holders keep 10%. These rules are planned for launch. Always review the terms of the selected collection before participating. These percentages cannot be voted away. Actual ETH allocations vary with the community-selected mint prices and supplies and the revenue received. All mint funds stay reserved until finalization. Unsold expiry or missing randomness at the fixed cutoff allows full mint-price refunds."
           },
           {
             "type": "paragraph",
@@ -97,9 +97,9 @@ export const docPages: DocPage[] = withDocVisuals([
         "title": "The free mint before the first season",
         "blocks": [
           { "type": "genesis-artwork", "caption": "The first vote. A minimal geometric identity generated and stored entirely onchain. Each NFT carries its own token number." },
-          { "type": "paragraph", "text": "The planned launch introduces Tincta Genesis before any paid collection: 1,000 free NFTs, up to two lifetime primary mints per wallet, and no mint deadline. The mint price is 0 ETH; holders pay network gas. Transferring an NFT does not reset the sender’s mint limit. Genesis is a separate edition outside the paid season catalog, sharing the new protocol’s single NFT contract. Selling out requires at least 500 minting wallets, not necessarily 500 distinct people or current holders." },
+          { "type": "paragraph", "text": "Tincta Genesis has two utilities: voting on the first collection and affiliate enrollment across all collections and seasons. The planned launch introduces 1,000 free NFTs before any paid collection, up to two lifetime primary mints per wallet, and no mint deadline. The mint price is 0 ETH; holders pay network gas. Transferring an NFT does not reset the sender’s mint limit. Genesis is a separate edition outside the paid season catalog, sharing the new protocol’s single NFT contract. Selling out requires at least 500 minting wallets, not necessarily 500 distinct people or current holders." },
           { "type": "paragraph", "text": "The first season cannot start until all 1,000 Genesis NFTs have minted. If Genesis never sells out, the first season never starts. The final mint opens the first ballot for its full voting duration; no elapsed-time fallback exists. Each Genesis NFT gives its current owner one vote in that ballot. An unused vote follows a transfer; a used vote never resets. Genesis votes expire after this first paid ballot, including unused votes; they do not renew at the start of another season." },
-          { "type": "paragraph", "text": "Genesis holders can enroll as affiliates throughout all collections and seasons. The first collection requires a Genesis NFT; later collections accept Genesis or an eligible NFT from an earlier successfully revealed paid collection. Enrollment still requires an available position, and rewards require a qualifying paid referral and a successful draw. Genesis grants no prize, sponsored mint credit or season holder reward entitlement. Later voting still requires successfully revealed paid NFTs." },
+          { "type": "paragraph", "text": "Genesis holders can enroll as affiliates throughout all collections and seasons. The first collection requires a Genesis NFT; later collections accept Genesis or an eligible NFT from an earlier successfully revealed paid collection. Enrollment still requires an available position. Share your referral URL: one paid token mint through it qualifies you to earn real ETH from an equal share of the affiliate pool, claimable after sellout and a successful draw. Genesis grants no prize, sponsored mint credit or season holder reward entitlement. Later voting still requires successfully revealed paid NFTs." },
           { "type": "paragraph", "text": "These revised launch terms await a new deployment. The current Sepolia test retains its earlier one-mint limit, fixed window and voting-only Genesis rights. Mainnet minting has not launched. Existing contracts keep their original rules; check the app’s configured network and contract before participating." }
         ]
       },
@@ -121,7 +121,7 @@ export const docPages: DocPage[] = withDocVisuals([
           },
           {
             "type": "paragraph",
-            "text": "For illustration, a successful collection of 1,000 NFTs at 0.01 ETH collects 10 ETH: 6 ETH for prizes, 2 ETH for affiliates, 1 ETH for season holders and 1 ETH for the treasury. The treasury allocation stays 10%, intended to fund infrastructure costs, future functionality and Tincta projects."
+            "text": "For illustration, a successful collection of 1,000 NFTs at 0.01 ETH collects 10 ETH: 6 ETH for prizes, 2 ETH for affiliates, 1 ETH for season holders and 1 ETH for the treasury. This example assumes at least one qualifying affiliate. If none qualifies, the 2 ETH affiliate allocation joins the 1 ETH operator treasury, making 3 ETH withdrawable after the successful draw. The treasury funds infrastructure costs, future functionality and Tincta projects."
           },
           {
             "type": "paragraph",
@@ -279,11 +279,11 @@ export const docPages: DocPage[] = withDocVisuals([
         "blocks": [
           {
             "type": "paragraph",
-            "text": "At least one attributed paid referral qualifies an enrolled affiliate. Self-referrals are rejected. Sellout fixes equal shares of the 20% affiliate pool, claimable only after a successful draw, regardless of individual referral counts. The ETH pool follows actual mint revenue under the voted terms; it is not a fixed 2 ETH."
+            "text": "Affiliates earn real ETH by sharing their referral URL. At least one paid token mint through that URL qualifies an enrolled affiliate. Self-referrals are rejected. Sellout fixes equal shares of the 20% affiliate pool, claimable only after a successful draw, regardless of individual referral counts. The ETH pool follows actual mint revenue under the voted terms; it is not a fixed 2 ETH."
           },
           {
             "type": "paragraph",
-            "text": "If three out of ten positions qualify, each receives one third of the pool, rounded down to whole wei. An unfilled or unqualified position does not keep a separate share. Division dust or a pool with zero qualifiers stays in a separately tracked unused reserve."
+            "text": "If three out of ten positions qualify, each receives one third of the pool, rounded down to whole wei. An unfilled or unqualified position does not keep a separate share. Under the planned launch rules, if no affiliate qualifies, the entire 20% affiliate allocation joins the operator’s 10% protocol treasury after a successful draw, making 30% withdrawable by the operator. This includes collections with no enrolled affiliates. With one or more qualifiers, the treasury remains 10% and only division dust stays in the separately tracked unused affiliate reserve. The same funds cannot be withdrawn from both buckets. Prize and holder allocations remain 60% and 10%. Existing deployments retain their original accounting."
           },
           {
             "type": "paragraph",

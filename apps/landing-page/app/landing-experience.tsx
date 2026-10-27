@@ -32,12 +32,12 @@ const faqs = (plannedRewards: PlannedRewards) => [
   {
     question: "What is the protocol treasury for?",
     answer:
-      "For Tincta seasons, after a successful draw, 10% of mint revenue is allocated to the protocol treasury to fund infrastructure costs, future functionality and Tincta projects. Prize, earned affiliate and refund obligations remain protected. Another 10% funds a locked season holder pool for the first 5% of eligible NFTs to claim after season end. Season holder rewards are planned for launch. Refundable collections create no treasury or holder allocation from mint revenue.",
+      "For the planned launch, a successful draw allocates 10% of mint revenue to the operator’s protocol treasury for infrastructure costs, future functionality and Tincta projects. If no affiliate brings at least one paid mint through their referral URL, the full 20% affiliate pool joins that treasury, making 30% withdrawable by the operator. Prize, earned affiliate and refund obligations remain protected. Another 10% funds a locked season holder pool for the first 5% of eligible NFTs to claim after season end. Season holder rewards are planned for launch. Refundable collections create no treasury or holder allocation from mint revenue.",
   },
   {
     question: "Can the team withdraw prizes, commissions or holder rewards?",
     answer:
-      "No. The contract reserves unpaid prizes and earned affiliate commissions for their recipients. The operator cannot withdraw those funds or claim them for you. Holder funds are held in a separate season pool with no operator withdrawal. Unallocated affiliate budget is a separate reserve that the operator can withdraw after the draw; it is not an earned commission.",
+      "No. The contract reserves unpaid prizes and earned affiliate commissions for their recipients. The operator cannot withdraw those funds or claim them for you. Holder funds are held in a separate season pool with no operator withdrawal. Under the planned launch rules, if no affiliate qualifies, the full 20% affiliate pool joins the operator’s 10% treasury after a successful draw. When affiliates do qualify, only division dust remains in the separate unused affiliate reserve. Neither is an earned commission.",
   },
   {
     question: "How are season holder rewards calculated?",
@@ -62,7 +62,7 @@ const faqs = (plannedRewards: PlannedRewards) => [
   {
     question: "How can I vote before the first paid collection?",
     answer:
-      "The planned launch begins with Tincta Genesis: 1,000 free NFTs, up to two lifetime primary mints per wallet, and no mint deadline. You pay network gas. The first season waits until all 1,000 are minted; the final mint opens its first ballot. Each Genesis NFT gives its current holder one vote in that ballot only. Holders can also enroll as affiliates throughout all collections and seasons, subject to available positions. The first collection requires Genesis; later collections also accept eligible paid NFTs. Affiliate rewards require a paid referral and a successful draw. These revised terms await deployment; the current Sepolia test retains its earlier rules.",
+      "Tincta Genesis has two utilities: voting on the first collection and affiliate enrollment across all collections and seasons. The planned launch has 1,000 free NFTs, up to two lifetime primary mints per wallet, and no mint deadline. You pay network gas. The first season waits until all 1,000 are minted; the final mint opens its first ballot. Each Genesis NFT gives its current holder one vote in that ballot only. Holders can also enroll as affiliates throughout all collections and seasons, subject to available positions. The first collection requires Genesis; later collections also accept eligible paid NFTs. Share your referral URL: one paid token mint through it qualifies you for an equal share of the ETH affiliate pool, claimable after sellout and a successful draw. These revised terms await deployment; the current Sepolia test retains its earlier rules.",
   },
   {
     question: "How does community voting change the prizes?",
@@ -82,7 +82,7 @@ const faqs = (plannedRewards: PlannedRewards) => [
   {
     question: "How do affiliate rewards work?",
     answer:
-      "For the planned launch, the first collection’s affiliates must hold Genesis. Later collections accept Genesis or an eligible NFT from an earlier successful paid collection. Holders enroll during voting, subject to one of ten available positions. Each NFT can qualify one wallet per collection; transferring it does not reset that use. One attributed paid referral qualifies an affiliate. Sellout fixes equal shares of the 20% affiliate pool, claimable after successful draw finalization. Three qualifiers each receive one third, regardless of referral count. Division dust or a pool with no qualifiers remains a separate reserve. Refundable collections create no affiliate payout.",
+      "For the planned launch, the first collection’s affiliates must hold Genesis. Later collections accept Genesis or an eligible NFT from an earlier successful paid collection. Holders enroll during voting, subject to one of ten available positions. Each NFT can qualify one wallet per collection; transferring it does not reset that use. One paid token mint through your referral URL qualifies you to earn real ETH. Sellout fixes equal shares of the 20% affiliate pool, claimable after successful draw finalization. Three qualifiers each receive one third, regardless of referral count. If no affiliate qualifies, the full 20% joins the operator’s 10% treasury allocation after a successful draw, making 30% withdrawable. Division dust when affiliates qualify remains a separate unused reserve. Refundable collections create no affiliate payout.",
   },
   {
     question: "What if a collection doesn’t sell out?",
@@ -250,12 +250,13 @@ export function LandingExperience({
         <section className="genesis-intro wrap" id="genesis" aria-labelledby="genesis-heading">
           <GenesisArtwork />
           <div className="genesis-intro-copy">
-            <p className="eyebrow">Tincta Genesis / The first vote</p>
-            <h2 id="genesis-heading">It starts with your vote.</h2>
-            <p>A free onchain NFT for the community that shapes the first paid collection.</p>
-            <p><strong>Only for the first vote.</strong> For future votes, you’ll need NFTs from successfully revealed paid season collections.</p>
+            <p className="eyebrow">Tincta Genesis / Two utilities</p>
+            <h2 id="genesis-heading">One NFT. Two utilities.</h2>
+            <p>Vote on the first collection. Enroll in the affiliate program across every collection and season.</p>
+            <p><strong>Earn real ETH through referrals.</strong> Enroll during voting, then share your referral URL. When someone uses it to mint a paid token, you qualify for an equal share of the 20% affiliate pool, claimable after sellout and a successful draw.</p>
+            <p>Genesis voting ends after the first ballot. For future votes, you’ll need NFTs from successfully revealed paid season collections.</p>
             <p>1,000 NFTs. Up to two lifetime mints per wallet. No mint deadline. 0 ETH + network gas.</p>
-            <p>The first season starts only after Genesis sells out. Affiliate enrollment requires Genesis for the first collection; later collections and seasons accept Genesis or eligible paid NFTs. Positions are limited, and rewards require a paid referral and a successful draw.</p>
+            <p>The first season starts only after Genesis sells out. Affiliate enrollment requires Genesis for the first collection; later collections and seasons accept Genesis or eligible paid NFTs. Positions are limited.</p>
             <p className="genesis-note">Genesis has no prize, sponsored mint or season holder reward entitlement. These are the planned launch terms; the current Sepolia test uses earlier rules. Mainnet minting has not launched.</p>
             <LinkButton href={`${footerLinks.docs ?? "https://app.tincta.xyz/docs"}/onchain-voting#genesis`} variant="secondary">Read Genesis rules<Icon name="arrow" /></LinkButton>
           </div>

@@ -8,7 +8,7 @@ const visuals: Record<string, Record<string, DocBlock[]>> = {
       { label: "Qualified affiliates", share: 20, text: "Equal shares for enrolled affiliates with a paid referral." },
       { label: "Season holders", share: 10, text: "A separate pool, locked until the whole season settles." },
       { label: "Protocol treasury", share: 10, text: "For infrastructure costs, future functionality and Tincta projects." },
-    ], caption: "This allocation applies after a successful draw. Before finalization, mint receipts stay reserved; refundable collections return the full mint price. Holder rewards are planned for launch.",
+    ], caption: "Planned allocation with at least one qualifying affiliate. With none, the full 20% affiliate pool joins the operator treasury: 30% after a successful draw. Prizes remain 60% and holders 10%. Before finalization, mint receipts stay reserved; refundable collections return the full mint price. Holder rewards are planned for launch.",
   }] },
   "onchain-voting": { vote: [{
     type: "flow", title: "From paid NFT ownership to final mint terms",
@@ -52,7 +52,7 @@ const visuals: Record<string, Record<string, DocBlock[]>> = {
   }, {
     type: "formula", title: "The same share for every qualifier", equations: ["Affiliate pool = R × 20%", "Share = ⌊ Affiliate pool ÷ Q ⌋"],
     definitions: [{ symbol: "R", meaning: "The collection’s actual mint revenue, in wei." }, { symbol: "Q", meaning: "Number of qualified affiliates at sellout, from 1 to 10." }, { symbol: "⌊x⌋", meaning: "Round down to a whole wei." }],
-    note: "With no qualifiers, no affiliate share is payable. An unused pool or division dust stays in the separate unused affiliate reserve; it is not an earned commission.",
+    note: "With no qualifiers, no affiliate share is payable. Under the planned launch rules, the entire 20% pool joins the operator’s 10% treasury after a successful draw, making 30% withdrawable. With qualifying affiliates, only division dust remains in the separate unused affiliate reserve.",
   }] },
   "holder-rewards": { "dynamic-amounts": [{
     type: "formula", title: "From season contributions to equal claims", equations: ["P = Σ (Rᵢ × 10%)", "E = Σ Nᵢ", "L = ⌊ E × 5% ⌋", "Reward per NFT = ⌊ P ÷ L ⌋"],
