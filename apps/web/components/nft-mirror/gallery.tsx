@@ -70,6 +70,6 @@ export function CollectionGalleryView({data}: {data: CollectionGallery}) {
         : syncing ? 'The gallery is catching up. Confirmed NFTs will appear as their artwork and numbers finish syncing.'
         : 'Minted NFTs will appear here automatically once confirmed.'}</p></div>}
     <GalleryPagination path={galleryPath(item.chainId,item.address)} page={page} total={item.ready} />
-    <p className="mirror-footnote">{genesis ? <>Ownership at the first paid ballot’s snapshot determines voting eligibility. <Link href="/docs/onchain-voting#genesis">Read the Genesis rules<Icon name="arrow" /></Link></> : <>These numbers identify each NFT; they do not predict prizes. <Link href="/docs/verification">How permanent numbers work<Icon name="arrow" /></Link></>}</p>
+    <p className="mirror-footnote">{genesis ? <>Ownership at the first paid ballot’s snapshot determines voting eligibility. <Link href="/docs/genesis">Read the Genesis rules<Icon name="arrow" /></Link></> : <>These numbers identify each NFT; they do not predict prizes. <Link href="/docs/verification">How permanent numbers work<Icon name="arrow" /></Link></>}</p>
   </section>;
 }

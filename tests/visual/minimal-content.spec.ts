@@ -62,12 +62,12 @@ for (const width of [390, 1440]) {
     await page.route('https://api.web3modal.org/appkit/v1/**', route => route.fulfill({ headers: { 'access-control-allow-origin': '*' }, json: { features: [], planLimits: { tier: 'starter', isAboveMauLimit: false, isAboveRpcLimit: false } } }));
     await page.setViewportSize({ width, height: 900 });
     await page.goto(urls.web + '/?state=unconfigured'); await ready(page);
-    await expect(page.locator('.public-allocation-grid > div')).toHaveCount(4);
+    await expect(page.locator('.public-allocation-grid')).toHaveCount(0);
     await expect(page.locator('.public-rules-grid')).toHaveCount(0);
-    await expect(page.getByRole('link', { name: 'Explore the documentation', exact: true })).toHaveAttribute('href', '/docs');
-    await expect(page.locator('.public-explainer')).toContainText('Shared rewards.');
-    await page.locator('.public-explainer').screenshot({ path: info.outputPath(`public-rules-${width}.png`) });
-    expect((await new AxeBuilder({ page }).include('.public-explainer').analyze()).violations).toEqual([]);
+    await expect(page.getByRole('link', { name: 'Read the Genesis guide', exact: true })).toHaveAttribute('href', '/docs/genesis');
+    await expect(page.locator('.public-explainer')).toHaveCount(0);
+    await page.locator('.public-primary').screenshot({ path: info.outputPath(`public-rules-${width}.png`) });
+    expect((await new AxeBuilder({ page }).include('.public-primary').analyze()).violations).toEqual([]);
     await page.addStyleTag({ content: 'html { font-size: 200%; }' });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });

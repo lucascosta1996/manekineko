@@ -53,6 +53,106 @@ export const docPages: DocPage[] = withDocVisuals([
     ]
   },
   {
+    "slug": "genesis",
+    "title": "Tincta Genesis",
+    "description": "One free NFT. Two utilities.",
+    "group": "Start here",
+    "minutes": 5,
+    "sections": [
+      {
+        "id": "utilities",
+        "title": "Two ways to participate",
+        "blocks": [
+          { "type": "list", "ordered": true, "items": [
+            "Vote on the first collection. Each Genesis NFT gives its owner one vote in the first paid collection’s ballot.",
+            "Enroll in the affiliate program across all collections and seasons. Share your referral URL to earn real ETH when it leads to a qualifying paid mint and the collection completes a successful draw."
+          ] },
+          { "type": "callout", "title": "Planned launch terms", "text": "Mainnet minting has not launched. These revised Genesis rules await deployment; the connected Sepolia test keeps its original terms, described below." }
+        ]
+      },
+      {
+        "id": "minting",
+        "title": "Minting your Genesis NFT",
+        "blocks": [
+          { "type": "table", "columns": ["Rule", "Genesis launch terms"], "rows": [
+            ["Supply", "1,000 NFTs"],
+            ["Mint price", "0 ETH, plus network gas"],
+            ["Wallet limit", "Up to two lifetime primary mints per wallet"],
+            ["Mint deadline", "None. Minting remains open until all 1,000 NFTs are minted."]
+          ] },
+          { "type": "paragraph", "text": "Transferring an NFT does not reset the sender’s mint allowance. Selling out requires at least 500 minting wallets, not necessarily 500 distinct people or current holders." },
+          { "type": "paragraph", "text": "Genesis is a separate edition outside the paid season catalog, sharing the new protocol’s single NFT contract. Its mint is free; network gas is still paid by the person submitting the transaction." }
+        ]
+      },
+      {
+        "id": "first-season",
+        "title": "The first season waits for sellout",
+        "blocks": [
+          { "type": "paragraph", "text": "The first season starts only after all 1,000 Genesis NFTs have minted. If Genesis never sells out, the first season never starts. There is no deadline that starts it automatically." },
+          { "type": "flow", "title": "From Genesis to the first paid collection", "steps": [
+            { "title": "Genesis sells out", "text": "All 1,000 NFTs must mint. There is no time limit." },
+            { "title": "The first ballot opens", "text": "The final Genesis mint opens the ballot for its full voting duration." },
+            { "title": "Paid minting begins", "text": "When voting ends, the winning terms become final and the first paid mint opens." }
+          ], "caption": "The voting period starts at Genesis sellout. Elapsed time alone cannot start the first season." }
+        ]
+      },
+      {
+        "id": "voting",
+        "title": "Vote on the first collection",
+        "blocks": [
+          { "type": "paragraph", "text": "Each Genesis NFT gives its current owner one vote in the first paid ballot. An unused vote follows a transfer; a used vote never resets." },
+          { "type": "paragraph", "text": "Genesis votes expire after that first ballot, including unused votes. They do not renew for later collections or seasons. Future voting requires eligible NFTs from successfully revealed paid collections." }
+        ]
+      },
+      {
+        "id": "affiliates",
+        "title": "Enroll as an affiliate across all collections",
+        "blocks": [
+          { "type": "table", "columns": ["Collection", "Enrollment eligibility"], "rows": [
+            ["First paid collection", "Genesis holders only"],
+            ["Later collections and seasons", "Genesis or an eligible NFT from an earlier successfully revealed paid collection"]
+          ] },
+          { "type": "paragraph", "text": "Enroll during voting while a position is available. There are ten affiliate positions per collection and one enrollment per wallet. Each NFT can qualify once per target collection; transferring a used NFT cannot create another enrollment in that collection. It can qualify again in a later collection or season." },
+          { "type": "paragraph", "text": "Voting and affiliate enrollment are independent uses of your NFT. Enrollment and earned affiliate rewards stay with the enrolling wallet after the qualifying NFT is transferred." }
+        ]
+      },
+      {
+        "id": "referral-rewards",
+        "title": "Earn real ETH through your referral URL",
+        "blocks": [
+          { "type": "paragraph", "text": "After enrolling, share your referral URL. When someone uses it to mint at least one paid token, you qualify for an equal share of the collection’s 20% affiliate pool. Self-referrals and sponsored mints do not qualify. More referrals do not increase a qualified affiliate’s share." },
+          { "type": "paragraph", "text": "Affiliate rewards are claimable only after sellout and a successful draw. Holding Genesis or enrolling alone does not create an ETH claim. Refundable collections create no affiliate payout." },
+          { "type": "paragraph", "text": "If no enrolled affiliate brings a qualifying paid mint, the entire 20% affiliate allocation joins the operator’s usual 10% treasury allocation after a successful draw, making 30% withdrawable by the operator. This also applies when nobody enrolls. With one or more qualifiers, treasury remains 10% and the affiliate pool is shared equally among them; only division dust is unused. Prize and holder allocations remain 60% and 10%. Refundable collections allocate nothing to either operator bucket." }
+        ]
+      },
+      {
+        "id": "limits",
+        "title": "What Genesis does not include",
+        "blocks": [
+          { "type": "paragraph", "text": "Genesis itself has no prize, sponsored mint credit or season holder reward entitlement. Those benefits belong to qualifying paid NFTs under their own collection rules." },
+          { "type": "paragraph", "text": "The current Sepolia test retains its earlier one-mint limit, fixed window and voting-only Genesis rights. Existing contracts keep their original rules; check the app’s configured network and contract before participating. The new launch rules do not change historical NFTs." }
+        ]
+      },
+      {
+        "id": "artwork",
+        "title": "An onchain edition",
+        "blocks": [
+          { "type": "genesis-artwork", "caption": "The first vote. A minimal geometric identity generated and stored entirely onchain. Each NFT carries its own token number." }
+        ]
+      },
+      {
+        "id": "related-guides",
+        "title": "Continue reading",
+        "blocks": [
+          { "type": "links", "items": [
+            { "label": "Voting and collection terms", "description": "How ballots choose price, supply, prizes and paid mint duration.", "href": "/docs/onchain-voting" },
+            { "label": "Affiliate rewards", "description": "Enrollment, referral attribution and claiming your share.", "href": "/docs/affiliates" }
+          ] }
+        ]
+      }
+    ]
+  },
+  {
     "slug": "holder-rewards",
     "title": "Season holder rewards",
     "description": "The 10% season pool, 5% NFT coverage and first-come claims.",
@@ -94,13 +194,10 @@ export const docPages: DocPage[] = withDocVisuals([
     "sections": [
       {
         "id": "genesis",
-        "title": "The free mint before the first season",
+        "title": "Tincta Genesis",
         "blocks": [
-          { "type": "genesis-artwork", "caption": "The first vote. A minimal geometric identity generated and stored entirely onchain. Each NFT carries its own token number." },
-          { "type": "paragraph", "text": "Tincta Genesis has two utilities: voting on the first collection and affiliate enrollment across all collections and seasons. The planned launch introduces 1,000 free NFTs before any paid collection, up to two lifetime primary mints per wallet, and no mint deadline. The mint price is 0 ETH; holders pay network gas. Transferring an NFT does not reset the sender’s mint limit. Genesis is a separate edition outside the paid season catalog, sharing the new protocol’s single NFT contract. Selling out requires at least 500 minting wallets, not necessarily 500 distinct people or current holders." },
-          { "type": "paragraph", "text": "The first season cannot start until all 1,000 Genesis NFTs have minted. If Genesis never sells out, the first season never starts. The final mint opens the first ballot for its full voting duration; no elapsed-time fallback exists. Each Genesis NFT gives its current owner one vote in that ballot. An unused vote follows a transfer; a used vote never resets. Genesis votes expire after this first paid ballot, including unused votes; they do not renew at the start of another season." },
-          { "type": "paragraph", "text": "Genesis holders can enroll as affiliates throughout all collections and seasons. The first collection requires a Genesis NFT; later collections accept Genesis or an eligible NFT from an earlier successfully revealed paid collection. Enrollment still requires an available position. Share your referral URL: one paid token mint through it qualifies you to earn real ETH from an equal share of the affiliate pool, claimable after sellout and a successful draw. Genesis grants no prize, sponsored mint credit or season holder reward entitlement. Later voting still requires successfully revealed paid NFTs." },
-          { "type": "paragraph", "text": "These revised launch terms await a new deployment. The current Sepolia test retains its earlier one-mint limit, fixed window and voting-only Genesis rights. Mainnet minting has not launched. Existing contracts keep their original rules; check the app’s configured network and contract before participating." }
+          { "type": "paragraph", "text": "Genesis holders vote on the first paid collection. Its free mint, first-season sellout requirement and ongoing affiliate eligibility are explained in the dedicated Genesis guide." },
+          { "type": "links", "items": [{ "label": "Read the Tincta Genesis guide", "description": "Minting, first-collection voting and affiliate enrollment across all collections and seasons.", "href": "/docs/genesis" }] }
         ]
       },
       {
@@ -109,7 +206,7 @@ export const docPages: DocPage[] = withDocVisuals([
         "blocks": [
           {
             "type": "paragraph",
-            "text": "Genesis NFTs qualify only for the first paid ballot, using the current-owner, once-per-NFT rule above. Later voting power is the number of eligible paid NFTs you held immediately before voting opened. Only previously successful, revealed and fully backed official paid collections qualify. Transferring a paid NFT after that snapshot does not give its recipient another vote."
+            "text": "Genesis NFTs qualify only for the first paid ballot, with one current-owner vote per NFT. Later voting power is the number of eligible paid NFTs you held immediately before voting opened. Only previously successful, revealed and fully backed official paid collections qualify. Transferring a paid NFT after that snapshot does not give its recipient another vote."
           },
           {
             "type": "paragraph",

@@ -214,8 +214,7 @@
   margin: auto;
 }
 .public-outcome h2,
-.public-empty h2,
-.public-explainer h2 {
+.public-empty h2 {
   font: 500 var(--ui-section) / 1.25 var(--ui-font-sans);
   letter-spacing: -0.025em;
 }
@@ -256,16 +255,6 @@
   margin: 0;
   padding-block: var(--ui-space-6);
 }
-.public-explainer {
-  border-top: 1px solid var(--ui-line);
-  padding-block: var(--ui-section-space);
-  text-align: center;
-  display: grid;
-  justify-items: center;
-  gap: var(--ui-space-6);
-}
-.public-explainer > h2 { margin: 0; }
-.public-explainer > p { max-width: 55ch; margin: 0; color: var(--ui-muted); }
 .public-selection,
 .public-previous {
   width: 100%;
@@ -408,7 +397,3 @@
 @media (forced-colors: active) {
   .holder-progress { appearance: auto; }
 }
-
-.public-allocation-grid { width: 100%; display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,14rem),1fr)); gap: var(--ui-space-8); margin: 0; padding-block: var(--ui-space-6); }
-.public-allocation-grid dt { font-weight: 500; margin-bottom: var(--ui-space-2); }
-.public-allocation-grid dd { margin: 0 auto; color: var(--ui-muted); max-width: 32ch; }

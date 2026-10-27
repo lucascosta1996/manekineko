@@ -258,7 +258,7 @@ export function LandingExperience({
             <p>1,000 NFTs. Up to two lifetime mints per wallet. No mint deadline. 0 ETH + network gas.</p>
             <p>The first season starts only after Genesis sells out. Affiliate enrollment requires Genesis for the first collection; later collections and seasons accept Genesis or eligible paid NFTs. Positions are limited.</p>
             <p className="genesis-note">Genesis has no prize, sponsored mint or season holder reward entitlement. These are the planned launch terms; the current Sepolia test uses earlier rules. Mainnet minting has not launched.</p>
-            <LinkButton href={`${footerLinks.docs ?? "https://app.tincta.xyz/docs"}/onchain-voting#genesis`} variant="secondary">Read Genesis rules<Icon name="arrow" /></LinkButton>
+            <LinkButton href={`${footerLinks.docs ?? "https://app.tincta.xyz/docs"}/genesis`} variant="secondary">Read Genesis rules<Icon name="arrow" /></LinkButton>
           </div>
         </section>
 

@@ -15,7 +15,6 @@ import { Icon } from "@manekineko/ui/icons";
 import { RewardsArtwork } from "@manekineko/ui/rewards-artwork";
 import type { Snapshot } from "./chain";
 import { CollectionTiming } from "./collection-timing";
-import { GenesisLaunchRules } from "./genesis-launch-rules";
 import "./public-workspace.css";
 
 export type PublicView = "home" | "claims" | "affiliates" | "holders";
@@ -337,27 +336,12 @@ export function PublicWorkspace({
       )}
       </div>
       <nav className="public-shortcuts" aria-label="Collection guide">
-        <Link className={textActionClassName()} href={view === "holders" ? "/docs/holder-rewards" : view === "affiliates" ? "/docs/affiliates" : view === "claims" ? "/docs/prizes" : state?.genesis && !r ? "/docs/onchain-voting#genesis" : "/docs/onchain-voting"}>
-          {view === "holders" ? "Read the holder reward rules" : view === "affiliates" ? "Read the affiliate guide" : view === "claims" ? "Read the prize and claim rules" : "Read the participation guide"}
+        <Link className={textActionClassName()} href={view === "holders" ? "/docs/holder-rewards" : view === "affiliates" ? "/docs/affiliates" : view === "claims" ? "/docs/prizes" : !r ? "/docs/genesis" : "/docs/onchain-voting"}>
+          {view === "holders" ? "Read the holder reward rules" : view === "affiliates" ? "Read the affiliate guide" : view === "claims" ? "Read the prize and claim rules" : !r ? "Read the Genesis guide" : "Read the participation guide"}
           <Icon name="arrow" />
         </Link>
       </nav>
       </div>
-      {(view === "home" || view === "affiliates") && <GenesisLaunchRules />}
-      {view === "home" && <section className="public-explainer" aria-label="How a collection works">
-        <h2>Every collection. Shared rewards.</h2>
-        <p>{state?.genesis && !r ? "Paid season allocations. Genesis itself has no prize or season holder reward entitlement." : "Mint revenue is allocated after a successful draw."}</p>
-        <dl className="public-allocation-grid">
-          <div><dt>60% · Winning tickets</dt><dd>Equal prizes for winning NFT holders.</dd></div>
-          <div><dt>20% · Qualified affiliates</dt><dd>Equal shares with at least one paid referral.</dd></div>
-          {protocolVersion >= 13 && <div><dt>10% · Holder rewards</dt><dd>At season end, the first 5% of eligible NFTs to claim.</dd></div>}
-          <div><dt>{protocolVersion >= 13 ? "10%" : "20%"} · Protocol treasury</dt><dd>Infrastructure, future functionality and Tincta projects.</dd></div>
-        </dl>
-        {!configured && <p>Planned allocations. Review each collection’s published terms.</p>}
-        <Link className={buttonClassName({ variant: "secondary" })} href="/docs">
-          Explore the documentation <Icon name="arrow" />
-        </Link>
-      </section>}
       {state && controller && (
         <p className="public-verification protocol-note">
           {stale ? "Last contract state check" : "Contract state checked"} at block {state.block}.{" "}

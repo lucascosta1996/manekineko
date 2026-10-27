@@ -135,7 +135,7 @@ for (const width of [390, 1440]) test(`Approved Genesis artwork across public pa
   for (const [url, selector, label] of [
     [`${urls.landing}/`, '.studio-genesis-art', 'studio'],
     [`${urls.landing}/rewards#genesis`, '#genesis', 'rewards'],
-    [`${urls.web}/docs/onchain-voting#genesis`, '.docs-genesis-preview', 'docs'],
+    [`${urls.web}/docs/genesis#artwork`, '.docs-genesis-preview', 'docs'],
   ]) {
     await page.goto(url); await ready(page); const panel = page.locator(selector);
     await panel.scrollIntoViewIfNeeded();
