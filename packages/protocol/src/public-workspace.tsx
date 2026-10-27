@@ -82,7 +82,7 @@ export function PublicWorkspace({
   explorer: (address: string) => string;
   controller?: string;
   holders?: ReactNode;
-  protocolVersion?: 12 | 13 | 14;
+  protocolVersion?: 12 | 13 | 14 | 16;
 }) {
   const r = state?.round;
   const step = r
@@ -164,7 +164,7 @@ export function PublicWorkspace({
         </section>
       )}
       {view === "home" && state?.genesis && !r && genesis}
-      {view !== "home" && state?.genesis && !r && <section className="public-empty"><h2>The free mint comes first.</h2><p>This connected test collection grants first-ballot voting only. Its original rules do not include Genesis affiliate eligibility.</p><Link className={buttonClassName({ variant: "secondary" })} href="/">View test collection</Link></section>}
+      {view !== "home" && state?.genesis && !r && <section className="public-empty"><h2>The free mint comes first.</h2><p>{protocolVersion===16?"Genesis holders can enroll as affiliates in every collection and season. Enrollment opens with the first ballot after Genesis sells out.":"This connected test collection grants first-ballot voting only. Its original rules do not include Genesis affiliate eligibility."}</p><Link className={buttonClassName({ variant: "secondary" })} href="/">View test collection</Link></section>}
       {state && !r && !state.genesis && (
         <section className="public-empty">
           <h2>The first collection is next.</h2>

@@ -9,9 +9,9 @@ export function GalleryPagination({path,page,total}: {path: string; page: number
   const pages = Math.max(1,Math.ceil(total/NFT_PAGE_SIZE));
   if (pages<2) return null;
   return <nav className="mirror-pagination" aria-label="Gallery pages">
-    {page>1 ? <Link prefetch={false} href={`${path}?page=${page-1}`} className={buttonClassName({variant:'secondary'})}><Icon name="back" />Previous</Link> : <span />}
+    {page>1 ? <Link prefetch={false} href={`${path}${path.includes("?")?"&":"?"}page=${page-1}`} className={buttonClassName({variant:'secondary'})}><Icon name="back" />Previous</Link> : <span />}
     <p>Page {page} of {pages}</p>
-    {page<pages ? <Link prefetch={false} href={`${path}?page=${page+1}`} className={buttonClassName({variant:'secondary'})}>Next<Icon name="arrow" /></Link> : <span />}
+    {page<pages ? <Link prefetch={false} href={`${path}${path.includes("?")?"&":"?"}page=${page+1}`} className={buttonClassName({variant:'secondary'})}>Next<Icon name="arrow" /></Link> : <span />}
   </nav>;
 }
 export function CollectionDirectoryView({data}: {data: CollectionDirectory}) {
@@ -20,8 +20,8 @@ export function CollectionDirectoryView({data}: {data: CollectionDirectory}) {
       <p>Explore Genesis and season collections, their minted NFTs and original onchain artwork.</p></header>
     {!!data.genesis?.length && <section className="mirror-genesis" aria-labelledby="genesis-collections-title">
       <div className="mirror-section-label"><h2 id="genesis-collections-title">Tincta Genesis</h2><p>The first vote.</p></div>
-      <p className="mirror-genesis-intro">A free collectible for the first paid vote only. No financial reward entitlement.</p>
-      <div className="mirror-grid">{data.genesis.map(item=><Link prefetch={false} className="mirror-collection" href={galleryPath(item.chainId,item.address)} key={`${item.chainId}:${item.address}`}>
+      <p className="mirror-genesis-intro">A free collectible for the first paid vote. Affiliate eligibility follows each deployment’s original rules.</p>
+      <div className="mirror-grid">{data.genesis.map(item=><Link prefetch={false} className="mirror-collection" href={galleryPath(item.chainId,item.address,item.collectionId)} key={`${item.chainId}:${item.address}:${item.collectionId??"legacy"}`}>
         {item.cover ? <img src={item.cover} alt="Tincta Genesis minted onchain artwork" width={600} height={600} loading="lazy" decoding="async" /> : <GenesisArtwork />}
         <div className="mirror-card-body"><p className="mirror-caption">{item.chainId === 11155111 ? 'Sepolia testnet' : 'Ethereum'} · 0 ETH + network gas</p>
           <h3>View Genesis NFTs<Icon name="arrow" /></h3><p className="mirror-caption">{item.minted} / 1,000 minted{item.minted>item.ready || item.catchingUp ? ' · Artwork syncing' : ''}</p></div>
@@ -31,7 +31,7 @@ export function CollectionDirectoryView({data}: {data: CollectionDirectory}) {
     {!data.collections.length ? <div className="mirror-message"><h2>{data.genesis?.length ? 'Season collections are on their way.' : 'Collections are on their way.'}</h2>
       <p>{data.configured ? 'The gallery is waiting for confirmed collection data. New mints appear after their artwork has synced.' : 'The collection gallery is being prepared. Check back soon.'}</p></div>
       : <><div className="mirror-section-label"><h2>{data.genesis?.length ? 'Season collections' : 'Collections'}</h2><p>{data.total} collections</p></div>
-        <div className="mirror-grid">{data.collections.map(item=><Link prefetch={false} className="mirror-collection" href={galleryPath(item.chainId,item.address)} key={`${item.chainId}:${item.address}`}>
+        <div className="mirror-grid">{data.collections.map(item=><Link prefetch={false} className="mirror-collection" href={galleryPath(item.chainId,item.address,item.collectionId)} key={`${item.chainId}:${item.address}:${item.collectionId??"legacy"}`}>
           {item.cover ? <img src={item.cover} alt={`${item.name} minted artwork`} width={640} height={800} loading="lazy" decoding="async" />
             : <div className="mirror-cover-empty"><Icon name="layers" /><span>Awaiting first artwork</span></div>}
           <div className="mirror-card-body"><p className="mirror-caption">{item.seasonName}</p><h3>{item.name}<Icon name="arrow" /></h3>
@@ -48,13 +48,13 @@ export function CollectionGalleryView({data}: {data: CollectionGallery}) {
     <div className="mirror-back-row"><Link className="ui-text-action" href="/collections"><Icon name="back" />All collections</Link></div>
     <header className="mirror-heading"><p className="eyebrow">{item.seasonName}</p><h1>{item.name}</h1>
       <p>{genesis ? 'The first vote. A free collectible with its own permanent onchain artwork.' : 'Original onchain artwork. Four permanent numbers for every minted NFT.'}</p>
-      {genesis && <p>Votes only on the first paid collection. No financial reward entitlement.</p>}</header>
+      {genesis && <p>{item.collectionId!==undefined?"Votes only on the first paid collection. Affiliate eligibility continues throughout every collection and season.":"Votes only on the first paid collection. No financial reward entitlement."}</p>}</header>
     <div className="mirror-section-label"><h2>Minted NFTs</h2><p>{item.ready} available{pending>0 ? ` · ${pending} syncing` : ''}</p></div>
     <div className="mirror-sync"><p>{item.catchingUp || !item.syncedAt ? 'The gallery is catching up with confirmed mints.' : `Mirrored through block ${item.blockNumber?.toLocaleString('en-US')}.`}
       {' '}New mints appear after confirmation and artwork sync.</p>
       {item.syncedAt && <p>Last synced <time dateTime={item.syncedAt}>{new Date(item.syncedAt).toISOString().replace('T',' ').slice(0,16)} UTC</time>.</p>}</div>
     {tokens.length ? <div className={`mirror-grid${genesis ? ' mirror-genesis' : ''}`}>{tokens.map(nft=>{
-      const links = nftLinks(item.chainId,item.address,String(nft.tokenId));
+      const links = nftLinks(item.chainId,item.address,String(item.collectionId===undefined?nft.tokenId:(BigInt(item.collectionId)<<17n)|BigInt(nft.tokenId)));
       return <article className="mirror-nft" key={nft.tokenId}>
         <a href={links.openSea ?? links.blockscout!} target="_blank" rel="noopener noreferrer" aria-label={`View ${nft.name} on ${links.openSea ? 'OpenSea' : 'Blockscout'}`}>
           <img src={nft.image} alt={genesis ? `${nft.name}. The first vote.` : `${nft.name}. Numbers ${nft.numbers.join(', ')}.`} width={genesis ? 600 : 640} height={genesis ? 600 : 800} loading="lazy" decoding="async" />
@@ -69,7 +69,7 @@ export function CollectionGalleryView({data}: {data: CollectionGallery}) {
       <p>{pending>0 ? `The minted NFTs are recorded. Their original artwork${genesis ? '' : ' and numbers'} will appear as the mirror catches up.`
         : syncing ? 'The gallery is catching up. Confirmed NFTs will appear as their artwork and numbers finish syncing.'
         : 'Minted NFTs will appear here automatically once confirmed.'}</p></div>}
-    <GalleryPagination path={galleryPath(item.chainId,item.address)} page={page} total={item.ready} />
-    <p className="mirror-footnote">{genesis ? <>Ownership at the first paid ballot’s snapshot determines voting eligibility. <Link href="/docs/genesis">Read the Genesis rules<Icon name="arrow" /></Link></> : <>These numbers identify each NFT; they do not predict prizes. <Link href="/docs/verification">How permanent numbers work<Icon name="arrow" /></Link></>}</p>
+    <GalleryPagination path={galleryPath(item.chainId,item.address,item.collectionId)} page={page} total={item.ready} />
+    <p className="mirror-footnote">{genesis ? <>{item.collectionId!==undefined?"Current ownership carries an unused first-ballot vote. A used vote never renews.":"Ownership at the first paid ballot’s snapshot determines voting eligibility."} <Link href="/docs/genesis">Read the Genesis rules<Icon name="arrow" /></Link></> : <>These numbers identify each NFT; they do not predict prizes. <Link href="/docs/verification">How permanent numbers work<Icon name="arrow" /></Link></>}</p>
   </section>;
 }

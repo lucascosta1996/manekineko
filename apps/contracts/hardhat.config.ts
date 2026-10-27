@@ -16,7 +16,7 @@ const reviewedCompiler = {
 const v6Compiler = { ...reviewedCompiler, settings: { ...reviewedCompiler.settings, optimizer: { enabled: true, runs: 1 }, viaIR: true } };
 const compilerProfile = {
   compilers: [reviewedCompiler],
-  overrides: { "contracts/ManekinekoSeasonControllerV14.sol": v6Compiler, "contracts/ManekinekoVotingV14.sol": v6Compiler, "contracts/ManekinekoGenesisV14.sol": v6Compiler, "contracts/ManekinekoVotingV12.sol": v6Compiler, "contracts/ManekinekoSeasonControllerV12.sol": v6Compiler, "contracts/ManekinekoWinnerCreditsV8.sol": v6Compiler, "contracts/ManekinekoWinnerCreditsV9.sol": v6Compiler, "contracts/ManekinekoSeasonControllerV13.sol": v6Compiler, "contracts/ManekinekoHolderRewardsV13.sol": v6Compiler, ...Object.fromEntries(["Factory", "Round", "Renderer", "RoundDeployer"].flatMap(component =>
+  overrides: { "contracts/ManekinekoV16.sol": v6Compiler, "contracts/ManekinekoArtworkV16.sol": v6Compiler, "contracts/ManekinekoSeasonControllerV14.sol": v6Compiler, "contracts/ManekinekoVotingV14.sol": v6Compiler, "contracts/ManekinekoGenesisV14.sol": v6Compiler, "contracts/ManekinekoVotingV12.sol": v6Compiler, "contracts/ManekinekoSeasonControllerV12.sol": v6Compiler, "contracts/ManekinekoWinnerCreditsV8.sol": v6Compiler, "contracts/ManekinekoWinnerCreditsV9.sol": v6Compiler, "contracts/ManekinekoSeasonControllerV13.sol": v6Compiler, "contracts/ManekinekoHolderRewardsV13.sol": v6Compiler, ...Object.fromEntries(["Factory", "Round", "Renderer", "RoundDeployer"].flatMap(component =>
     [6, 7, 8, 9, 10, 11, 12, 13].map(version => [`contracts/Manekineko${component}V${version}.sol`, v6Compiler]))), },
 };
 
@@ -33,6 +33,11 @@ export default defineConfig({
   },
   networks: {
     hardhatMainnet: { type: "edr-simulated", chainType: "l1", hardfork: "cancun" },
+    // EDR currently stops at Osaka. These isolated models test V16 behavior;
+    // tests separately enforce the 64 KiB Sepolia bound. Actual network gas
+    // and deployment acceptance must be checked independently through live RPCs.
+    hardhatV16Adapters: { type: "edr-simulated", chainType: "l1", chainId: 11155111, hardfork: "cancun", allowUnlimitedContractSize: true },
+    hardhatV16Model: { type: "edr-simulated", chainType: "l1", chainId: 31337, hardfork: "cancun", allowUnlimitedContractSize: true },
     hardhatV12Rehearsal: { type: "edr-simulated", chainType: "l1", chainId: 11155111, hardfork: "cancun" },
     localhost: { type: "http", chainType: "l1", url: "http://127.0.0.1:8545" },
     mainnetReadOnly: { type: "http", chainType: "l1", chainId: 1, url: configVariable("MAINNET_RPC_URL"), accounts: [] },

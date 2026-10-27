@@ -1,6 +1,7 @@
 export type MintActivity = {
   chainId: 1 | 11155111;
   collection: string;
+  collectionId?:number;
   name: string;
   kind: 'genesis' | 'paid';
   tokenId: number;
@@ -19,11 +20,12 @@ export function parseMintActivity(value: unknown): MintActivity[] {
       || !['genesis', 'paid'].includes(event.kind) || !Number.isSafeInteger(event.tokenId) || event.tokenId < 1 || event.tokenId > 65536) {
       throw new Error('Invalid mint activity.');
     }
-    return { chainId: event.chainId, collection: event.collection.toLowerCase(), name: event.name.trim(), kind: event.kind,
+    if(event.collectionId!==undefined&&event.collectionId!==null&&(!Number.isInteger(event.collectionId)||event.collectionId<0||event.collectionId>256||event.chainId!==11155111||(event.kind==='genesis')!==(event.collectionId===0)))throw new Error('Invalid mint activity.');
+    return { ...(event.collectionId===undefined||event.collectionId===null?{}:{collectionId:event.collectionId}), chainId: event.chainId, collection: event.collection.toLowerCase(), name: event.name.trim(), kind: event.kind,
       tokenId: event.tokenId, transaction: event.transaction.toLowerCase() };
   });
 }
 
 // One notification per mint transaction in each collection, including batch mints.
-export const mintActivityId = (event: MintActivity) => `${event.chainId}:${event.collection}:${event.transaction}`;
+export const mintActivityId = (event: MintActivity) => `${event.chainId}:${event.collection}:${event.collectionId??"legacy"}:${event.transaction}`;
 export const mintTransactionUrl = (event: MintActivity) => `https://${event.chainId === 1 ? '' : 'sepolia.'}etherscan.io/tx/${event.transaction}`;

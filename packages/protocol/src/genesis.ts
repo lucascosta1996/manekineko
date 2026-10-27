@@ -4,8 +4,10 @@ import genesisAbi from '@manekineko/contract-abi/genesis-v14' with { type: 'json
 import votingAbi from '@manekineko/contract-abi/voting-v14' with { type: 'json' };
 import type { ProtocolConfig } from './config.ts';
 import type { Snapshot } from './chain.ts';
+import {v16Abi} from './v16.ts';
 
 export type GenesisState = {
+  version?:16; primaryMints?:bigint|null; maxMints?:bigint; soldOutAt?:bigint;
   address: string; start: bigint; end: bigint; minted: bigint; supply: bigint;
   open: boolean; walletMinted: boolean | null;
 };
@@ -28,6 +30,10 @@ export async function readGenesis(provider: Provider, config: ProtocolConfig, bl
 /** Called against a fresh snapshot before review and again before the wallet prompt. */
 export async function genesisMintTransaction(state: Snapshot) {
   const g = state.genesis;
+  if(g?.version===16){
+    if(!state.sealed||!g.open||g.primaryMints===null||g.primaryMints===undefined||g.primaryMints>=2n)throw new Error('This wallet cannot mint another Genesis NFT.');
+    return {...await new Contract(g.address,v16Abi).mintGenesis.populateTransaction(),value:0n};
+  }
   if (!g || state.count !== 0 || !state.sealed || !g.open) throw new Error('The free mint is closed.');
   if (g.walletMinted === null) throw new Error('Connect a wallet to check its free mint.');
   if (g.walletMinted) throw new Error('This wallet has already minted its free NFT.');

@@ -16,5 +16,5 @@ export interface MirrorChain {
   verify(anchor: Anchor): Promise<void>;
   discover(from: number, to: Anchor): Promise<MirrorCollection[]>;
   events(collection: MirrorCollection, from: number, to: Anchor): Promise<MintEvent[]>;
-  artwork(collection: MirrorCollection, tokenId: number, anchor: Anchor): Promise<CachedNft>;
+  artwork(collection: MirrorCollection, tokenId: number, anchor: Anchor, mintBlock?:number): Promise<CachedNft>;
 }

@@ -1,0 +1,39 @@
+{
+  "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+  "codeHash": "0xf922fd995949d2368b98a0df53d5339b8515d27303f28d12760d616f8f57161f",
+  "wallet": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+  "timestamp": 1793120300,
+  "name": "Aster Atlas",
+  "options": [
+    {
+      "supply": "1000",
+      "price": "10000000000000000",
+      "winners": "6",
+      "duration": "3600"
+    },
+    {
+      "supply": "2000",
+      "price": "20000000000000000",
+      "winners": "4",
+      "duration": "86400"
+    },
+    {
+      "supply": "1000",
+      "price": "10000000000000000",
+      "winners": "10",
+      "duration": "86400"
+    }
+  ],
+  "source": "Actual local V16 contract with the exact deployed Sepolia code and 216-entry catalog; local Genesis sold out. No live rehearsal activity.",
+  "renderedOptions": [
+    "Option 1 · fallbackPrice0.01 ETHSupply1000Equal prizes6Mint window1 hourVotes0",
+    "Option 2Price0.02 ETHSupply2000Equal prizes4Mint window24 hoursVotes0",
+    "Option 3Price0.01 ETHSupply1000Equal prizes10Mint window24 hoursVotes0"
+  ],
+  "desktopOverflow": false,
+  "mobileOverflow": false,
+  "axeViolations": 0,
+  "simulatedWalletRejections": 1,
+  "liveTransactions": 0,
+  "browserErrors": []
+}

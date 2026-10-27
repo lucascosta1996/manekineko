@@ -14,7 +14,8 @@ function pins(): MirrorPin[] {
   if (!Array.isArray(entries) || entries.length>4) throw new Error('Invalid mirror pins.');
   const seen = new Set<string>();
   return entries.map(entry=>{
-    if (!entry || ![1,11155111].includes(entry.chainId) || ![12,13,14].includes(entry.version) || !isHexString(entry.codeHash,32)) throw new Error('Invalid mirror pins.');
+    if (!entry || ![1,11155111].includes(entry.chainId) || ![12,13,14,16].includes(entry.version) || !isHexString(entry.codeHash,32)) throw new Error('Invalid mirror pins.');
+    if(entry.version===16&&entry.chainId!==11155111)throw new Error('Invalid mirror pins.');
     const controller = getAddress(entry.controller).toLowerCase(), key = `${entry.chainId}:${controller}`;
     if (controller === ZeroAddress || seen.has(key)) throw new Error('Invalid mirror pins.');
     seen.add(key);
@@ -28,7 +29,7 @@ export async function getCollectionDirectory(page: number) {
 export async function getMintActivity() {
   return queryMintActivity((sql,values)=>database().query(sql,values),pins());
 }
-export async function getCollectionGallery(chainId: number, address: string, page: number) {
-  try { return await queryGallery((sql,values)=>database().query(sql,values),pins(),chainId,address,page); }
+export async function getCollectionGallery(chainId: number, address: string, page: number, collectionId?:number) {
+  try { return await queryGallery((sql,values)=>database().query(sql,values),pins(),chainId,address,page,collectionId); }
   catch { throw new Error('The collection gallery is temporarily unavailable.'); }
 }

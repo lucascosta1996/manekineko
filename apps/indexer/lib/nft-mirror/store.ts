@@ -74,7 +74,7 @@ export class MirrorStore {
       ORDER BY CASE WHEN $3 THEN round_id END DESC,checked_at,round_id LIMIT 1`,[...this.key,preferLatest]);
     return rows[0] ? collection(rows[0]) : null;
   }
-  async resetCollection(address: string): Promise<void> {
+  async resetCollection(address: string, _roundId?: number): Promise<void> {
     await this.transaction(async client => {
       await client.query('DELETE FROM manekineko_nft_mirror_tokens WHERE chain_id=$1 AND collection_address=$2',[this.config.chainId,address]);
       await client.query(`UPDATE manekineko_nft_mirror_collections SET cursor_block=NULL,cursor_hash=NULL,synced_at=NULL
@@ -106,7 +106,7 @@ export class MirrorStore {
         synced_at=CASE WHEN $5 THEN now() ELSE synced_at END WHERE chain_id=$1 AND address=$2`,[item.chainId,item.address,to.number,to.hash,caughtUp]);
     });
   }
-  async pending(): Promise<{collection: MirrorCollection; tokenId: number; mintHash: string} | null> {
+  async pending(): Promise<{collection: MirrorCollection; tokenId: number; mintHash: string; mintBlock?:number} | null> {
     const {rows} = await this.pool.query(`SELECT c.*,t.token_id,t.mint_block_hash FROM manekineko_nft_mirror_tokens t
       JOIN manekineko_nft_mirror_collections c ON c.chain_id=t.chain_id AND c.address=t.collection_address
       WHERE c.chain_id=$1 AND c.controller=$2 AND t.metadata IS NULL AND t.retry_after<=now()

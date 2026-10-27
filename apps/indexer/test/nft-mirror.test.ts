@@ -5,6 +5,7 @@ import { readFile } from 'node:fs/promises';
 import pg from 'pg';
 import { readMirrorConfigs, fingerprint } from '../lib/nft-mirror/config.ts';
 import { MirrorStore } from '../lib/nft-mirror/store.ts';
+import {V16MirrorStore} from '../lib/nft-mirror/v16-store.ts';
 import { mirrorSource } from '../lib/nft-mirror/runner.ts';
 import { IndexerError } from '../lib/types.ts';
 import type { MirrorChain, MirrorCollection, CachedNft, MintEvent } from '../lib/nft-mirror/types.ts';
@@ -51,7 +52,7 @@ test('mirror SQL: leases, retries, atomic replay, reorgs and paginated database-
   try {
     await admin.query(`CREATE SCHEMA ${schema}`);
     pool=new pg.Pool({connectionString,max:8,options:`-c search_path=${schema},public`});
-    for(const file of ['033_nft_mirror.sql','034_genesis_v14_mirror.sql','035_genesis_nft_gallery.sql']) await pool.query(await readFile(new URL('../../../database/migrations/'+file,import.meta.url),'utf8'));
+    for(const file of ['033_nft_mirror.sql','034_genesis_v14_mirror.sql','035_genesis_nft_gallery.sql','036_v16_nft_mirror.sql']) await pool.query(await readFile(new URL('../../../database/migrations/'+file,import.meta.url),'utf8'));
     const db=pool, query=(sql: string,values: unknown[])=>db.query(sql,values);
     const stores=Array.from({length:4},()=>new MirrorStore(db,config));
     const leases=await Promise.all(stores.map(s=>s.claim()));
@@ -143,6 +144,22 @@ test('mirror SQL: leases, retries, atomic replay, reorgs and paginated database-
       chain.verify=async()=>{throw new IndexerError('collection_trust_mismatch');};
       assert.equal((await run()).ok,false);
       assert.equal(await queryGallery(query,[config],c.chainId,c.address,1),null);
+    });
+    await t.test('V16 collections at one address keep serials, artwork, burns and cursors isolated from each other and history',async()=>{
+      const v16={...config,controller:'0x'+'6'.repeat(40),version:16 as const};
+      const store16=new V16MirrorStore(db,v16);assert.ok(await store16.claim());await store16.verified(true,{number:22,hash:hash(22)});
+      const first={...c,address:v16.controller,controller:v16.controller,renderer:v16.controller,roundId:1,name:'First'},second={...c,address:v16.controller,controller:v16.controller,renderer:v16.controller,roundId:2,name:'Second'};
+      await store16.discover([first,second],{number:22,hash:hash(22)},check);
+      for(const item of [first,second]){await store16.events(item,[mint(1)],{number:22,hash:hash(22)},true,check);await store16.cache(item,1,hash(11),artwork(1),check);}
+      assert.equal((await queryDirectory(query,[v16],1)).total,2);
+      assert.equal(await queryGallery(query,[v16],v16.chainId,v16.controller,1),null,'V16 gallery URLs require an explicit collection ID');
+      const read=async(id:number)=>(await queryGallery(query,[v16],v16.chainId,v16.controller,1,id))!;
+      assert.equal((await read(1)).collection.name,'First');assert.equal((await read(2)).collection.name,'Second');
+      await store16.events(first,[{...mint(1),burned:true}],{number:22,hash:hash(22)},true,check);
+      assert.equal((await read(1)).tokens[0].burned,true);assert.equal((await read(2)).tokens[0].burned,false);
+      await store16.resetCollection(first.address,1);assert.equal((await read(1)).collection.minted,0);assert.equal((await read(2)).collection.minted,1);
+      assert.equal((await queryMintActivity(query,[v16])).events[0].collectionId,2);
+      await store16.release();
     });
     await t.test('expired workers cannot commit after lease takeover',async()=>{
       const old=new MirrorStore(db,config); assert.ok(await old.claim());

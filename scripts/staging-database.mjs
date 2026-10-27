@@ -197,7 +197,7 @@ export const WEB_READ_TABLES = [
   "manekineko_networks", "manekineko_series", "manekineko_collections", "manekineko_deployments",
   "manekineko_collection_state", "manekineko_collection_history", "manekineko_history_winners", "manekineko_collection_awards", "manekineko_affiliate_programs",
   "manekineko_chain_events", "manekineko_indexer_checkpoints",
-  "manekineko_nft_mirror_sources", "manekineko_nft_mirror_collections", "manekineko_nft_mirror_tokens",
+  "manekineko_nft_mirror_sources", "manekineko_nft_mirror_collections", "manekineko_nft_mirror_tokens", "manekineko_nft_mirror_v16_collections", "manekineko_nft_mirror_v16_tokens",
 ];
 
 export async function grantStagingPrivileges(client, config) {

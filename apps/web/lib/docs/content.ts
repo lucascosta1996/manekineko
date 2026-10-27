@@ -20,7 +20,7 @@ export const docPages: DocPage[] = withDocVisuals([
           },
           {
             "type": "paragraph",
-            "text": "The planned launch begins with Genesis: 1,000 free NFTs, up to two lifetime primary mints per wallet, and no mint deadline. The first season starts only after all 1,000 mint. Genesis holders alone can enroll as affiliates in the first collection; later collections and seasons also accept eligible paid NFTs. These revised rules await deployment. The connected Sepolia test retains its original terms."
+            "text": "The planned launch begins with Genesis: 1,000 free NFTs, up to two lifetime primary mints per wallet, and no mint deadline. The first season starts only after all 1,000 mint. Genesis holders alone can enroll as affiliates in the first collection; later collections and seasons also accept eligible paid NFTs. The connected Sepolia deployment uses these rules. Mainnet has not launched."
           },
           {
             "type": "paragraph",
@@ -67,7 +67,7 @@ export const docPages: DocPage[] = withDocVisuals([
             "Vote on the first collection. Each Genesis NFT gives its owner one vote in the first paid collection’s ballot.",
             "Enroll in the affiliate program across all collections and seasons. Share your referral URL to earn real ETH when it leads to a qualifying paid mint and the collection completes a successful draw."
           ] },
-          { "type": "callout", "title": "Planned launch terms", "text": "Mainnet minting has not launched. These revised Genesis rules await deployment; the connected Sepolia test keeps its original terms, described below." }
+          { "type": "callout", "title": "Planned launch terms", "text": "Mainnet minting has not launched. The connected Sepolia deployment uses these Genesis rules. Older test deployments keep their original terms." }
         ]
       },
       {
@@ -130,7 +130,7 @@ export const docPages: DocPage[] = withDocVisuals([
         "title": "What Genesis does not include",
         "blocks": [
           { "type": "paragraph", "text": "Genesis itself has no prize, sponsored mint credit or season holder reward entitlement. Those benefits belong to qualifying paid NFTs under their own collection rules." },
-          { "type": "paragraph", "text": "The current Sepolia test retains its earlier one-mint limit, fixed window and voting-only Genesis rights. Existing contracts keep their original rules; check the app’s configured network and contract before participating. The new launch rules do not change historical NFTs." }
+          { "type": "paragraph", "text": "The earlier Sepolia test retains its one-mint limit, fixed window and voting-only Genesis rights. Existing contracts keep their original rules; check the app’s configured network and contract before participating. The new launch rules do not change historical NFTs." }
         ]
       },
       {
@@ -362,7 +362,7 @@ export const docPages: DocPage[] = withDocVisuals([
         "blocks": [
           {
             "type": "paragraph",
-            "text": "Under the planned launch rules, the first paid collection requires a Genesis NFT. Every later collection, including new seasons, accepts Genesis or an eligible NFT from an earlier successfully revealed paid collection. Enrollment is open during voting, subject to one of ten available positions and one enrollment per wallet per collection. These revised rules await deployment; existing tests retain their original eligibility rules."
+            "text": "Under the planned launch rules, the first paid collection requires a Genesis NFT. Every later collection, including new seasons, accepts Genesis or an eligible NFT from an earlier successfully revealed paid collection. Enrollment is open during voting, subject to one of ten available positions and one enrollment per wallet per collection. The connected Sepolia deployment uses these rules; earlier deployments retain their original eligibility rules."
           },
           {
             "type": "paragraph",

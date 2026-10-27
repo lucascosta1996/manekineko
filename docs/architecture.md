@@ -1,5 +1,14 @@
 # Tincta protocol architecture and agent handoff
 
+## 2026-10-28 verified V16 Sepolia deployment; rehearsal remains stopped
+
+V16 is deployed at `0x673D155f884976bb42eab2F1F11b381dc4d8D26A`, with exact source publication and independent RPC agreement on code, settings, all three immutable voting options and all 216 catalog entries. The catalog is unsealed: zero Genesis mints, zero paid preparations and zero operating funding. Mainnet remains unconfigured. See [the release record](sepolia-v16-release-2026-10-28.md), [Genesis rules](genesis-utility-v16.md) and [the prepared manual rehearsal](sepolia-v16-rehearsal.md).
+
+`packages/protocol/src/v16.ts` and `v16-operator-actions.ts` implement the single-address APIs; V16 signing checks bind internal collection IDs and translate displayed serials to global ERC-721 IDs. Web/Launch use dedicated V16 pins, while historical adapters keep their versions. Migration 036 adds separate V16 mirror tables keyed by chain/address/collection/serial; the indexer reads historical mint-block metadata even after refund burns. Old gallery rows and the paused V14 rehearsal are preserved.
+
+The new frozen rehearsal lives outside the repository with 501 fresh wallets, manual custody checkpoints, a 30 ETH external funding ceiling, durable journals and reports. Its 216 planned outcomes include 172 sellouts and 44 refunds. The 40 ETH option is covered by partial mint/refund live and sellout locally. Automation is paused and has not signed a transaction. UI deployments do not alter the contract or frozen runner; missed immutable windows require an explicitly documented actual-outcome/refund recovery. Local tests, hosted checks and future live wallet/VRF results are separate evidence.
+
+
 ## 2026-10-26 V14 Sepolia release and Genesis-first rehearsal
 
 The fresh V14 graph is deployed on Sepolia, with the approved Genesis artwork shared by the mint app, public voting guide and both landing pages. See the [release evidence](sepolia-v14-release-2026-10-26.md) and [public manifest](deployments/sepolia-v14-2026-10-26.json) for finalized two-RPC checks, addresses, exact source proofs and deployment receipts. Genesis closes **2026-10-26 17:08:24 UTC / October 27 01:08:24 Asia/Shanghai**. No paid ballot can open before then. Mainnet remains unconfigured.

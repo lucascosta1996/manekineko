@@ -1,4 +1,5 @@
 "use client";
+import {v16Abi, v16Token, v16RoundTransaction} from "./v16";
 
 import { genesisMintTransaction, readGenesis } from './genesis';
 import { GenesisArtwork } from "@manekineko/ui/genesis-artwork";
@@ -327,12 +328,17 @@ function Experience({
         session.address,
         sourcePage
       );
-      if (state?.round && fresh.round?.address !== state.round.address)
+      if (state?.round && (fresh.round?.address !== state.round.address || fresh.round?.id !== state.round.id))
         throw new Error(
           "The selected collection changed. Refresh and review it again."
         );
       const walletController = await verifyController(session.provider, config);
-      const [walletVoting, walletCredits, walletRound] = await Promise.all([
+      const walletVoting = fresh.voting;
+      if(config.version===16){
+        const independent=await readProtocol(session.provider,config,selected,session.address,sourcePage);
+        if(independent.count!==fresh.count||independent.round?.id!==fresh.round?.id||independent.round?.termsHash!==fresh.round?.termsHash||independent.genesis?.primaryMints!==fresh.genesis?.primaryMints)throw new Error("The wallet and display providers disagree. Refresh before signing.");
+      }else{
+      const [boundVoting, walletCredits, walletRound] = await Promise.all([
         walletController.voting(),
         walletController.credits(),
         fresh.round
@@ -340,7 +346,7 @@ function Experience({
           : Promise.resolve(null),
       ]);
       if (
-        getAddress(walletVoting) !== getAddress(fresh.voting) ||
+        getAddress(boundVoting) !== getAddress(fresh.voting) ||
         getAddress(walletCredits) !== getAddress(fresh.credits) ||
         (fresh.round && getAddress(walletRound) !== fresh.round.address)
       )
@@ -351,6 +357,7 @@ function Experience({
         const walletGenesis = await readGenesis(session.provider, config, fresh.block, fresh.timestamp, fresh.voting, session.address);
         if (walletGenesis.address !== fresh.genesis.address || walletGenesis.walletMinted !== fresh.genesis.walletMinted)
           throw new Error("The wallet and display providers disagree about the free mint.");
+      }
       }
       const tx = await build(fresh, session.address);
       if (fresh.holders) {
@@ -378,6 +385,7 @@ function Experience({
       const checked = await build(reviewed, session.address);
       if (
         reviewed.count !== fresh.count ||
+        reviewed.round?.id !== fresh.round?.id ||
         reviewed.round?.termsHash !== fresh.round?.termsHash ||
         String(checked.to) !== String(tx.to) ||
         checked.data !== tx.data ||
@@ -461,6 +469,7 @@ function Experience({
   ) {
     return submit(label, description, async (s, address) => {
       if (!s.round) throw new Error("Select a prepared collection.");
+      if(config?.version===16)return v16RoundTransaction(s,method,args(s,address),value(s));
       return new Contract(s.round.address, roundAbi)
         .getFunction(method)
         .populateTransaction(...args(s, address), { value: value(s) });
@@ -489,6 +498,8 @@ function Experience({
       );
     }
   }
+  const [genesisTokens, setGenesisTokens] = useState("");
+  const v16 = config?.version === 16;
   const r = state?.round,
     disabled = !wallet.session || wallet.session.chainId !== config?.chainId || busy || !!pending || !!error || !state;
   const canVote =
@@ -527,6 +538,19 @@ function Experience({
       <GenesisArtwork />
       <div className="genesis-details">
       <h2 id="genesis-title">Tincta Genesis</h2>
+      {v16 ? <>
+        <p>Vote on the first paid collection. Enroll as an affiliate throughout every collection and season.</p>
+        <dl className="genesis-terms">
+          <div><dt>Mint price</dt><dd>0 ETH + network gas</dd></div>
+          <div><dt>Minted</dt><dd>{String(state.genesis.minted)} / 1,000</dd></div>
+          <div><dt>Wallet limit</dt><dd>2 mints per wallet, for life</dd></div>
+          <div><dt>Mint window</dt><dd>No deadline · closes at sellout</dd></div>
+        </dl>
+        <p>{state.sealed ? "The first ballot opens when all 1,000 Genesis NFTs are minted." : "The deployment is ready. Genesis minting has not opened yet."}</p>
+        {state.genesis.primaryMints!==null && state.genesis.primaryMints!==undefined && <p>{String(2n-state.genesis.primaryMints)} free mints remaining for your wallet.</p>}
+        <Button disabled={disabled||!state.genesis.open||state.genesis.walletMinted!==false} onClick={()=>void submit("Mint free NFT","Mint one Genesis NFT for 0 ETH plus network gas. It grants one first-ballot vote and affiliate eligibility throughout all collections and seasons. Referral rewards require a paid referral and successful draw.",genesisMintTransaction)}>{state.genesis.walletMinted?"Wallet limit reached":"Mint free NFT"}</Button>
+        <p className="protocol-note">Each Genesis NFT carries one first-ballot vote for its current holder. Transferring it never renews a used vote or mint allowance. Genesis has no prize, sponsored mint or season holder reward.</p>
+      </> : <>
       <p>Connected test collection · original rules. These terms apply to the existing test NFT.</p>
       <p className="genesis-voting-rule"><strong>Only for the first vote.</strong> For future votes, you’ll need NFTs from successfully revealed paid season collections.</p>
       <dl className="genesis-terms">
@@ -542,6 +566,7 @@ function Experience({
         {state.genesis.walletMinted ? "Free NFT minted" : "Mint free NFT"}
       </Button>
       <p className="protocol-note">This test collection has no prizes, affiliate eligibility, sponsored mints or season holder rewards. Transferring this NFT does not restore your free mint.</p>
+      </>}
       <a className={textActionClassName()} href={`${explorer(state.genesis.address)}#code`} target="_blank" rel="noreferrer">Read free mint contract</a>
       </div>
     </section>
@@ -594,9 +619,10 @@ function Experience({
         </div>
         <p>
           {wallet.session
-            ? `${power} unused votes in this source group.`
-            : "Connect to see your snapshot voting power."}{" "}
+            ? v16&&r.id===1?`${power} unused Genesis votes.`:`${power} unused votes in this source group.`
+            : v16&&r.id===1?"Connect to check your unused Genesis votes.":"Connect to see your snapshot voting power."}{" "}
         </p>
+        {v16 && r.id===1 && field("Genesis NFT numbers",genesisTokens,setGenesisTokens,"Enter the numbers of the NFTs you hold, separated by commas. Each may vote once.")}
         {state.sourceCount > 16 && (
           <div className="protocol-actions">
             <Button
@@ -619,19 +645,25 @@ function Experience({
           </div>
         )}
         <Button
-          disabled={disabled || !canVote || power === 0n}
+          disabled={disabled || !canVote || power === 0n || (v16 && r.id===1 && !genesisTokens.trim())}
           onClick={() =>
             void submit(
               "Cast vote",
-              `Use ${power} votes for option ${
+              `Use ${v16&&r.id===1?genesisTokens.split(",").filter(x=>x.trim()).length:power} votes for option ${
                 choice + 1
               }. Votes cannot be changed. Other source groups can be voted separately.`,
-              async (s) =>
-                new Contract(s.voting, votingAbi).castVote.populateTransaction(
-                  s.round!.address,
-                  choice,
-                  s.sources.filter((x) => x.power > 0n).map((x) => x.address)
-                )
+              async (s) => {
+                if(v16){
+                  const c=new Contract(s.voting,v16Abi);
+                  if(s.round!.id===1){
+                    const tokens=genesisTokens.split(",").map(x=>integerInput(x.trim(),1n,1000n));
+                    if(new Set(tokens.map(String)).size!==tokens.length)throw new Error("Each NFT number may appear only once.");
+                    return c.castGenesisVote.populateTransaction(choice,tokens);
+                  }
+                  return c.castVote.populateTransaction(s.round!.id,choice,s.sources.filter(x=>x.power>0n).map(x=>x.collectionId!));
+                }
+                return new Contract(s.voting,votingAbi).castVote.populateTransaction(s.round!.address,choice,s.sources.filter(x=>x.power>0n).map(x=>x.address));
+              }
             )
           }
         >
@@ -640,13 +672,11 @@ function Experience({
         <Disclosure title="Voting eligibility & rules">
           <div className="protocol-details">
           <p>
-            Snapshot: {date(r.voteStart - 1n)}. Voting closes: {date(r.start)}.
+            {v16&&r.id===1?"Eligibility: current Genesis ownership. ":`Snapshot: ${date(r.voteStart-1n)}. `}Voting closes: {date(r.start)}.
             Minting then opens without another operator signature.
           </p>
           <p>
-            {state.genesis && r.id === 1 ? "Tincta Genesis NFTs qualify for this first paid ballot only. " : "Only NFTs from successfully revealed paid collections qualify. "}A transfer
-            after the snapshot does not create another vote. Votes cannot be
-            changed.
+            {v16&&r.id===1?"Every Genesis NFT grants its current holder one vote on this ballot only. A transfer carries an unused vote; it never renews a used vote.":`${state.genesis&&r.id===1?"Tincta Genesis NFTs qualify for this first paid ballot only.":"Only NFTs from successfully revealed paid collections qualify."} A transfer after the snapshot does not create another vote.`} Votes cannot be changed.
           </p>
           <p>
             No votes: option 1 wins. Ties: the lowest numbered tied option wins.
@@ -836,7 +866,7 @@ function Experience({
         Bring at least one paid referral. Share the 20% affiliate pool equally
         with other qualified affiliates after a successful draw.
       </p>
-      <p className="protocol-note">Enrollment here follows this connected collection’s original contract rules. The planned launch adds Genesis eligibility as explained below.</p>
+      <p className="protocol-note">{v16?"Genesis qualifies in every collection and season. From collection two, NFTs from earlier successfully drawn collections also qualify.":"Enrollment here follows this connected collection’s original contract rules. The planned launch adds Genesis eligibility as explained below."}</p>
       {r.affiliateId > 0n ? (
         <>
           <p>
@@ -894,7 +924,7 @@ function Experience({
           </p>
           {canVote && r.nextSlot > 0n && !(state.bootstrap && r.id === 1) && (
             <>
-              {field("Qualifying collection address", source, setSource)}
+              {field(v16?"Qualifying collection number":"Qualifying collection address",source,setSource,v16?"Use 0 for Genesis, or an earlier successfully drawn collection number.":undefined)}
               {field("Qualifying NFT number", sourceToken, setSourceToken)}
             </>
           )}
@@ -909,7 +939,7 @@ function Experience({
                   r.nextSlot,
                   state.bootstrap && r.id === 1
                     ? ZeroAddress
-                    : getAddress(source),
+                    : v16 ? integerInput(source,0n,BigInt(r.id-1)) : getAddress(source),
                   state.bootstrap && r.id === 1 ? 0 : integerInput(sourceToken),
                 ]
               )
@@ -951,7 +981,7 @@ function Experience({
       {r.phase === 4 && (
         <>
           <p>
-            Anyone can finish this draw. The executor earns{" "}
+            Anyone can finish this draw. The executor can claim{" "}
             {eth(r.executionReserve)} from separate operating funds. Network
             fees are paid by the executor.
           </p>
@@ -960,16 +990,16 @@ function Experience({
             disabled={disabled}
             onClick={() =>
               void onRound(
-                "Finalize draw & collect reward",
+                v16?"Finalize draw":"Finalize draw & collect reward",
                 `Process the fixed draw and collect ${eth(
                   r.executionReserve
-                )} to your connected wallet if finalization succeeds. A bounded progress-only call pays no reward yet.`,
+                )} ${v16?"through a separate claim after finalization":"to your connected wallet if finalization succeeds"}. A bounded progress-only call pays no reward yet.`,
                 "finalizeDrawAndClaim",
                 (_, address) => [address]
               )
             }
           >
-            Finalize draw & collect reward
+            {v16?"Finalize draw":"Finalize draw & collect reward"}
           </Button>
         </>
       )}
@@ -1085,16 +1115,16 @@ function Experience({
         A settled winning NFT earns a sponsored mint in a later collection. One
         redeemed ticket per wallet, for life.
       </p>
-      {field("Winning collection address", rewardSource, setRewardSource)}
-      {field("Prize position", rank, setRank)}
+      {field(v16?"Winning collection number":"Winning collection address", rewardSource, setRewardSource)}
+      {field(v16?"Winning NFT number":"Prize position", rank, setRank)}
       <Button
         variant="secondary"
-        disabled={disabled || r.phase !== 1}
+        disabled={disabled || r.phase !== 1 || (v16 && r.id <= 1)}
         onClick={() =>
           void submit(
             "Redeem sponsored ticket",
             "Redeem your lifetime reward into this collection. This consumes your one lifetime sponsored mint.",
-            async (s) =>
+            async (s) => v16 ? new Contract(s.credits,v16Abi).redeemSponsored.populateTransaction(v16Token(integerInput(rewardSource,1n,BigInt(s.round!.id-1)),integerInput(rank)),s.round!.id) :
               new Contract(
                 s.credits,
                 creditsAbi
@@ -1366,11 +1396,13 @@ function Experience({
                         if (
                           !fresh.round ||
                           fresh.round.address !== state.round?.address ||
+                          fresh.round.id !== state.round?.id ||
                           ![2, 3].includes(fresh.round.phase)
                         )
                           throw new Error(
                             "The draw state changed. Refresh before adding funds."
                           );
+                        if(v16)return new Contract(fresh.round.address,v16Abi).fundRandomness.populateTransaction(fresh.round.id,{value});
                         return new Contract(
                           fresh.round.address,
                           roundAbi

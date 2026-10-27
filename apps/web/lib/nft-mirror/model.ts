@@ -1,7 +1,7 @@
 export const NFT_PAGE_SIZE = 24;
-export interface MirrorPin { chainId: number; controller: string; codeHash: string; version: 12 | 13 | 14 }
+export interface MirrorPin { chainId: number; controller: string; codeHash: string; version: 12 | 13 | 14 | 16 }
 export interface GalleryCollection {
-  kind?: 'paid' | 'genesis'; chainId: number; address: string; name: string; seasonName: string;
+  collectionId?: number; kind?: 'paid' | 'genesis'; chainId: number; address: string; name: string; seasonName: string;
   color: string; textColor: string; minted: number; ready: number;
   cover: string | null; syncedAt: string | null; blockNumber: number | null; catchingUp: boolean;
 }
@@ -15,8 +15,8 @@ export function galleryPage(value: string | string[] | undefined): number {
   if (typeof value !== 'string' || !/^[1-9]\d{0,3}$/.test(value) || Number(value)>Math.ceil(65536/NFT_PAGE_SIZE)) throw new Error('Invalid page.');
   return Number(value);
 }
-export function galleryPath(chainId: number, address: string): string {
-  return `/collections/${chainId}/${address.toLowerCase()}`;
+export function galleryPath(chainId: number, address: string, collectionId?:number): string {
+  return `/collections/${chainId}/${address.toLowerCase()}${collectionId===undefined?"":`?collection=${collectionId}`}`;
 }
 export function galleryIdentity(chainId: string, address: string): {chainId: number; address: string} | null {
   if (!['1','11155111'].includes(chainId) || !/^0x[0-9a-f]{40}$/i.test(address) || /^0x0{40}$/i.test(address)) return null;

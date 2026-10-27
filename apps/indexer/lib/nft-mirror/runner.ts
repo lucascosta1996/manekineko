@@ -4,9 +4,11 @@ import { ensure, errorCode } from '../types.ts';
 import { readMirrorConfigs, fingerprint, type MirrorConfig } from './config.ts';
 import { RpcMirrorChain } from './chain.ts';
 import { MirrorStore } from './store.ts';
+import {V16MirrorChain} from './v16-chain.ts';
+import {V16MirrorStore} from './v16-store.ts';
 import type { Anchor, MirrorChain } from './types.ts';
 
-export async function mirrorSource(config: MirrorConfig, chain: MirrorChain, store: MirrorStore, deadline: number, now = Date.now) {
+export async function mirrorSource(config: MirrorConfig, chain: MirrorChain, store: Pick<MirrorStore,keyof MirrorStore>, deadline: number, now = Date.now) {
   const source = await store.claim();
   if (!source) return {ok:false,status:'leased'};
   const same = async (anchor: Anchor) => (await chain.block(anchor.number)).hash === anchor.hash;
@@ -33,7 +35,7 @@ export async function mirrorSource(config: MirrorConfig, chain: MirrorChain, sto
       // burn/refund scans then rotate by age without delaying the active mint.
       const item = await store.nextCollection(pass===0);
       if (item) {
-        if (item.cursor && !await same(item.cursor)) { await store.resetCollection(item.address); item.cursor=null; }
+        if (item.cursor && !await same(item.cursor)) { await store.resetCollection(item.address,item.roundId); item.cursor=null; }
         ensure(!item.cursor || item.cursor.number<=head.number,'chain_head_stale');
         const start = item.cursor ? item.cursor.number+1 : item.deploymentBlock;
         const to = await chain.block(Math.min(head.number,start+config.blockRange-1));
@@ -46,10 +48,11 @@ export async function mirrorSource(config: MirrorConfig, chain: MirrorChain, sto
         // A job may belong to a collection we have not scanned during this pass.
         // Recheck its cursor before trusting a queued mint from an earlier invocation.
         if (job.collection.cursor && !await same(job.collection.cursor)) {
-          await store.resetCollection(job.collection.address); continue;
+          await store.resetCollection(job.collection.address,job.collection.roundId); continue;
         }
         try {
-          const art = await chain.artwork(job.collection,job.tokenId,head);
+          if(job.mintBlock!==undefined)ensure((await chain.block(job.mintBlock)).hash===job.mintHash,'canonical_block_changed');
+          const art = await chain.artwork(job.collection,job.tokenId,head,job.mintBlock);
           await store.cache(job.collection,job.tokenId,job.mintHash,art,async()=>{ await check(head); if(job.collection.cursor) await check(job.collection.cursor); });
         } catch (error) {
           if (['canonical_block_changed','collection_trust_mismatch'].includes(errorCode(error))) throw error;
@@ -76,7 +79,7 @@ export async function runNftMirror() {
   for (const config of configs) {
     const provider = createRpcProvider(config);
     try {
-      const result = await mirrorSource(config,new RpcMirrorChain(provider,config),new MirrorStore(getIndexerPool(),config),Date.now()+slice);
+      const result = await mirrorSource(config,config.version===16?new V16MirrorChain(provider,config):new RpcMirrorChain(provider,config),config.version===16?new V16MirrorStore(getIndexerPool(),config):new MirrorStore(getIndexerPool(),config),Date.now()+slice);
       sources.push({chainId:config.chainId,controller:config.controller,...result});
     } finally { provider.destroy(); }
   }
