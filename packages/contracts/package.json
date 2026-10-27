@@ -143,6 +143,8 @@
     "./voting-v14-source": "./src/ManekinekoVotingV14.source.json",
     "./genesis-v14": "./src/ManekinekoGenesisV14.json",
     "./genesis-v14-source": "./src/ManekinekoGenesisV14.source.json",
+    "./protocol-v15": "./src/ManekinekoV15.json",
+    "./protocol-v15-source": "./src/ManekinekoV15.source.json",
     "./protocol-v16": "./src/ManekinekoV16.json",
     "./protocol-v16-source": "./src/ManekinekoV16.source.json"
   },

@@ -1,0 +1,155 @@
+{
+  "release": {
+    "checkedAt": "2026-10-27T17:17:57.044Z",
+    "sha": "b1414c3f34b89f6fa0bd69a2e1520180957c61dd",
+    "projects": [
+      {
+        "project": "manekineko-staging-web",
+        "id": "dpl_Gpnm9oR2WHE8GsRjSrhUBxMdaKoU",
+        "state": "READY",
+        "url": "manekineko-staging-on1crf9cx-pro-5deee0e3.vercel.app",
+        "sha": "b1414c3f34b89f6fa0bd69a2e1520180957c61dd",
+        "productionMatches": true,
+        "aliases": [
+          {
+            "alias": "app.tincta.xyz",
+            "matches": true
+          },
+          {
+            "alias": "manekineko-staging-web.vercel.app",
+            "matches": true
+          },
+          {
+            "alias": "manekineko-staging-web-pro-5deee0e3.vercel.app",
+            "matches": true
+          },
+          {
+            "alias": "manekineko-staging-web-git-main-pro-5deee0e3.vercel.app",
+            "matches": true
+          }
+        ]
+      },
+      {
+        "project": "manekineko-staging-launch",
+        "id": "dpl_3zKF1u7cTa8xt6tNfKyMJ1ZeZsHU",
+        "state": "READY",
+        "url": "manekineko-staging-launch-2t3xna5hj-pro-5deee0e3.vercel.app",
+        "sha": "b1414c3f34b89f6fa0bd69a2e1520180957c61dd",
+        "productionMatches": true,
+        "aliases": [
+          {
+            "alias": "launch.app.tincta.xyz",
+            "matches": true
+          },
+          {
+            "alias": "manekineko-staging-launch.vercel.app",
+            "matches": true
+          },
+          {
+            "alias": "manekineko-staging-launch-pro-5deee0e3.vercel.app",
+            "matches": true
+          },
+          {
+            "alias": "manekineko-staging-launch-git-main-pro-5deee0e3.vercel.app",
+            "matches": true
+          }
+        ]
+      },
+      {
+        "project": "manekineko-staging-landing",
+        "id": "dpl_9CGxhoJfUT99zVu6CpBtqadsia1w",
+        "state": "READY",
+        "url": "manekineko-staging-landing-mfq6lykey-pro-5deee0e3.vercel.app",
+        "sha": "b1414c3f34b89f6fa0bd69a2e1520180957c61dd",
+        "productionMatches": true,
+        "aliases": [
+          {
+            "alias": "rewards.tincta.xyz",
+            "matches": true
+          },
+          {
+            "alias": "manekineko-staging-landing.vercel.app",
+            "matches": true
+          },
+          {
+            "alias": "manekineko-staging-landing-pro-5deee0e3.vercel.app",
+            "matches": true
+          },
+          {
+            "alias": "manekineko-staging-landing-git-main-pro-5deee0e3.vercel.app",
+            "matches": true
+          }
+        ]
+      },
+      {
+        "project": "manekineko-staging-indexer",
+        "id": "dpl_9BhU74hiLd3m1xMZjbgnahMQvXHt",
+        "state": "READY",
+        "url": "manekineko-staging-indexer-9ugr4846o-pro-5deee0e3.vercel.app",
+        "sha": "b1414c3f34b89f6fa0bd69a2e1520180957c61dd",
+        "productionMatches": true,
+        "aliases": [
+          {
+            "alias": "manekineko-staging-indexer.vercel.app",
+            "matches": true
+          },
+          {
+            "alias": "manekineko-staging-indexer-pro-5deee0e3.vercel.app",
+            "matches": true
+          },
+          {
+            "alias": "manekineko-staging-indexer-git-main-pro-5deee0e3.vercel.app",
+            "matches": true
+          }
+        ]
+      },
+      {
+        "project": "tincta",
+        "id": "dpl_BLHGNwiSXTyhs2RPTbGQozgpw3DE",
+        "state": "READY",
+        "url": "tincta-dkxbv8bjt-pro-5deee0e3.vercel.app",
+        "sha": "b1414c3f34b89f6fa0bd69a2e1520180957c61dd",
+        "productionMatches": true,
+        "aliases": [
+          {
+            "alias": "tincta.xyz",
+            "matches": true
+          },
+          {
+            "alias": "tincta-pi.vercel.app",
+            "matches": true
+          },
+          {
+            "alias": "www.tincta.xyz",
+            "matches": true
+          },
+          {
+            "alias": "tincta-pro-5deee0e3.vercel.app",
+            "matches": true
+          },
+          {
+            "alias": "tincta-git-main-pro-5deee0e3.vercel.app",
+            "matches": true
+          }
+        ]
+      }
+    ]
+  },
+  "rehearsal": {
+    "at": "2026-10-27T17:17:53.345Z",
+    "status": "prepared-not-started",
+    "paused": true,
+    "contract": "0x673D155f884976bb42eab2F1F11b381dc4d8D26A",
+    "planHash": "cfbc750182277bd27d26bff386ca43f5321dac365905a0f8bf76201b6e30ae86",
+    "runtimeSha256": "c0467ab3623b34e5d93b70d964b704d240a1d5611b61e80827ac042cdedfd5e0",
+    "wallets": 501,
+    "externalFundingTransactions": 0,
+    "transactionJournals": 0,
+    "bank": "0x6E33bE5D2e41A27b4d580eeEdf4C0b324dB393a1",
+    "bankBalanceWei": "0",
+    "genesisMints": "0",
+    "preparedCollections": 0
+  },
+  "hostedEvidence": "hosted-verification.json",
+  "githubCi": "in_progress_at_handoff"
+}

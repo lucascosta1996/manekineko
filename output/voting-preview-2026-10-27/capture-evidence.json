@@ -1,0 +1,17 @@
+{
+  "desktopOverflow": false,
+  "mobileOverflow": false,
+  "submissions": 0,
+  "errors": [],
+  "source": "apps/contracts/test/ProtocolV16Rehearsal.ts",
+  "options": [
+    {
+      "supply": "1000",
+      "price": "10000000000000000",
+      "winners": "6",
+      "duration": "3600",
+      "votes": "0"
+    }
+  ],
+  "boundary": "Production layout with local V16 model readback and preview-only Genesis wording; no V16 app integration or Sepolia deployment."
+}

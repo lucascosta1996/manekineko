@@ -1,5 +1,7 @@
 # V14 Genesis-first Sepolia rehearsal
 
+**October 26 pause:** this run completed 50 Genesis mints and stopped before paid preparation. Its launcher is now guarded against restart while the user-requested [single-contract V15](single-contract-v15.md) is developed. Preserve the used wallet vault and journals; do not run the commands below as a fresh or unused-wallet adoption.
+
 The approved run uses the existing encrypted bank and 50 buyer wallets, a fresh V14 manifest and a new private transaction journal. The original V13 run stays paused. Do not edit or restart its frozen runtime.
 
 ## Scenarios and timing

@@ -1,0 +1,63 @@
+.motion-word { display: inline; }
+.studio-principle .studio-eyebrow { justify-content: space-between; }
+/* Marketing actions retain shared metrics; forms and recovery actions stay still. */
+[data-motion-action] { position: relative; z-index: 4; }
+@media (prefers-reduced-motion: no-preference) {
+  .motion-word { display: inline-block; max-inline-size: 100%; transform-origin: 50% 100%; }
+  /* Spatial movement only: flat type in focus, a small departure at section edges. */
+  .landing-motion[data-scroll-motion="on"] :is(h1, h2)[data-motion-entered] {
+    transform-style: preserve-3d;
+    transform: perspective(max(1000px, 300vw))
+      translate3d(calc(var(--type-departure, 0) * clamp(6px, .8vw, 12px)), calc(var(--type-departure, 0) * -4px), calc(var(--type-depth, 0) * -18px))
+      rotateX(calc(var(--type-departure, 0) * 1.5deg)) rotateY(calc(var(--type-departure, 0) * -2deg));
+  }
+  [data-scroll-motion="on"] [data-motion-action] { transition: translate 180ms var(--ui-ease); }
+  [data-scroll-motion="on"] [data-motion-entered="true"] .motion-word {
+    animation: word-arrive 700ms cubic-bezier(.16,1,.3,1) both;
+    animation-delay: calc(min(var(--word-index, 0), 9) * 30ms);
+  }
+  [data-scroll-motion="on"] [data-motion-action][data-motion-entered="true"] {
+    animation: action-arrive 500ms cubic-bezier(.16,1,.3,1) both;
+  }
+  [data-scroll-motion="on"] [data-motion-action][data-motion-entered="true"] .ui-icon {
+    animation: action-arrow 2.8s ease-in-out infinite;
+  }
+  [data-scroll-motion="on"] [data-motion-action][data-motion-entered="true"] .lucide-arrow-down { animation-name: action-arrow-down; }
+  [data-scroll-motion="on"] [data-motion-action]::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    border-radius: inherit; opacity: 0;
+    background: linear-gradient(110deg, transparent 25%, rgb(255 255 255 / .22) 48%, transparent 70%);
+    background-size: 250% 100%;
+  }
+  [data-scroll-motion="on"] [data-motion-action]:hover { translate: 0 -3px; }
+  [data-scroll-motion="on"] [data-motion-action]:hover::after { animation: action-glint 750ms ease-out; }
+  [data-scroll-motion="on"] [data-motion-action]:focus-visible { animation: none; translate: none; }
+  [data-scroll-motion="on"] [data-motion-copy][data-motion-entered="true"] { animation: copy-arrive 1s cubic-bezier(.16,1,.3,1) both; }
+  .landing-motion[data-scroll-motion="on"] .motion-heading { transform: translate3d(0, calc(var(--scroll-drift, 0px) * -.55), 0); }
+  .landing-motion[data-scroll-motion="on"] .motion-art { transform: translate3d(0, var(--scroll-drift, 0px), 0); }
+  .landing-motion[data-scroll-motion="on"] .motion-icon { transform: translateY(calc(var(--scroll-drift, 0px) * -.35)) rotate(var(--scroll-turn, 0deg)); }
+  .landing-motion[data-scroll-motion="on"] .motion-sequence > :nth-child(2) { transform: translateY(calc(var(--scroll-drift, 0px) * -.4)); }
+  .landing-motion[data-scroll-motion="on"] .motion-sequence > :nth-child(3) { transform: translateY(calc(var(--scroll-drift, 0px) * -.8)); }
+  .landing-motion[data-scroll-motion="on"] .motion-sequence > :focus-within { transform: none; }
+  .landing-motion[data-motion-hidden="true"] [data-motion-entered="true"] .motion-word,
+  .landing-motion[data-motion-hidden="true"] [data-motion-action],
+  .landing-motion[data-motion-hidden="true"] [data-motion-copy],
+  .landing-motion[data-motion-hidden="true"] [data-motion-action] .ui-icon { animation-play-state: paused; }
+}
+@media (forced-colors: active) {
+  .landing-motion[data-scroll-motion="on"] :is(h1, h2)[data-motion-entered] { transform: none; }
+}
+@keyframes word-arrive {
+  from { transform: translate3d(0, 4px, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+@keyframes copy-arrive { from { transform: translateY(24px); } to { transform: translateY(0); } }
+@keyframes action-arrive { from { transform: translateY(8px); } to { transform: translateY(0); } }
+@keyframes action-arrow { 0%, 65%, 100% { transform: translateX(0); } 80% { transform: translateX(5px); } }
+@keyframes action-arrow-down { 0%, 65%, 100% { transform: translateY(0); } 80% { transform: translateY(4px); } }
+@keyframes action-glint { 0% { opacity: 0; background-position: 100% 0; } 25% { opacity: 1; } 100% { opacity: 0; background-position: 0 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .landing-motion .motion-heading, .landing-motion .motion-art,
+  .landing-motion .motion-icon, .landing-motion .motion-line,
+  .landing-motion .motion-sequence > * { transform: none; }
+}

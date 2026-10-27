@@ -9,7 +9,7 @@
 .studio-hero-copy { width: 100%; max-width: 64rem; margin-inline: auto; }
 .studio-hero .studio-eyebrow { justify-content: center; }
 .studio h1 { max-width: none; font-size: var(--ui-hero); text-wrap: balance; }
-.studio h1 span { display: block; }
+.studio h1 > .motion-line { display: block; width: fit-content; max-width: 100%; margin-inline: auto; }
 .studio-intro { max-width: 52ch; color: var(--ui-muted); margin: var(--ui-space-6) auto var(--ui-space-8); line-height: var(--ui-body-line); text-wrap: balance; }
 .studio-art { margin: 0; min-width: 0; }
 .studio-art svg { width: 100%; height: auto; aspect-ratio: 14 / 11; }

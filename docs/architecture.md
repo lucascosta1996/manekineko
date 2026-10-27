@@ -2,12 +2,38 @@
 
 ## 2026-10-28 verified V16 Sepolia deployment; rehearsal remains stopped
 
+The [full application release](full-app-release-2026-10-28.md) records publication of the remaining parent/Rewards landing changes, historical V15 source and visual evidence across all five Vercel projects. It preserves the deployed V16 pins and the stopped rehearsal.
+
 V16 is deployed at `0x673D155f884976bb42eab2F1F11b381dc4d8D26A`, with exact source publication and independent RPC agreement on code, settings, all three immutable voting options and all 216 catalog entries. The catalog is unsealed: zero Genesis mints, zero paid preparations and zero operating funding. Mainnet remains unconfigured. See [the release record](sepolia-v16-release-2026-10-28.md), [Genesis rules](genesis-utility-v16.md) and [the prepared manual rehearsal](sepolia-v16-rehearsal.md).
 
 `packages/protocol/src/v16.ts` and `v16-operator-actions.ts` implement the single-address APIs; V16 signing checks bind internal collection IDs and translate displayed serials to global ERC-721 IDs. Web/Launch use dedicated V16 pins, while historical adapters keep their versions. Migration 036 adds separate V16 mirror tables keyed by chain/address/collection/serial; the indexer reads historical mint-block metadata even after refund burns. Old gallery rows and the paused V14 rehearsal are preserved.
 
 The new frozen rehearsal lives outside the repository with 501 fresh wallets, manual custody checkpoints, a 30 ETH external funding ceiling, durable journals and reports. Its 216 planned outcomes include 172 sellouts and 44 refunds. The 40 ETH option is covered by partial mint/refund live and sellout locally. Automation is paused and has not signed a transaction. UI deployments do not alter the contract or frozen runner; missed immutable windows require an explicitly documented actual-outcome/refund recovery. Local tests, hosted checks and future live wallet/VRF results are separate evidence.
 
+
+## 2026-10-27 V16 minimum three-option ballots
+
+Every paid V16 collection must offer at least **three distinct voting packages**. The constructor now accepts 3–8 packages, rejecting one/two-option menus and duplicates. The same immutable menu applies across all collections and seasons in that deployment; it cannot be edited after deployment. Each package includes mint price, supply, equal prize count and paid mint duration. Genesis current-owner voting, later paid-NFT snapshots, the no-vote option-1 fallback and lowest-numbered tie winner are unchanged.
+
+[`apps/contracts/config/v16-ballot.ts`](../apps/contracts/config/v16-ballot.ts) is the shared **local draft** used by V16 tests, the ten-collection rehearsal and the voting preview. It retains the previous Sepolia packages (0.01 ETH / 1,000 / six / one hour and 0.02 ETH / 2,000 / four / 24 hours) and adds 0.01 ETH / 1,000 / ten / 24 hours. The third package is a proposed local default, not frozen deployment terms. All three options receive votes in every rehearsal collection. See [the V16 ballot record](genesis-utility-v16.md#voting-packages) for exact terms and evidence. No historical contract, existing Sepolia deployment, runtime pin or paused rehearsal is changed.
+
+## 2026-10-27 V16 Genesis utility and sellout-only first-season start
+
+**Affiliate allocation exception:** after a successful V16 draw with zero qualifying affiliates, the complete 20% affiliate allocation joins the operator's 10% treasury. `withdrawBucket(collectionId, 0, amount)` can withdraw that combined 30%; the affiliate-dust bucket has zero allocation in that case, preventing double withdrawal. With any qualifying affiliate, treasury stays 10%, earned commissions stay protected and only division dust remains in the separate unused affiliate bucket. Before finalization, and for either refund outcome, neither treasury nor affiliate dust can be withdrawn. Prize and holder allocations remain 60% and 10%.
+
+[V16](genesis-utility-v16.md) supersedes V15's local Genesis timing and eligibility policy: 1,000 free NFTs, two cumulative primary mints per wallet, no mint deadline, and no first season unless Genesis sells out. The final mint opens a full first ballot. Genesis holders alone can enroll as affiliates in the first collection; later collections and seasons accept Genesis or an eligible earlier successfully revealed paid NFT. Ten positions, one enrollment per wallet/collection, one use per NFT/collection and the qualifying paid-referral requirement remain. Genesis votes are still first-ballot-only.
+
+Sealing pre-funds collection 1 but leaves its voting and sale timestamps at zero until sellout. No timeout can enable minting, refunds, reserve recovery or next-collection preparation while Genesis is incomplete. The two-mint cap establishes at least 500 minting wallets, not distinct people. The new contract, versioned ABI/source, tests and planned-launch copy are local implementation. Existing V14 adapters/pins, V15 sources, historic contracts and the paused rehearsal remain unchanged; a live V16 release still requires the single-contract integrations and deployment verification in the V16 guide.
+
+## 2026-10-26 V15 single-contract implementation; V14 rehearsal paused
+
+The user requested all NFTs, voting and rewards in one contract. [V15](single-contract-v15.md) implements one ERC-721 address with internal collection IDs, Genesis, the paid catalog, ownership checkpoints, ballots, draw/claim/refund accounting, affiliates, sponsored mints and holder pools. Artwork and math compile into the same runtime; only Chainlink's coordinator is external. Percentages, artwork, paid voting eligibility and perpetual refunds are preserved. This is local implementation, not deployment; hosted apps and pins remain V14.
+
+**Genesis timing update:** the first vote starts at Genesis sellout or its 24-hour deadline, whichever comes first. Genesis remains mintable until all 1,000 are minted. Late minters may vote while that first ballot is open; each NFT has one vote that cannot be renewed by transfer. Minting after the ballot closes grants no future voting rights. Sealing requires first-collection funding and prepares its ballot in advance, so opening needs no keeper or later operator signature. Early sellout retains the full voting duration; late sellout never extends a ballot. Later paid-NFT snapshot voting is unchanged. See the V15 guide for the new read/write APIs.
+
+The current 38,815-byte runtime requires EIP-7954, activated on Sepolia with Glamsterdam. Mainnet support remains unqualified. Model tests distinguish installed EDR behavior from actual Glamsterdam gas rules. One Sepolia RPC accepted a deployment estimate for the earlier 37,251-byte revision; that estimate does not qualify the updated Genesis timing bytecode, which has not been estimated on Sepolia. The V15 record documents exact evidence and pending client, worker and release integration.
+
+V14's runner had exited while waiting for Genesis, before paid preparation. It is now explicitly paused against restart; onchain deadlines remain immutable. Two RPCs confirmed zero paid collections, 51 Genesis NFTs and 19.999993568736926356 ETH liquid in bank/buyers at block 11,995,688. Preserve encrypted vaults, journals and the fixed recovery address. Do not treat these used wallets as an unused V13 import.
 
 ## 2026-10-26 V14 Sepolia release and Genesis-first rehearsal
 

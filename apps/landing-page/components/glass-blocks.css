@@ -1,0 +1,38 @@
+/* Sculptures sit in front of copy: their clear faces let the actual words show through. */
+.studio main > section { position: relative; isolation: isolate; }
+.studio main form { position: relative; z-index: 4; }
+.glass-field { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: clip; }
+.glass-orbit { --cube-unit: clamp(2.5rem, 6.5vw, 5.25rem); position: absolute; width: var(--cube-unit); height: var(--cube-unit); }
+.glass-orbit-1 { top: 6rem; left: 10%; }
+.glass-orbit-2 { top: 65%; left: 78%; --cube-unit: clamp(2rem, 5vw, 4rem); }
+.glass-orbit-3 { top: 76%; left: 24%; --cube-unit: clamp(1.5rem, 3vw, 2.75rem); }
+.glass-float { width: 100%; height: 100%; }
+.glass-sculpture { position: absolute; width: 480%; height: 480%; left: -190%; top: -190%; overflow: visible; }
+.glass-field-origin .glass-orbit-1 { --cube-unit: clamp(3.25rem, 8.3vw, 8rem); top: 41%; }
+.glass-field-origin .glass-orbit-2 { --cube-unit: clamp(3rem, 7vw, 6rem); top: 19%; }
+.glass-field-origin .glass-orbit-3 { top: 81%; }
+.glass-field-possibilities .glass-orbit-1 { --cube-unit: clamp(2rem, 5vw, 4rem); }
+.glass-field-join .glass-orbit-1 { top: 35%; }
+.glass-field-unfold .glass-orbit {
+  --cube-unit: clamp(2rem, 3.8vw, 3rem);
+  top: calc(50% - var(--cube-unit) / 2);
+}
+.glass-field-unfold .glass-orbit-1 { left: 25%; }
+.glass-field-unfold .glass-orbit-2 { left: 65%; }
+@media (prefers-reduced-motion: no-preference) {
+  /* Vertical position belongs to document flow; only lateral/depth drift is animated. */
+  [data-scroll-motion="on"] .glass-orbit { left: 0; transform: translate3d(var(--glass-x, 10vw), 0, 0); }
+}
+@media (max-width: 759px) {
+  .glass-orbit-1 { top: 5rem; }
+  .glass-field-origin .glass-orbit-1 { top: 39%; }
+  .glass-field-origin .glass-orbit-2 { top: 14%; }
+  .glass-field-origin .glass-orbit-3 { top: 84%; }
+  .glass-field-join .glass-orbit-1 { top: 24%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glass-orbit-1 { left: 78%; top: 3rem; }
+  .glass-field-origin .glass-orbit-1 { left: 12%; top: 17%; }
+  .glass-field-origin .glass-orbit-2 { top: 76%; }
+}
+@media (forced-colors: active) { .glass-field { display: none; } }

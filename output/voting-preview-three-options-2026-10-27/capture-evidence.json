@@ -1,0 +1,31 @@
+{
+  "desktopOverflow": false,
+  "mobileOverflow": false,
+  "submissions": 0,
+  "errors": [],
+  "source": "apps/contracts/config/v16-ballot.ts",
+  "options": [
+    {
+      "supply": "1000",
+      "price": "10000000000000000",
+      "winners": "6",
+      "duration": "3600",
+      "votes": "0"
+    },
+    {
+      "supply": "2000",
+      "price": "20000000000000000",
+      "winners": "4",
+      "duration": "86400",
+      "votes": "0"
+    },
+    {
+      "supply": "1000",
+      "price": "10000000000000000",
+      "winners": "10",
+      "duration": "86400",
+      "votes": "0"
+    }
+  ],
+  "boundary": "Production layout with local V16 model readback and preview-only Genesis wording; no V16 app integration or Sepolia deployment."
+}

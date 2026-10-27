@@ -41,7 +41,7 @@ test.describe('Landing asynchronous production states', () => {
    const announcement=page.getByRole('region',{name:'Collection status',exact:true});
    await expect(announcement).toHaveCount(1);
    await expect(page.locator('.hero h1')).toHaveText('100% onchain autonomous rewards.');
-   await expect(page.locator('.hero-description')).toHaveText('You win. You vote. The next collection opens.');
+   await expect(page.locator('.hero-description')).toHaveText('You vote. You mint. You win. The next collection opens.');
    await expect(page.locator('.hero').getByRole('region',{name:'Collection status',exact:true})).toHaveCount(0);
    expect(await announcement.evaluate(element => {
     const header=document.querySelector('.header');
@@ -247,81 +247,6 @@ test('Landing late response cannot restore fresh availability while offline', as
  await page.unroute('**/api/live-collection');
  await page.evaluate(()=>{Object.defineProperty(navigator,'onLine',{configurable:true,value:true});window.dispatchEvent(new Event('online'));});
  await expect(page.locator('.collection-announcement')).toHaveAttribute('data-phase','ready');
-});
-
-for (const width of [320,390,768,1280,1440]) test(`Landing Open hero motion preserves geometry and respects preferences ${width}`, async ({page}, info) => {
- test.skip(info.project.name !== 'chromium' && ![390,1440].includes(width), 'Secondary engines cover phone and desktop.');
- await page.setViewportSize({width,height:width < 768 ? 844 : 900});
- await page.emulateMedia({reducedMotion:'no-preference'});await prepare(page);await page.goto(`${urls.landing}/rewards`);await ready(page);
- const container=page.locator('.hero-art');
- const artwork=page.locator('.hero-art [data-tincta-artwork="open"]');
- await expect(artwork).toHaveCount(1);
- await expect(container).toHaveAttribute('data-motion','running');
- const original=await artwork.innerHTML();
- const cta=page.getByRole('link',{name:'Explore the rewards',exact:true});
- const layout=await cta.boundingBox();
- const duration=await artwork.evaluate(svg=>Number(svg.getAnimations()[0].effect!.getTiming().duration));
- const frame=async (time:number) => artwork.evaluate((svg,time) => {
-  for(const animation of svg.getAnimations({subtree:true})) { animation.pause();animation.currentTime=time; }
-  return [...svg.querySelectorAll('path')].map(path=>{
-   const bounds=path.getBoundingClientRect();
-   return {x:bounds.x,y:bounds.y,width:bounds.width,height:bounds.height,fill:getComputedStyle(path).fill};
-  });
- },time);
- const initial=await frame(0);
- for(const time of [.25,.5,.75].map(progress=>progress*duration)) {
-  const planes=await frame(time);
-  expect(planes[0].y).toBeLessThan(initial[0].y);
-  expect(planes[8].y-initial[8].y).toBeLessThan(planes[7].y-initial[7].y);
-  const box=(await container.boundingBox())!;
-  if(time===duration/2) {
-   // The opening must read at phone size, not just register a subpixel change.
-   expect(initial[0].y-planes[0].y).toBeGreaterThan(box.width*.06);
-   expect(initial[8].y-planes[8].y).toBeGreaterThan(box.width*.085);
-   expect(planes[4].x-planes[0].x-(initial[4].x-initial[0].x)).toBeGreaterThan(box.width*.045);
-  }
-  planes.forEach((plane,index)=>{
-   expect(plane.fill).toBe(initial[index].fill);
-   expect(plane.width).toBeCloseTo(initial[index].width,1);
-   expect(plane.height).toBeCloseTo(initial[index].height,1);
-   expect(plane.x).toBeGreaterThanOrEqual(box.x);
-   expect(plane.x+plane.width).toBeLessThanOrEqual(box.x+box.width);
-   expect(plane.y).toBeGreaterThanOrEqual(box.y);
-   expect(plane.y+plane.height).toBeLessThanOrEqual(box.y+box.height);
-  });
-  expect(await cta.boundingBox()).toEqual(layout);
-  await page.screenshot({path:info.outputPath(`open-${width}-${time}.png`),animations:'allow'});
- }
- expect(await frame(duration)).toEqual(initial);
- expect(await artwork.innerHTML()).toBe(original);
- expect(await page.evaluate(()=>document.documentElement.scrollWidth <= innerWidth)).toBe(true);
- // Reload before lifecycle checks: WAAPI scrubbing can retain script-owned
- // animations in Chromium after the originating CSS rule is removed.
- await page.reload();await ready(page);
- await expect(container).toHaveAttribute('data-motion','running');
- await page.evaluate(()=>window.scrollTo({top:document.body.scrollHeight,behavior:'instant'}));
- await expect(container).toHaveAttribute('data-motion','paused');
- await expect(artwork).toHaveCSS('animation-play-state','paused');
- await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
- await expect(container).toHaveAttribute('data-motion','running');
- await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));});
- await expect(container).toHaveAttribute('data-motion','paused');
- await page.evaluate(()=>{delete (document as any).hidden;document.dispatchEvent(new Event('visibilitychange'));});
- await expect(container).toHaveAttribute('data-motion','running');
- await page.emulateMedia({reducedMotion:'reduce'});
- await expect(page.locator('.site')).toHaveClass(/motion-paused/);
- expect(await artwork.evaluate(svg=>svg.getAnimations({subtree:true}).length)).toBe(0);
- await expect(artwork).toHaveCSS('transform','none');
- for(const path of await artwork.locator('path').all()) await expect(path).toHaveCSS('transform','none');
- await expect(page.locator('.affiliate-rings')).toHaveCSS('animation-name','none');
- await page.clock.runFor(7000);expect(await artwork.innerHTML()).toBe(original);
- await page.screenshot({path:info.outputPath(`open-${width}-reduced.png`)});
- await page.emulateMedia({reducedMotion:'no-preference'});
- await expect(page.locator('.site')).not.toHaveClass(/motion-paused/);
- await expect(artwork).toHaveCSS('animation-play-state','running');
- // Brand artwork elsewhere stays static even when the hero is moving.
- expect(await page.locator('.header [data-tincta-artwork="open"]').evaluate(svg=>svg.getAnimations({subtree:true}).length)).toBe(0);
- await expect(page.locator('.affiliate-rings')).toHaveCSS('animation-play-state','running');
 });
 
 test('Landing recovery focuses the empty status without stealing moved focus', async ({page}) => {

@@ -1,6 +1,5 @@
 "use client";
 import { GenesisArtwork } from "@manekineko/ui/genesis-artwork";
-import { RewardsBrand } from "@manekineko/ui/rewards-brand";
 import { Button, IconButton, LinkButton } from "@manekineko/ui/button";
 import { PublicFooter } from "@manekineko/ui/footer";
 import type { PublicLinks } from "@manekineko/ui/links";
@@ -8,11 +7,13 @@ import { Icon } from "@manekineko/ui/icons";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { LiveCollection } from "../components/live-collection";
-import { RewardsHeroArtwork } from "../components/rewards-hero-artwork";
+import { RewardsMachine } from "../components/rewards-machine";
 import { LandingNavigation } from "../components/landing-navigation";
+import { MotionWords } from "../components/motion-words";
+import { LandingMotion } from "../components/landing-motion";
 import artwork from "./artwork.json";
 import { NewsletterSignup } from "./newsletter-signup";
-import { TinctaWordmark } from "../components/tincta-logo";
+import { TinctaMark } from "../components/tincta-logo";
 import type { PlannedRewards } from "../lib/planned-rewards";
 
 type Season = { season: number; colors: string[] };
@@ -23,7 +24,7 @@ function Brand({ footer = false }: { footer?: boolean }) {
       href="#top"
       aria-label="Tincta Rewards home"
     >
-      <RewardsBrand decorative><TinctaWordmark className="brand-wordmark" title="" /></RewardsBrand>
+      <span className="rewards-landing-brand"><TinctaMark title="" /><span>REWARDS</span></span>
     </a>
   );
 }
@@ -115,7 +116,6 @@ export function LandingExperience({
   const [catalogSeason, setCatalogSeason] = useState(0);
   const [showCatalog, setShowCatalog] = useState(false);
   const [galleryEdges, setGalleryEdges] = useState({ start: true, end: false });
-  const root = useRef<HTMLDivElement>(null);
   const gallery = useRef<HTMLDivElement>(null);
   const motionOff = reducedMotion;
   const selectedSeason = seasons[catalogSeason];
@@ -131,44 +131,6 @@ export function LandingExperience({
     preference.addEventListener("change", sync);
     return () => preference.removeEventListener("change", sync);
   }, []);
-
-
-  useEffect(() => {
-    if (!root.current || motionOff) return;
-    const elements =
-      root.current.querySelectorAll<HTMLElement>("[data-reveal]");
-    const observer = new IntersectionObserver(
-      (entries) =>
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            observer.unobserve(entry.target);
-          }
-        }),
-      { threshold: 0.08 }
-    );
-    elements.forEach((element) => {
-      if (element.getBoundingClientRect().top > window.innerHeight)
-        element.classList.add("reveal-ready");
-      observer.observe(element);
-    });
-    let frame = 0;
-    const update = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const amount = Math.min(window.scrollY, 900);
-        root.current?.style.setProperty("--hero-drift", `${amount * 0.11}px`);
-      });
-    };
-    window.addEventListener("scroll", update, { passive: true });
-    return () => {
-      observer.disconnect();
-      elements.forEach((element) => element.classList.remove("reveal-ready"));
-      window.removeEventListener("scroll", update);
-      cancelAnimationFrame(frame);
-      root.current?.style.setProperty("--hero-drift", "0px");
-    };
-  }, [motionOff]);
 
 
   function moveGallery(direction: number) {
@@ -189,8 +151,7 @@ export function LandingExperience({
   }
 
   return (
-    <div
-      ref={root}
+    <LandingMotion
       id="top"
       className={`site${motionOff ? " motion-paused" : ""}`}
     >
@@ -218,7 +179,7 @@ export function LandingExperience({
         <section className="hero wrap" aria-labelledby="hero-title">
           <div className="hero-main">
             <div className="hero-copy">
-              <h1 id="hero-title">
+              <h1 className="motion-heading" id="hero-title"><MotionWords>
                 100%{" "}
                 <span className="win-word">
                   onchain
@@ -232,9 +193,9 @@ export function LandingExperience({
                   </svg>
                 </span>
                 {" "}autonomous rewards.
-              </h1>
-              <p className="hero-description">
-                You win. You vote. The next collection opens.
+              </MotionWords></h1>
+              <p className="hero-description motion-heading">
+                You vote. You mint. You win. The next collection opens.
               </p>
               <div className="hero-actions">
                 <LinkButton  href="#rewards">
@@ -243,7 +204,7 @@ export function LandingExperience({
                 </LinkButton>
               </div>
             </div>
-            <RewardsHeroArtwork />
+            <RewardsMachine />
           </div>
         </section>
 
@@ -251,7 +212,7 @@ export function LandingExperience({
           <GenesisArtwork />
           <div className="genesis-intro-copy">
             <p className="eyebrow">Tincta Genesis / Two utilities</p>
-            <h2 id="genesis-heading">One free NFT. Two utilities.</h2>
+            <h2 className="motion-heading" id="genesis-heading"><MotionWords>One free NFT. Two utilities.</MotionWords></h2>
             <p>Vote on the first collection. Enroll in the affiliate program across every collection and season.</p>
             <p><strong>Earn real ETH through referrals.</strong> Enroll during voting, then share your referral URL. When someone uses it to mint a paid token, you qualify for an equal share of the 20% affiliate pool, claimable after sellout and a successful draw.</p>
             <p>Genesis voting ends after the first ballot. For future votes, you’ll need NFTs from successfully revealed paid season collections.</p>
@@ -263,10 +224,10 @@ export function LandingExperience({
         </section>
 
         <section className="rewards-overview wrap" id="rewards" aria-label="Planned rewards across all seasons">
-          <div className="reward-rail">
+          <div className="reward-rail motion-sequence">
             <div className="reward-metric">
               <div className="metric-top">
-                <Icon name="spark" />
+                <Icon name="spark" className="motion-icon" />
                 <span>PRIZE POOL EXAMPLE</span>
               </div>
               <div className="metric-number">
@@ -290,7 +251,7 @@ export function LandingExperience({
               </p>
             </div>
             <div className="reward-metric holder-metric">
-              <div className="metric-top"><Icon name="layers" /><span>HOLDER POOL EXAMPLE</span></div>
+              <div className="metric-top"><Icon name="layers" className="motion-icon" /><span>HOLDER POOL EXAMPLE</span></div>
               <div className="metric-number">{plannedRewards.holderPoolEth} <span>ETH</span></div>
               <p>10% across separate season pools. Example: {plannedRewards.holderClaimSlots.toLocaleString("en-US")} claims at <strong>{plannedRewards.holderRewardEth} ETH each.</strong></p>
               <a className="ui-text-action" href="#holder-rewards">See holder calculations <Icon name="down" /></a>
@@ -314,7 +275,7 @@ export function LandingExperience({
           tabIndex={-1}
         >
           <div className="launch-content">
-            <h2 id="launch-title">Stay in the loop.</h2>
+            <h2 className="motion-heading" id="launch-title"><MotionWords>Stay in the loop.</MotionWords></h2>
             <p id="launch-description">Get notified when voting and minting open.</p>
             <NewsletterSignup />
           </div>
@@ -325,16 +286,16 @@ export function LandingExperience({
           id="reward-details"
           aria-labelledby="prizes-title"
         >
-          <div className="prize-panel" data-reveal>
+          <div className="prize-panel">
             <div className="prize-copy">
               <p className="eyebrow">
-                <Icon name="spark" /> PRIZES CLAIMED DIRECTLY
+                <Icon name="spark" className="motion-icon" /> PRIZES CLAIMED DIRECTLY
               </p>
-              <h2 id="prizes-title">
+              <h2 className="motion-heading" id="prizes-title"><MotionWords>
                 The community votes.
                 <br />
                 <span className="serif">The prize amount follows.</span>
-              </h2>
+              </MotionWords></h2>
               <p>
                 Winning NFTs share 60% of mint revenue equally. The community’s
                 voted terms set the amount. After a successful draw, holders claim directly.
@@ -367,15 +328,15 @@ export function LandingExperience({
                   </span>
                   <span className="ticket-bottom">
                     EXAMPLE PRIZE
-                    <Icon name="spark" />
+                    <Icon name="spark" className="motion-icon" />
                   </span>
                 </div>
               ))}
             </div>
           </div>
-          <div className="affiliate-panel" id="affiliates" data-reveal>
+          <div className="affiliate-panel" id="affiliates">
             <div className="affiliate-visual" aria-hidden="true">
-              <div className="affiliate-art">
+              <div className="affiliate-art motion-art">
                 <svg viewBox="0 0 400 300" fill="none">
                   <g className="affiliate-rings">
                     {Array.from({ length: 20 }, (_, i) => (
@@ -404,11 +365,11 @@ export function LandingExperience({
             </div>
             <div className="affiliate-copy">
               <p className="eyebrow">COMMISSIONS CALCULATED ONCHAIN</p>
-              <h2>
+              <h2><MotionWords>
                 Your referrals.
                 <br />
                 Contract-calculated <span className="serif">commissions.</span>
-              </h2>
+              </MotionWords></h2>
               <p>
                 Enroll during voting. Bring one paid referral to qualify for an
                 equal share of the affiliate pool, claimable after a successful draw.
@@ -433,17 +394,16 @@ export function LandingExperience({
 
         <section
           className="manifesto wrap"
-          data-reveal
           aria-labelledby="manifesto-title"
         >
           <p className="eyebrow section-kicker">
             <span className="section-index">01 /</span> CONTRACT-CONTROLLED REWARDS
           </p>
-          <h2 id="manifesto-title">
+          <h2 className="motion-heading" id="manifesto-title"><MotionWords>
             The community chooses.
             <br />
             <span className="muted-heading">The contract enforces.</span>
-          </h2>
+          </MotionWords></h2>
           <div className="manifesto-bottom">
             <p>
               Vote on price, supply, winners and mint duration. When voting closes,
@@ -461,27 +421,27 @@ export function LandingExperience({
           aria-labelledby="seasons-title"
         >
           <div className="wrap">
-            <div className="section-heading" data-reveal>
+            <div className="section-heading">
               <div>
                 <p className="eyebrow">
                   <span className="section-index">02 /</span> COLLECTION TERMS ONCHAIN
                 </p>
-                <h2 id="seasons-title">
+                <h2 className="motion-heading" id="seasons-title"><MotionWords>
                   Every collection.
                   <br />
                   Its own <span className="serif">voted terms.</span>
-                </h2>
+                </MotionWords></h2>
               </div>
               <p>
                 A new palette. A new vote. A separate draw for every collection.
               </p>
             </div>
-            <div className="season-explorer" data-reveal>
+            <div className="season-explorer">
               <div className="season-explorer-top">
                 <span className="mono">EXPLORE THE COLLECTIONS</span>
                 <span className="catalog-tag">
                   {seasons.length} planned seasons
-                  <Icon name="plus" />
+                  <Icon name="plus" className="motion-icon" />
                   {totalCollections} collections
                 </span>
               </div>
@@ -575,7 +535,7 @@ export function LandingExperience({
                 </div>
               )}
             </div>
-            <div className="season-facts" data-reveal>
+            <div className="season-facts motion-sequence">
               <div>
                 <span>22</span>
                 <p>Planned seasons</p>
@@ -604,16 +564,16 @@ export function LandingExperience({
           id="collection"
           aria-labelledby="art-title"
         >
-          <div className="wrap section-heading" data-reveal>
+          <div className="wrap section-heading">
             <div>
               <p className="eyebrow">
                 <span className="section-index">03 /</span> YOUR ENTRY INTO THE DRAW
               </p>
-              <h2 id="art-title">
+              <h2 className="motion-heading" id="art-title"><MotionWords>
                 Your NFT connects
                 <br />
                 you to the <span className="serif">draw.</span>
-              </h2>
+              </MotionWords></h2>
             </div>
             <div>
               <p>
@@ -708,27 +668,27 @@ export function LandingExperience({
           id="how-it-works"
           aria-labelledby="how-title"
         >
-          <div className="section-heading" data-reveal>
+          <div className="section-heading">
             <div>
               <p className="eyebrow">
                 <span className="section-index">04 /</span> FROM VOTE TO CLAIM
               </p>
-              <h2 id="how-title">
+              <h2 className="motion-heading" id="how-title"><MotionWords>
                 Vote. Mint.
                 <br />
                 Claim if you win.
-              </h2>
+              </MotionWords></h2>
             </div>
             <p>
               Follow the community vote. Review final terms before minting.
               Submit your claim directly to the contract.
             </p>
           </div>
-          <div className="steps" data-reveal>
+          <div className="steps motion-sequence">
             <article>
               <span className="step-number">
                 01
-                <Icon name="plus" />
+                <Icon name="plus" className="motion-icon" />
               </span>
               <h3>Choose the terms.</h3>
               <p>
@@ -741,7 +701,7 @@ export function LandingExperience({
             <article>
               <span className="step-number">
                 02
-                <Icon name="plus" />
+                <Icon name="plus" className="motion-icon" />
               </span>
               <h3>Mint your NFT.</h3>
               <p>
@@ -754,7 +714,7 @@ export function LandingExperience({
             <article>
               <span className="step-number">
                 03
-                <Icon name="spark" />
+                <Icon name="spark" className="motion-icon" />
               </span>
               <h3>Claim your rewards.</h3>
               <p>
@@ -765,7 +725,7 @@ export function LandingExperience({
               </span>
             </article>
           </div>
-          <div className="trust-strip" data-reveal>
+          <div className="trust-strip">
             <span>
               <Icon name="check" /> Verifiable Chainlink VRF draw
             </span>
@@ -784,10 +744,10 @@ export function LandingExperience({
               <p className="eyebrow">
                 <span className="section-index">05 /</span> ONCHAIN REFUND RULES
               </p>
-              <h2 id="refund-title">
+              <h2 className="motion-heading" id="refund-title"><MotionWords>
                 Not sold out by the deadline?{" "}
                 <span className="muted-heading">Claim your mint-price refund.</span>
-              </h2>
+              </MotionWords></h2>
               <p className="refund-intro">
                 If a collection has not sold out when its onchain deadline is
                 reached, current NFT holders can claim the original mint price
@@ -821,7 +781,7 @@ export function LandingExperience({
         <section className="manifesto holder-section wrap" id="holder-rewards" aria-labelledby="holders-title">
           <p className="eyebrow section-kicker"><span className="section-index">06 /</span> SEASON HOLDER REWARDS · PLANNED FOR LAUNCH</p>
           <div className="holder-copy">
-            <h2 id="holders-title">Not a winner,<br /><span className="muted-heading">but still a holder?</span></h2>
+            <h2 className="motion-heading" id="holders-title"><MotionWords>Not a winner,<br /><span className="muted-heading">but still a holder?</span></MotionWords></h2>
             <div className="holder-explanation">
               <p>Successful draws add 10% of mint revenue to the season pool. At season end, the first 5% of eligible NFTs to claim share it equally. Winners qualify too. One claim per NFT, while slots remain.</p>
               <LinkButton href={footerLinks.app ? `${footerLinks.app.replace(/\/$/, "")}/holders` : undefined}>Explore holder rewards <Icon name="diagonal" /></LinkButton>
@@ -844,17 +804,16 @@ export function LandingExperience({
           className="faq-section wrap"
           id="questions"
           aria-labelledby="faq-title"
-          data-reveal
         >
           <div>
             <p className="eyebrow">
               <span className="section-index">07 /</span> INDEPENDENTLY VERIFIABLE
             </p>
-            <h2 id="faq-title">
+            <h2 className="motion-heading" id="faq-title"><MotionWords>
               Inspect the code.
               <br />
               Verify the outcome.
-            </h2>
+            </MotionWords></h2>
             <p>
               Go deeper into voting, rewards and the contracts behind them.
             </p>
@@ -881,12 +840,12 @@ export function LandingExperience({
               />
             ))}
           </div>
-          <div className="wrap closing-content" data-reveal>
+          <div className="wrap closing-content">
             <p className="eyebrow">BE READY FOR THE FIRST COLLECTION</p>
-            <h2 id="closing-title">
+            <h2 className="motion-heading" id="closing-title"><MotionWords>
               Know the rules
               <br />before you <span className="serif">enter.</span>
-            </h2>
+            </MotionWords></h2>
             <LinkButton href={footerLinks.docs ?? "#questions"}>
               Explore the documentation
               <Icon name="diagonal" />
@@ -900,6 +859,6 @@ export function LandingExperience({
         links={footerLinks}
         legal={<>Launch preview. Illustrative amounts depend on community-voted terms. Prize and affiliate payouts require sellout and a successful draw. Review final terms before minting.</>}
       />
-    </div>
+    </LandingMotion>
   );
 }

@@ -1,0 +1,32 @@
+{
+  "kind": "Local V16 EVM rehearsal snapshot; not a Sepolia deployment",
+  "source": "apps/contracts/test/ProtocolV16Rehearsal.ts",
+  "runtimeHash": "0x1ffe2ce3c4c2be77e70c163c5a70070495c2c4fa00ae12d851b82716eaf0d535",
+  "chainId": 31337,
+  "protocol": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+  "collection": {
+    "seasonId": "0xee62437ef4af4c89a1c165f53d578b4db352eba393d12eed845468e8128222fe",
+    "seasonName": "V16 50-wallet rehearsal",
+    "name": "Rehearsal 1",
+    "color": "#330000",
+    "textColor": "#FFFFFF"
+  },
+  "optionCount": 1,
+  "options": [
+    {
+      "supply": "1000",
+      "price": "10000000000000000",
+      "winners": "6",
+      "duration": "3600",
+      "votes": "0"
+    }
+  ],
+  "votingDuration": "3600",
+  "voteStart": "1793113887",
+  "saleStart": "1793117487",
+  "timestamp": 1793113887,
+  "genesisSupply": "1000",
+  "wallet": "0x5a6bD5c08aAf574491f0810E5B12b49A591Fe9e5",
+  "unusedVotes": "2",
+  "fallback": "0"
+}

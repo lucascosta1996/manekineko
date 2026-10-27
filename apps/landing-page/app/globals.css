@@ -31,6 +31,9 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 .collection-announcement-detail { font-variant-numeric: tabular-nums; }
 .landing-header { min-height: 3.5rem; padding-block: var(--ui-space-1); display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: var(--ui-space-4); }
 .brand { display: inline-flex; align-items: center; flex-shrink: 0; max-width: 100%; min-height: 2.75rem; padding-block: var(--ui-space-1); }
+.rewards-landing-brand { display: inline-flex; align-items: center; gap: var(--ui-space-3); color: var(--ui-ink); }
+.rewards-landing-brand > svg { width: 32px; height: 32px; flex-shrink: 0; }
+.rewards-landing-brand > span { font-size: var(--ui-label); font-weight: 600; letter-spacing: .13em; }
 .brand-wordmark { width: var(--ui-brand-wordmark); height: auto; aspect-ratio: 3947 / 780; }
 .header-cta { justify-self: end; }
 .desktop-nav { display: flex; align-items: center; gap: var(--ui-space-4); font: 500 var(--ui-label)/var(--ui-control-line) var(--ui-font-sans); }
@@ -38,50 +41,13 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 .desktop-nav a:hover { text-decoration: underline; text-underline-offset: .25rem; }
 .menu-toggle, .mobile-nav { display: none; }
 .hero, .rewards-overview, .launch-section, .manifesto, .seasons-section, .art-section, .rewards-section, .how-section, .refund-section, .faq-section { padding-block: var(--ui-section-space); }
-.hero-main { display: grid; grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr); align-items: center; justify-items: center; gap: var(--ui-space-16); max-width: 60rem; margin-inline: auto; }
-.hero-copy { min-width: 0; width: 100%; max-width: 55rem; text-align: left; container-type: inline-size; }
+.hero-main { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; justify-items: center; gap: var(--ui-space-8); margin-inline: auto; }
+.hero-copy { min-width: 0; width: 100%; max-width: 55rem; text-align: center; container-type: inline-size; }
 /* The compact shared title scale wraps naturally as text is enlarged. */
 .hero-copy h1 { max-width: none; font-size: var(--ui-hero); text-wrap: wrap; }
-.hero-description { max-width: 55ch; margin: var(--ui-space-6) 0; }
+.hero-description { max-width: 55ch; margin: var(--ui-space-6) auto; }
 .hero-copy .hero-description { font-size: var(--ui-subheading); line-height: 1.35; letter-spacing: -.01em; font-weight: 500; color: var(--ui-ink); text-wrap: balance; }
-.hero-actions { display: flex; align-items: center; justify-content: flex-start; }
-.hero-art { position: relative; min-width: 0; width: 100%; max-width: 20rem; margin-inline: auto; }
-.rewards-hero-artwork { width: 100%; height: auto; aspect-ratio: 1; }
-/* Open's ten canonical planes: left fold 1–4, right fold 5–7,
-   lower bridge 8, center 9–10. Each fold moves as one connected piece. */
-@media (prefers-reduced-motion: no-preference) {
-  .rewards-hero-artwork,
-  .rewards-hero-artwork path {
-    animation-duration: 5s;
-    animation-timing-function: ease-in-out;
-    animation-iteration-count: infinite;
-    animation-play-state: paused;
-    transform-box: view-box;
-  }
-  .rewards-hero-artwork { animation-name: rewards-open-float; }
-  .rewards-hero-artwork path:nth-of-type(-n + 4) { animation-name: rewards-open-left; }
-  .rewards-hero-artwork path:nth-of-type(n + 5):nth-of-type(-n + 7) { animation-name: rewards-open-right; }
-  .rewards-hero-artwork path:nth-of-type(n + 9) { animation-name: rewards-open-center; }
-  .hero-art[data-motion="running"] .rewards-hero-artwork,
-  .hero-art[data-motion="running"] .rewards-hero-artwork path { animation-play-state: running; }
-}
-@keyframes rewards-open-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4%); }
-}
-@keyframes rewards-open-left {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(-2.5%, -2.5%); }
-}
-@keyframes rewards-open-right {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(2.5%, -1.5%); }
-}
-@keyframes rewards-open-center {
-  0%, 100% { transform: translate(0, 0); }
-  40% { transform: translate(1%, -6.5%); }
-  75% { transform: translate(-.8%, -2%); }
-}
+.hero-actions { display: flex; align-items: center; justify-content: center; }
 .reward-rail { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); border-block: 1px solid var(--ui-line); padding-block: var(--ui-space-8); gap: var(--ui-space-8); }
 .reward-metric { min-width: 0; }
 .affiliate-metric, .holder-metric { border-left: 1px solid var(--ui-line); padding-left: var(--ui-space-8); }

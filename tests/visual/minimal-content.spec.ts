@@ -10,20 +10,14 @@ for (const width of [390, 1440]) {
     const heroGroup = await page.locator('.hero-main').boundingBox();
     const heroCopy = await page.locator('.hero-copy').boundingBox();
     const heroAction = await page.locator('.hero-actions .ui-button').boundingBox();
-    const heroArt = await page.locator('.hero-art').boundingBox();
+    const heroArt = await page.locator('[data-rewards-machine]').boundingBox();
     expect(Math.abs(heroGroup!.x + heroGroup!.width / 2 - width / 2)).toBeLessThanOrEqual(1);
-    expect(Math.abs(heroAction!.x - heroCopy!.x)).toBeLessThanOrEqual(1);
-    await expect(page.locator('.hero-copy')).toHaveCSS('text-align', 'left');
+    expect(Math.abs(heroAction!.x + heroAction!.width / 2 - width / 2)).toBeLessThanOrEqual(1);
+    await expect(page.locator('.hero-copy')).toHaveCSS('text-align', 'center');
     const heroDescription = await page.locator('.hero-description').boundingBox();
-    expect(Math.abs(heroDescription!.x - heroCopy!.x)).toBeLessThanOrEqual(1);
-    if (width >= 760) {
-      expect(heroArt!.x).toBeGreaterThan(heroCopy!.x + heroCopy!.width);
-      expect(Math.abs(heroCopy!.y + heroCopy!.height / 2 - heroArt!.y - heroArt!.height / 2)).toBeLessThanOrEqual(1);
-      expect(heroGroup!.width).toBeLessThanOrEqual(960);
-    } else {
-      expect(heroArt!.y).toBeGreaterThan(heroAction!.y + heroAction!.height);
-      expect(Math.abs(heroArt!.x + heroArt!.width / 2 - width / 2)).toBeLessThanOrEqual(1);
-    }
+    expect(Math.abs(heroDescription!.x + heroDescription!.width / 2 - width / 2)).toBeLessThanOrEqual(1);
+    expect(heroArt!.y).toBeGreaterThan(heroCopy!.y + heroCopy!.height);
+    expect(Math.abs(heroArt!.x + heroArt!.width / 2 - width / 2)).toBeLessThanOrEqual(1);
     await expect(page.locator('.site main .section-index')).toHaveText(['01 /', '02 /', '03 /', '04 /', '05 /', '06 /', '07 /']);
     const sections = await page.locator('.site main > section:not(.closing-section)').evaluateAll(elements => elements.map(element => {
       const style = getComputedStyle(element);

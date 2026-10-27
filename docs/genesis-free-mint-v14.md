@@ -1,5 +1,7 @@
 # V14 Genesis free mint
 
+**October 26 follow-up:** the rehearsal is paused before paid preparation while the requested [single-contract V15](single-contract-v15.md) is developed. V14 addresses, existing NFTs and immutable mint window remain unchanged. Do not restart its frozen runner.
+
 V14 is deployed on **Sepolia**. See the [October 26 release record](sepolia-v14-release-2026-10-26.md) and [public manifest](deployments/sepolia-v14-2026-10-26.json) for exact source proofs, finalized runtime checks and Genesis dates. The user authorized the [Genesis-first buyer rehearsal](sepolia-v14-buyer-rehearsal.md). The old V13 run remains paused; X delivery and Mainnet remain inactive. Dated local validation sections below describe earlier snapshots, not current release status.
 
 The user stopped the V13 rehearsal before its first participant transaction and selected **one free primary mint per wallet, 1,000 NFTs total, and a 24-hour window**. This document describes a new graph; it does not upgrade or relabel the existing V13 graph.
