@@ -45,3 +45,15 @@ test('manual gates require the exact confirmed action and cannot reuse a receipt
   await assert.rejects(engine.send(0,'bot-claim',request),Hold);
  }finally{await rm(directory,{recursive:true,force:true});}
 });
+
+test('bot gas top-ups respect the fee cap and never use a human wallet',async()=>{
+ const directory=await mkdtemp(join(tmpdir(),'tincta-v16-gas-')),wallets=Array.from({length:3},()=>new Wallet(Wallet.createRandom().privateKey)),plan=rehearsalPlan(release,'a'.repeat(64));
+ const state={custody:{},journals:{},gasWei:'0',vrfFeesWei:'0',operatorBudgetWei:'0'} as unknown as RunState;let fee=500000000n;
+ const provider={getFeeData:async()=>({maxFeePerGas:fee}),estimateGas:async()=>5000000n,getBalance:async()=>202000000000000000n} as any;
+ const engine=new RehearsalEngine({plan,state,directory,provider,secondary:provider,wallets,operator:wallets[0]}),funding:any[]=[];
+ (engine as any).fund=async(...args:any[])=>funding.push(args);(engine as any).pipeline=()=>({send:async()=>({hash:'0x'+'7'.repeat(64)})});(engine as any).account=async()=>{};
+ try{await engine.send(2,'mint',{to:release.address,value:200000000000000000n});assert.equal(funding.length,1);assert.equal(funding[0][0],2);assert.equal(funding[0][1],2000000000000000n);
+  fee=500000001n;await assert.rejects(engine.send(2,'mint-high-fee',{to:release.address,value:200000000000000000n}),Hold);assert.equal(funding.length,1);
+  state.custody[wallets[2].address.toLowerCase()]={reason:'User testing'};await assert.rejects(engine.send(2,'human-mint',{to:release.address}),Hold);assert.equal(funding.length,1);
+ }finally{await rm(directory,{recursive:true,force:true});}
+});

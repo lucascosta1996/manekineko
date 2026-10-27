@@ -9,6 +9,7 @@
 - All **216 collections / 22 seasons** uploaded in 22 catalog batches, preserving the Sepolia catalog identities and order.
 - Two independent RPCs verified exact compiled runtime, immutable chain identity, settings, all three options, complete catalog and inactive state at block **12006290**, hash `0x63913c4ce38a2ff53f4533646e21fb2175be2383009ddc21f059ee78b5ee24cd`.
 - Exact source published successfully on Etherscan.
+- All 23 deployment/catalog transactions are confirmed: **195,815,938 gas**, total actual fee **5,281,908,316 wei (0.000000005281908316 Sepolia ETH)**. This is deployment cost, separate from the future 30 ETH rehearsal budget.
 - **Unsealed; zero prepared collections, zero Genesis mints, zero operating funding.** No rehearsal transaction has been sent.
 
 The deployment uses a fresh V16 address; earlier deployments and their frozen exports remain unchanged. Sepolia accepted the current 39,442-byte runtime and deployment transaction. Mainnet remains unconfigured and unqualified.
@@ -21,12 +22,12 @@ Migration **036_v16_nft_mirror.sql** was tested against isolated PostgreSQL, the
 
 Public runtime pins and the indexer source were written and read back for `manekineko-staging-web`, `manekineko-staging-launch`, and `manekineko-staging-indexer`. Vercel's expired CLI token was refreshed through the existing authenticated CLI before the update. No secret is embedded in browser code; the browser uses a public RPC endpoint.
 
-Hosted readiness, alias resolution and observed V16 page behavior are checked after publishing this release. A successful local build or saved environment pin alone is not hosted verification. The private release folder retains deployment, source-publication, database and hosted evidence; only redacted reports may be shared.
+Commit `84677880d65c135f635430fc66c2401b0c6250cd` reached **Ready** on all five Vercel projects. Every production alias was checked against that exact deployment, including `app.tincta.xyz`, `launch.app.tincta.xyz`, `rewards.tincta.xyz` and `tincta.xyz`. Hosted browser/indexer verification is recorded below. A successful local build alone is not hosted verification. The private release folder retains deployment, source-publication, database and hosted evidence; only redacted reports may be shared.
 
 ## Verification boundaries
 
 - `npm run protocol:v16:test`: **29 passing**, including actual V16 application/mirror adapters and a ten-collection local conservation rehearsal.
-- `npm run protocol:v16:rehearsal:test`: **4 passing**; full catalog/budget, encrypted vault uniqueness/privacy, manual receipt matching and custody safeguards.
+- `npm run protocol:v16:rehearsal:test`: **5 passing**; full catalog/budget, encrypted vault uniqueness/privacy, manual receipt matching, custody safeguards and fee-capped bot gas top-ups.
 - Isolated PostgreSQL NFT mirror tests: **7 passing, none skipped**, including same-address collection/NFT collisions, scoped reset, burned NFT metadata and legacy projections.
 - Web tests: **300 passing, 3 database-gated skips**. Indexer tests: **73 passing, 9 database-gated skips**; the mirror database tests were additionally executed separately. Launch tests and preparation tests pass.
 - Workspace TypeScript and Web, Launch, indexer builds pass. These are separate from hosted CI status.
@@ -36,3 +37,13 @@ Hosted readiness, alias resolution and observed V16 page behavior are checked af
 The first deployment pass finished its catalog transactions but encountered a readback anchor that preceded the final batch. The verifier was corrected to wait for a common anchor containing the last receipt, then resumed the saved journal. It sent no duplicate deployment or catalog transaction. Final two-RPC verification and source publication succeeded.
 
 The rehearsal is prepared outside the repository with 501 fresh encrypted wallets, a frozen runtime and plan, empty transaction journals, a pause marker, two unfunded human-wallet handoffs and a successful read-only preflight. See [the complete workflow](sepolia-v16-rehearsal.md) and [216-collection matrix](sepolia-v16-scenarios.md). No scheduler or worker was started for it. UI fixes can be deployed independently; the contract's clocks never pause.
+
+## Hosted verification
+
+The hosted Web home, Rewards, Affiliates and Holders pages were checked at 1440 and 390 px against the V16 pin. They display the correct unstarted state; the home shows zero Genesis mints, the two-mint lifetime cap and a disabled mint button. Launch shows 0 / 216 prepared collections and 22 catalog seasons. All checked layouts fit their viewport. The V16 Genesis gallery link is present with `collection=0`.
+
+The indexer endpoint rejected an unauthenticated request with 401 and completed an authenticated scan with 200. All three configured historical/current sources reported `caught_up`, including V16 at block 12006512. This is a read-only chain scan plus database projection, not a rehearsal start. [Hosted evidence](../output/v16-deployment-2026-10-28/hosted-verification.json), [desktop](../output/v16-deployment-2026-10-28/hosted-genesis-1440.png), [mobile](../output/v16-deployment-2026-10-28/hosted-genesis-390.png).
+
+The unfunded runner's final review added dynamic bot gas top-ups bounded by the saved fee cap, so a fee rise can be handled without signing for a human wallet. Its replacement bundle preserves all 501 wallet identities and was prepared while the pause marker existed, with zero funding, zero journals and `started=false`. The final runtime and plan hashes are in the workflow. No contract redeployment or rehearsal transaction was required.
+
+At this verification checkpoint, GitHub **Checks** and **Visual UI contracts** were still running; they are not reported as passed. Vercel readiness, local tests and the hosted checks above are independently confirmed.

@@ -65,6 +65,12 @@ export class RehearsalEngine{
   if(index===-1&&!this.state.journals[index]?.transactions.some(t=>t.action===action)){const fee=await this.provider.getFeeData(),gas=await this.provider.estimateGas({...request,from:this.operator.address}),maximum=BigInt(String(request.value??0))+gas*120n/100n*(fee.maxFeePerGas??BigInt(this.plan.maxFeePerGasWei));
    if(BigInt(this.state.operatorBudgetWei)<maximum)await this.fund(-1,maximum-BigInt(this.state.operatorBudgetWei)+eth/1000n,'operator-budget');
   }
+  if(index>=0&&index!==this.plan.bankIndex&&!this.state.journals[index]?.transactions.some(t=>t.action===action)){
+   const fee=await this.provider.getFeeData(),gas=await this.provider.estimateGas({...request,from:this.address(index)}),price=fee.maxFeePerGas??fee.gasPrice;
+   if(price===null||price>BigInt(this.plan.maxFeePerGasWei))throw new Hold('fee-cap','Wait for fees below the saved cap before funding a bot transaction.');
+   const required=BigInt(String(request.value??0))+gas*120n/100n*price,balance=await this.provider.getBalance(this.address(index));
+   if(balance<required)await this.fund(index,required-balance+eth/1000n,'transaction-gas');
+  }
   const pipeline=this.pipeline(index);await this.save();
   for(;;){await this.stopped();try{const receipt=await pipeline.send(action,request,deadline?{broadcastDeadline:deadline}:{});await this.account(index,action,receipt);return receipt;}catch(e){if(!(e instanceof ChainPendingError))throw e;await new Promise(r=>setTimeout(r,4000));}}
  }

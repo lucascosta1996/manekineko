@@ -6,8 +6,8 @@ The deployed contract is [0x673D155f884976bb42eab2F1F11b381dc4d8D26A](https://se
 
 The frozen runner, encrypted vault, journal and reports live outside the repository at `/Users/admin/.local/share/tincta/v16-rehearsal-2026-10-28/`. Its `command.mjs` loads owner-only credentials from `/Users/admin/.config/tincta/v16-rehearsal-2026-10-28.env`. UI deployments do not replace the runner, wallet vault, plan or transaction history.
 
-- Frozen runtime SHA-256: `b78e0a513a4a7fd9e50f3044fe5ecbdbbbccd82658ced7a89fb51f203510f25a`.
-- Plan SHA-256: `4fcf1ee3858133040a066295d5ef597bfbfecd6ef1049bbe608d303e3a684ef9`.
+- Frozen runtime SHA-256: `c0467ab3623b34e5d93b70d964b704d240a1d5611b61e80827ac042cdedfd5e0`.
+- Plan SHA-256: `cfbc750182277bd27d26bff386ca43f5321dac365905a0f8bf76201b6e30ae86`.
 - Fresh bank: `0x6E33bE5D2e41A27b4d580eeEdf4C0b324dB393a1`.
 - Manual affiliate wallet 0: `0x76E0D6518b3Dec962044575E8C0FDCfe34d494a6`.
 - Manual referred buyer wallet 1: `0xC9cEAB404436a85aAc34bC2F6F3A5814809323C1`.
@@ -50,13 +50,13 @@ After the user starts the rehearsal, substitute the actual funding hash, current
 ```sh
 node "$V16_RUN/command.mjs" funding 0xFUNDING_TRANSACTION_HASH
 node "$V16_RUN/command.mjs" resume
-node "$V16_RUN/command.mjs" run --execute 4fcf1ee3858133040a066295d5ef597bfbfecd6ef1049bbe608d303e3a684ef9
+node "$V16_RUN/command.mjs" run --execute cfbc750182277bd27d26bff386ca43f5321dac365905a0f8bf76201b6e30ae86
 node "$V16_RUN/command.mjs" ack GATE_ID "Observed result and evidence path" 0xMANUAL_TRANSACTION_HASH
 # Omit the final transaction hash for readiness/review gates.
 node "$V16_RUN/command.mjs" handoff WINNER_WALLET_INDEX
 node "$V16_RUN/command.mjs" pause
 # Only after final review and completion:
-node "$V16_RUN/command.mjs" recover --execute 4fcf1ee3858133040a066295d5ef597bfbfecd6ef1049bbe608d303e3a684ef9
+node "$V16_RUN/command.mjs" recover --execute cfbc750182277bd27d26bff386ca43f5321dac365905a0f8bf76201b6e30ae86
 ```
 
 The `state.json` address array gives each wallet index. `status` returns the current checkpoint and public report path. `resume` only removes the local pause marker; it submits no transaction. `run` additionally requires `--execute` and the exact plan hash. No approval is inferred from elapsed time.
