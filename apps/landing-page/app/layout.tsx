@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { MintNotification } from "@manekineko/ui/mint-notification";
 import "@manekineko/ui/styles.css";
 import "./globals.css";
 import "./compact.css";
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>{children}<MintNotification /></body>
     </html>
   );
 }

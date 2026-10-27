@@ -6,6 +6,28 @@ const trusted = `WITH trusted AS (
   AS p(chain_id integer,controller text,code_hash text,version integer)
   USING (chain_id,controller,code_hash,version) WHERE s.verified
 )`;
+export async function queryMintActivity(query: Query, pins: MirrorPin[]) {
+  if (!pins.length) return { events: [] };
+  const { rows } = await query(`${trusted}, recent AS (
+    SELECT c.chain_id,c.address,c.name,c.kind,t.token_id,t.mint_transaction,t.mint_block
+    FROM manekineko_nft_mirror_collections c JOIN trusted s USING (chain_id,controller)
+    CROSS JOIN LATERAL (
+      SELECT token_id,mint_transaction,mint_block,burned FROM manekineko_nft_mirror_tokens t
+      WHERE t.chain_id=c.chain_id AND t.collection_address=c.address
+      ORDER BY token_id DESC LIMIT 20
+    ) t
+    WHERE s.verified_at >= now()-interval '3 minutes'
+      AND NOT t.burned AND t.mint_block BETWEEN s.anchor_block-50 AND LEAST(s.anchor_block,c.cursor_block)
+  ), transactions AS (
+    SELECT chain_id,address,name,kind,mint_transaction,max(token_id) AS token_id,max(mint_block) AS mint_block
+    FROM recent GROUP BY chain_id,address,name,kind,mint_transaction
+  ), ranked AS (
+    SELECT *,row_number() OVER (PARTITION BY chain_id ORDER BY mint_block DESC,address,token_id DESC) AS position
+    FROM transactions
+  ) SELECT chain_id AS "chainId",address AS collection,name,kind,token_id AS "tokenId",mint_transaction AS transaction
+    FROM ranked WHERE position<=20 ORDER BY position,chain_id`, [pinsJson(pins)]);
+  return { events: rows };
+}
 const summary = `SELECT count(*)::integer AS minted,count(*) FILTER (WHERE metadata IS NOT NULL)::integer AS ready
   FROM manekineko_nft_mirror_tokens t WHERE t.chain_id=c.chain_id AND t.collection_address=c.address`;
 function collection(row: Record<string, any>): GalleryCollection {

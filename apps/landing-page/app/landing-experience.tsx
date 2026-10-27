@@ -251,7 +251,7 @@ export function LandingExperience({
           <GenesisArtwork />
           <div className="genesis-intro-copy">
             <p className="eyebrow">Tincta Genesis / Two utilities</p>
-            <h2 id="genesis-heading">One NFT. Two utilities.</h2>
+            <h2 id="genesis-heading">One free NFT. Two utilities.</h2>
             <p>Vote on the first collection. Enroll in the affiliate program across every collection and season.</p>
             <p><strong>Earn real ETH through referrals.</strong> Enroll during voting, then share your referral URL. When someone uses it to mint a paid token, you qualify for an equal share of the 20% affiliate pool, claimable after sellout and a successful draw.</p>
             <p>Genesis voting ends after the first ballot. For future votes, you’ll need NFTs from successfully revealed paid season collections.</p>

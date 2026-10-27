@@ -11,7 +11,7 @@ for (const width of [320, 390, 599, 600, 601, 719, 720, 721, 768, 1280, 1440]) {
     await page.goto(`${urls.landing}/rewards`); await ready(page);
     const genesis = page.locator('#genesis');
     await genesis.scrollIntoViewIfNeeded();
-    await expect(genesis.getByRole('heading', { name: 'One NFT. Two utilities.' })).toBeVisible();
+    await expect(genesis.getByRole('heading', { name: 'One free NFT. Two utilities.' })).toBeVisible();
     await expect(genesis).toContainText('Vote on the first collection. Enroll in the affiliate program across every collection and season.');
     await expect(genesis).toContainText('Earn real ETH through referrals.');
     await expect(genesis).toContainText('share your referral URL');
@@ -47,7 +47,7 @@ for (const width of [320, 390, 599, 600, 601, 719, 720, 721, 768, 1280, 1440]) {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.goto(urls.landing); await ready(page);
     await expect(page.locator('.studio-feature')).toContainText('Up to two lifetime mints per wallet');
-    await expect(page.locator('.studio-feature')).toContainText('one NFT, two utilities');
+    await expect(page.locator('.studio-feature')).toContainText('One free NFT. Two utilities.');
     await expect(page.locator('.studio-feature')).toContainText('enroll as an affiliate across all collections and seasons');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.locator('.studio-feature').screenshot({ path: `test-results/v16-parent-${width}-${info.project.name}.png` });
@@ -71,7 +71,7 @@ for (const width of [320, 390, 768, 1280, 1440]) {
     for (const route of ['/', '/affiliates']) {
       await page.goto(`${urls.web}${route}?state=unconfigured`); await ready(page);
       const rules = page.getByRole('region', { name: 'Genesis launch rules' });
-      await expect(rules).toContainText('One NFT. Two utilities.');
+      await expect(rules).toContainText('One free NFT. Two utilities.');
       await expect(rules).toContainText('Earn real ETH through referrals.');
       await expect(rules).toContainText('making 30% withdrawable by the operator.');
       await expect(rules).toContainText('Two per wallet');

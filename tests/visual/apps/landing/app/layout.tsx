@@ -1,5 +1,6 @@
 import "@manekineko/ui/styles.css";
+import { MintNotification } from "@manekineko/ui/mint-notification";
 import "../../../../../apps/landing-page/app/globals.css";
 import "../../../../../apps/landing-page/app/compact.css";
 export const metadata = { title: "Tincta — Launch preview" };
-export default function Layout({children}: {children: React.ReactNode}) { return <html lang="en"><body>{children}</body></html>; }
+export default function Layout({children}: {children: React.ReactNode}) { return <html lang="en"><body>{children}<MintNotification /></body></html>; }

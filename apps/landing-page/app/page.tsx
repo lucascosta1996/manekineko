@@ -49,7 +49,7 @@ export default function LandingPage() {
                 <div className="studio-project-name">Tincta Rewards</div>
                 <h3>Rewards governed by immutable terms.</h3>
                 <p>Vote on collection terms. Mint original onchain artwork. Claim ETH rewards under published rules.</p>
-                <p><strong>Tincta Genesis: one NFT, two utilities.</strong> Vote on the first collection and enroll as an affiliate across all collections and seasons. Share your referral URL: one paid mint through it qualifies you for an equal share of the ETH affiliate pool after sellout and a successful draw. Enrollment positions are limited.</p>
+                <p><strong>One free NFT. Two utilities.</strong> With Tincta Genesis, vote on the first collection and enroll as an affiliate across all collections and seasons. Share your referral URL: one paid mint through it qualifies you for an equal share of the ETH affiliate pool after sellout and a successful draw. Enrollment positions are limited.</p>
                 <p>1,000 free NFTs. Up to two lifetime mints per wallet, plus network gas. No mint deadline; the first season waits for all 1,000 NFTs to mint.</p>
                 <p>These are the planned launch terms. The current Sepolia test uses earlier rules; Mainnet minting has not launched.</p>
                 <LinkButton href="/rewards" variant="secondary" icon={<Icon name="arrow" />}>Explore Tincta Rewards</LinkButton>

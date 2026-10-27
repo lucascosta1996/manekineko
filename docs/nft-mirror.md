@@ -49,6 +49,18 @@ A release with no configured controller can publish the gallery shell before act
 
 ## Local validation
 
+### Public mint notifications
+
+Web's read-only `/api/mint-activity` returns recent confirmed Genesis and paid NFT mint transactions from this same mirror. The parent and Rewards landing pages proxy that endpoint through their own origin; they need no database or RPC credentials. Their upstream is `NEXT_PUBLIC_WEB_URL`, defaulting to `https://app.tincta.xyz`. The shared `MintNotification` component also runs in the public app and docs.
+
+Only configured controller/code-hash/version pins with a currently verified source checked within three minutes are admitted. Queries examine at most the latest 20 tokens per collection, keep non-burned mints within 50 blocks of the confirmed anchor and the collection cursor, group by transaction/collection, then return at most 20 transactions per chain. Artwork does not need to finish caching. Secondary transfers never produce notifications. This is a bounded activity sample during bursts, not a complete transaction history.
+
+Visitors establish a quiet baseline when the page opens. Visible, online pages check every 15 seconds and display only newly observed transactions, with at most three queued notices and eight seconds per notice. Hover or keyboard focus pauses dismissal. Returning from a hidden/offline page or a long outage establishes another baseline. Duplicate transactions are not replayed, and dismissing hides notifications for the tab's session. Errors and empty feeds stay quiet. Labels say **Mint confirmed**, with an explicit **Sepolia testnet** label where applicable, and link to the correct chain's Etherscan transaction. Confirmation depth, mirror processing and polling mean delivery is not instantaneous.
+
+The source projection, confirmation rules, chain pins and signing paths remain unchanged. No database migration or new chain subscription is required. Future contract generations need their own verified mirror integration before their mints can enter this feed.
+
+### Test coverage
+
 `apps/indexer/test/nft-mirror.test.ts` uses migration 033 in a disposable localhost schema. It checks leases, atomic rollback, repeated events, caching/retries, burn labels, reorg removal, trust failures and 24/24/1 database pagination. `apps/contracts/test/NftMirror.ts` runs both current contract generations locally and compares the cached renderer response and numbers against `tokenURI()`/`combination()`, including a transferred then refunded NFT. The existing strict metadata/SVG suite covers malformed or active content.
 
 `scripts/verify-nft-mirror-web.mjs` serves the real production build against an isolated schema and SELECT-only role. It verifies actual SSR pagination, hyperlinks and invalid-route boundaries. It accepts only `TEST_NFT_MIRROR_DATABASE_URL` on localhost; run with `node --import tsx` after building Web. It removes its schema/role and stops its server when finished.

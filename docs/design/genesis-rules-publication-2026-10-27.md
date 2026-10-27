@@ -31,7 +31,7 @@ These results cover local source and isolated browser fixtures. Hosted deploymen
 
 ## Follow-up: two utilities and the treasury exception
 
-The Genesis heading now leads with “One NFT. Two utilities.” Its first sentence explains first-collection voting and affiliate enrollment across all collections and seasons. The referral explanation explicitly names real ETH and the affiliate URL, while retaining enrollment, a paid mint, sellout and successful-draw conditions. The parent page, app, voting guide and affiliate guide use the same meaning. Treasury FAQs, allocation captions and the 10 ETH example document the zero-qualifier exception: 3 ETH operator treasury, 6 ETH prizes and 1 ETH holders.
+The Genesis heading now leads with “One free NFT. Two utilities.” Its first sentence explains first-collection voting and affiliate enrollment across all collections and seasons. The referral explanation explicitly names real ETH and the affiliate URL, while retaining enrollment, a paid mint, sellout and successful-draw conditions. The parent page, app, voting guide and affiliate guide use the same meaning. Treasury FAQs, allocation captions and the 10 ETH example document the zero-qualifier exception: 3 ETH operator treasury, 6 ETH prizes and 1 ETH holders.
 
 The V16 implementation and metadata were updated locally, with 25 focused contract tests passing, including the ten-collection reserve-conservation rehearsal. Cases cover no enrollment, enrolled affiliates with zero referrals, exact cumulative 30% withdrawal, blocked duplicate withdrawals, qualified commissions and division dust, and unsold/randomness-timeout refunds. Those contract changes are not activated by this website release. Historical contracts, adapters and pins remain unchanged.
 

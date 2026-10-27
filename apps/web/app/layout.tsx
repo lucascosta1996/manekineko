@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { MintNotification } from "@manekineko/ui/mint-notification";
 import { WebWalletProvider } from "@manekineko/protocol/web-wallet-provider";
 import { protocolConfig } from "../lib/protocol/config";
 import "@manekineko/ui/styles.css";
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" data-scroll-behavior="smooth">
-      <body><WebWalletProvider defaultChainId={protocolConfig()?.chainId ?? 1}>{children}</WebWalletProvider></body>
+      <body><WebWalletProvider defaultChainId={protocolConfig()?.chainId ?? 1}>{children}</WebWalletProvider><MintNotification /></body>
     </html>
   );
 }

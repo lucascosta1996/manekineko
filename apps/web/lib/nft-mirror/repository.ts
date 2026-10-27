@@ -2,7 +2,7 @@ import 'server-only';
 import { getAddress, isHexString, ZeroAddress } from 'ethers';
 import { protocolConfig } from '../protocol/config';
 import { database } from '../database';
-import { queryDirectory, queryGallery } from './queries';
+import { queryDirectory, queryGallery, queryMintActivity } from './queries';
 import type { MirrorPin } from './model';
 
 function pins(): MirrorPin[] {
@@ -24,6 +24,9 @@ function pins(): MirrorPin[] {
 export async function getCollectionDirectory(page: number) {
   try { return await queryDirectory((sql,values)=>database().query(sql,values),pins(),page); }
   catch { throw new Error('The collection gallery is temporarily unavailable.'); }
+}
+export async function getMintActivity() {
+  return queryMintActivity((sql,values)=>database().query(sql,values),pins());
 }
 export async function getCollectionGallery(chainId: number, address: string, page: number) {
   try { return await queryGallery((sql,values)=>database().query(sql,values),pins(),chainId,address,page); }

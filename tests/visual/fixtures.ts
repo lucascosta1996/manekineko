@@ -28,6 +28,7 @@ export async function prepare(page: Page, state = 'loaded') {
   if (url.port === '4313') { const response = launchFixtureResponse(request.url(), { method: request.method(), empty: state === 'empty' }); return route.fulfill({ status: state === 'error' ? 503 : response.status, json: response.body }); }
   if (request.method() !== 'GET') return route.fulfill({status:409,json:{error:'Visual fixture: write intercepted.'}});
   if (url.pathname === '/api/live-collection') return route.fulfill({ status: state === 'error' ? 503 : 200, json: { collection: state === 'empty' ? null : collection } });
+  if (url.pathname === '/api/mint-activity') return route.fulfill({ json: { events: [] } });
   const body = webVisualResponse(request.url(), state);
   return route.fulfill({ status: state === 'error' ? 503 : body === null ? 404 : 200, json: body ?? {error:'No visual fixture for this request.'} });
  });

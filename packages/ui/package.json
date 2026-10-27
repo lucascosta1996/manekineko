@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./mint-activity": "./src/mint-activity.ts",
+    "./mint-notification": "./src/mint-notification.tsx",
     "./button": "./src/button.tsx",
     "./button-styles": "./src/button-styles.ts",
     "./forms": "./src/forms.tsx",

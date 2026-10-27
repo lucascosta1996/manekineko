@@ -62,6 +62,12 @@ try {
   for(const url of [path+'?page=4',path+'?page=-1','/collections/31337/'+address,'/collections/1/nope']) {
     const response=await fetch(base+url); assert.match(await response.text(),/This gallery isn/);
   }
+  const activity=await fetch(base+'/api/mint-activity');
+  assert.equal(activity.status,200);assert.equal(activity.headers.get('cache-control'),'no-store');
+  assert.deepEqual(await activity.json(),{events:[{chainId:11155111,collection:address,name:item.name,kind:'paid',tokenId:49,transaction:hash}]});
+  await pool.query('UPDATE manekineko_nft_mirror_sources SET verified=false');
+  assert.deepEqual(await (await fetch(base+'/api/mint-activity')).json(),{events:[]});
+  console.log('Production mint activity API passed: SELECT-only access, batch grouping, public fields and unverified-source exclusion.');
   console.log('Production gallery SSR passed: read-only PostgreSQL, 24/24/1 pagination, NFT links and invalid-route boundaries.');
 } finally {
   if(child) { child.kill('SIGTERM'); await new Promise(resolve=>{child.once('exit',resolve);setTimeout(resolve,5000).unref();}); }

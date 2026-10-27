@@ -4,7 +4,7 @@ import { buttonClassName } from "@manekineko/ui/button";
 export function GenesisLaunchRules() {
   return (
     <section className="public-explainer" aria-label="Genesis launch rules">
-      <h2>One NFT. Two utilities.</h2>
+      <h2>One free NFT. Two utilities.</h2>
       <p>Vote on the first collection. Enroll in the affiliate program across every collection and season.</p>
       <p><strong>Earn real ETH through referrals.</strong> Enroll during voting, then share your referral URL. One paid mint through it qualifies you for an equal share of the 20% affiliate pool, claimable after sellout and a successful draw.</p>
       <p>Planned launch rules. The connected Sepolia test retains its original terms.</p>
