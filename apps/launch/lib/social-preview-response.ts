@@ -1,6 +1,6 @@
 import { renderSeasonSocialSvg } from '@manekineko/contract-abi/season-social-image';
-import { previewMessage } from '../../../scripts/protocol-v16/social-preview';
-import type { Stage } from '../../../scripts/protocol-v16/social-content';
+import { previewMessage } from '@manekineko/contract-abi/v16-social-preview';
+import type { Stage } from '@manekineko/contract-abi/v16-social-content';
 import mainnet from '../catalog/mainnet.json';
 import sepolia from '../catalog/sepolia.json';
 export async function socialPreviewResponse(request: Request) {

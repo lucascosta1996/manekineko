@@ -6,7 +6,7 @@ import { runtimeEncryptionConfigured } from '../../../lib/season-runtime-crypto'
 import { verifySocialAccountInput } from '../../../lib/social-account-service';
 import { AutomationError } from '../../../lib/launch-automation';
 import { LaunchConfigurationError } from '../../../lib/launch-config';
-import { verifyXAccount, XApiError } from '../../../../../scripts/season-runner/social';
+import { verifyXAccount, XApiError } from '@manekineko/contract-abi/x-transport';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 function chain(request: Request) {

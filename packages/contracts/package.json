@@ -146,7 +146,10 @@
     "./protocol-v15": "./src/ManekinekoV15.json",
     "./protocol-v15-source": "./src/ManekinekoV15.source.json",
     "./protocol-v16": "./src/ManekinekoV16.json",
-    "./protocol-v16-source": "./src/ManekinekoV16.source.json"
+    "./protocol-v16-source": "./src/ManekinekoV16.source.json",
+    "./v16-social-content": "./src/v16-social-content.ts",
+    "./v16-social-preview": "./src/v16-social-preview.ts",
+    "./x-transport": "./src/x-transport.ts"
   },
   "dependencies": {
     "ethers": "6.17.0"

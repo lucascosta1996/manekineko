@@ -21,3 +21,7 @@ V16 sender configurations may explicitly select `accountSource: "launch"`; their
 - After the final loading/error/sign-out-shell adjustment, all 57 focused Launch boundary and login checks passed. Chromium, Firefox and WebKit covered phone and desktop; additional widths were checked in the branding matrix. Real mobile devices and manual screen-reader use remain separate.
 
 No database test fixtures were seeded into staging. Read-only checks confirmed the existing operator/profile and key decryption, a paused legacy runtime, and no unresolved historical account-binding restriction. No live X credential replacement or delivery was tested. No sender, funded/sealed Genesis or rehearsal was started. Mainnet and live wallet/VRF verification remain outside this application release. Hosted deployment and GitHub CI outcomes must be reported separately from these local results.
+
+## Hosted packaging correction
+
+The first hosted Launch build exposed an application import from `/scripts`, a directory intentionally removed by `.vercelignore`. Reusable V16 templates/preview data and the server-only X transport now live in `packages/contracts/src`, with compatibility re-exports at their historical script paths. The application uses explicit package exports; private operator tooling remains excluded. A deployment-import regression joins `ui:source`. The corrected Launch build, social/transport tests, UI typecheck and V16 typecheck passed locally before the follow-up publication.
