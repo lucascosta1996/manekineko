@@ -1,9 +1,8 @@
 "use client";
 
-import { Button } from "@manekineko/ui/button";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import artwork from "./rewards-machine-artwork.json";
-import { arcPoint, clamp, machineFrame, MACHINE_DURATION, MACHINE_STEPS, stepTime, type MachinePhase } from "./rewards-machine-motion";
+import { arcPoint, clamp, machineFrame, MACHINE_DURATION, stepTime, type MachinePhase } from "./rewards-machine-motion";
 import styles from "./rewards-machine.module.css";
 
 const wallets = ["0xA1…9F22", "0x72…0B41", "0xE8…6D03"];
@@ -22,10 +21,7 @@ function Bucket({ vrf = false }: { vrf?: boolean }) {
 
 export function RewardsMachine() {
   const root = useRef<HTMLDivElement>(null);
-  const controller = useRef<{ play: () => void; pause: () => void; select: (phase: MachinePhase) => void } | null>(null);
   const [phase, setPhase] = useState<MachinePhase>("winners");
-  const [playing, setPlaying] = useState(false);
-  const [reduced, setReduced] = useState(false);
 
   useEffect(() => {
     const container = root.current;
@@ -44,7 +40,7 @@ export function RewardsMachine() {
     const svg = element.querySelector<SVGSVGElement>("[data-machine-routes]")!;
     const paths = [...svg.querySelectorAll("path")];
     const preference = matchMedia("(prefers-reduced-motion: reduce)");
-    let time = stepTime("winners"), previous = 0, raf = 0, visible = false, wanted = !preference.matches;
+    let time = stepTime("winners"), previous = 0, raf = 0, visible = false;
     let lastPhase: MachinePhase = "winners";
     let sources: Point[] = [], targets: Point[] = [], pool: Point = { x: 0, y: 0 }, vrf: Point = pool;
 
@@ -105,32 +101,25 @@ export function RewardsMachine() {
     }
     function sync() {
       cancelAnimationFrame(raf); previous = 0;
-      const active = wanted && visible && !document.hidden && !preference.matches;
+      const active = visible && !document.hidden && !preference.matches;
       element.dataset.motion = active ? "running" : "paused";
-      setPlaying(wanted && !preference.matches);
       if (active) raf = requestAnimationFrame(frame);
     }
     function preferenceChanged() {
-      setReduced(preference.matches);
-      if (preference.matches) { wanted = false; time = stepTime("winners"); paint(); }
+      time = preference.matches ? stepTime("winners") : 0;
+      paint();
       sync();
     }
-    controller.current = {
-      play() { if (!preference.matches) { wanted = true; if(time >= stepTime("claims")) time = 0; sync(); } },
-      pause() { wanted = false; sync(); },
-      select(selected) { wanted = false; time = stepTime(selected); paint(); sync(); },
-    };
     const resize = new ResizeObserver(() => { measure(); paint(); }); resize.observe(scene);
     const intersection = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; sync(); }); intersection.observe(scene);
     document.addEventListener("visibilitychange", sync);
     preference.addEventListener("change", preferenceChanged);
-    measure(); setReduced(preference.matches);
+    measure();
     if (!preference.matches) time = 0;
     paint(); sync();
-    return () => { cancelAnimationFrame(raf); resize.disconnect(); intersection.disconnect(); document.removeEventListener("visibilitychange", sync); preference.removeEventListener("change", preferenceChanged); controller.current = null; };
+    return () => { cancelAnimationFrame(raf); resize.disconnect(); intersection.disconnect(); document.removeEventListener("visibilitychange", sync); preference.removeEventListener("change", preferenceChanged); };
   }, []);
 
-  const step = MACHINE_STEPS.find((item) => item.id === phase)!;
   return <div ref={root} className={styles.machine} data-rewards-machine="" data-phase="winners" data-motion="paused" data-prize-fill="1.000">
     <div className={styles.scene} data-machine-scene="" role="img" aria-label="Illustrative paid collection: wallets mint permanent numbered NFTs; 60% of mint revenue enters the prize pool; after sellout Chainlink VRF supplies randomness; six winning NFTs are revealed; their holders submit claims and the prize pool empties. Other allocations are separate.">
       <div className={styles.floorClip}><div className={styles.floor} /></div>
@@ -157,11 +146,5 @@ export function RewardsMachine() {
       {Array.from({length:9},(_,index)=><span key={index} className={styles.coin} data-machine-coin="" aria-hidden="true">Ξ</span>)}
       <span className={styles.proof} data-machine-proof="" aria-hidden="true" />
     </div>
-    <p className={styles.description} aria-live={playing ? "off" : "polite"}>{step.description}</p>
-    <div className={styles.controls}>
-      {!reduced && <Button variant="secondary" reserveLabels={["Play animation", "Pause animation"]} onClick={() => playing ? controller.current?.pause() : controller.current?.play()}>{playing ? "Pause animation" : "Play animation"}</Button>}
-      <div className={styles.steps} role="group" aria-label="Rewards animation steps">{MACHINE_STEPS.map((item) => <Button key={item.id} variant={phase === item.id ? "secondary" : "ghost"} aria-pressed={phase === item.id} onClick={() => controller.current?.select(item.id)}>{item.label}</Button>)}</div>
-    </div>
-    <p className={styles.note}>Illustrative paid draw. Fictional wallets. Winner count follows collection terms. Prizes require holder claims.</p>
   </div>;
 }

@@ -49,10 +49,6 @@
 .machine:is([data-phase="mint"], [data-phase="pool"], [data-phase="vrf"]) .resultLabel { visibility: hidden; }
 .coin { position: absolute; z-index: 8; left: 0; top: 0; display: grid; place-items: center; width: 25px; height: 25px; border-radius: 50%; border: 1px solid #8290aa; color: #455775; background: linear-gradient(135deg, #fff, #c1cde4); font: 18px/1 serif; box-shadow: 2px 3px 0 #a1b0cc; opacity: 0; pointer-events: none; }
 .proof { position: absolute; z-index: 8; left: 0; top: 0; width: 13px; height: 13px; border-radius: 3px; border: 1px solid #6796ec; background: #d2e2ff; box-shadow: 0 0 14px #c7d9fd; opacity: 0; pointer-events: none; }
-.description { max-width: 43rem; min-height: 2.8em; margin: 18px auto 0; text-align: center; font-size: var(--ui-body); line-height: 1.4; text-wrap: pretty; }
-.controls { margin-top: 16px; display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap; }
-.steps { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
-.note { max-width: 48rem; margin: 18px auto 0; color: var(--ui-muted); font-size: var(--ui-caption); line-height: 1.5; text-align: center; text-wrap: pretty; }
 @media (max-width: 1000px) and (min-width: 901px) {
   .wallet { padding: 10px 7px; }
   .walletIdentity { gap: 4px; }
@@ -84,7 +80,7 @@
 @media (forced-colors: active) {
   .floor, .routes, .coin, .proof { display: none; }
   .wallet, .winner, .bucketBody, .bucket::before, .liquid, .claimed { border-color: CanvasText; background: Canvas; }
-  .bucketName, .vrf .bucketName, .bucketCaption, .owner, .note, .mintLabel, .resultLabel, .claimed { color: CanvasText; }
+  .bucketName, .vrf .bucketName, .bucketCaption, .owner, .mintLabel, .resultLabel, .claimed { color: CanvasText; }
 }
 
 .minted img:first-child { position: absolute; z-index: -1; top: -7px; left: 5px; transform: rotate(7deg); }

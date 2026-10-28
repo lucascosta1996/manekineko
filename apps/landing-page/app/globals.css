@@ -87,12 +87,6 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
 .season-option { display: flex; flex-direction: column; width: 100%; }
 .mini-palette { display: flex; width: 100%; height: 1.5rem; gap: 1px; margin-bottom: var(--ui-space-2); }
 .mini-palette > span { flex: 1; }
-.season-facts { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); margin-top: var(--ui-space-12); gap: var(--ui-space-8); }
-.season-facts > div { display: flex; align-items: center; gap: var(--ui-space-6); }
-.season-facts > div > span { font-size: var(--ui-hero); line-height: 1.12; letter-spacing: -.035em; }
-.season-facts sup { font-size: var(--ui-section); color: var(--ui-muted); }
-.season-facts p { font-size: var(--ui-label); line-height: var(--ui-control-line); color: var(--ui-muted); margin-bottom: 0; }
-.section-footnote { font-size: var(--ui-caption); line-height: var(--ui-control-line); color: var(--ui-muted); margin-block: var(--ui-space-6) 0; }
 .gallery-controls { display: flex; flex-wrap: wrap; max-width: 100%; align-items: center; gap: var(--ui-space-2); margin-top: var(--ui-space-6); }
 .gallery-controls > .mono { margin-right: auto; }
 .art-gallery { display: flex; gap: var(--ui-space-6); overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; padding: var(--ui-space-3) var(--ui-page-gutter) var(--ui-space-8); }
@@ -196,7 +190,6 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
   .prize-panel, .affiliate-panel, .faq-section { grid-template-columns: minmax(0,1fr); }
   .steps { grid-template-columns: minmax(0,1fr); }
   .nft-card { flex-basis: min(65vw,22rem); }
-  .season-facts > div { flex-direction: column; align-items: flex-start; gap: var(--ui-space-3); }
 }
 @media (max-width: 599px) {
   .brand-wordmark { width: var(--ui-brand-wordmark); }
@@ -207,7 +200,6 @@ h3 { font-size: var(--ui-section); line-height: 1.25; letter-spacing: -.025em; f
   .season-explorer-top, .season-explorer-bottom { flex-wrap: wrap; }
   .season-swatch-stage { height: 10rem; gap: var(--ui-space-1); }
   .season-catalog { grid-template-columns: repeat(2,minmax(0,1fr)); gap: var(--ui-space-3); }
-  .season-facts { grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr)); gap: var(--ui-space-4); }
   .prize-tickets { grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr)); }
   .season-catalog { grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr)); }
   .ticket-top, .ticket-bottom { flex-wrap: wrap; }

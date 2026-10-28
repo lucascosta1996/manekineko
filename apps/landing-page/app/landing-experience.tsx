@@ -167,8 +167,8 @@ export function LandingExperience({
             { label: "Rewards", href: "#rewards" },
             { label: "Collections", href: "#seasons" },
             { label: "Affiliates", href: "#affiliates" },
-            { label: "How it works", href: "#how-it-works" },
-            { label: "FAQ", href: "#questions", mobileOnly: true },
+            { label: "FAQ", href: "#questions" },
+            { label: "Documentation", href: "https://app.tincta.xyz/docs", newTab: true },
             { label: "Join the launch list", href: "#launch-list", mobileOnly: true },
           ]}
           action={{ label: "Open app", href: "https://app.tincta.xyz" }}
@@ -535,27 +535,6 @@ export function LandingExperience({
                 </div>
               )}
             </div>
-            <div className="season-facts motion-sequence">
-              <div>
-                <span>22</span>
-                <p>Planned seasons</p>
-              </div>
-              <div>
-                <span>216</span>
-                <p>Planned collections</p>
-              </div>
-              <div>
-                <span>
-                  1–10<sup>*</sup>
-                </span>
-                <p>Winning NFTs, selected by the voted terms</p>
-              </div>
-            </div>
-            <p className="section-footnote">
-              *Winner counts come from the published options and must divide the
-              prize allocation exactly; seven and nine are excluded. Each NFT
-              enters only its own collection’s draw.
-            </p>
           </div>
         </section>
 

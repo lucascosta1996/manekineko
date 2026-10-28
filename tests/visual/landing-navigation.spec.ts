@@ -3,7 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { prepare, ready, urls } from './fixtures';
 
 for (const [name, route, destination] of [
-  ['Rewards', '/rewards', 'How it works'],
+  ['Rewards', '/rewards', 'FAQ'],
   ['Parent', '/', 'Projects'],
 ] as const) {
   for (const width of [320, 390, 768, 959, 960, 961, 1440]) {
@@ -32,6 +32,16 @@ for (const [name, route, destination] of [
         await expect(menu).toBeHidden();await expect(navigation).toBeHidden();
         await expect(page.getByRole('navigation', {name:'Main navigation'})).toBeVisible();
       }
+      if(name==='Rewards') {
+        if(width<960) await menu.click();
+        const nav=width<960 ? navigation : page.getByRole('navigation',{name:'Main navigation'});
+        await expect(nav.getByRole('link',{name:'FAQ',exact:true})).toHaveAttribute('href','#questions');
+        const docs=nav.getByRole('link',{name:'Documentation',exact:true});
+        await expect(docs).toHaveAttribute('href','https://app.tincta.xyz/docs');
+        await expect(docs).toHaveAttribute('target','_blank');
+        await expect(docs).toHaveAttribute('rel','noopener noreferrer');
+        expect(await nav.getByRole('link').allTextContents()).toEqual(['Rewards','Collections','Affiliates','FAQ','Documentation',...(width<960?['Join the launch list','Open app']:[])]);
+      }
       expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
       await page.clock.resume();expect((await new AxeBuilder({page}).include('header').analyze()).violations).toEqual([]);
     });
@@ -48,7 +58,7 @@ for (const [name, route, destination] of [
     await expect(navigation.getByRole('link').first()).toBeFocused();
     await page.keyboard.press('Escape');await expect(menu).toBeFocused();
     await menu.click();await navigation.getByRole('link',{name:destination,exact:true}).click();
-    await expect(navigation).toBeHidden();await expect(page).toHaveURL(new RegExp(name==='Rewards'?'#how-it-works$':'#projects$'));
+    await expect(navigation).toBeHidden();await expect(page).toHaveURL(new RegExp(name==='Rewards'?'#questions$':'#projects$'));
     await menu.click();await page.setViewportSize({width:960,height:900});
     await expect(menu).toBeHidden();await expect(page.locator('header a').first()).toBeFocused();
     await page.setViewportSize({width:320,height:568});await expect(menu).toHaveAttribute('aria-expanded','false');
