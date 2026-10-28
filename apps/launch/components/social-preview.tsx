@@ -6,6 +6,7 @@ import { LinkButton } from '@manekineko/ui/button';
 import type { Catalog } from '@manekineko/protocol/progress';
 import { previewMessage, COPY, GENESIS_STAGES, COLLECTION_STAGES, SEASON_STAGES } from '@manekineko/contract-abi/v16-social-preview';
 import type { Stage } from '@manekineko/contract-abi/v16-social-content';
+import { SocialConnectionTest } from './social-connection-test';
 
 export function SocialPreview({ catalog }: { catalog: Catalog }) {
   const [id, setId] = useState(0), [stage, setStage] = useState<Stage>('genesis-open');
@@ -17,6 +18,7 @@ export function SocialPreview({ catalog }: { catalog: Catalog }) {
   const collections = catalog.seasons.flatMap((season, seasonIndex) => season.collections.map(collection => ({ season, seasonIndex, collection })));
   return <section className="social-preview" aria-labelledby="social-title">
     <div><h1 id="social-title">X posts & images</h1><p>Review Genesis and every season’s collection images in the published catalog order. These are illustrative previews of the same templates used by the posting worker.</p><p className="social-preview-note">Design preview · {catalog.chainId === 1 ? 'Mainnet is not deployed.' : 'Sepolia testnet; test ETH.'} Previewing sends no posts or transactions.</p></div>
+    <SocialConnectionTest key={catalog.chainId} chainId={catalog.chainId} />
     <div className="social-preview-fields">
       <Field label="Collection">{p => <CompactSelect {...p} value={String(id)} onChange={event => { const next = Number(event.target.value); setId(next); setStage(next === 0 ? 'genesis-open' : 'voting'); }}>
         <option value="0">Tincta Genesis · Free collection</option>

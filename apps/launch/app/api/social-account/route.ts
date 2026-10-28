@@ -3,7 +3,7 @@ import { requireLaunchSession, assertLaunchOrigin, boundedLaunchJson, launchAuth
 import { configuredLaunchChain, requireLaunchChain, requireSeasonPlanningChain } from '../../../lib/chain-policy';
 import { getRuntimeProfile, getRuntimeWorkerProfile, saveRuntimeProfile } from '../../../lib/season-runtime-store';
 import { runtimeEncryptionConfigured } from '../../../lib/season-runtime-crypto';
-import { verifySocialAccountInput } from '../../../lib/social-account-service';
+import { testSavedSocialAccount, verifySocialAccountInput } from '../../../lib/social-account-service';
 import { AutomationError } from '../../../lib/launch-automation';
 import { LaunchConfigurationError } from '../../../lib/launch-config';
 import { verifyXAccount, XApiError } from '@manekineko/contract-abi/x-transport';
@@ -14,8 +14,25 @@ function chain(request: Request) {
   requireSeasonPlanningChain(id); return id;
 }
 function failure(error: unknown) {
+  if (error instanceof XApiError && error.status === 429) return Response.json({ error: 'X is limiting connection checks. Try again later.' }, { status: 429, headers: { 'Cache-Control': 'no-store' } });
   if (error instanceof AutomationError || error instanceof LaunchConfigurationError || error instanceof XApiError) return Response.json({ error: error instanceof XApiError ? 'X could not verify this account. Check its four OAuth credentials and account ID.' : error.message }, { status: error instanceof XApiError ? 422 : error.status, headers: { 'Cache-Control': 'no-store' } });
   return launchAuthResponse(error);
+}
+/** Manually verify saved credentials with X; no uploads, posts or profile writes. */
+export async function POST(request: Request) {
+  try {
+    assertLaunchOrigin(request);
+    await requireLaunchSession(request);
+    const chainId = chain(request);
+    requireLaunchChain(chainId);
+    if (!configuredLaunchChain() || !runtimeEncryptionConfigured()) throw new LaunchAuthError('settings_unavailable', 'Account storage is not configured for this environment.', 503);
+    const result = await testSavedSocialAccount({
+      saved: () => getRuntimeWorkerProfile(database(), chainId),
+      current: () => getRuntimeProfile(database(), chainId),
+      verify: (credentials, expectedAccountId) => verifyXAccount(credentials, { expectedAccountId }),
+    });
+    return Response.json(result, { headers: { 'Cache-Control': 'no-store' } });
+  } catch (error) { return failure(error); }
 }
 export async function GET(request: Request) {
   try {

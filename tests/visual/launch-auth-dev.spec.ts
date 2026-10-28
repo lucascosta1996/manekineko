@@ -19,7 +19,9 @@ test('real Launch pages and image APIs reject missing, malformed and unknown ses
       expect(result.status()).toBe(401); expect(result.headers()['cache-control']).toBe('no-store');
     }
   }
-  for (const [path, method] of [['/api/auth/session', 'POST'], ['/api/auth/session', 'DELETE'], ['/api/social-account', 'PUT']]) {
+  const deniedTest = await request.post(`${origin}/api/social-account?chainId=11155111`, { headers: { Origin: origin! } });
+  expect(deniedTest.status()).toBe(401);
+  for (const [path, method] of [['/api/auth/session', 'POST'], ['/api/auth/session', 'DELETE'], ['/api/social-account', 'PUT'], ['/api/social-account', 'POST']]) {
     const result = await request.fetch(`${origin}${path}`, { method, headers: { Origin: 'https://wrong-origin.invalid', 'Content-Type': 'application/json' }, data: '{}' });
     expect(result.status()).toBe(403);
   }

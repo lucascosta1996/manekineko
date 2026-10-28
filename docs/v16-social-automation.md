@@ -2,6 +2,12 @@
 
 Launch exposes a read-only **X previews** page at `/social`, linked from its dashboard. Choose Ethereum Mainnet or Sepolia, Genesis or any of the 216 ordered catalog collections, then an event. The page shows the exact worker template text and a marked 1600 × 900 image, with a PNG download. Images use the canonical TC glyph on both networks. Preview data is illustrative; it is not an observation of a live event. Mainnet remains unconfigured. Historical editors and worker APIs remain retired. The user-requested Launch login now protects every active page and image endpoint using the existing authentication store.
 
+## Test the X connection
+
+In **X previews**, use **Test X connection** to verify the currently saved account. The authenticated, same-origin `POST /api/social-account?chainId=…` checks the deployment network, decrypts the saved credentials on the server, and calls X’s read-only identity endpoint. It checks the returned ID and handle and rechecks the profile revision before displaying the account, network and check time. No credentials are returned, no profile is changed, and no media or post is published. This confirms account authentication, not media-upload or post-creation permissions.
+
+Checks run only on demand, work even when automated posts are disabled, prevent duplicate clicks while pending, and time out with a retryable message. Missing settings, profile changes, expired Launch sessions and X rate limits have explicit feedback. The account-settings link preserves the network; Mainnet remains unavailable in the Sepolia deployment.
+
 ## Change the posting account
 
 Open **Launch → X account**, or `/social/account?chainId=11155111`, and sign in with the existing Launch operator username and password. The deployed Launch origin is `https://launch.app.tincta.xyz`; `LAUNCH_PUBLIC_ORIGIN` must match that exact origin for authenticated mutations. Local development uses its own exact origin, normally `http://localhost:3200`.

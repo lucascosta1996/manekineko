@@ -25,3 +25,9 @@ No database test fixtures were seeded into staging. Read-only checks confirmed t
 ## Hosted packaging correction
 
 The first hosted Launch build exposed an application import from `/scripts`, a directory intentionally removed by `.vercelignore`. Reusable V16 templates/preview data and the server-only X transport now live in `packages/contracts/src`, with compatibility re-exports at their historical script paths. The application uses explicit package exports; private operator tooling remains excluded. A deployment-import regression joins `ui:source`. The corrected Launch build, social/transport tests, UI typecheck and V16 typecheck passed locally before the follow-up publication.
+
+## On-demand X connection check
+
+X previews now includes **Test X connection**, which verifies the saved account through X's read-only identity endpoint and reports the handle, numeric ID, network and check time. The server requires an operator session, same origin and the configured network, and rejects a profile that changes during verification. Credentials remain server-side. This action creates no post, uploads no image, changes no settings and does not start a sender; a successful identity check does not establish post/media permissions.
+
+Local validation: Launch's 197 tests and five preparation tests passed, with six database-dependent skips; the production build, UI source checks and UI typecheck passed. The preview/connection/authentication browser matrix passed 31 checks with eight intentional viewport skips across Chromium, Firefox and WebKit, including real-server authentication/origin rejection. A live read-only check of the saved Sepolia account succeeded using the configured local network proxy. Hosted deployment and CI are verified separately from these results.
