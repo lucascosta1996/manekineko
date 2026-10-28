@@ -22,10 +22,10 @@ for (const width of [390, 1440]) test(`X account sign-in, verified save and secr
   await page.getByLabel('Launch username', { exact: true }).fill('operator'); await page.getByLabel('Launch password', { exact: true }).fill('fictional-password-for-test');
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Posting account: @tincta_test' })).toBeVisible();
-  for (const [label, value] of [['API key', 'fictional-key'], ['API key secret', 'fictional-secret'], ['Access token', 'fictional-token'], ['Access token secret', 'fictional-token-secret']]) await page.getByLabel(label, { exact: true }).fill(value);
+  for (const [label, value] of [['Consumer Key (API key)', 'fictional-key'], ['Consumer Secret (API key secret)', 'fictional-secret'], ['Access token', 'fictional-token'], ['Access token secret', 'fictional-token-secret']]) await page.getByLabel(label, { exact: true }).fill(value);
   await page.getByRole('button', { name: 'Verify and save account', exact: true }).click();
   await expect(page.getByRole('status')).toContainText('Verified @tincta_test'); expect(saves).toBe(1);
-  await expect(page.getByLabel('API key', { exact: true })).toHaveValue('');
+  await expect(page.getByLabel('Consumer Key (API key)', { exact: true })).toHaveValue('');
   expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)).toBe(false);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.screenshot({ path: `test-results/x-account-${info.project.name}-${width}.png`, fullPage: true });

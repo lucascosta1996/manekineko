@@ -6,7 +6,7 @@ import type { RuntimeProfile, RuntimeCredentials } from '../lib/season-runtime';
 
 type Settings = { username: string; profile: RuntimeProfile | null; encryptionConfigured: boolean; allowedChainId: string | null };
 const emptyCredentials = (): RuntimeCredentials => ({ apiKey: '', apiKeySecret: '', accessToken: '', accessTokenSecret: '' });
-const credentialFields = [['apiKey', 'API key'], ['apiKeySecret', 'API key secret'], ['accessToken', 'Access token'], ['accessTokenSecret', 'Access token secret']] as const;
+const credentialFields = [['apiKey', 'Consumer Key (API key)'], ['apiKeySecret', 'Consumer Secret (API key secret)'], ['accessToken', 'Access token'], ['accessTokenSecret', 'Access token secret']] as const;
 export function SocialAccount({ chainId }: { chainId: number }) {
   const [status, setStatus] = useState<'loading' | 'login' | 'ready' | 'error'>('loading');
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -49,7 +49,7 @@ export function SocialAccount({ chainId }: { chainId: number }) {
   function save(event: FormEvent) {
     event.preventDefault(); void perform(async () => {
       const entered = Object.values(credentials).filter(Boolean).length;
-      if (entered > 0 && entered < 4) throw new Error('Enter all four OAuth credentials, or leave all four blank to keep the saved credentials.');
+      if (entered > 0 && entered < 4) throw new Error('Enter all four OAuth 1.0a credentials, or leave all four blank to keep the saved credentials.');
       const value = await send(endpoint, 'PUT', { revision: settings?.profile?.revision ?? 0, handle, expectedAccountId: accountId, publicBaseUrl: website, enabled, ...(entered ? { credentials } : {}) });
       hydrate({ ...settings!, profile: value.profile }); setNotice(`Verified @${value.profile.handle} and saved this network’s account. Publishing has not been started.`);
     });
@@ -70,6 +70,11 @@ export function SocialAccount({ chainId }: { chainId: number }) {
         <Field label="Numeric X account ID">{p => <Input {...p} value={accountId} onChange={e => setAccountId(e.target.value)} required disabled={blocked} inputMode="numeric" autoComplete="off" />}</Field>
       </div>
       <Field label="Public website" hint="The HTTPS website linked from this network’s posts.">{p => <Input {...p} type="url" value={website} onChange={e => setWebsite(e.target.value)} required disabled={blocked} />}</Field>
+      <div>
+        <h3>OAuth 1.0a credentials</h3>
+        <p>In the X Developer Console, open your app’s Keys &amp; Tokens tab and use the OAuth 1.0 Keys section. Enter all four values below. OAuth 2.0 Client ID, Client Secret and the app-only Bearer Token are not used here.</p>
+        <p>Set the app’s permissions to Read and write, then generate the access token and secret for the posting account. If you change permissions, regenerate that token pair.</p>
+      </div>
       <div className="social-preview-fields">{credentialFields.map(([key, label]) => <Field key={key} label={label} hint={settings.profile ? 'Leave blank to keep the saved credential.' : undefined}>{p => <Input {...p} type="password" value={credentials[key]} onChange={e => setCredentials(c => ({ ...c, [key]: e.target.value }))} required={!settings.profile} disabled={blocked} autoComplete="new-password" />}</Field>)}</div>
       <Checkbox checked={enabled} onChange={e => setEnabled(e.target.checked)} label="Allow automated posts to this account" disabled={blocked} />
       <p className="social-preview-note">The sender must be started separately. Changing the destination stops an existing sender; its previous posting history stays bound to the old account.</p>
