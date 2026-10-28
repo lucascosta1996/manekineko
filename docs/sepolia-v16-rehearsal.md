@@ -1,5 +1,7 @@
 # V16 Sepolia rehearsal — prepared, not started
 
+**October 29 update:** the user replaced this eleven-day test schedule with the [accelerated V17 workflow](v17-fast-rehearsal.md). This V16 deployment, frozen plan, vault and pause marker remain preserved. Do not fund or start this old runner for the V17 test.
+
 The deployed contract is [0x673D155f884976bb42eab2F1F11b381dc4d8D26A](https://sepolia.etherscan.io/address/0x673D155f884976bb42eab2F1F11b381dc4d8D26A#code). The application is [app.tincta.xyz](https://app.tincta.xyz). No Genesis mint, sealing, operating funding, paid preparation or rehearsal transaction has been sent. The separate historical V14 rehearsal remains paused.
 
 ## Files and wallets

@@ -7,7 +7,7 @@ import type { Snapshot } from './chain.ts';
 import {v16Abi} from './v16.ts';
 
 export type GenesisState = {
-  version?:16; primaryMints?:bigint|null; maxMints?:bigint; soldOutAt?:bigint;
+  version?:16|17; primaryMints?:bigint|null; maxMints?:bigint; soldOutAt?:bigint;
   address: string; start: bigint; end: bigint; minted: bigint; supply: bigint;
   open: boolean; walletMinted: boolean | null;
 };
@@ -30,7 +30,7 @@ export async function readGenesis(provider: Provider, config: ProtocolConfig, bl
 /** Called against a fresh snapshot before review and again before the wallet prompt. */
 export async function genesisMintTransaction(state: Snapshot) {
   const g = state.genesis;
-  if(g?.version===16){
+  if((g?.version===16||g?.version===17)){
     if(!state.sealed||!g.open||g.primaryMints===null||g.primaryMints===undefined||g.primaryMints>=2n)throw new Error('This wallet cannot mint another Genesis NFT.');
     return {...await new Contract(g.address,v16Abi).mintGenesis.populateTransaction(),value:0n};
   }

@@ -34,7 +34,7 @@
     "db:test": "node --env-file-if-exists=apps/web/.env.local scripts/verify-history-database.mjs",
     "db:test:affiliates": "node --env-file-if-exists=apps/web/.env.local scripts/verify-affiliate-database.mjs",
     "db:prune:affiliates": "node --env-file-if-exists=apps/web/.env.local scripts/prune-affiliate-enrollment.mjs",
-    "test": "npm run protocol:v16:rehearsal:test && npm run contracts:test && npm run web:test && npm run launch:test && npm run indexer:test && npm run credits:test && npm run eligibility:test && npm run landing:test",
+    "test": "npm run protocol:v17:rehearsal:test && npm run protocol:v16:rehearsal:test && npm run contracts:test && npm run web:test && npm run launch:test && npm run indexer:test && npm run credits:test && npm run eligibility:test && npm run landing:test",
     "check": "npm run test && npm run typecheck && npm run build",
     "dev:launch": "npm run dev --workspace @manekineko/launch",
     "dev:indexer": "npm run dev --workspace @manekineko/indexer",
@@ -108,7 +108,11 @@
     "protocol:v16:rehearsal:build": "node --import tsx scripts/protocol-v16/rehearsal/build.mts",
     "protocol:v16:release": "node --import tsx scripts/protocol-v16/release.mts",
     "protocol:v16:social": "node --import tsx scripts/protocol-v16/social.mts",
-    "protocol:v16:social:test": "node --import tsx --test scripts/protocol-v16/social.test.ts scripts/protocol-v16/social-account.test.ts"
+    "protocol:v16:social:test": "node --import tsx --test scripts/protocol-v16/social.test.ts scripts/protocol-v16/social-account.test.ts",
+    "protocol:v17:test": "npm exec --workspace @manekineko/contracts -- hardhat test test/ProtocolV17.ts test/ProtocolV17Production.ts test/ProtocolV17Catalog.ts test/ProtocolV17Adapters.ts test/ProtocolV17Runner.ts",
+    "protocol:v17:rehearsal:test": "node --import tsx --test scripts/protocol-v17/rehearsal/rehearsal.test.mts && tsc -p scripts/protocol-v17/tsconfig.json",
+    "protocol:v17:rehearsal:build": "node --import tsx scripts/protocol-v17/rehearsal/build.mts",
+    "protocol:v17:release": "node --import tsx scripts/protocol-v17/release.mts"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.11.1",

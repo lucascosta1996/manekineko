@@ -52,7 +52,7 @@ test('mirror SQL: leases, retries, atomic replay, reorgs and paginated database-
   try {
     await admin.query(`CREATE SCHEMA ${schema}`);
     pool=new pg.Pool({connectionString,max:8,options:`-c search_path=${schema},public`});
-    for(const file of ['033_nft_mirror.sql','034_genesis_v14_mirror.sql','035_genesis_nft_gallery.sql','036_v16_nft_mirror.sql']) await pool.query(await readFile(new URL('../../../database/migrations/'+file,import.meta.url),'utf8'));
+    for(const file of ['033_nft_mirror.sql','034_genesis_v14_mirror.sql','035_genesis_nft_gallery.sql','036_v16_nft_mirror.sql','037_v17_accelerated_rehearsal.sql']) await pool.query(await readFile(new URL('../../../database/migrations/'+file,import.meta.url),'utf8'));
     const db=pool, query=(sql: string,values: unknown[])=>db.query(sql,values);
     const stores=Array.from({length:4},()=>new MirrorStore(db,config));
     const leases=await Promise.all(stores.map(s=>s.claim()));
@@ -160,6 +160,15 @@ test('mirror SQL: leases, retries, atomic replay, reorgs and paginated database-
       await store16.resetCollection(first.address,1);assert.equal((await read(1)).collection.minted,0);assert.equal((await read(2)).collection.minted,1);
       assert.equal((await queryMintActivity(query,[v16])).events[0].collectionId,2);
       await store16.release();
+    });
+    await t.test('V17 permits only Sepolia and keeps its single-address gallery IDs separate from V16',async()=>{
+      const fast={...config,controller:'0x'+'7'.repeat(40),version:17 as const},store17=new V16MirrorStore(db,fast);
+      assert.ok(await store17.claim());await store17.verified(true,{number:22,hash:hash(22)});
+      const item={...c,address:fast.controller,controller:fast.controller,renderer:fast.controller,roundId:1,name:'Fast first'};
+      await store17.discover([item],{number:22,hash:hash(22)},check);await store17.events(item,[mint(1)],{number:22,hash:hash(22)},true,check);await store17.cache(item,1,hash(11),artwork(1),check);
+      assert.equal(await queryGallery(query,[fast],fast.chainId,fast.controller,1),null);
+      assert.equal((await queryGallery(query,[fast],fast.chainId,fast.controller,1,1))!.collection.collectionId,1);
+      await assert.rejects(db.query("INSERT INTO manekineko_nft_mirror_sources(chain_id,controller,fingerprint,code_hash,version,from_block) VALUES(1,$1,$2,$3,17,1)",['0x'+'8'.repeat(40),'x',hash(1)]));await store17.release();
     });
     await t.test('expired workers cannot commit after lease takeover',async()=>{
       const old=new MirrorStore(db,config); assert.ok(await old.claim());

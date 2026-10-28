@@ -7,7 +7,7 @@ import votingAbi from '@manekineko/contract-abi/voting-v12' with { type: 'json' 
 import creditsAbi from '@manekineko/contract-abi/winner-credits-v8' with { type: 'json' };
 import type { ProtocolConfig } from './config.ts';
 import { readHolderSeason, type HolderSeason } from './holder-rewards.ts';
-import {readV16, verifyV16} from './v16.ts';
+import {readV16, verifySingleContract} from './v16.ts';
 export { controllerAbi, roundAbi, votingAbi, creditsAbi };
 export type Option = { supply: bigint; price: bigint; winners: bigint; duration: bigint; votes: bigint };
 export type RoundState = {
@@ -45,7 +45,8 @@ export type RoundState = {
   awards: { rank: number; tokenId: bigint; amount: bigint; claimed: boolean; holder: string }[];
 };
 export type Snapshot = {
-  protocolVersion?: 16;
+  protocolVersion?: 16 | 17;
+  rehearsalMode?: boolean;
   holders?: HolderSeason;
   genesis?: GenesisState;
   block: number;
@@ -67,7 +68,7 @@ export type Snapshot = {
   round: RoundState | null;
 };
 export async function verifyController(provider: Provider, config: ProtocolConfig, blockTag?: number) {
-  if(config.version===16)return verifyV16(provider,config,blockTag);
+  if((config.version===16||config.version===17))return verifySingleContract(provider,config,blockTag);
   if (Number((await provider.getNetwork()).chainId) !== config.chainId)
     throw new Error('The RPC network does not match this deployment.');
   const code = await provider.getCode(config.controller, blockTag);
@@ -83,7 +84,7 @@ export async function readProtocol(
   wallet?: string,
   sourcePage = 0
 ): Promise<Snapshot> {
-  if(config.version===16)return readV16(provider,config,selectedId,wallet,sourcePage);
+  if((config.version===16||config.version===17))return readV16(provider,config,selectedId,wallet,sourcePage);
   const block = await provider.getBlock('latest');
   if (!block || Date.now() / 1000 - block.timestamp > 180)
     throw new Error('The network data is out of date. Retry before signing.');

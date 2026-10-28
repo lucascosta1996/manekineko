@@ -1,0 +1,20 @@
+{
+  "profile": "V17 accelerated local",
+  "contract": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+  "codeHash": "0x1e3bef6ef6d189205f9da3537b5dd5e530d05a6af67a708a49a386187c7c563c",
+  "genesisSupply": 20,
+  "options": [
+    "Option 1 · fallbackPrice0.0001 ETHSupply20Equal prizes6Mint window10 minutesVotes0",
+    "Option 2Price0.0002 ETHSupply40Equal prizes4Mint window3 minutesVotes0",
+    "Option 3Price0.0001 ETHSupply20Equal prizes10Mint window10 minutesVotes0"
+  ],
+  "viewports": [
+    1440,
+    390
+  ],
+  "axeViolations": 0,
+  "overflow": false,
+  "simulatedWalletRejections": 1,
+  "liveTransactions": 0,
+  "browserErrors": []
+}

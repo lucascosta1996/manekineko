@@ -79,7 +79,7 @@ export async function runNftMirror() {
   for (const config of configs) {
     const provider = createRpcProvider(config);
     try {
-      const result = await mirrorSource(config,config.version===16?new V16MirrorChain(provider,config):new RpcMirrorChain(provider,config),config.version===16?new V16MirrorStore(getIndexerPool(),config):new MirrorStore(getIndexerPool(),config),Date.now()+slice);
+      const result = await mirrorSource(config,(config.version===16||config.version===17)?new V16MirrorChain(provider,config):new RpcMirrorChain(provider,config),(config.version===16||config.version===17)?new V16MirrorStore(getIndexerPool(),config):new MirrorStore(getIndexerPool(),config),Date.now()+slice);
       sources.push({chainId:config.chainId,controller:config.controller,...result});
     } finally { provider.destroy(); }
   }

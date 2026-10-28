@@ -1,5 +1,11 @@
 # Tincta protocol architecture and agent handoff
 
+## 2026-10-29 accelerated V17 qualification
+
+The user requested a fast rehearsal within half a day. [V17](v17-fast-rehearsal.md) adds an immutable Sepolia/local accelerated profile to a new single-contract implementation; Mainnet rejects fast mode and production mode retains the V16 limits. The six live scenarios cover two seasons, all three sellout packages, two unsold refunds and manual wallet custody. The complete ordered 216-entry catalog is additionally exercised locally with controlled time and mocked VRF. Historical V16 source/deployment, pins and its frozen paused runner are preserved. This is a new deployment, not an upgrade or resumed V16 run.
+
+The [readiness report](v17-readiness-report-2026-10-29.md) tracks evidence and preparation defects. The runner generates both JSON and Markdown reports and independently reconstructs exact wei liabilities. Successful compressed tests do not certify Mainnet; the approximately 40 KB runtime still requires explicit qualification against the target network's active deployment limits.
+
 ## 2026-10-28 V16 social previews and Genesis announcements
 
 The [Launch/social release record](launch-social-release-2026-10-28.md) documents the restored authentication, account configuration, full local release checks and verification boundaries.

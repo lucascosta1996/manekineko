@@ -1,0 +1,118 @@
+{
+  "version": 17,
+  "chainId": 11155111,
+  "address": "0x39f625904CC50C08797e52b909EE51F6eB66d26E",
+  "codeHash": "0x1e3bef6ef6d189205f9da3537b5dd5e530d05a6af67a708a49a386187c7c563c",
+  "block": 12013986,
+  "blockHash": "0xa08a15f8f0b2eabb6046116c0208fd9938d2db6eb926fcea70a454194558b9df",
+  "deploymentBlock": 12013983,
+  "deploymentTransaction": "0x726f68cdfac440ee52cac1b5c3955d8d9b42c780b827c8a8e501bc5ce177141d",
+  "manifestHash": "0x5c65e1b16d4974f9b85d01506bd0ad8edc6375df3384c8accf50f3a070765178",
+  "verifiedAt": "2026-10-28T18:04:21.673Z",
+  "sources": [
+    {
+      "address": "0x39f625904CC50C08797e52b909EE51F6eB66d26E",
+      "verification": "etherscan-exact",
+      "published": true
+    }
+  ],
+  "rehearsal": true,
+  "unsealed": true,
+  "genesisMints": 0,
+  "prepared": 0,
+  "operatingFundingWei": "0",
+  "rehearsalStarted": false,
+  "settings": {
+    "operator": "0x3b2571129c05bD71B6504596aB2ca52B3ffB7223",
+    "coordinator": "0x9DdfaCa8183c41ad55329BdeeD9F6A8d53168B1B",
+    "keyHash": "0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae",
+    "confirmations": 3,
+    "callbackGas": 200000,
+    "votingDuration": 180,
+    "votingDelay": 1,
+    "randomnessBudget": "10000000000000000",
+    "sponsorshipBudget": "1000000000000000"
+  },
+  "options": [
+    {
+      "supply": "20",
+      "price": "100000000000000",
+      "winners": "6",
+      "duration": "600"
+    },
+    {
+      "supply": "40",
+      "price": "200000000000000",
+      "winners": "4",
+      "duration": "180"
+    },
+    {
+      "supply": "20",
+      "price": "100000000000000",
+      "winners": "10",
+      "duration": "600"
+    }
+  ],
+  "catalog": [
+    {
+      "seasonId": "0xdf3b80c2c7b93cdf304b349a2cb72a68ba433574bd76706dd1184e8cdf3ba7c1",
+      "seasonName": "Aster Study",
+      "name": "Aster Atlas",
+      "color": "#330000",
+      "textColor": "#FFFFFF"
+    },
+    {
+      "seasonId": "0xdf3b80c2c7b93cdf304b349a2cb72a68ba433574bd76706dd1184e8cdf3ba7c1",
+      "seasonName": "Aster Study",
+      "name": "Aster Beacon",
+      "color": "#660000",
+      "textColor": "#FFFFFF"
+    },
+    {
+      "seasonId": "0xdf3b80c2c7b93cdf304b349a2cb72a68ba433574bd76706dd1184e8cdf3ba7c1",
+      "seasonName": "Aster Study",
+      "name": "Aster Current",
+      "color": "#990000",
+      "textColor": "#FFFFFF"
+    },
+    {
+      "seasonId": "0xc47ab000587df536da66cdb738f5bb5608b90a827719051ab6d55109ae379807",
+      "seasonName": "Beryl Study",
+      "name": "Beryl Atlas",
+      "color": "#996600",
+      "textColor": "#FFFFFF"
+    },
+    {
+      "seasonId": "0xc47ab000587df536da66cdb738f5bb5608b90a827719051ab6d55109ae379807",
+      "seasonName": "Beryl Study",
+      "name": "Beryl Beacon",
+      "color": "#CC6600",
+      "textColor": "#000000"
+    },
+    {
+      "seasonId": "0xc47ab000587df536da66cdb738f5bb5608b90a827719051ab6d55109ae379807",
+      "seasonName": "Beryl Study",
+      "name": "Beryl Current",
+      "color": "#CC9900",
+      "textColor": "#000000"
+    }
+  ],
+  "gasUsed": "68664153",
+  "actualFeeWei": "1369049732",
+  "transactions": [
+    {
+      "action": "deploy-v17",
+      "hash": "0x726f68cdfac440ee52cac1b5c3955d8d9b42c780b827c8a8e501bc5ce177141d",
+      "block": 12013983,
+      "gasUsed": "64430825",
+      "gasPriceWei": "20"
+    },
+    {
+      "action": "catalog:0",
+      "hash": "0x6f47df971077c33214ccf4425b2513c3830145c4fbde5bf5bc18243722075006",
+      "block": 12013986,
+      "gasUsed": "4233328",
+      "gasPriceWei": "19"
+    }
+  ]
+}

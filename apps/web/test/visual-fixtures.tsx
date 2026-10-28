@@ -1,4 +1,5 @@
 "use client";
+import v17VisualPin from './v17-visual-pin.json';
 
 /** Production components with isolated data. This module is never routed by apps/web. */
 import { CollectionDirectoryView, CollectionGalleryView } from "../components/nft-mirror/gallery";
@@ -60,7 +61,7 @@ export function WebVisualFixture({ path = "/", state = "loaded", page = 1 }: { p
   }
   if (["/", "/vote", "/claims", "/affiliates", "/holders", "/operations"].includes(path)) {
     const view = path === "/holders" ? "holders" : path === "/claims" ? "claims" : path === "/affiliates" ? "affiliates" : path === "/operations" ? "operations" : "home";
-    return <SiteShell section={view} protocolEnabled={state !== "unconfigured"} chainId={11155111}><ProtocolExperience view={view} config={state === "unconfigured" ? null : state === "v16" ? {version:16,chainId:11155111,controller:"0x5FbDB2315678afecb367f032d93F642f64180aa3",codeHash:"0xf922fd995949d2368b98a0df53d5339b8515d27303f28d12760d616f8f57161f",rpcUrl:"https://v16.fixture.invalid"} : {chainId:11155111,controller:"0x1111111111111111111111111111111111111111",codeHash:keccak256("0x6000"),rpcUrl:"https://v12.fixture.invalid", ...(state === "v14" ? { version: 14 as const, holderRewardsCodeHash: keccak256("0x6000"), genesisCodeHash: keccak256("0x6000") } : path === "/holders" && state !== "v12" ? { version: 13 as const, holderRewardsCodeHash: keccak256("0x6000") } : {})}} /></SiteShell>;
+    return <SiteShell section={view} protocolEnabled={state !== "unconfigured"} chainId={11155111}><ProtocolExperience view={view} config={state === "unconfigured" ? null : state === "v17" ? {...v17VisualPin,version:17 as const} : state === "v16" ? {version:16,chainId:11155111,controller:"0x5FbDB2315678afecb367f032d93F642f64180aa3",codeHash:"0xf922fd995949d2368b98a0df53d5339b8515d27303f28d12760d616f8f57161f",rpcUrl:"https://v16.fixture.invalid"} : {chainId:11155111,controller:"0x1111111111111111111111111111111111111111",codeHash:keccak256("0x6000"),rpcUrl:"https://v12.fixture.invalid", ...(state === "v14" ? { version: 14 as const, holderRewardsCodeHash: keccak256("0x6000"), genesisCodeHash: keccak256("0x6000") } : path === "/holders" && state !== "v12" ? { version: 13 as const, holderRewardsCodeHash: keccak256("0x6000") } : {})}} /></SiteShell>;
   }
   if(path === "/visual/review-controls") return <ReviewControlsFixture/>;
   const retry = () => window.location.reload(); // Only the isolated harness imports this callback.

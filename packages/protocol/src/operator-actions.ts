@@ -5,7 +5,7 @@ import {v16OperatorActions} from './v16-operator-actions.ts';
 export type OperatorAction = { id: string; title: string; description: string; operatorOnly: boolean; secondary: boolean; request: TransactionRequest };
 /** Only executable state transitions enter the queue. No timer or server can approve them. */
 export function operatorActions(s: Snapshot, config: ProtocolConfig): OperatorAction[] {
-  if(config.version===16)return v16OperatorActions(s,config);
+  if((config.version===16||config.version===17))return v16OperatorActions(s,config);
   const actions: OperatorAction[] = [], controller = new Interface(controllerAbi), round = new Interface(roundAbi), credits = new Interface(creditsAbi);
   const add = (id: string, title: string, description: string, to: string, data: string, operatorOnly = false, value = 0n, secondary = false) => actions.push({ id, title, description, operatorOnly, secondary, request: { to, data, value } });
   const r = s.round;

@@ -4,7 +4,7 @@ import holderAbi from '@manekineko/contract-abi/holder-rewards-v13' with { type:
 import roundAbi from '@manekineko/contract-abi/round-v13' with { type: 'json' };
 import type { ProtocolConfig } from './config.ts';
 import type { Snapshot } from './chain.ts';
-import {verifyV16,v16Token,v16Abi} from './v16.ts';
+import {verifySingleContract,v16Token,v16Abi} from './v16.ts';
 export { holderAbi };
 export type HolderSeason = {
   address: string; seasonId: string; funded: bigint; eligibleNfts: bigint;
@@ -13,7 +13,7 @@ export type HolderSeason = {
 };
 
 export async function verifyHolderPool(provider: Provider, config: ProtocolConfig, blockTag?: number) {
-  if(config.version===16)return verifyV16(provider,config,blockTag);
+  if((config.version===16||config.version===17))return verifySingleContract(provider,config,blockTag);
   if ((config.version !== 13 && config.version !== 14) || !config.holderRewardsCodeHash) throw new Error('This deployment has no season holder pool.');
   const at = blockTag === undefined ? {} : { blockTag };
   const controller = new Contract(config.controller, controllerAbi, provider);
@@ -38,9 +38,9 @@ export async function readHolderSeason(provider: Provider, config: ProtocolConfi
 /** Built again after review. Contract execution, not a browser quote, reserves a slot. */
 export async function holderClaimTransaction(provider: Provider, config: ProtocolConfig, state: Snapshot, tokenId: bigint, wallet: string, expectedReward: bigint) {
   const h = state.holders, r = state.round;
-  if(config.version===16){
+  if((config.version===16||config.version===17)){
     if(!h||!r||!h.unlocked||h.claims>=h.claimLimit||h.rewardPerNft===0n||h.rewardPerNft!==expectedReward)throw new Error('This season has no available holder claim at the reviewed amount.');
-    const c=await verifyV16(provider,config,state.block),global=v16Token(r.id,tokenId),at={blockTag:state.block};
+    const c=await verifySingleContract(provider,config,state.block),global=v16Token(r.id,tokenId),at={blockTag:state.block};
     const [round,claimed,owner]=await Promise.all([c.round(r.id,at),c.holderClaimed(global,at),c.ownerOf(global,at)]);
     if(round.finalizedAt===0n||claimed||getAddress(owner)!==getAddress(wallet))throw new Error('Connect the holder of an eligible, unclaimed NFT.');
     return new Contract(config.controller,v16Abi).claimHolder.populateTransaction(global,wallet);

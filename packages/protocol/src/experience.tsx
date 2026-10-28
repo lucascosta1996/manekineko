@@ -334,7 +334,7 @@ function Experience({
         );
       const walletController = await verifyController(session.provider, config);
       const walletVoting = fresh.voting;
-      if(config.version===16){
+      if((config.version===16||config.version===17)){
         const independent=await readProtocol(session.provider,config,selected,session.address,sourcePage);
         if(independent.count!==fresh.count||independent.round?.id!==fresh.round?.id||independent.round?.termsHash!==fresh.round?.termsHash||independent.genesis?.primaryMints!==fresh.genesis?.primaryMints)throw new Error("Your wallet and this page report different contract data. Refresh before signing.");
       }else{
@@ -469,7 +469,7 @@ function Experience({
   ) {
     return submit(label, description, async (s, address) => {
       if (!s.round) throw new Error("Select a prepared collection.");
-      if(config?.version===16)return v16RoundTransaction(s,method,args(s,address),value(s));
+      if((config?.version===16||config?.version===17))return v16RoundTransaction(s,method,args(s,address),value(s));
       return new Contract(s.round.address, roundAbi)
         .getFunction(method)
         .populateTransaction(...args(s, address), { value: value(s) });
@@ -499,7 +499,7 @@ function Experience({
     }
   }
   const [genesisTokens, setGenesisTokens] = useState("");
-  const v16 = config?.version === 16;
+  const v16 = (config?.version === 16 || config?.version === 17);
   const r = state?.round,
     disabled = !wallet.session || wallet.session.chainId !== config?.chainId || busy || !!pending || !!error || !state;
   const canVote =
@@ -535,18 +535,18 @@ function Experience({
     }etherscan.io/address/${address}`;
   const genesisPanel = state?.genesis && !r && (
     <section className="protocol-panel genesis-panel" aria-labelledby="genesis-title">
-      <GenesisArtwork />
+      <GenesisArtwork supply={state.genesis.supply} />
       <div className="genesis-details">
       <h2 id="genesis-title">Tincta Genesis</h2>
       {v16 ? <>
         <p>Vote on the first paid collection. Enroll as an affiliate throughout every collection and season.</p>
         <dl className="genesis-terms">
           <div><dt>Mint price</dt><dd>0 ETH + network gas</dd></div>
-          <div><dt>Minted</dt><dd>{String(state.genesis.minted)} / 1,000</dd></div>
+          <div><dt>Minted</dt><dd>{String(state.genesis.minted)} / {state.genesis.supply.toLocaleString('en-US')}</dd></div>
           <div><dt>Wallet limit</dt><dd>2 mints per wallet, for life</dd></div>
           <div><dt>Mint window</dt><dd>No deadline · closes at sellout</dd></div>
         </dl>
-        <p>{state.sealed ? "The first ballot opens when all 1,000 Genesis NFTs are minted." : "The deployment is ready. Genesis minting has not opened yet."}</p>
+        <p>{state.sealed ? `The first ballot opens when all ${state.genesis.supply.toLocaleString('en-US')} Genesis NFTs are minted.` : "The deployment is ready. Genesis minting has not opened yet."}</p>
         {state.genesis.primaryMints!==null && state.genesis.primaryMints!==undefined && <p>{String(2n-state.genesis.primaryMints)} free mints remaining for your wallet.</p>}
         <Button disabled={disabled||!state.genesis.open||state.genesis.walletMinted!==false} onClick={()=>void submit("Mint free NFT","Mint one Genesis NFT for 0 ETH plus network gas. It grants one first-ballot vote and affiliate eligibility throughout all collections and seasons. Referral rewards require a paid referral and successful draw.",genesisMintTransaction)}>{state.genesis.walletMinted?"Wallet limit reached":"Mint free NFT"}</Button>
         <p className="protocol-note">Each Genesis NFT carries one first-ballot vote for its current holder. Transferring it never renews a used vote or mint allowance. Genesis has no prize, sponsored mint or season holder reward.</p>
@@ -555,7 +555,7 @@ function Experience({
       <p className="genesis-voting-rule"><strong>Only for the first vote.</strong> For future votes, you’ll need NFTs from successfully revealed paid season collections.</p>
       <dl className="genesis-terms">
         <div><dt>Mint price</dt><dd>0 ETH + network gas</dd></div>
-        <div><dt>Minted</dt><dd>{String(state.genesis.minted)} / {String(state.genesis.supply)}</dd></div>
+        <div><dt>Minted</dt><dd>{String(state.genesis.minted)} / {state.genesis.supply.toLocaleString('en-US')}</dd></div>
         <div><dt>Wallet limit</dt><dd>1 mint per wallet, for life</dd></div>
         <div><dt>Mint window</dt><dd>{state.genesis.start ? `${date(state.genesis.start)} – ${date(state.genesis.end)}` : "24 hours, opening with the sealed catalog"}</dd></div>
       </dl>
@@ -656,7 +656,7 @@ function Experience({
                 if(v16){
                   const c=new Contract(s.voting,v16Abi);
                   if(s.round!.id===1){
-                    const tokens=genesisTokens.split(",").map(x=>integerInput(x.trim(),1n,1000n));
+                    const tokens=genesisTokens.split(",").map(x=>integerInput(x.trim(),1n,s.genesis!.supply));
                     if(new Set(tokens.map(String)).size!==tokens.length)throw new Error("Each NFT number may appear only once.");
                     return c.castGenesisVote.populateTransaction(choice,tokens);
                   }
@@ -1294,6 +1294,7 @@ function Experience({
     );
   return (
     <div className="protocol-page">
+      {config?.version === 17 && <p className="protocol-note" role="status">Accelerated Sepolia rehearsal. Small supplies, test prices and short deadlines apply to this deployment.</p>}
       <header className="protocol-intro">
         <p className="protocol-eyebrow">Tincta · Onchain seasons</p>
         <h1>Season control.</h1>

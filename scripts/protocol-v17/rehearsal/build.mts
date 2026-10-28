@@ -1,0 +1,10 @@
+import {build} from 'esbuild';
+import {mkdir,writeFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {resolve} from 'node:path';
+const directory=process.argv[2];if(!directory?.startsWith('/'))throw new Error('Provide an absolute private runtime directory.');
+await mkdir(directory,{recursive:true,mode:0o700});
+const result=await build({entryPoints:[resolve('scripts/protocol-v17/rehearsal/cli.mts')],bundle:true,write:false,platform:'node',format:'esm',target:'node22',banner:{js:"import { createRequire as runtimeRequire } from 'node:module'; const require = runtimeRequire(import.meta.url);"}});
+const bytes=result.outputFiles[0].contents,sha256=createHash('sha256').update(bytes).digest('hex');
+await writeFile(directory+'/runner.mjs',bytes,{mode:0o600,flag:'wx'});await writeFile(directory+'/build.json',JSON.stringify({version:17,sha256,builtAt:new Date().toISOString()})+'\n',{mode:0o600,flag:'wx'});
+console.log(JSON.stringify({status:'prepared-not-started',runtime:directory+'/runner.mjs',sha256}));

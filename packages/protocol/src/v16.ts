@@ -2,6 +2,7 @@ import {Contract, getAddress, keccak256, ZeroAddress, type Provider, type Transa
 import abi from '@manekineko/contract-abi/protocol-v16' with {type:'json'};
 import type {ProtocolConfig} from './config.ts';
 import type {Snapshot, RoundState} from './chain.ts';
+import v17Abi from '@manekineko/contract-abi/protocol-v17' with {type:'json'};
 export {abi as v16Abi};
 type RawRound = Record<'voteStart'|'saleStart'|'soldOutAt'|'entropyAt'|'finalizedAt'|'minted'|'refunded'|'revenue'|'subscription'|'requestId'|'word'|'counter'|'executionReserve'|'sponsorReserve'|'affiliateShare'|'qualified'|'growthWithdrawn'|'treasuryWithdrawn'|'prizesClaimed',bigint> & {requested:boolean;subscriptionClosed:boolean;executor:string;winners:bigint[]};
 
@@ -12,39 +13,50 @@ export function v16Token(collection: number | bigint, serial: bigint): bigint {
   return(id<<17n)|serial;
 }
 export async function verifyV16(provider: Provider, config: ProtocolConfig, block?: number) {
-  if(config.version!==16||config.chainId!==11155111||Number((await provider.getNetwork()).chainId)!==config.chainId)throw new Error('This deployment requires the verified Sepolia network.');
+  if(config.version!==16)throw new Error('Select a V16 deployment.');
+  return verifySingleContract(provider,config,block);
+}
+export async function verifyV17(provider: Provider, config: ProtocolConfig, block?: number) {
+  if(config.version!==17)throw new Error('Select a V17 deployment.');
+  return verifySingleContract(provider,config,block);
+}
+export async function verifySingleContract(provider: Provider, config: ProtocolConfig, block?: number) {
+  if((config.version!==16&&config.version!==17)||config.chainId!==11155111||Number((await provider.getNetwork()).chainId)!==config.chainId)throw new Error('This deployment requires the verified Sepolia network.');
   const code=await provider.getCode(config.controller,block);
   if(code==='0x'||keccak256(code).toLowerCase()!==config.codeHash.toLowerCase())throw new Error('The deployment could not be verified. Signing is disabled.');
-  const c=new Contract(config.controller,abi,provider),at=block===undefined?{}:{blockTag:block};
+  const c=new Contract(config.controller,config.version===17?v17Abi:abi,provider),at=block===undefined?{}:{blockTag:block};
   const [version,algorithm,supply,limit,optionCount]=await Promise.all([c.CONTRACT_VERSION(at),c.ALGORITHM_VERSION(at),c.GENESIS_SUPPLY(at),c.GENESIS_MAX_MINTS_PER_WALLET(at),c.optionCount(at)]);
-  if(version!=='tincta-v16'||algorithm!=='unique-rank-v6'||supply!==1000n||limit!==2n||optionCount<3n||optionCount>8n)throw new Error('The contract rules could not be verified. Signing is disabled.');
+  if(version!==`tincta-v${config.version}`||algorithm!=='unique-rank-v6'||supply!==(config.version===17?20n:1000n)||limit!==2n||optionCount<3n||optionCount>8n)throw new Error('The contract rules could not be verified. Signing is disabled.');
+  if(config.version===17&&(!await c.REHEARSAL_MODE(at)||await c.RANDOMNESS_TIMEOUT(at)!==900n||await c.EXECUTION_REWARD(at)!==100000000000000n))throw new Error('The accelerated deployment profile could not be verified.');
   return c;
 }
-export function v16Phase(r: {saleStart:bigint;soldOutAt:bigint;entropyAt:bigint;finalizedAt:bigint;requested:boolean;prizesClaimed:bigint}, timestamp: number, deadline: bigint, winners: bigint) {
+export function v16Phase(r: {saleStart:bigint;soldOutAt:bigint;entropyAt:bigint;finalizedAt:bigint;requested:boolean;prizesClaimed:bigint}, timestamp: number, deadline: bigint, winners: bigint, timeout=259200n) {
   if(r.saleStart===0n)return null;
   if(r.finalizedAt>0n)return r.prizesClaimed>=winners?6:5;
   if(r.entropyAt>0n)return 4;
-  if(r.soldOutAt>0n)return BigInt(timestamp)>=r.soldOutAt+259200n?7:r.requested?3:2;
+  if(r.soldOutAt>0n)return BigInt(timestamp)>=r.soldOutAt+timeout?7:r.requested?3:2;
   if(BigInt(timestamp)<r.saleStart)return 0;
   return BigInt(timestamp)>=deadline?7:1;
 }
 export async function readV16(provider: Provider, config: ProtocolConfig, selected=0, wallet?:string, sourcePage=0,now=Date.now()):Promise<Snapshot> {
+  if(config.version!==16&&config.version!==17)throw new Error('Select a single-contract deployment.');
+  const version=config.version,supply=version===17?20n:1000n,timeout=version===17?900n:259200n;
   const block=await provider.getBlock('latest');
   if(!block||Math.abs(now/1000-block.timestamp)>180)throw new Error('The network data is out of date. Retry before signing.');
-  const c=await verifyV16(provider,config,block.number),at={blockTag:block.number},address=getAddress(config.controller);
+  const c=await verifySingleContract(provider,config,block.number),at={blockTag:block.number},address=getAddress(config.controller);
   const [settings,sealed,prepared,catalogCount,cost,operatingBalance,g,genesisStart,genesisSold,primary]=await Promise.all([c.settings(at),c.catalogSealed(at),c.prepared(at),c.catalogCount(at),c.preparationCost(at),c.operatingReserve(at),c.round(0,at),c.genesisStartsAt(at),c.genesisSoldOutAt(at),wallet?c.primaryMints(0,wallet,at):null]);
   const count=Number(prepared),total=Number(catalogCount);
-  if(total>256||count>total||!Number.isInteger(selected)||selected<0||selected>count||g.minted>1000n||primary!==null&&primary>2n)throw new Error('The contract returned inconsistent collection data. Signing is disabled.');
-  const genesis={version:16 as const,address,start:genesisStart,end:0n,minted:g.minted,supply:1000n,open:sealed&&g.minted<1000n,walletMinted:primary===null?null:primary>=2n,primaryMints:primary,maxMints:2n,soldOutAt:genesisSold};
+  if(total>256||count>total||!Number.isInteger(selected)||selected<0||selected>count||g.minted>supply||primary!==null&&primary>2n)throw new Error('The contract returned inconsistent collection data. Signing is disabled.');
+  const genesis={version,address,start:genesisStart,end:0n,minted:g.minted,supply,open:sealed&&g.minted<supply,walletMinted:primary===null?null:primary>=2n,primaryMints:primary,maxMints:2n,soldOutAt:genesisSold};
   const latest=count?await c.round(count,at):null;
   const latestTerms=count?await c.terms(count,at):null;
-  const latestPhase=latest?v16Phase(latest,block.timestamp,await c.mintDeadline(count,at),latestTerms.winners):null;
-  const base={protocolVersion:16 as const,block:block.number,timestamp:block.timestamp,operator:getAddress(settings.operator),voting:address,credits:address,bootstrap:false,sealed,count,catalogCount:total,cost,operatingBalance,canPrepare:sealed&&count<total&&latestPhase!==null&&[5,6,7].includes(latestPhase),latestPhase,sourceCount:0,sources:[],legacy:[],genesis};
+  const latestPhase=latest?v16Phase(latest,block.timestamp,await c.mintDeadline(count,at),latestTerms.winners,timeout):null;
+  const base={protocolVersion:version,rehearsalMode:version===17,block:block.number,timestamp:block.timestamp,operator:getAddress(settings.operator),voting:address,credits:address,bootstrap:false,sealed,count,catalogCount:total,cost,operatingBalance,canPrepare:sealed&&count<total&&latestPhase!==null&&[5,6,7].includes(latestPhase),latestPhase,sourceCount:0,sources:[],legacy:[],genesis};
   const id=selected||count;
   if(!id||id===1&&genesisSold===0n)return{...base,round:null};
   const [rawRound,plan,t,hash,deadline,optionCount,used,affiliateId]=await Promise.all([c.round(id,at),c.collection(id,at),c.terms(id,at),c.termsHash(id,at),c.mintDeadline(id,at),c.optionCount(at),wallet?c.primaryMints(id,wallet,at):0n,wallet?c.affiliateId(id,wallet,at):0n]);
   const r=rawRound as RawRound;
-  const phase=v16Phase(r,block.timestamp,deadline,t.winners);
+  const phase=v16Phase(r,block.timestamp,deadline,t.winners,timeout);
   if(phase===null)throw new Error('This collection is waiting for Genesis sellout.');
   const options=await Promise.all(Array.from({length:Number(optionCount)},async(_,i)=>{
     const [o,votes]=await Promise.all([c.option(i,at),c.votes(id,i,at)]);
@@ -71,12 +83,12 @@ export async function readV16(provider: Provider, config: ProtocolConfig, select
     const sr=await c.round(n,at);if(sr.finalizedAt>0n||await c.refundsAvailable(n,at))settled++;
   }
   const holders={address,seasonId:plan.seasonId,funded:season.funded,eligibleNfts:season.eligible,claimLimit:summary.limit,rewardPerNft:summary.reward,claims:season.claims,paid:season.paid,collections:BigInt(season.last)-BigInt(season.first)+1n,settledCollections:settled,unlocked:summary.unlocked};
-  return{...base,sourceCount,sources,holders,round:{address,id,name:plan.name,season:plan.seasonName,color:plan.color,phase,supply:t.supply,price:t.price,winners:t.winners,minted:r.minted,start:r.saleStart,deadline,termsHash:hash,voteStart:r.voteStart,totalVotes:options.reduce((n,o)=>n+o.votes,0n),options,operatorAvailable:available,operatorRemaining:available,canFinalize:phase===4,soldOutAt:r.soldOutAt,randomnessDeadline:r.soldOutAt?r.soldOutAt+259200n:0n,executionReserve:r.executionReserve,executionRecipient:getAddress(r.executor),reserve:await c.accountedBalance(at),growth,affiliateId,affiliateAvailable:slot&&slot.referrals>0n&&!slot.claimed&&r.finalizedAt>0n?r.affiliateShare:0n,nextSlot:BigInt(slots.findIndex(s=>s.wallet===ZeroAddress)+1),remaining:20n-used,sponsorship:r.sponsorReserve,subscriptionClosed:r.subscriptionClosed,awards}};
+  return{...base,sourceCount,sources,holders,round:{address,id,name:plan.name,season:plan.seasonName,color:plan.color,phase,supply:t.supply,price:t.price,winners:t.winners,minted:r.minted,start:r.saleStart,deadline,termsHash:hash,voteStart:r.voteStart,totalVotes:options.reduce((n,o)=>n+o.votes,0n),options,operatorAvailable:available,operatorRemaining:available,canFinalize:phase===4,soldOutAt:r.soldOutAt,randomnessDeadline:r.soldOutAt?r.soldOutAt+timeout:0n,executionReserve:r.executionReserve,executionRecipient:getAddress(r.executor),reserve:await c.accountedBalance(at),growth,affiliateId,affiliateAvailable:slot&&slot.referrals>0n&&!slot.claimed&&r.finalizedAt>0n?r.affiliateShare:0n,nextSlot:BigInt(slots.findIndex(s=>s.wallet===ZeroAddress)+1),remaining:20n-used,sponsorship:r.sponsorReserve,subscriptionClosed:r.subscriptionClosed,awards}};
 }
 
 /** Translate legacy UI action names only here; never call an old ABI at a V16 address. */
 export async function v16RoundTransaction(state:Snapshot,method:string,args:unknown[],value=0n):Promise<TransactionRequest>{
-  const r=state.round;if(!r||state.protocolVersion!==16)throw new Error('Select a V16 collection.');
+  const r=state.round;if(!r||(state.protocolVersion!==16&&state.protocolVersion!==17))throw new Error('Select a V16 collection.');
   const c=new Contract(r.address,abi);
   switch(method){
     case'mintQuoted':return c.mint.populateTransaction(r.id,...args,{value});
