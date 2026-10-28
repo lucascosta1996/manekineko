@@ -95,6 +95,7 @@ export class RehearsalEngine{
  }
  async manual(id:string,index:number,instruction:string,request:TransactionRequest,condition:boolean,extra:Partial<Gate>={}){
   const address=this.address(index);this.state.custody[address.toLowerCase()]??={reason:instruction};
+  if(!condition&&await this.provider.getBalance(address)<eth/200n)await this.ensureBalance(index,eth/100n,'manual-gas');
   await this.gate({id,instruction,wallet:address,walletIndex:index,request:{to:String(request.to),data:String(request.data),value:String(request.value??0)},...extra},condition);
  }
  async verifyFunding(hash:string,value?:bigint){

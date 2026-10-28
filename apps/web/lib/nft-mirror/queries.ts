@@ -37,7 +37,7 @@ export async function queryMintActivity(query: Query, pins: MirrorPin[]) {
 const summary = `SELECT count(*)::integer AS minted,count(*) FILTER (WHERE metadata IS NOT NULL)::integer AS ready
   FROM all_tokens t WHERE t.chain_id=c.chain_id AND t.collection_address=c.address AND t.round_id=c.round_id`;
 function collection(row: Record<string, any>): GalleryCollection {
-  return {...((row.protocol_version===16||row.protocol_version===17)?{collectionId:Number(row.round_id)}:{}),kind:row.kind,chainId:row.chain_id,address:row.address,name:row.name,seasonName:row.season_name,color:row.color,textColor:row.text_color,
+  return {...((row.protocol_version===16||row.protocol_version===17)?{collectionId:Number(row.round_id)}:{}),...(row.kind==='genesis'?{genesisSupply:row.protocol_version===17?20:1000}:{}),kind:row.kind,chainId:row.chain_id,address:row.address,name:row.name,seasonName:row.season_name,color:row.color,textColor:row.text_color,
     minted:Number(row.minted),ready:Number(row.ready),cover:row.cover ?? null,
     syncedAt:row.synced_at ? new Date(row.synced_at).toISOString() : null,
     blockNumber:row.cursor_block === null ? null : Number(row.cursor_block),catchingUp:row.catching_up};

@@ -165,9 +165,11 @@ test('mirror SQL: leases, retries, atomic replay, reorgs and paginated database-
       const fast={...config,controller:'0x'+'7'.repeat(40),version:17 as const},store17=new V16MirrorStore(db,fast);
       assert.ok(await store17.claim());await store17.verified(true,{number:22,hash:hash(22)});
       const item={...c,address:fast.controller,controller:fast.controller,renderer:fast.controller,roundId:1,name:'Fast first'};
-      await store17.discover([item],{number:22,hash:hash(22)},check);await store17.events(item,[mint(1)],{number:22,hash:hash(22)},true,check);await store17.cache(item,1,hash(11),artwork(1),check);
+      const genesis={...item,kind:'genesis' as const,roundId:0,name:'Fast Genesis'};
+      await store17.discover([item,genesis],{number:22,hash:hash(22)},check);await store17.events(item,[mint(1)],{number:22,hash:hash(22)},true,check);await store17.cache(item,1,hash(11),artwork(1),check);
       assert.equal(await queryGallery(query,[fast],fast.chainId,fast.controller,1),null);
       assert.equal((await queryGallery(query,[fast],fast.chainId,fast.controller,1,1))!.collection.collectionId,1);
+      assert.equal((await queryDirectory(query,[fast],1)).genesis![0].genesisSupply,20);
       await assert.rejects(db.query("INSERT INTO manekineko_nft_mirror_sources(chain_id,controller,fingerprint,code_hash,version,from_block) VALUES(1,$1,$2,$3,17,1)",['0x'+'8'.repeat(40),'x',hash(1)]));await store17.release();
     });
     await t.test('expired workers cannot commit after lease takeover',async()=>{

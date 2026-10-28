@@ -12,15 +12,15 @@ The user can attend for up to half a day. Target approximately **1–3 hours** f
 - Manual affiliate wallet 0: `0xd20d2De0f415ef35948699B6f663A9B6f827bA92`.
 - Manual buyer wallet 1: `0xDADbF94Fde7ac02f229a27919c820e2BA39128D3`.
 - Private run: `/Users/admin/.local/share/tincta/v17-fast-rehearsal-2026-10-29/`. Handoffs are under `handoffs/wallet-0/` and `handoffs/wallet-1/`; import their local encrypted keystore or private-key file without sharing it.
-- Frozen runtime SHA-256: `32ea0c7bf01f379d1f21f3fc90c277e6a69a1bcbd371a23b50249a6687d90e47`.
-- Frozen plan SHA-256: `3e726da1c7a49a97cbe5963216e4d86b5b2c6444c53137fe2cfaedf94c13a878`.
+- Frozen runtime SHA-256: `38dce81cae69247672922e4d7c1a914d86cc5d2dc591a2d4ee614f323d27be63`.
+- Frozen plan SHA-256: `091653694c4beeff97dff852bbdc468ec4ceec2de1f7f5d17d58f74e17daab69`.
 - Read-only preflight passed. Pause marker present; zero bank funding, signed journals, Genesis mints and prepared collections. Contract remains unsealed. No live rehearsal transaction has been sent.
 
 `command.mjs` loads owner-only credentials from `/Users/admin/.config/tincta/v17-fast-rehearsal-2026-10-29.env`. Use the website's verified V17 pin before opening Genesis.
 
 ```sh
 V17_RUN=/Users/admin/.local/share/tincta/v17-fast-rehearsal-2026-10-29
-V17_PLAN=3e726da1c7a49a97cbe5963216e4d86b5b2c6444c53137fe2cfaedf94c13a878
+V17_PLAN=091653694c4beeff97dff852bbdc468ec4ceec2de1f7f5d17d58f74e17daab69
 node "$V17_RUN/command.mjs" preflight
 node "$V17_RUN/command.mjs" status
 # After the confirmed 0.15 Sepolia ETH bank transfer:
@@ -70,7 +70,7 @@ Other bots broadcast concurrently by distinct signer. Bank funding is serialized
 
 Use only the new V17 bank and handoffs from the verified release. **Do not fund the old V16 bank for this run.** Import manual affiliate wallet 0 and referred-buyer wallet 1 locally. The winning/refund wallet indices appear in subsequent gates and are exported only after custody reservation. Keep all keys, passwords, signed journal bytes and authenticated RPC URLs private.
 
-Recommended initial funding is **0.15 Sepolia ETH**; the script requires at least 0.1 ETH, protects 0.01 ETH of liquid bank funds and caps external funding at 0.5 ETH. The pinned source/final recovery address remains `0xC0Eb929903dCD29c7a33E6dA1f78a247CFB68145`. Verify control of it before funding. Fees are capped at 0.5 gwei; 0.05 ETH of recorded gas plus known VRF fees triggers a cost review. These are ceilings and stops, not forecasts.
+Recommended initial funding is **0.15 Sepolia ETH**; the script requires at least 0.1 ETH, protects 0.01 ETH of liquid bank funds and caps external funding at 0.5 ETH. The pinned source/final recovery address remains `0xC0Eb929903dCD29c7a33E6dA1f78a247CFB68145`. Verify control of it before funding. Fees are capped at 0.5 gwei; 0.05 ETH of recorded gas plus known VRF fees triggers a cost review. These are ceilings and stops, not forecasts. Before a pending manual transaction, accounts below 0.005 ETH receive a bank top-up to 0.01 ETH for gas; the runner still never signs their action.
 
 1. Run read-only preflight/status. Verify contract pin, runtime/plan hashes and both wallet imports. Send initial funding from the pinned source and register the confirmed transaction hash.
 2. Resume and invoke `run --execute PLAN_HASH --wait`. It stops at `start-genesis`; review and acknowledge it. Mint two free Genesis NFTs from each manual account, acknowledging each receipt separately. Test that a third primary mint is unavailable.
@@ -81,6 +81,8 @@ Recommended initial funding is **0.15 Sepolia ETH**; the script requires at leas
 7. During the run return excess manual-wallet funds to the V17 bank, retaining sufficient gas. At completion, reconcile liabilities and manual balances, acknowledge final review, and recover automation balances. Return manual balances yourself to the pinned recovery address. Protected holder division dust and gas reserves remain explicitly reported.
 
 The `--wait` option retries only time/VRF waits. It never acknowledges a manual/readiness gate. Its default wait budget is 180 minutes; `--max-minutes` accepts 1–240. The pause marker stops further bot signatures; it never pauses contract clocks. If a deadline is missed, record the actual outcome, inspect the incident and use the explicit reconciliation/refund path. A UI update cannot reopen a ballot or sale.
+
+The final pre-start gas-funding revision was frozen while paused, with zero bank funding, zero signed journals and `started=false`. The original V17 bundle/plan/state are archived locally; all eleven wallet identities and both exported accounts are preserved. UI deployments do not replace this final runtime.
 
 ## Reports and acceptance
 

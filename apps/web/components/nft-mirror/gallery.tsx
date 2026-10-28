@@ -22,9 +22,9 @@ export function CollectionDirectoryView({data}: {data: CollectionDirectory}) {
       <div className="mirror-section-label"><h2 id="genesis-collections-title">Tincta Genesis</h2><p>The first vote.</p></div>
       <p className="mirror-genesis-intro">A free collectible for the first paid vote. Affiliate eligibility follows each deployment’s original rules.</p>
       <div className="mirror-grid">{data.genesis.map(item=><Link prefetch={false} className="mirror-collection" href={galleryPath(item.chainId,item.address,item.collectionId)} key={`${item.chainId}:${item.address}:${item.collectionId??"legacy"}`}>
-        {item.cover ? <img src={item.cover} alt="Tincta Genesis minted onchain artwork" width={600} height={600} loading="lazy" decoding="async" /> : <GenesisArtwork />}
+        {item.cover ? <img src={item.cover} alt="Tincta Genesis minted onchain artwork" width={600} height={600} loading="lazy" decoding="async" /> : <GenesisArtwork supply={BigInt(item.genesisSupply??1000)} />}
         <div className="mirror-card-body"><p className="mirror-caption">{item.chainId === 11155111 ? 'Sepolia testnet' : 'Ethereum'} · 0 ETH + network gas</p>
-          <h3>View Genesis NFTs<Icon name="arrow" /></h3><p className="mirror-caption">{item.minted} / 1,000 minted{item.minted>item.ready || item.catchingUp ? ' · Artwork syncing' : ''}</p></div>
+          <h3>View Genesis NFTs<Icon name="arrow" /></h3><p className="mirror-caption">{item.minted} / {(item.genesisSupply??1000).toLocaleString('en-US')} minted{item.minted>item.ready || item.catchingUp ? ' · Artwork syncing' : ''}</p></div>
       </Link>)}</div>
       <div className="mirror-back-row"><Link className="ui-text-action" href="/">Open participation<Icon name="arrow" /></Link></div>
     </section>}
