@@ -84,6 +84,19 @@ The `--wait` option retries only time/VRF waits. It never acknowledges a manual/
 
 The final pre-start gas-funding revision was frozen while paused, with zero bank funding, zero signed journals and `started=false`. The original V17 bundle/plan/state are archived locally; all eleven wallet identities and both exported accounts are preserved. UI deployments do not replace this final runtime.
 
+## What to observe and record
+
+At each manual checkpoint, record the selected account, network, collection, amount, expected result and actual transaction hash. Check these visible behaviors:
+
+- Wallet choice and rejection: select the intended account; a rejected signature leaves the action retryable without a paid transaction. Confirm that switching accounts refreshes balances and eligibility.
+- Genesis: two free primary mints per account; a third is unavailable. The first ballot starts only at sellout. The three packages show their exact supply, price, prize count and mint window.
+- Affiliate: wallet 0 enrolls in slot 1 using its specified Genesis NFT. The copied link retains both collection and affiliate. Wallet 1’s paid mint credits that referral; qualification changes only after a paid referral. Check enrollment again in the second season.
+- Drawing and prizes: observe the real VRF pending/fulfilled transition, distinct winning NFT serials and the exact prize amount. Switch to the exported actual winning holder; confirm the receipt and claimed state. Reject and retry a signature before the successful claim if requested.
+- Refunds: the three-mint collections expire unsold. Each refund returns the full price before gas, burns that NFT, and retains its historical metadata. A completed refund stays completed on resume.
+- Sponsored and holder rewards: a sponsored redemption consumes that wallet’s lifetime entitlement. The season pool stays locked until all three collections are terminal, then uses the first-5% limit. Confirm the manual holder claim before bot claims and inspect the fixed reward and division dust.
+
+The runner proves transaction details and onchain state; your notes prove what you actually observed in the wallet and UI. Do not acknowledge an unobserved result. A local pause does not stop ballot or mint deadlines.
+
 ## Reports and acceptance
 
 Every status/execution checkpoint refreshes private `report.json` and readable `report.md`, including anchored actual outcomes, transaction hashes, manual test notes, gas, VRF fees, custody balances, incidents and independent exact-wei liability reconstruction. A final execution pass requires six expected terminal outcomes, all relevant payouts/refunds, both holder limits filled, zero collection liabilities and balanced reserves. Errors remain visible; reconciliation does not convert a failed test into a pass. Raw private `state.json` is never a shareable report.

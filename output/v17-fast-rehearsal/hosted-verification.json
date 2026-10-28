@@ -1,0 +1,165 @@
+{
+  "applicationCommit": "61cc4ece2983e6ba0b9b1b2bd7e9052842715f12",
+  "webAndLaunch": {
+    "at": "2026-10-28T18:54:44.230Z",
+    "results": [
+      {
+        "service": "launch-auth",
+        "authenticated": true,
+        "status": 200
+      },
+      {
+        "service": "web",
+        "path": "/",
+        "width": 1440,
+        "v17Verified": true,
+        "unsealed": true,
+        "minted": 0,
+        "signingDisabled": true,
+        "noOverflow": true
+      },
+      {
+        "service": "web",
+        "path": "/claims",
+        "width": 1440,
+        "v17Verified": true,
+        "unsealed": true,
+        "minted": 0,
+        "signingDisabled": true,
+        "noOverflow": true
+      },
+      {
+        "service": "web",
+        "path": "/affiliates",
+        "width": 1440,
+        "v17Verified": true,
+        "unsealed": true,
+        "minted": 0,
+        "signingDisabled": true,
+        "noOverflow": true
+      },
+      {
+        "service": "web",
+        "path": "/holders",
+        "width": 1440,
+        "v17Verified": true,
+        "unsealed": true,
+        "minted": 0,
+        "signingDisabled": true,
+        "noOverflow": true
+      },
+      {
+        "service": "launch",
+        "width": 1440,
+        "v17Verified": true,
+        "prepared": 0,
+        "collections": 6,
+        "seasons": 2,
+        "noOverflow": true
+      },
+      {
+        "service": "web",
+        "path": "/",
+        "width": 390,
+        "v17Verified": true,
+        "unsealed": true,
+        "minted": 0,
+        "signingDisabled": true,
+        "noOverflow": true
+      },
+      {
+        "service": "web",
+        "path": "/claims",
+        "width": 390,
+        "v17Verified": true,
+        "unsealed": true,
+        "minted": 0,
+        "signingDisabled": true,
+        "noOverflow": true
+      },
+      {
+        "service": "web",
+        "path": "/affiliates",
+        "width": 390,
+        "v17Verified": true,
+        "unsealed": true,
+        "minted": 0,
+        "signingDisabled": true,
+        "noOverflow": true
+      },
+      {
+        "service": "web",
+        "path": "/holders",
+        "width": 390,
+        "v17Verified": true,
+        "unsealed": true,
+        "minted": 0,
+        "signingDisabled": true,
+        "noOverflow": true
+      },
+      {
+        "service": "launch",
+        "width": 390,
+        "v17Verified": true,
+        "prepared": 0,
+        "collections": 6,
+        "seasons": 2,
+        "noOverflow": true
+      },
+      {
+        "service": "gallery",
+        "genesisVisible": true,
+        "supply": 20,
+        "svgSupply": 20
+      }
+    ]
+  },
+  "indexer": {
+    "at": "2026-10-28T18:49:28.602Z",
+    "results": [
+      {
+        "service": "indexer",
+        "authenticated": false,
+        "status": 401,
+        "ok": false,
+        "error": "unauthorized"
+      },
+      {
+        "service": "indexer",
+        "authenticated": true,
+        "status": 200,
+        "ok": true,
+        "sources": [
+          {
+            "chainId": 11155111,
+            "controller": "0x479198a1dc89e4ddf856077d04aa49c661c197c4",
+            "ok": true,
+            "status": "caught_up",
+            "confirmedBlock": 12014213
+          },
+          {
+            "chainId": 11155111,
+            "controller": "0xccaa796a3db877647670fe0aeb077488840b798b",
+            "ok": true,
+            "status": "caught_up",
+            "confirmedBlock": 12014213
+          },
+          {
+            "chainId": 11155111,
+            "controller": "0x673d155f884976bb42eab2f1f11b381dc4d8d26a",
+            "ok": true,
+            "status": "caught_up",
+            "confirmedBlock": 12014213
+          },
+          {
+            "chainId": 11155111,
+            "controller": "0x39f625904cc50c08797e52b909ee51f6eb66d26e",
+            "ok": true,
+            "status": "caught_up",
+            "confirmedBlock": 12014214
+          }
+        ]
+      }
+    ]
+  }
+}

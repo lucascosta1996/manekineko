@@ -25,22 +25,20 @@ The repository-wide test stage passed **569 contract cases**, Web **300 passing 
 2. Restarting after a refund could ask for ownership of a burned NFT. Confirmed canonical manual/bot receipts now prove a completed refund; unexpected ownership failures remain errors.
 3. Previously accepted manual receipts were not rechecked on resume. V17 now verifies their successful receipt and canonical block ancestry again before continuing.
 4. Shared V16 assumptions in supply, timeout, metadata version, catalog and gallery collection IDs required explicit V17 handling. Historical V16 behavior retains its own version and pins.
-
 5. The accelerated Genesis preview and gallery initially retained the 1,000-supply caption. The shared preview now matches the actual deployment supply and has exact parity with V17 onchain SVG output; default production artwork is unchanged.
 6. The NodeNext contract typecheck required an explicit JSON import attribute in that preview helper. It was added and the affected stages rerun.
-
 7. Winning/refund accounts needed an explicit manual-gas reserve. The runner now refills accounts below 0.005 ETH to 0.01 ETH before a pending manual transaction. Its complete six-collection replay passed again. The final runtime was frozen while paused/unfunded, preserving all wallet identities and archiving the prior bundle.
 
 These are preparation findings fixed locally. They are not incidents observed on live Sepolia.
 
-The initial application commit `35ab3cc` reached Ready on all five Vercel projects with matching production aliases. Hosted Web and authenticated Launch were checked at 1440/390 against V17: zero Genesis mints, 0/6 prepared collections, two seasons and disabled minting. The V17 indexer source was caught up; one combined request returned 503 because another worker held the historical V16 lease, recorded as concurrency rather than hidden or removed. The gallery denominator and placeholder were then corrected to use each deployment’s supply.
+The initial application commit `35ab3cc` reached Ready on all five Vercel projects with matching production aliases. Hosted Web and authenticated Launch were checked at 1440/390 against V17: zero Genesis mints, 0/6 prepared collections, two seasons and disabled minting. The V17 indexer source was caught up; one combined request returned 503 because another worker held the historical V16 lease, recorded as concurrency rather than hidden or removed. The gallery denominator and placeholder were then corrected to use each deployment’s supply. Final hosted acceptance at application commit `61cc4ec` verified the 0/20 gallery and decoded SVG caption as well as Web and authenticated Launch at both widths. A later authenticated indexer scan returned HTTP 200 with **all four sources caught up**; unauthenticated access returned 401. [Public hosted evidence](../output/v17-fast-rehearsal/hosted-verification.json). All five Vercel projects reached Ready at that application commit, with every production alias matching. GitHub Checks and Visual UI contracts were still in progress at verification; local passing checks and Vercel Ready do not substitute for those workflow results. The following publication adds only documentation and sanitized evidence.
 
 ## Required remaining evidence
 
 | Area | Required evidence | Current boundary |
 |---|---|---|
 | Live release | Exact source, immutable/profile/settings/catalog readback through independent RPCs | Passed through both RPCs; unsealed, zero mints/funding |
-| Hosted application | Correct V17 pins, visible accelerated notice, desktop/mobile layouts, indexer catching up | Desktop/mobile Web and authenticated Launch passed on the initial application release; final gallery correction is being published |
+| Hosted application | Correct V17 pins, visible accelerated notice, desktop/mobile layouts, indexer catching up | Passed on hosted desktop/mobile Web and authenticated Launch; V17 gallery count/SVG are 20; all four indexer sources caught up |
 | Human wallets | Real Genesis, affiliate, referral, prize, sponsored, refund and holder receipts plus observed UI behavior | Pending live checkpoints |
 | Chainlink | Genuine request/fulfillment and actual fees for the four live sellouts | Local coordinator is mocked |
 | Final reconciliation | Six actual outcomes, claims, bank/manual returns, gas, fees, dust and all liabilities | Produced during/after the live run |
