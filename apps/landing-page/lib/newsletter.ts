@@ -50,7 +50,7 @@ function assertOrigin(request: Request, env: Environment): string {
     if (configured.username || configured.password || configured.pathname !== "/" || configured.search || configured.hash
       || (configured.protocol !== "https:" && !isLocalPreview(request, env))) throw new Error();
     origin = configured.origin;
-  } catch { throw new NewsletterError("Email registration is not available yet. Please try again later.", 503); }
+  } catch { throw new NewsletterError("Newsletter signup is unavailable. Please try again later.", 503); }
   const caller = request.headers.get("origin") ?? "";
   const trustedStudio = requestedUrl.origin === REWARDS_ORIGIN && STUDIO_ORIGINS.has(caller);
   let localAlias = false;
@@ -65,7 +65,7 @@ function assertOrigin(request: Request, env: Environment): string {
   }
   if ((!trustedStudio && !localAlias && caller !== origin) || requestedUrl.origin !== origin
     || request.headers.get("sec-fetch-site") === "cross-site") {
-    throw new NewsletterError("Please register from the Tincta website.", 403);
+    throw new NewsletterError("Sign up from the Tincta website.", 403);
   }
   return caller;
 }
@@ -84,7 +84,7 @@ export function newsletterPreflight(request: Request, env: Environment = process
       "Vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
     } });
   } catch (error) {
-    return Response.json({ error: "Please register from the Tincta website." }, { status: error instanceof NewsletterError ? error.status : 403, headers: responseHeaders });
+    return Response.json({ error: "Sign up from the Tincta website." }, { status: error instanceof NewsletterError ? error.status : 403, headers: responseHeaders });
   }
 }
 
@@ -125,7 +125,7 @@ async function readBody(request: Request): Promise<Record<string, unknown>> {
 
 function networkDigest(request: Request, env: Environment): string {
   const secret = env.NEWSLETTER_IP_HASH_SECRET;
-  if (!secret || secret.length < 32) throw new NewsletterError("Email registration is not available yet. Please try again later.", 503);
+  if (!secret || secret.length < 32) throw new NewsletterError("Newsletter signup is unavailable. Please try again later.", 503);
   let network: string;
   if (env.VERCEL === "1") {
     const forwarded = request.headers.get("x-vercel-forwarded-for")?.trim();
@@ -135,7 +135,7 @@ function networkDigest(request: Request, env: Environment): string {
     // Local previews have one shared quota; client-supplied forwarding headers are not trusted.
     network = "local-development";
   } else {
-    throw new NewsletterError("Email registration is not available yet. Please try again later.", 503);
+    throw new NewsletterError("Newsletter signup is unavailable. Please try again later.", 503);
   }
   return createHmac("sha256", secret).update(`newsletter:${network}`).digest("hex");
 }
@@ -148,10 +148,10 @@ export async function registerNewsletter(request: Request, repository: Newslette
       throw new NewsletterError("Send a JSON request.", 415);
     }
     const body = await readBody(request);
-    if (body.website !== undefined && body.website !== "") throw new NewsletterError("Unable to accept this registration.", 400);
+    if (body.website !== undefined && body.website !== "") throw new NewsletterError("We couldn’t accept this signup. Please try again.", 400);
     const email = normalizeNewsletterEmail(body.email);
     const subjectHash = networkDigest(request, env);
-    if (!await repository.consumeRateLimit(subjectHash)) throw new NewsletterError("Too many attempts. Please try again in ten minutes.", 429);
+    if (!await repository.consumeRateLimit(subjectHash)) throw new NewsletterError("Too many attempts. Try again in ten minutes.", 429);
     await repository.save(email);
     // Identical results for existing and new addresses avoid disclosing the subscriber list.
     return Response.json({ success: true }, { headers });
@@ -161,6 +161,6 @@ export async function registerNewsletter(request: Request, repository: Newslette
     }
     // Never log email addresses, IPs, connection strings or raw database errors.
     console.error("Newsletter registration failed: storage is temporarily unavailable.");
-    return Response.json({ error: "We could not save your email. Please try again shortly." }, { status: 503, headers });
+    return Response.json({ error: "We couldn’t save your email. Please try again." }, { status: 503, headers });
   }
 }

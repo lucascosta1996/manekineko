@@ -58,7 +58,7 @@ export function SiteNavigation({ section, protocolEnabled = false }: { section: 
       <Link href="/affiliates" aria-current={section === "affiliates" ? "page" : undefined} onClick={() => setOpen(false)}>Affiliates</Link>
       <Link href="/holders" aria-current={section === "holders" ? "page" : undefined} onClick={() => setOpen(false)}>Holders</Link>
       <Link href="/collections" aria-current={section === "nfts" ? "page" : undefined} onClick={() => setOpen(false)}>NFTs</Link>
-      <Link href="/docs" aria-current={section === "docs" ? "page" : undefined} onClick={() => setOpen(false)}>How It Works</Link>
+      <Link href="/docs" aria-current={section === "docs" ? "page" : undefined} onClick={() => setOpen(false)}>How it works</Link>
     </nav>
   </div>;
 }

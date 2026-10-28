@@ -1,0 +1,10 @@
+{
+  "version": 16,
+  "chainId": 11155111,
+  "controller": "0x673D155f884976bb42eab2F1F11b381dc4d8D26A",
+  "controllerCodeHash": "0xf922fd995949d2368b98a0df53d5339b8515d27303f28d12760d616f8f57161f",
+  "rpcUrl": "https://ethereum-sepolia-rpc.publicnode.com",
+  "appUrl": "https://app.tincta.xyz/",
+  "accountSource": "launch",
+  "xAccountId": ""
+}

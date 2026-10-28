@@ -22,7 +22,7 @@ export async function verifyHolderPool(provider: Provider, config: ProtocolConfi
   if (code === '0x' || keccak256(code).toLowerCase() !== config.holderRewardsCodeHash.toLowerCase()) throw new Error('The holder rewards contract could not be verified. Signing is disabled.');
   const pool = new Contract(address, holderAbi, provider);
   const [bound, version, coverage, allocation] = await Promise.all([pool.controller(at), pool.CONTRACT_VERSION(at), pool.COVERAGE_BPS(at), pool.HOLDER_BPS(at)]);
-  if (getAddress(bound) !== getAddress(config.controller) || version !== 'holder-rewards-v13' || coverage !== 500n || allocation !== 1000n) throw new Error('Holder rewards policy verification failed.');
+  if (getAddress(bound) !== getAddress(config.controller) || version !== 'holder-rewards-v13' || coverage !== 500n || allocation !== 1000n) throw new Error('The holder reward rules could not be verified. Signing is disabled.');
   return pool;
 }
 
@@ -31,7 +31,7 @@ export async function readHolderSeason(provider: Provider, config: ProtocolConfi
   const seasonId = await new Contract(collection, roundAbi, provider).seasonId(at);
   const result = await pool.summary(seasonId, at);
   const { funded, eligibleNfts, claimLimit, rewardPerNft, claims, paid, collections, settledCollections, unlocked } = result;
-  if (claims > claimLimit || paid > funded || settledCollections > collections || collections > 10n || claimLimit !== eligibleNfts / 20n || rewardPerNft !== (claimLimit ? funded / claimLimit : 0n)) throw new Error('Invalid holder pool state.');
+  if (claims > claimLimit || paid > funded || settledCollections > collections || collections > 10n || claimLimit !== eligibleNfts / 20n || rewardPerNft !== (claimLimit ? funded / claimLimit : 0n)) throw new Error('The holder pool returned inconsistent data. Signing is disabled.');
   return { address: getAddress(await pool.getAddress()), seasonId, funded, eligibleNfts, claimLimit, rewardPerNft, claims, paid, collections, settledCollections, unlocked };
 }
 

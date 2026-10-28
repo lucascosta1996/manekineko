@@ -27,7 +27,7 @@ export function HolderRewardsPanel({
   if (!h)
     return (
       <section className="public-empty">
-        <h2>No holder pool in this deployment.</h2>
+        <h2>This deployment has no holder pool.</h2>
         <p>
           This collection does not include a season holder pool. Check its
           prize and affiliate rewards under the collection’s own terms.
@@ -54,7 +54,7 @@ export function HolderRewardsPanel({
           </span>
         </div>
         <p className="protocol-note">
-          10% of this season’s actual mint revenue from successful draws accumulates here.
+          Successful draws add 10% of their collection’s mint revenue to this season pool.
         </p>
         <p className="holder-total">
           <strong>{formatEther(h.funded)}</strong> <span>ETH accumulated</span>
@@ -133,7 +133,7 @@ export function HolderRewardsPanel({
         {!empty && !exhausted && (
           <>
             <Field
-              label="NFT token ID"
+              label="NFT number"
               hint={`Use an NFT you own from ${state.round?.name}. Choose a different collection above if needed.`}
             >
               {(p) => (

@@ -103,7 +103,7 @@ export async function readProtocol(
   const count = Number(countValue),
     catalogCount = Number(catalogValue);
   if (count > 256 || catalogCount > 256 || count > catalogCount)
-    throw new Error('Invalid collection catalog.');
+    throw new Error('The collection catalog could not be verified. Signing is disabled.');
   const v = new Contract(voting, votingAbi, provider);
   const [bootstrap, legacyCount] = await Promise.all([v.bootstrapAllowed(at), v.legacySourceCount(at)]);
   if (legacyCount > 256n) throw new Error('Invalid legacy source count.');

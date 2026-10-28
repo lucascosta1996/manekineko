@@ -32,3 +32,8 @@ test("dashboard routes preserve network through authentication", () => {
   assert.equal(safeLaunchDestination(launchDestination(path, "11155111")), `${path}?chainId=11155111`);
  }
 });
+
+test("X account and preview deep links survive sign-in without open redirects", () => {
+  for (const path of ["/social", "/social/account"]) for (const chain of ["1", "11155111"]) assert.equal(safeLaunchDestination(`${path}?chainId=${chain}`), `${path}?chainId=${chain}`);
+  for (const path of ["/social?next=//evil.example", "/social/account?chainId=1&chainId=11155111", "/social/account/../../api/auth/session", "/social/account#//evil.example"]) assert.equal(safeLaunchDestination(path), "/dashboard");
+});

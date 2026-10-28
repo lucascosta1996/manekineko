@@ -1,3 +1,4 @@
+import genesisArtwork from "../../ui/src/genesis-artwork.json" with { type: "json" };
 import { buildTinctaLinework } from "./tincta-motifs.ts";
 import { contrastTextColor } from "./season-appearance.ts";
 import type { SeasonSocialMessage } from "./season-social.ts";
@@ -24,6 +25,7 @@ function typography(value: string, preferred: number, maxWidth: number, spacing:
 /** Preserves the approved 1600x900 white frame, ordered palette and stable
  * motif. Preview is explicit; Sepolia is always visibly labeled as a test. */
 export function renderSeasonSocialSvg(message: SeasonSocialMessage, options: { preview?: boolean } = {}): string {
+  if (message.kind === 'genesis') return renderGenesisSvg(message, options);
   const { season, collection } = message;
   const brand = message.chainId === 11155111 ? "Sepolia collections" : "Tincta";
   const upcoming = message.event === "upcoming-season", stats = message.event === "season-complete";
@@ -51,11 +53,30 @@ export function renderSeasonSocialSvg(message: SeasonSocialMessage, options: { p
     <title id="title">${xml(`${brand} — ${message.header} — Season ${pad(season.number)}`)}</title><desc id="description">${xml(`${options.preview ? "Design preview. " : ""}${message.alt}`)}</desc>
     <defs>${bands.map(band => `<clipPath id="band-${band.index}"><rect x="${band.x}" y="132" width="${band.width}" height="640"/></clipPath>`).join("")}</defs>
     ${css}<rect width="1600" height="900" fill="#FFFFFF"/>
-    ${message.chainId === 11155111 ? `<text x="48" y="88" fill="#111111" font-size="38" font-weight="600" letter-spacing="-1.5">${xml(brand)}</text>` : TINCTA_SOCIAL_LOCKUP_SVG}
+    ${TINCTA_SOCIAL_LOCKUP_SVG}
     <text x="1552" y="82" text-anchor="end" fill="#111111" class="mono" font-size="20" letter-spacing="2">${xml(message.header)}</text>
     ${marker ? `<text x="1552" y="111" text-anchor="end" fill="#71717A" class="mono" font-size="12" letter-spacing="1">${xml(marker)}</text>` : ""}
     ${palette}
     <text x="48" y="847" fill="#111111" ${typography(message.footer, 23, 1200, -0.4)} letter-spacing="-0.4">${xml(message.footer)}</text>
     <text x="1552" y="847" text-anchor="end" fill="#111111" class="mono" font-size="21">${message.chainId === 11155111 ? "SEPOLIA" : "tincta.xyz"}</text>
+  </svg>\n`;
+}
+
+/** The free collection has no paid-season number or invented financial metrics. */
+function renderGenesisSvg(message: SeasonSocialMessage, options: { preview?: boolean }): string {
+  const marker = [options.preview ? 'DESIGN PREVIEW' : '', message.chainId === 11155111 ? 'SEPOLIA TEST · TEST ETH' : ''].filter(Boolean).join(' · ');
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title description">
+    <title id="title">Tincta Genesis — ${xml(message.header)}</title><desc id="description">${xml(`${options.preview ? 'Design preview. ' : ''}${message.alt}`)}</desc>
+    ${css}<rect width="1600" height="900" fill="#FFFFFF"/>
+    ${TINCTA_SOCIAL_LOCKUP_SVG}
+    <text x="1552" y="82" text-anchor="end" fill="#111111" class="mono" font-size="20" letter-spacing="2">${xml(message.header)}</text>
+    <text x="1552" y="111" text-anchor="end" fill="#666666" class="mono" font-size="14">${xml(marker)}</text>
+    <rect x="48" y="132" width="1504" height="640" fill="#FAFAFA" stroke="#E4E4E4"/>
+    <text x="104" y="211" fill="#111111" class="mono" font-size="23" letter-spacing="2">TINCTA GENESIS / FREE COLLECTION</text>
+    ${message.headline.map((line, i) => `<text x="104" y="${400 + i * 130}" fill="#111111" ${typography(line, 112, 800, -4)} font-weight="500" letter-spacing="-4">${xml(line)}</text>`).join('')}
+    <image href="${genesisArtwork.image}" x="960" y="230" width="500" height="500"/>
+    <text x="104" y="700" fill="#111111" class="mono" ${typography(message.detail ?? '', 20, 800, 0, true)}>${xml(message.detail ?? '')}</text>
+    <text x="48" y="847" fill="#111111" font-size="23">${xml(message.footer)}</text>
+    <text x="1552" y="847" text-anchor="end" fill="#111111" class="mono" font-size="21">${message.chainId === 11155111 ? 'SEPOLIA' : 'tincta.xyz'}</text>
   </svg>\n`;
 }

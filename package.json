@@ -106,7 +106,9 @@
     "protocol:v16:test": "npm exec --workspace @manekineko/contracts -- hardhat test test/ProtocolV16.ts test/ProtocolV16Rehearsal.ts test/ProtocolV16Adapters.ts",
     "protocol:v16:rehearsal:test": "node --import tsx --test scripts/protocol-v16/rehearsal/rehearsal.test.mts && tsc -p scripts/protocol-v16/tsconfig.json",
     "protocol:v16:rehearsal:build": "node --import tsx scripts/protocol-v16/rehearsal/build.mts",
-    "protocol:v16:release": "node --import tsx scripts/protocol-v16/release.mts"
+    "protocol:v16:release": "node --import tsx scripts/protocol-v16/release.mts",
+    "protocol:v16:social": "node --import tsx scripts/protocol-v16/social.mts",
+    "protocol:v16:social:test": "node --import tsx --test scripts/protocol-v16/social.test.ts scripts/protocol-v16/social-account.test.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.11.1",

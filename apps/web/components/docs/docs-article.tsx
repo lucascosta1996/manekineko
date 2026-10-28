@@ -29,13 +29,13 @@ export function DocsArticle({ page }: { page: DocPage }) {
   const sections = page.sections.map(({ id, title }) => ({ id, title }));
   return <div className="docs-reading-layout">
     <article className="docs-article" aria-labelledby="docs-title">
-      <div className="docs-breadcrumb"><Link href="/docs">How It Works</Link><span aria-hidden="true">/</span><span>{page.group}</span></div>
+      <div className="docs-breadcrumb"><Link href="/docs">How it works</Link><span aria-hidden="true">/</span><span>{page.group}</span></div>
       <header className="docs-article-header"><p className="eyebrow">TINCTA / REWARD GUIDE</p><h1 id="docs-title">{page.title}</h1><p className="docs-description">{page.description}</p><div className="docs-reading-meta"><span>{page.minutes} min read</span><span>Protocol guide</span></div></header>
       {page.slug === "overview" && <div className="docs-intro-strip" aria-label="Mint a ticket. Check results. Claim rewards."><span>01 <strong>Mint a ticket</strong></span><span>02 <strong>Check results</strong></span><span>03 <strong>Claim rewards</strong></span></div>}
       <details className="ui-disclosure docs-inline-outline"><summary>On this page<Icon name="chevron" className="ui-disclosure-icon" /></summary><nav aria-label="Page sections">{sections.map(section => <a key={section.id} href={`#${section.id}`}>{section.title}</a>)}</nav></details>
       <div className="docs-prose">{page.sections.map(section => <section key={section.id} aria-labelledby={section.id}><h2 id={section.id}>{section.title}<a href={`#${section.id}`} aria-label={`Link to ${section.title}`} className="docs-heading-anchor">#</a></h2>{section.blocks.map((block, blockIndex) => <Block key={blockIndex} block={block} sectionTitle={section.title} />)}</section>)}</div>
       <nav className="docs-pagination" aria-label="Reward guides">{previous ? <Link href={docHref(previous.slug)}><span><Icon name="back" /> Previous</span><strong>{previous.title}</strong></Link> : <span />}{next && <Link href={docHref(next.slug)} className="docs-next"><span>Next <Icon name="arrow" /></span><strong>{next.title}</strong></Link>}</nav>
-      <p className="docs-page-note">Understand your rewards. Verify the contract. Claim directly.</p>
+      <p className="docs-page-note">Check the selected collection’s terms and network before you sign.</p>
     </article>
     <DocsOutline key={page.slug} sections={sections} />
   </div>;

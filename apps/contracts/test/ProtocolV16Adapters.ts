@@ -1,4 +1,5 @@
 import {expect} from 'chai';
+import {observeV16} from '../../../scripts/protocol-v16/social.mts';
 import {network} from 'hardhat';
 import {v16LocalBallotOptions} from '../config/v16-ballot.ts';
 import {readV16,v16Token,v16RoundTransaction} from '../../../packages/protocol/src/v16.ts';
@@ -23,14 +24,18 @@ describe('V16 application adapters against real local contract state',function()
   const address=await c.getAddress(),deployment=await c.deploymentTransaction()!.wait();
   await c.appendCollections([1,2].map(i=>({seasonId:ethers.id('adapter season'),seasonName:'Adapter season',name:`Adapter ${i}`,color:'#330000',textColor:'#FFFFFF'})));
   const config={version:16 as const,chainId:11155111,controller:address,codeHash:ethers.keccak256(await ethers.provider.getCode(address)),rpcUrl:'https://example.invalid'};
+  const social=async()=>observeV16({...config,controllerCodeHash:config.codeHash,appUrl:'https://app.tincta.xyz/',xAccountId:'123'},ethers.provider,Number((await ethers.provider.getBlock('latest'))!.timestamp)*1000);
   const read=async(id=0,wallet=buyer.address)=>readV16(ethers.provider,config,id,wallet,0,Number((await ethers.provider.getBlock('latest'))!.timestamp)*1000);
   let s=await read();expect(s.sealed).eq(false);expect(s.count).eq(0);expect(s.round).eq(null);expect(s.genesis!.open).eq(false);expect(operatorActions(s,config)).length(0);
+  expect(await social()).length(0);
   const catalog=await readCatalog(ethers.provider,config,s);expect(catalog.seasons[0].collections.map(x=>x.name)).deep.eq(['Adapter 1','Adapter 2']);
   await c.fundOperating({value:price*10n});await c.sealCatalog();s=await read();expect(s.count).eq(1);expect(s.round).eq(null);expect(s.genesis!.open).eq(true);
+  expect((await social()).map(e=>e.key.split(':').slice(-2).join(':'))).deep.eq(['0:genesis-open']);
   await buyer.sendTransaction(await genesisMintTransaction(s));s=await read();expect(s.genesis!.primaryMints).eq(1n);await buyer.sendTransaction(await genesisMintTransaction(s));
   expect((await read()).genesis!.walletMinted).eq(true);await c.connect(affiliate).mintGenesis();
   for(let n=0;n<498;n++){const a=ethers.getAddress(ethers.dataSlice(ethers.id(`V16 adapter genesis ${n}`),12));await networkHelpers.setBalance(a,price);const w=await ethers.getImpersonatedSigner(a);await c.connect(w).mintGenesis();await c.connect(w).mintGenesis();}
   await c.connect(affiliate).mintGenesis();s=await read();expect(s.round!.options).length(3);expect(s.round!.phase).eq(0);expect(s.sources[0].collectionId).eq(0);expect(s.sources[0].power).eq(2n);
+  const firstPosts=await social();expect(firstPosts.some(e=>e.key.endsWith(':0:genesis-soldout'))).eq(true);expect(firstPosts.some(e=>e.key.endsWith(':1:voting'))).eq(true);expect(firstPosts.some(e=>e.key.endsWith(':1:opening'))).eq(false);
   await c.connect(buyer).castGenesisVote(2,[1,2]);s=await read();expect(s.sources[0].power).eq(0n);
   await affiliate.sendTransaction(await v16RoundTransaction(await read(1,affiliate.address),'enrollAffiliate',[1,0,3]));
   expect((await read(1,affiliate.address)).round!.affiliateId).eq(1n);
@@ -47,6 +52,7 @@ describe('V16 application adapters against real local contract state',function()
   await networkHelpers.time.increaseTo(await c.mintDeadline(2));s=await read(2);expect(s.round!.phase).eq(7);expect(s.holders!.unlocked).eq(true);
   await buyer.sendTransaction(await v16RoundTransaction(s,'refund',[1,buyer.address]));
   s=await read(1);await buyer.sendTransaction(await holderClaimTransaction(ethers.provider,config,s,1n,buyer.address,s.holders!.rewardPerNft));expect(await c.holderClaimed(v16Token(1,1n))).eq(true);
+  const finalPosts=await social();expect(finalPosts.some(e=>e.key.endsWith(':1:revealed'))).eq(true);expect(finalPosts.some(e=>e.key.endsWith(':2:refunds'))).eq(true);expect(finalPosts.some(e=>e.key.endsWith(':2:season-complete'))).eq(true);
   const mirrorConfig={...config,controller:address.toLowerCase(),fromBlock:deployment!.blockNumber,confirmations:2,blockRange:2000};
   const mirror=new V16MirrorChain(ethers.provider as any,mirrorConfig),head=await mirror.block((await ethers.provider.getBlock('latest'))!.number);
   await mirror.verify(head);const collections=await mirror.discover(deployment!.blockNumber,head);expect(collections.map(x=>x.roundId)).deep.eq([0,1,2]);

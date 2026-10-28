@@ -1,5 +1,13 @@
 # Tincta protocol architecture and agent handoff
 
+## 2026-10-28 V16 social previews and Genesis announcements
+
+The [Launch/social release record](launch-social-release-2026-10-28.md) documents the restored authentication, account configuration, full local release checks and verification boundaries.
+
+Launch now has a read-only `/social` preview alongside `/dashboard`, plus `/social/account` for the network-specific X destination. The user-requested `/login` and `/api/auth/session` restore the existing Launch operator authentication for every active page and social API. Page checks run before their client/RSC payloads are created, and API checks are independent of the page gate. Account settings reuse the encrypted credential store through scoped `/api/social-account` endpoints; historical season editors and worker APIs remain retired. Account saves verify the numeric ID and handle with X, preserve network and publication-history guards, and do not start delivery. V16 senders can explicitly use this saved profile and stop on a revision change or disabled publication permission; legacy environment-based configurations retain their behavior.
+
+Genesis and the complete catalog share the same pure templates as a dedicated V16 finalized-chain observer. Genesis sellout is described as the immediate start of the first ballot; paid minting follows voting. Zero timestamps before sellout never announce a paid collection or season. The independent sender reuses the durable X outbox and explicit account/version binding, with an optional 60-second observer loop; it cannot sign chain transactions. See [V16 social automation](v16-social-automation.md) for setup, coverage and activation boundaries. No sender was activated, and the frozen rehearsal remains paused.
+
 ## 2026-10-28 verified V16 Sepolia deployment; rehearsal remains stopped
 
 The [full application release](full-app-release-2026-10-28.md) records publication of the remaining parent/Rewards landing changes, historical V15 source and visual evidence across all five Vercel projects. It preserves the deployed V16 pins and the stopped rehearsal.

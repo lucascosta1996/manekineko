@@ -175,7 +175,7 @@ function Experience({
     } catch (e) {
       if (version === generation.current)
         setError(
-          e instanceof Error ? e.message : "Unable to read the network."
+          e instanceof Error ? e.message : "We couldn’t load the contract state. Please try again."
         );
     }
   }, [provider, config, selected, wallet.session, sourcePage, view]);
@@ -253,7 +253,7 @@ function Experience({
           setMessage(
             receipt.status === 1
               ? `${pending.label} confirmed.`
-              : `${pending.label} reverted. No payment was completed.`
+              : `${pending.label} reverted. The action did not complete; network fees may still apply.`
           );
           void refresh();
         }
@@ -336,7 +336,7 @@ function Experience({
       const walletVoting = fresh.voting;
       if(config.version===16){
         const independent=await readProtocol(session.provider,config,selected,session.address,sourcePage);
-        if(independent.count!==fresh.count||independent.round?.id!==fresh.round?.id||independent.round?.termsHash!==fresh.round?.termsHash||independent.genesis?.primaryMints!==fresh.genesis?.primaryMints)throw new Error("The wallet and display providers disagree. Refresh before signing.");
+        if(independent.count!==fresh.count||independent.round?.id!==fresh.round?.id||independent.round?.termsHash!==fresh.round?.termsHash||independent.genesis?.primaryMints!==fresh.genesis?.primaryMints)throw new Error("Your wallet and this page report different contract data. Refresh before signing.");
       }else{
       const [boundVoting, walletCredits, walletRound] = await Promise.all([
         walletController.voting(),
@@ -351,18 +351,18 @@ function Experience({
         (fresh.round && getAddress(walletRound) !== fresh.round.address)
       )
         throw new Error(
-          "The wallet and display providers disagree about this collection."
+          "Your wallet and this page report different collection data. Refresh before signing."
         );
       if (fresh.genesis) {
         const walletGenesis = await readGenesis(session.provider, config, fresh.block, fresh.timestamp, fresh.voting, session.address);
         if (walletGenesis.address !== fresh.genesis.address || walletGenesis.walletMinted !== fresh.genesis.walletMinted)
-          throw new Error("The wallet and display providers disagree about the free mint.");
+          throw new Error("Your wallet and this page report different free mint data. Refresh before signing.");
       }
       }
       const tx = await build(fresh, session.address);
       if (fresh.holders) {
         const pool = await verifyHolderPool(session.provider, config);
-        if (getAddress(await pool.getAddress()) !== fresh.holders.address) throw new Error("The wallet and display providers disagree about the holder pool.");
+        if (getAddress(await pool.getAddress()) !== fresh.holders.address) throw new Error("Your wallet and this page report different holder pool data. Refresh before signing.");
       }
       if (
         !(await requestConfirmation({
@@ -445,7 +445,7 @@ function Experience({
       const submitted = { ...intent, hash: sent.hash };
       localStorage.setItem(key, JSON.stringify(submitted));
       setPending(submitted);
-      setMessage("Transaction submitted. Waiting for its receipt.");
+      setMessage("Transaction submitted. Waiting for confirmation.");
     } catch (e) {
       if (
         intentWritten &&
@@ -861,12 +861,12 @@ function Experience({
   );
   const affiliatePanel = r && state && (
     <section className="protocol-panel">
-      <h2>Invite people. Share the rewards.</h2>
+      <h2>Enroll and share your referral link</h2>
       <p>
         Bring at least one paid referral. Share the 20% affiliate pool equally
         with other qualified affiliates after a successful draw.
       </p>
-      <p className="protocol-note">{v16?"Genesis qualifies in every collection and season. From collection two, NFTs from earlier successfully drawn collections also qualify.":"Enrollment here follows this connected collection’s original contract rules. The planned launch adds Genesis eligibility as explained below."}</p>
+      <p className="protocol-note">{v16?"Genesis qualifies in every collection and season. From collection two, NFTs from earlier successfully drawn collections also qualify.":"Enrollment follows this deployment’s original rules. Check the affiliate guide for the Genesis rules used in the current launch."}</p>
       {r.affiliateId > 0n ? (
         <>
           <p>
@@ -1183,14 +1183,14 @@ function Experience({
           <p>{error}</p>
           {state && (
             <p>
-              Showing the last verified snapshot. Signing is paused until a
-              fresh read succeeds.
+              Showing the last verified data. Signing is paused until we can
+              refresh it.
             </p>
           )}
           <Button
             variant="secondary"
             busy={retrying}
-            busyLabel="Reading network"
+            busyLabel="Refreshing…"
             onClick={async () => {
               if (retrying) return;
               setRetrying(true);
@@ -1201,12 +1201,12 @@ function Experience({
               }
             }}
           >
-            Retry network read
+            Try again
           </Button>
         </div>
       )}
       {!state && !error && (
-        <p className="protocol-loading" role="status">Reading the collection contracts…</p>
+        <p className="protocol-loading" role="status">Loading collection details…</p>
       )}
       {message && (
         <p className="protocol-feedback" role="status">
@@ -1305,11 +1305,9 @@ function Experience({
       {!config ? (
         <>
           <section className="protocol-panel">
-            <h2>Onchain seasons are being prepared.</h2>
+            <h2>No deployment connected.</h2>
             <p>
-              The new voting contracts are not connected to this website yet.
-              Existing collections and claims keep their immutable contracts and
-              holder rights.
+              No verified deployment is configured for this network. Existing collections and claims retain their original contracts and holder rights.
             </p>
           </section>
           <OperatorWorkspace

@@ -52,14 +52,17 @@ test("network credentials, custom promotional text and calendar dates never carr
   assert.throws(() => mockSepoliaSeason(mock), /Mainnet season/);
 });
 
-test("Sepolia preview posts, alt text and images omit hardcoded production branding", () => {
+test("Sepolia preview copy preserves its network identity while images use the TC glyph", () => {
   const source = payloadFromAutomationForm(defaultAutomationForm([randomUUID()], "1", `0x${"12".repeat(32)}`));
   const mock = mockSepoliaSeason(source);
   const previews = seasonRuntimePreviews({ id: randomUUID(), revision: 1, plan: mock } as AutomationPlan);
   assert.equal(previews.length, 9);
   for (const preview of previews) {
     assert.doesNotMatch(JSON.stringify(preview.message), /tincta|manekineko/i);
-    assert.doesNotMatch(renderSeasonSocialSvg(preview.message), /tincta|manekineko/i);
+    const svg = renderSeasonSocialSvg(preview.message);
+    assert.doesNotMatch(svg.replace(/<[^>]*>/g, ''), /tincta|manekineko/i);
+    assert.match(svg, /data-tincta-identity="ligature"/);
+    assert.match(svg, /SEPOLIA TEST · TEST ETH/);
     assert.match(preview.message.post, /Sepolia test/);
   }
   const mainnet = seasonRuntimePreviews({ id: randomUUID(), revision: 1, plan: source } as AutomationPlan);

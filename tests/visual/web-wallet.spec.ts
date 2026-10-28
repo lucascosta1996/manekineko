@@ -11,7 +11,7 @@ test('Reown connects from the header and survives navigation', async ({ page }) 
   await expect(page.getByRole('button', { name: `Manage wallet ${A}` })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Mint tickets', exact: true })).toBeEnabled();
   const requestsBefore = await page.evaluate(() => (window as any).__v12WalletRequests.filter((q: any) => q.method === 'eth_requestAccounts').length);
-  for (const label of ['Rewards', 'Affiliates', 'Holders', 'How It Works', 'Participate']) {
+  for (const label of ['Rewards', 'Affiliates', 'Holders', 'How it works', 'Participate']) {
     await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: label, exact: true }).click();
     await expect(page.getByRole('button', { name: `Manage wallet ${A}` })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Connect wallet', exact: true })).toHaveCount(0);
@@ -48,9 +48,9 @@ for (const [width, height] of widths) test(`header wallet and responsive menu ${
     expect(after!.y).toBeGreaterThan(before!.y);
     await expect(page.getByRole('button', { name: /^Manage wallet/ })).toBeVisible();
     await page.screenshot({ path: `test-results/header-wallet-menu-${width}-${info.project.name}.png` });
-    await nav.getByRole('link', { name: 'How It Works' }).click();
+    await nav.getByRole('link', { name: 'How it works' }).click();
     await expect(page.getByRole('button', { name: 'Open menu' })).toHaveAttribute('aria-expanded', 'false');
-  } else await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'How It Works' }).click();
+  } else await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'How it works' }).click();
   await expect(page.getByRole('button', { name: /^Manage wallet/ })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);

@@ -1,5 +1,9 @@
 @import "./tokens.css";
 
+.ui-rewards-glyph-brand { display: inline-flex; align-items: center; gap: var(--ui-space-3); color: var(--ui-ink); }
+.ui-rewards-glyph-brand > svg { width: var(--ui-space-8); height: var(--ui-space-8); flex: none; }
+.ui-rewards-glyph-brand > span { font-size: var(--ui-label); font-weight: 600; letter-spacing: .13em; }
+
 .ui-rewards-brand { display: inline-flex; align-items: center; flex-wrap: wrap; max-width: 100%; gap: var(--ui-brand-gap); flex: 0 1 auto; white-space: nowrap; vertical-align: middle; }
 .ui-rewards-brand > svg { flex: none; }
 .ui-rewards-signature { display: inline-flex; align-items: center; gap: var(--ui-space-2); }

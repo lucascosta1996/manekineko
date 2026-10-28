@@ -44,7 +44,7 @@ function Navigation({ entries, pathname }: { entries: DocSearchEntry[]; pathname
       <span>{current?.title ?? "Browse topics"}</span><Icon name={open ? "minus" : "plus"} />
     </Button>
     <div className="docs-navigation-panel" id="docs-navigation-panel">
-      <Link className="docs-sidebar-title" href="/docs">How It Works <span>01 / TINCTA</span></Link>
+      <Link className="docs-sidebar-title" href="/docs">How it works <span>01 / TINCTA</span></Link>
       <div className="docs-search-field">
         <Icon name="search" />
         <input className="ui-input" type="search" ref={search} aria-label="Search reward guides" placeholder="Search guides…" value={query} onChange={event => setQuery(event.target.value)} />

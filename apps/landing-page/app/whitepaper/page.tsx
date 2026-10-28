@@ -67,7 +67,7 @@ export default function WhitepaperPage() {
             <div>
               <p className="studio-eyebrow">Tincta research / Whitepaper 01</p>
               <h1>Tincta Autonomous Standard</h1>
-              <p className="paper-deck">A specification for systems whose rules, state, and continuity belong onchain.</p>
+              <p className="paper-deck">A proposed standard for systems that remain usable without their original publisher.</p>
             </div>
             <dl className="paper-metadata">
               <div><dt>Identifier</dt><dd>TAS-1</dd></div>
@@ -186,7 +186,7 @@ export default function WhitepaperPage() {
 
               <Section index={9}>
                 <Rule id="TAS-08">A conforming root MUST expose the exact specification revision and an onchain manifest describing the system under assessment.</Rule>
-                <p>This draft proposes a deliberately small discovery surface. It complements application interfaces rather than replacing their mint, vote, transfer, or settlement functions. ERC-165 provides the interface-detection mechanism. <a href="#ref-165">[5]</a></p>
+                <p>This draft proposes two functions for identifying the specification and its manifest. It complements application interfaces rather than replacing their mint, vote, transfer, or settlement functions. ERC-165 provides the interface-detection mechanism. <a href="#ref-165">[5]</a></p>
                 <pre className="paper-code" tabIndex={0} aria-label="Proposed Solidity discovery interface"><code>{interfaceDraft}</code></pre>
                 <p>For this revision, <code>specification()</code> returns <code>keccak256(bytes("TAS-1:0.1.0"))</code>. The root also implements ERC-165 and reports support for <code>type(ITAS1).interfaceId</code>. These are proposed conventions, not an assigned ERC identifier or proof of correct behavior.</p>
                 <p><code>manifestURI()</code> returns a self-contained <code>data:application/json;base64,</code> document. Its bytes MUST be immutable once the system is sealed. Runtime status belongs in separate getters. The manifest records:</p>

@@ -21,7 +21,7 @@ export function NewsletterSignup({ endpoint = "/api/newsletter", descriptionId =
     event.preventDefault();
     if (inFlight.current || status === "success") return;
     if (!emailInput.current?.validity.valid) {
-      setStatus("error"); setInvalid(true); setMessage("Please enter a valid email address.");
+      setStatus("error"); setInvalid(true); setMessage("Enter a valid email address.");
       emailInput.current?.focus(); return;
     }
     setInvalid(false);
@@ -41,9 +41,9 @@ export function NewsletterSignup({ endpoint = "/api/newsletter", descriptionId =
         if (response.status === 400) { setInvalid(true); emailInput.current?.focus(); }
         setStatus("error");
         setMessage(response.status === 429
-          ? "Too many attempts. Please try again in a little while."
+          ? "Too many attempts. Try again in ten minutes."
           : response.status === 400
-            ? "Please enter a valid email address."
+            ? "Enter a valid email address."
             : "We couldn’t save your email right now. Please try again.");
         return;
       }

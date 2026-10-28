@@ -27,6 +27,7 @@ export type SeasonSocialInput = {
   drawVerified?: boolean;
 };
 export type SeasonSocialMessage = {
+  kind?: "genesis";
   event: SeasonSocialEvent; chainId: 1 | 11155111; season: SeasonSocialIdentity; collection?: SeasonSocialCollection;
   generatedAt: string; validUntil: string | null;
   post: string; replies: string[]; replyKeys: string[];

@@ -5,13 +5,17 @@ for (const [app, routes] of Object.entries({landing:['/rewards'],web:['/docs','/
  for(const width of [320,390,768,1440]) for(const route of routes) {
   test(`${app} ${route} ${width}`,async({page})=>{
    await page.setViewportSize({width,height:900});await prepare(page);await page.goto(urls[app as keyof typeof urls]+route);await ready(page);
-   const brands=page.locator(app === 'landing' ? '.rewards-landing-brand:visible' : '.ui-rewards-brand:visible');expect(await brands.count()).toBeGreaterThan(0);
-   if(app === 'landing') {
+   const brands=page.locator(app !== 'launch' ? '.ui-rewards-glyph-brand:visible' : '.ui-rewards-brand:visible');expect(await brands.count()).toBeGreaterThan(0);
+   if(app !== 'launch') {
     await expect(brands.first()).toHaveText('REWARDS');
     await expect(brands.locator('[data-tincta-logo="mark"]')).toHaveCount(1);
-    await expect(page.locator('[data-tincta-artwork="open"]')).toHaveCount(0);
+    await expect(brands.locator('[data-tincta-artwork="open"]')).toHaveCount(0);
+    const metrics = await brands.first().evaluate(el => ({ glyph: el.querySelector('svg')!.getBoundingClientRect().width, gap: getComputedStyle(el).gap }));
+    expect(metrics.glyph).toBe(32); expect(metrics.gap).toBe('12px');
+    const border = await page.locator('header').first().evaluate(el => ({ width: getComputedStyle(el).borderBottomWidth, color: getComputedStyle(el).borderBottomColor }));
+    expect(border).toEqual({ width: '1px', color: 'rgb(228, 228, 228)' });
    }
-   for(const brand of app === 'landing' ? [] : await brands.all()) {
+   for(const brand of app !== 'launch' ? [] : await brands.all()) {
     await expect(brand.locator('[data-tincta-artwork="open"]')).toHaveCount(1);
     const logo = brand.locator('[data-tincta-logo="wordmark"]');
     await expect(logo).toHaveAttribute('data-tincta-identity', 'ligature');
@@ -26,7 +30,7 @@ for (const [app, routes] of Object.entries({landing:['/rewards'],web:['/docs','/
    const routeName = route.replaceAll('/','').replace(/[^a-zA-Z0-9_-]+/g,'-') || 'home';
    await brands.first().screenshot({path:`test-results/rewards-lockup-${app}-${routeName}-${width}.png`});
    await page.screenshot({path:`test-results/rewards-${app}-${routeName}-${width}.png`,fullPage:true});
-   await page.clock.resume();const a=await new AxeBuilder({page}).include(app === 'landing' ? '.rewards-landing-brand' : '.ui-rewards-brand').analyze();expect(a.violations).toEqual([]);
+   await page.clock.resume();const a=await new AxeBuilder({page}).include(app !== 'launch' ? '.ui-rewards-glyph-brand' : '.ui-rewards-brand').analyze();expect(a.violations).toEqual([]);
   });
  }
 }

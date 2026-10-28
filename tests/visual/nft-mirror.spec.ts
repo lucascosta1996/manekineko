@@ -61,7 +61,7 @@ for (const state of ['syncing','backfill','empty','mainnet','error','not-found',
   } else if (state==='mainnet') {
     await expect(page.locator('.mirror-links a').first()).toHaveAttribute('href',/opensea.io\/assets\/ethereum\/0x2{40}\/1$/);
   } else if (state==='error') {
-    await expect(page.locator('main').getByRole('alert')).toContainText('couldn’t load');
+    await expect(page.locator('main').getByRole('alert')).toContainText('Please try again to load the collection data.');
     await page.getByRole('button',{name:'Try again'}).click(); await ready(page);
     await expect(page.locator('.mirror-collection')).toHaveCount(3);
   } else if (state==='not-found') {
@@ -77,7 +77,8 @@ for(const width of [390,1440]) test(`Genesis directory and minted gallery ${widt
   await page.goto(urls.web+'/collections?state=genesis'); await ready(page);
   await expect(page.getByRole('heading',{name:'Tincta Genesis',exact:true})).toBeVisible();
   await expect(page.getByText('50 / 1,000 minted',{exact:true})).toBeVisible();
-  await expect(page.locator('.mirror-genesis-intro')).toContainText('first paid vote only');
+  await expect(page.locator('.mirror-genesis-intro')).toContainText('A free collectible for the first paid vote.');
+  await expect(page.locator('.mirror-genesis-intro')).toContainText('Affiliate eligibility follows each deployment’s original rules.');
   await page.screenshot({path:`test-results/genesis-directory-${width}.png`,fullPage:true});
   await page.getByRole('link',{name:/View Genesis NFTs/}).click(); await ready(page);
   await expect(page.locator('.mirror-nft')).toHaveCount(24);

@@ -10,7 +10,7 @@ for (const width of [320,390,768,1280,1440]) test(`Rewards machine static steps 
   await expect(machine).toHaveAttribute('data-motion','paused');
   await expect(machine).toHaveAttribute('data-phase','winners');
   await expect(page.locator('.header [data-tincta-logo="mark"]')).toHaveCount(1);
-  await expect(page.locator('.rewards-landing-brand')).toHaveText('REWARDS');
+  await expect(page.locator('.ui-rewards-glyph-brand')).toHaveText('REWARDS');
   await expect(page.locator('[data-tincta-artwork="open"]')).toHaveCount(0);
   await expect(machine.getByRole('button',{name:/animation/})).toHaveCount(0);
   await page.locator('.hero').screenshot({path:info.outputPath(`machine-winners-${width}.png`)});

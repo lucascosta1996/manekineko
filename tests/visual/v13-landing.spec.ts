@@ -13,7 +13,7 @@ for (const [width, height] of widths)
     await ready(page);
     await page.clock.resume();
     const section = page.getByRole("region", {
-      name: "Not a winner, but still a holder?",
+      name: "A season pool for NFT holders.",
     });
     await section.scrollIntoViewIfNeeded();
     await expect(section).toContainText("PLANNED FOR LAUNCH");

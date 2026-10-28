@@ -52,14 +52,15 @@ test("same input renders the same image and previews visibly mark their evidence
   assert.equal(a.sha256, b.sha256); assert.deepEqual(a.png, b.png);
   assert.match(renderSeasonSocialSvg(message, { preview: true }), /DESIGN PREVIEW/);
 });
-test("all production event images use the outlined Ligature while Sepolia stays explicitly neutral", async () => {
+test("all event images use the canonical TC glyph while Sepolia stays explicitly labeled", async () => {
   for (const event of SEASON_SOCIAL_EVENTS) {
     const input = forEvent(event);
     const mainnet = renderSeasonSocialSvg(buildSeasonSocialMessage({ ...input, chainId: 1 }));
     assert.ok(mainnet.includes(TINCTA_SOCIAL_LOCKUP_SVG), `${event} uses the canonical lockup`);
     assert.doesNotMatch(mainnet, />Tincta<\/text>/);
     const testnet = renderSeasonSocialSvg(buildSeasonSocialMessage(input));
-    assert.ok(!testnet.includes(TINCTA_SOCIAL_LOCKUP_SVG));
+    assert.ok(testnet.includes(TINCTA_SOCIAL_LOCKUP_SVG));
+    assert.doesNotMatch(testnet, /data-tincta-artwork="open"/);
     assert.match(testnet, /Sepolia collections/);
     assert.match(testnet, /SEPOLIA TEST · TEST ETH/);
   }

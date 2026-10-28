@@ -10,7 +10,7 @@ for (const width of [320,390,768,1280,1440]) {
   test(`Launch pending signatures and progress tree ${width}`, async ({page}) => {
     await page.setViewportSize({width,height:1000}); await prepare(page); await rpc(page,7); await page.clock.resume();
     await page.goto(`${urls.launch}/dashboard`);
-    await expect(page.getByRole('heading',{name:'Pending signatures'})).toBeVisible();
+    await expect(page.getByRole('heading',{name:'Actions to review'})).toBeVisible();
     await expect(page.getByRole('heading',{name:'Fictional voting study'})).toBeVisible();
     await ready(page);
     await expect(page.getByRole('heading',{name:'Prepare the next collection',exact:true})).toBeVisible();
@@ -18,9 +18,9 @@ for (const width of [320,390,768,1280,1440]) {
     await expect(page.getByRole('button',{name:'Review transaction'}).first()).toBeDisabled();
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
     expect((await new AxeBuilder({page}).include('.operator-shell').analyze()).violations).toEqual([]);
-    await page.getByLabel('Find a season or collection').fill('missing season');
+    await page.getByLabel('Search seasons and collections').fill('missing season');
     await expect(page.getByText('No seasons match your search.')).toBeVisible();
-    await page.getByLabel('Find a season or collection').fill('');
+    await page.getByLabel('Search seasons and collections').fill('');
     await page.screenshot({path:`test-results/v12-launch-${width}.png`,fullPage:true});
   });
 }
@@ -39,8 +39,8 @@ test('Launch invalid pins disable signing and recover on retry', async ({page}) 
   await prepare(page); await rpc(page,7,true); await page.clock.resume(); await page.goto(`${urls.launch}/dashboard`);
   await expect(page.locator('.protocol-panel[role=alert]')).toContainText('deployment could not be verified');
   await expect(page.getByRole('button',{name:'Review transaction'})).toHaveCount(0);
-  await rpc(page,7,false); await page.getByRole('button',{name:'Retry network read'}).click();
-  await expect(page.getByRole('heading',{name:'Pending signatures'})).toBeVisible();
+  await rpc(page,7,false); await page.getByRole('button',{name:'Try again'}).click();
+  await expect(page.getByRole('heading',{name:'Actions to review'})).toBeVisible();
 });
 test('Launch restores an unknown submission and rejects a wrong recovery hash', async ({page}) => {
   await prepare(page); await rpc(page,7); await page.clock.resume();

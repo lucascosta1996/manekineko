@@ -1,5 +1,6 @@
 "use client";
 import { GenesisArtwork } from "@manekineko/ui/genesis-artwork";
+import { RewardsBrand } from "@manekineko/ui/rewards-brand";
 import { Button, IconButton, LinkButton } from "@manekineko/ui/button";
 import { PublicFooter } from "@manekineko/ui/footer";
 import type { PublicLinks } from "@manekineko/ui/links";
@@ -24,7 +25,7 @@ function Brand({ footer = false }: { footer?: boolean }) {
       href="#top"
       aria-label="Tincta Rewards home"
     >
-      <span className="rewards-landing-brand"><TinctaMark title="" /><span>REWARDS</span></span>
+      <RewardsBrand decorative variant="glyph"><TinctaMark title="" /></RewardsBrand>
     </a>
   );
 }
@@ -33,7 +34,7 @@ const faqs = (plannedRewards: PlannedRewards) => [
   {
     question: "What is the protocol treasury for?",
     answer:
-      "For the planned launch, a successful draw allocates 10% of mint revenue to the operator’s protocol treasury for infrastructure costs, future functionality and Tincta projects. If no affiliate brings at least one paid mint through their referral URL, the full 20% affiliate pool joins that treasury, making 30% withdrawable by the operator. Prize, earned affiliate and refund obligations remain protected. Another 10% funds a locked season holder pool for the first 5% of eligible NFTs to claim after season end. Season holder rewards are planned for launch. Refundable collections create no treasury or holder allocation from mint revenue.",
+      "After a successful draw, the launch rules allocate 10% of mint revenue to the operator’s protocol treasury for infrastructure costs, future functionality and Tincta projects. If no affiliate brings at least one paid mint through their referral URL, the full 20% affiliate pool joins that treasury, making 30% withdrawable by the operator. Prize, earned affiliate and refund obligations remain protected. Another 10% funds a locked season holder pool for the first 5% of eligible NFTs to claim after season end. Refundable collections create no treasury or holder allocation from mint revenue.",
   },
   {
     question: "Can the team withdraw prizes, commissions or holder rewards?",
@@ -53,17 +54,17 @@ const faqs = (plannedRewards: PlannedRewards) => [
   {
     question: "How can I verify the contract?",
     answer:
-      "At launch, every collection will link to its deployed Ethereum contract and verified source code. You will be able to inspect the fixed terms, draw results, prize claims, affiliate claims, and season holder pools on the blockchain before and after participating. Check the connected deployment and network before participating.",
+      "Use the contract links in the app to inspect the deployed code, collection terms, draw results and claims. Check the network as well as the address: Sepolia activity uses test ETH, and Mainnet minting has not launched. Source verification is not an independent security audit.",
   },
   {
     question: "Are rewards sent to my wallet automatically?",
     answer:
-      "The contract determines entitlement and executes payment, without team approval. You submit a claim transaction from the current winning NFT holder or qualifying affiliate wallet. For season rewards, the current owner of an eligible NFT can claim after season end while the first-5% slots remain. Minting opens at the voting deadline without activation. Preparation and draw finalization require transactions; autonomous rewards does not mean the entire launch runs without external services or transaction submissions.",
+      "No. The current winning NFT holder or qualifying affiliate submits a claim transaction. The contract checks eligibility and pays the claim without team approval. For season rewards, the current owner of an eligible NFT can claim after season end while the first-5% slots remain. Minting opens at the voting deadline without activation. Preparation and draw finalization still require transactions, and Chainlink supplies the draw’s randomness.",
   },
   {
     question: "How can I vote before the first paid collection?",
     answer:
-      "Tincta Genesis has two utilities: voting on the first collection and affiliate enrollment across all collections and seasons. The planned launch has 1,000 free NFTs, up to two lifetime primary mints per wallet, and no mint deadline. You pay network gas. The first season waits until all 1,000 are minted; the final mint opens its first ballot. Each Genesis NFT gives its current holder one vote in that ballot only. Holders can also enroll as affiliates throughout all collections and seasons, subject to available positions. The first collection requires Genesis; later collections also accept eligible paid NFTs. Share your referral URL: one paid token mint through it qualifies you for an equal share of the ETH affiliate pool, claimable after sellout and a successful draw. These revised terms await deployment; the current Sepolia test retains its earlier rules.",
+      "Tincta Genesis has two utilities: voting on the first collection and affiliate enrollment across all collections and seasons. The planned launch has 1,000 free NFTs, up to two lifetime primary mints per wallet, and no mint deadline. You pay network gas. The first season waits until all 1,000 are minted; the final mint opens its first ballot. Each Genesis NFT gives its current holder one vote in that ballot only. Holders can also enroll as affiliates throughout all collections and seasons, subject to available positions. The first collection requires Genesis; later collections also accept eligible paid NFTs. After enrolling, share your referral URL. One qualifying paid NFT mint earns you an equal share of the ETH affiliate pool, claimable after sellout and a successful draw. These rules are deployed on Sepolia for testing. Mainnet minting has not launched; older deployments retain their original rules.",
   },
   {
     question: "How does community voting change the prizes?",
@@ -83,7 +84,7 @@ const faqs = (plannedRewards: PlannedRewards) => [
   {
     question: "How do affiliate rewards work?",
     answer:
-      "For the planned launch, the first collection’s affiliates must hold Genesis. Later collections accept Genesis or an eligible NFT from an earlier successful paid collection. Holders enroll during voting, subject to one of ten available positions. Each NFT can qualify one wallet per collection; transferring it does not reset that use. One paid token mint through your referral URL qualifies you to earn real ETH. Sellout fixes equal shares of the 20% affiliate pool, claimable after successful draw finalization. Three qualifiers each receive one third, regardless of referral count. If no affiliate qualifies, the full 20% joins the operator’s 10% treasury allocation after a successful draw, making 30% withdrawable. Division dust when affiliates qualify remains a separate unused reserve. Refundable collections create no affiliate payout.",
+      "The launch rules require first-collection affiliates to hold Genesis. Later collections accept Genesis or an eligible NFT from an earlier successful paid collection. Holders enroll during voting, subject to one of ten available positions. Each NFT can qualify one wallet per collection; transferring it does not reset that use. At least one qualifying paid NFT mint through your referral URL earns you a share of the pool. Self-referrals and sponsored mints do not qualify. Sellout fixes equal shares of the 20% affiliate pool, claimable after successful draw finalization. Three qualifiers each receive one third, regardless of referral count. If no affiliate qualifies, the full 20% joins the operator’s 10% treasury allocation after a successful draw, making 30% withdrawable. Division dust when affiliates qualify remains a separate unused reserve. Refundable collections create no affiliate payout.",
   },
   {
     question: "What if a collection doesn’t sell out?",
@@ -98,7 +99,7 @@ const faqs = (plannedRewards: PlannedRewards) => [
   {
     question: "Is Tincta live?",
     answer:
-      `The catalog plans ${plannedRewards.seasonCount} seasons and ${plannedRewards.collectionCount} collections. The illustrated totals assume every collection sells out 1,000 NFTs at 0.01 ETH with six winners: ${Number(plannedRewards.prizePoolEth).toLocaleString("en-US")} ETH in prizes and ${plannedRewards.affiliatePoolEth} ETH in affiliate pools, plus ${plannedRewards.holderPoolEth} ETH across separate holder pools (${plannedRewards.holderClaimSlots.toLocaleString("en-US")} claim slots at ${plannedRewards.holderRewardEth} ETH each under these assumptions). Voting selects actual terms. These examples are not collected funds or a Mainnet launch announcement. Check the configured collection before participating.`,
+      `Mainnet minting has not launched. The current deployment is a Sepolia test using test ETH. The catalog plans ${plannedRewards.seasonCount} seasons and ${plannedRewards.collectionCount} collections. The illustrated totals assume every collection sells out 1,000 NFTs at 0.01 ETH with six winners: ${Number(plannedRewards.prizePoolEth).toLocaleString("en-US")} ETH in prizes and ${plannedRewards.affiliatePoolEth} ETH in affiliate pools, plus ${plannedRewards.holderPoolEth} ETH across separate holder pools (${plannedRewards.holderClaimSlots.toLocaleString("en-US")} claim slots at ${plannedRewards.holderRewardEth} ETH each under these assumptions). Voting selects actual terms. These examples are not collected funds or a Mainnet launch announcement. Check the configured collection before participating.`,
   },
 ];
 
@@ -180,9 +181,8 @@ export function LandingExperience({
           <div className="hero-main">
             <div className="hero-copy">
               <h1 className="motion-heading" id="hero-title"><MotionWords>
-                100%{" "}
                 <span className="win-word">
-                  onchain
+                  Onchain
                   <svg viewBox="0 0 200 20" fill="none" aria-hidden="true">
                     <path
                       d="M3 13C52 2 144 1 195 8M18 19C71 10 129 8 176 11"
@@ -192,10 +192,10 @@ export function LandingExperience({
                     />
                   </svg>
                 </span>
-                {" "}autonomous rewards.
+                {" "}art. ETH prizes.
               </MotionWords></h1>
               <p className="hero-description motion-heading">
-                You vote. You mint. You win. The next collection opens.
+                Vote on the terms. Mint an NFT. Claim a prize if you win.
               </p>
               <div className="hero-actions">
                 <LinkButton  href="#rewards">
@@ -214,11 +214,11 @@ export function LandingExperience({
             <p className="eyebrow">Tincta Genesis / Two utilities</p>
             <h2 className="motion-heading" id="genesis-heading"><MotionWords>One free NFT. Two utilities.</MotionWords></h2>
             <p>Vote on the first collection. Enroll in the affiliate program across every collection and season.</p>
-            <p><strong>Earn real ETH through referrals.</strong> Enroll during voting, then share your referral URL. When someone uses it to mint a paid token, you qualify for an equal share of the 20% affiliate pool, claimable after sellout and a successful draw.</p>
+            <p><strong>Qualify for ETH referral rewards.</strong> Enroll during voting, then share your referral URL. One qualifying paid NFT mint earns you an equal share of the 20% affiliate pool after sellout and a successful draw. Self-referrals and sponsored mints do not qualify.</p>
             <p>Genesis voting ends after the first ballot. For future votes, you’ll need NFTs from successfully revealed paid season collections.</p>
             <p>1,000 NFTs. Up to two lifetime mints per wallet. No mint deadline. 0 ETH + network gas.</p>
             <p>The first season starts only after Genesis sells out. Affiliate enrollment requires Genesis for the first collection; later collections and seasons accept Genesis or eligible paid NFTs. Positions are limited.</p>
-            <p className="genesis-note">Genesis has no prize, sponsored mint or season holder reward entitlement. These are the planned launch terms; the current Sepolia test uses earlier rules. Mainnet minting has not launched.</p>
+            <p className="genesis-note">Genesis has no prize, sponsored mint or season holder reward entitlement. These rules are deployed on Sepolia for testing. Mainnet minting has not launched.</p>
             <LinkButton href={`${footerLinks.docs ?? "https://app.tincta.xyz/docs"}/genesis`} variant="secondary">Read Genesis rules<Icon name="arrow" /></LinkButton>
           </div>
         </section>
@@ -275,7 +275,7 @@ export function LandingExperience({
           tabIndex={-1}
         >
           <div className="launch-content">
-            <h2 className="motion-heading" id="launch-title"><MotionWords>Stay in the loop.</MotionWords></h2>
+            <h2 className="motion-heading" id="launch-title"><MotionWords>Get voting and mint alerts.</MotionWords></h2>
             <p id="launch-description">Get notified when voting and minting open.</p>
             <NewsletterSignup />
           </div>
@@ -292,9 +292,9 @@ export function LandingExperience({
                 <Icon name="spark" className="motion-icon" /> PRIZES CLAIMED DIRECTLY
               </p>
               <h2 className="motion-heading" id="prizes-title"><MotionWords>
-                The community votes.
+                Voted terms.
                 <br />
-                <span className="serif">The prize amount follows.</span>
+                <span className="serif">Equal prizes.</span>
               </MotionWords></h2>
               <p>
                 Winning NFTs share 60% of mint revenue equally. The community’s
@@ -366,9 +366,9 @@ export function LandingExperience({
             <div className="affiliate-copy">
               <p className="eyebrow">COMMISSIONS CALCULATED ONCHAIN</p>
               <h2><MotionWords>
-                Your referrals.
+                One qualifying referral.
                 <br />
-                Contract-calculated <span className="serif">commissions.</span>
+                An equal <span className="serif">share.</span>
               </MotionWords></h2>
               <p>
                 Enroll during voting. Bring one paid referral to qualify for an
@@ -406,11 +406,11 @@ export function LandingExperience({
           </MotionWords></h2>
           <div className="manifesto-bottom">
             <p>
-              Vote on price, supply, winners and mint duration. When voting closes,
+              Vote for a package of price, supply, winner count and mint duration. When voting closes,
               those terms are fixed. Explore the rules before you take part.
             </p>
             <LinkButton variant="secondary" href={footerLinks.docs ?? "#questions"}>
-              Explore the documentation <Icon name="arrow" />
+              Read the guides <Icon name="arrow" />
             </LinkButton>
           </div>
         </section>
@@ -427,13 +427,13 @@ export function LandingExperience({
                   <span className="section-index">02 /</span> COLLECTION TERMS ONCHAIN
                 </p>
                 <h2 className="motion-heading" id="seasons-title"><MotionWords>
-                  Every collection.
+                  A palette and a ballot
                   <br />
-                  Its own <span className="serif">voted terms.</span>
+                  for every <span className="serif">collection.</span>
                 </MotionWords></h2>
               </div>
               <p>
-                A new palette. A new vote. A separate draw for every collection.
+                Each collection has its own color, voted terms and draw after sellout.
               </p>
             </div>
             <div className="season-explorer">
@@ -570,9 +570,9 @@ export function LandingExperience({
                 <span className="section-index">03 /</span> YOUR ENTRY INTO THE DRAW
               </p>
               <h2 className="motion-heading" id="art-title"><MotionWords>
-                Your NFT connects
+                Permanent artwork.
                 <br />
-                you to the <span className="serif">draw.</span>
+                Your entry in the <span className="serif">draw.</span>
               </MotionWords></h2>
             </div>
             <div>
@@ -692,7 +692,7 @@ export function LandingExperience({
               </span>
               <h3>Choose the terms.</h3>
               <p>
-                Vote on price, supply, winner count and mint duration.
+                Choose a published package of price, supply, winner count and mint duration.
               </p>
               <span className="step-caption">
                 COMMUNITY VOTE. ONCHAIN RESULT.
@@ -718,7 +718,7 @@ export function LandingExperience({
               </span>
               <h3>Claim your rewards.</h3>
               <p>
-                Hold a winning NFT after a successful draw? Claim its ETH prize directly.
+                If you hold a winning NFT after the draw, claim its ETH prize directly.
               </p>
               <span className="step-caption">
                 DIRECT CLAIMS. NO TEAM APPROVAL.
@@ -781,7 +781,7 @@ export function LandingExperience({
         <section className="manifesto holder-section wrap" id="holder-rewards" aria-labelledby="holders-title">
           <p className="eyebrow section-kicker"><span className="section-index">06 /</span> SEASON HOLDER REWARDS · PLANNED FOR LAUNCH</p>
           <div className="holder-copy">
-            <h2 className="motion-heading" id="holders-title"><MotionWords>Not a winner,<br /><span className="muted-heading">but still a holder?</span></MotionWords></h2>
+            <h2 className="motion-heading" id="holders-title"><MotionWords>A season pool<br /><span className="muted-heading">for NFT holders.</span></MotionWords></h2>
             <div className="holder-explanation">
               <p>Successful draws add 10% of mint revenue to the season pool. At season end, the first 5% of eligible NFTs to claim share it equally. Winners qualify too. One claim per NFT, while slots remain.</p>
               <LinkButton href={footerLinks.app ? `${footerLinks.app.replace(/\/$/, "")}/holders` : undefined}>Explore holder rewards <Icon name="diagonal" /></LinkButton>
@@ -815,7 +815,7 @@ export function LandingExperience({
               Verify the outcome.
             </MotionWords></h2>
             <p>
-              Go deeper into voting, rewards and the contracts behind them.
+              Find answers about voting, eligibility, claims and refunds.
             </p>
           </div>
           <div className="faq-list">
@@ -847,7 +847,7 @@ export function LandingExperience({
               <br />before you <span className="serif">enter.</span>
             </MotionWords></h2>
             <LinkButton href={footerLinks.docs ?? "#questions"}>
-              Explore the documentation
+              Read the guides
               <Icon name="diagonal" />
             </LinkButton>
 

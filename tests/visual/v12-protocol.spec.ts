@@ -46,7 +46,7 @@ test('V12 invalid deployment pins suppress all actions and permit retry', async 
   await expect(page.getByRole('button', { name: 'Vote for option 1' })).toHaveCount(0);
   await page.unroute('https://v12.fixture.invalid/**');
   await rpc(page);
-  await page.getByRole('button', { name: 'Retry network read' }).click();
+  await page.getByRole('button', { name: 'Try again' }).click();
   await expect(page.getByRole('heading', { name: 'Fictional voting study' })).toBeVisible();
 });
 test('V12 unconfigured route explains deployment without offering stale flows', async ({ page }) => {

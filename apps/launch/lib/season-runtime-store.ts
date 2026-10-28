@@ -40,7 +40,7 @@ export async function getRuntimeProfile(db: Query, chainId: RuntimeChainId): Pro
   const result = await db.query<RuntimeProfileRow>(`SELECT ${profileColumns} FROM manekineko_season_runtime_profiles WHERE chain_id=$1`, [chainId]);
   return result.rows[0] ? runtimeProfile(result.rows[0]) : null;
 }
-/** Worker-only: the public API must use getRuntimeProfile, never this function. */
+/** Server-only credential access for workers and account verification. API responses must use getRuntimeProfile, never this result. */
 export async function getRuntimeWorkerProfile(db: Query, chainId: RuntimeChainId, env: Record<string, string | undefined> = process.env): Promise<{ profile: RuntimeProfile; credentials: RuntimeCredentials }> {
   const result = await db.query<RuntimeProfileRow>("SELECT * FROM manekineko_season_runtime_profiles WHERE chain_id=$1", [chainId]);
   const row = result.rows[0];

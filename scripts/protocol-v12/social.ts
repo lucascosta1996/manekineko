@@ -13,7 +13,7 @@ export { lifecycleMessages } from './social-content.ts';
 export type Observation = { key: string; text: string; block: number; blockHash: string; image?: SeasonSocialMessage };
 export type Delivery = Observation & { status: 'pending' | 'intent' | 'sent' | 'uncertain'; postId?: string; mediaId?: string; mediaExpiresAt?: number; imageHash?: string };
 export type Config = {
-  version?: 12 | 13 | 14;
+  version?: 12 | 13 | 14 | 16;
   holderRewardsCodeHash?: string;
   genesisCodeHash?: string;
   chainId: number;
@@ -22,8 +22,9 @@ export type Config = {
   rpcUrl: string;
   appUrl: string;
   xAccountId: string;
+  accountSource?: 'environment' | 'launch';
 };
-export function mergeObservations(existing: Delivery[], observations: Observation[]): Delivery[] {
+export function mergeObservations(existing: Delivery[], observations: Observation[], order: readonly string[] = STAGES): Delivery[] {
   const map = new Map(existing.map((e) => [e.key, e]));
   for (const e of observations) {
     const previous = map.get(e.key);
@@ -35,10 +36,11 @@ export function mergeObservations(existing: Delivery[], observations: Observatio
   }
   return [...map.values()].sort((a, b) => {
     const left = a.key.split(':'), right = b.key.split(':');
-    return Number(left.at(-2)) - Number(right.at(-2)) || STAGES.indexOf(left.at(-1) as typeof STAGES[number]) - STAGES.indexOf(right.at(-1) as typeof STAGES[number]);
+    return Number(left.at(-2)) - Number(right.at(-2)) || order.indexOf(left.at(-1)!) - order.indexOf(right.at(-1)!);
   });
 }
 export async function observe(config: Config, suppliedProvider?: Provider): Promise<Observation[]> {
+  if (config.version === 16) throw new Error('V16 requires its single-address observer.');
   if (![1, 11155111].includes(config.chainId) && !(suppliedProvider && config.chainId === 31337)) throw new Error('Unsupported social network.');
   const app = new URL(config.appUrl);
   if (app.protocol !== 'https:' || app.username || app.password || app.search || app.hash)
@@ -49,7 +51,7 @@ export async function observe(config: Config, suppliedProvider?: Provider): Prom
       throw new Error('Social network mismatch.');
     const block = await provider.getBlock('finalized');
     if (!block?.hash || Date.now() / 1000 - block.timestamp > 3600) throw new Error('Fresh finalized chain state unavailable.');
-    const runtime = await workerRuntime(provider, { ...config, codeHash: config.controllerCodeHash }, block.number);
+    const runtime = await workerRuntime(provider, { ...config, version: config.version, codeHash: config.controllerCodeHash }, block.number);
     const c = runtime.controller,
       at = { blockTag: block.number };
     if (!(await c.catalogSealed(at))) return [];
@@ -120,14 +122,24 @@ export function deliveryFailureStatus(error: unknown, writeStarted: boolean): 'p
   // Network/5xx/malformed-success ambiguity and persistence failure after a send require reconciliation.
   return !writeStarted || (error instanceof XApiError && !(error instanceof AmbiguousDelivery)) ? 'pending' : 'uncertain';
 }
-export async function run(requiredVersion?: 12 | 13 | 14) {
+export async function run(requiredVersion?: 12 | 13 | 14 | 16, adapter?: {
+  version: 16; observe: (config: Config) => Promise<Observation[]>; templateVersion: string; stages: readonly string[];
+  resolveAccount?: (config: Config, mode: string) => Promise<{ config: Config; credentials: XCredentials; assertCurrent: () => Promise<void> } | undefined>;
+}) {
   const [configFile, stateFile, mode = '--observe', eventKey, postId] = process.argv.slice(2);
   if (!configFile || !stateFile || !['--observe', '--publish', '--reconcile'].includes(mode))
     throw new Error(
       'Usage: social.ts config.json state.json [--observe|--publish|--reconcile eventKey postId]'
     );
-  const config: Config = JSON.parse(await readFile(configFile, 'utf8'));
-  const version = runtimeVersion(config);
+  const fileConfig: Config = JSON.parse(await readFile(configFile, 'utf8'));
+  if (fileConfig.accountSource === 'launch' && !adapter?.resolveAccount) throw new Error('The Launch account source requires the V16 sender.');
+  const account = await adapter?.resolveAccount?.(fileConfig, mode);
+  const config = account?.config ?? fileConfig;
+  if (adapter && (config.version !== adapter.version || requiredVersion !== adapter.version || config.holderRewardsCodeHash || config.genesisCodeHash)) throw new Error('Explicit single-address V16 configuration required.');
+  if (!adapter && config.version === 16) throw new Error('V16 requires its single-address observer.');
+  const version = adapter ? adapter.version : runtimeVersion({ ...config, version: config.version as 12 | 13 | 14 | undefined });
+  const observeCurrent = adapter?.observe ?? observe;
+  const merge = (entries: Delivery[], observations: Observation[]) => mergeObservations(adapter ? entries.filter(e => e.status !== 'pending' || observations.some(o => o.key === e.key)) : entries, observations, adapter?.stages);
   if (requiredVersion && version !== requiredVersion) throw new Error('Explicit worker version required.');
   const binding = `${config.chainId}:${getAddress(
     config.controller
@@ -149,9 +161,9 @@ export async function run(requiredVersion?: 12 | 13 | 14) {
       state = { binding, entries: [] };
     }
     if (state.binding !== binding) throw new Error('Outbox network/controller/account binding mismatch.');
-    state.templateVersion = SOCIAL_TEMPLATE_VERSION;
+    state.templateVersion = adapter?.templateVersion ?? SOCIAL_TEMPLATE_VERSION;
     if (mode === '--observe') {
-      state.entries = mergeObservations(state.entries, await observe(config));
+      state.entries = merge(state.entries, await observeCurrent(config));
       await save();
       console.log(
         JSON.stringify({
@@ -164,13 +176,14 @@ export async function run(requiredVersion?: 12 | 13 | 14) {
     const prefix =
       config.chainId === 1 ? `V${version}_MAINNET_X_` : config.chainId === 11155111 ? `V${version}_SEPOLIA_X_` : '';
     if (!prefix) throw new Error('Unsupported network.');
-    const credentials: XCredentials = {
+    const credentials: XCredentials = account?.credentials ?? {
       apiKey: process.env[prefix + 'API_KEY'] ?? '',
       apiKeySecret: process.env[prefix + 'API_KEY_SECRET'] ?? '',
       accessToken: process.env[prefix + 'ACCESS_TOKEN'] ?? '',
       accessTokenSecret: process.env[prefix + 'ACCESS_TOKEN_SECRET'] ?? '',
     };
     const options = { expectedAccountId: config.xAccountId };
+    await account?.assertCurrent();
     if (mode === '--reconcile') {
       const e = state.entries.find((e) => e.key === eventKey);
       if (!e || !['intent', 'uncertain'].includes(e.status) || !postId)
@@ -183,9 +196,10 @@ export async function run(requiredVersion?: 12 | 13 | 14) {
     }
     assertPublishable(state.entries);
     // Refresh pending work only; previously sent/uncertain content remains exact reconciliation evidence.
-    state.entries = mergeObservations(state.entries, await observe(config));
+    state.entries = merge(state.entries, await observeCurrent(config));
     await save();
     for (const e of state.entries.filter((e) => e.status === 'pending').slice(0, 5)) {
+      await account?.assertCurrent();
       if (!e.image) throw new Error('Branded image observation unavailable.');
       const rendered = await renderSeasonSocialImage(e.image);
       if (!e.mediaId || !e.mediaExpiresAt || e.mediaExpiresAt <= Date.now() + 60_000 || e.imageHash !== rendered.sha256) {
@@ -200,9 +214,10 @@ export async function run(requiredVersion?: 12 | 13 | 14) {
       await setXMediaAltText(credentials, e.mediaId, e.image.alt, options);
       let writeStarted = false;
       const beforePost = async () => {
-        const current = (await observe(config)).find(o => o.key === e.key);
+        const current = (await observeCurrent(config)).find(o => o.key === e.key);
         if (!current || current.text !== e.text || JSON.stringify(current.image) !== JSON.stringify(e.image))
           throw new Error('Outbox no longer matches canonical chain state.');
+        await account?.assertCurrent();
         writeStarted = true;
       };
       // Durable intent precedes the only public write. Uncertain results stop the whole queue.

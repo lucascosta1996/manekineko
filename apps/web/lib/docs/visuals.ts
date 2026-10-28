@@ -8,7 +8,7 @@ const visuals: Record<string, Record<string, DocBlock[]>> = {
       { label: "Qualified affiliates", share: 20, text: "Equal shares for enrolled affiliates with a paid referral." },
       { label: "Season holders", share: 10, text: "A separate pool, locked until the whole season settles." },
       { label: "Protocol treasury", share: 10, text: "For infrastructure costs, future functionality and Tincta projects." },
-    ], caption: "Planned allocation with at least one qualifying affiliate. With none, the full 20% affiliate pool joins the operator treasury: 30% after a successful draw. Prizes remain 60% and holders 10%. Before finalization, mint receipts stay reserved; refundable collections return the full mint price. Holder rewards are planned for launch.",
+    ], caption: "Launch allocation with at least one qualifying affiliate. With none, the full 20% affiliate pool joins the operator treasury: 30% after a successful draw. Prizes remain 60% and holders 10%. Before finalization, mint receipts stay reserved; refundable collections return the full mint price.",
   }] },
   "onchain-voting": { vote: [{
     type: "flow", title: "From paid NFT ownership to final mint terms",
@@ -52,7 +52,7 @@ const visuals: Record<string, Record<string, DocBlock[]>> = {
   }, {
     type: "formula", title: "The same share for every qualifier", equations: ["Affiliate pool = R × 20%", "Share = ⌊ Affiliate pool ÷ Q ⌋"],
     definitions: [{ symbol: "R", meaning: "The collection’s actual mint revenue, in wei." }, { symbol: "Q", meaning: "Number of qualified affiliates at sellout, from 1 to 10." }, { symbol: "⌊x⌋", meaning: "Round down to a whole wei." }],
-    note: "With no qualifiers, no affiliate share is payable. Under the planned launch rules, the entire 20% pool joins the operator’s 10% treasury after a successful draw, making 30% withdrawable. With qualifying affiliates, only division dust remains in the separate unused affiliate reserve.",
+    note: "With no qualifiers, no affiliate share is payable. Under the current launch rules, the entire 20% pool joins the operator’s 10% treasury after a successful draw, making 30% withdrawable. With qualifying affiliates, only division dust remains in the separate unused affiliate reserve.",
   }] },
   "holder-rewards": { "dynamic-amounts": [{
     type: "formula", title: "From season contributions to equal claims", equations: ["P = Σ (Rᵢ × 10%)", "E = Σ Nᵢ", "L = ⌊ E × 5% ⌋", "Reward per NFT = ⌊ P ÷ L ⌋"],
@@ -75,7 +75,7 @@ const visuals: Record<string, Record<string, DocBlock[]>> = {
   }] },
   verification: { read: [{
     type: "flow", title: "From verified state to a confirmed action", steps: [
-      { title: "Read one verified block", text: "Check the network, runtime code and official controller, collection and holder-pool bindings." },
+      { title: "Read one verified block", text: "Check the network, deployed code and collection identity using the checks for that deployment." },
       { title: "Review and recheck", text: "Show exact transaction details, refresh wallet-dependent eligibility and simulate through the wallet provider." },
       { title: "Sign, submit, confirm", text: "Your wallet approves the transaction. Its confirmed receipt establishes execution." },
     ], caption: "A failed or stale read disables signing. The contract remains authoritative if ownership, remaining slots or other state changes before execution.",
@@ -88,7 +88,7 @@ const drawAlgorithm: DocSection = {
       { title: "Record verified randomness", text: "The fixed coordinator records one valid VRF word before the cutoff." },
       { title: "Derive a candidate", text: "Keccak combines the word, chain, collection, round, supply, domain and persistent counter." },
       { title: "Reject biased candidates", text: "Candidates below the acceptance threshold are skipped. Every caller follows the same counter sequence." },
-      { title: "Select without replacement", text: "Decode the accepted index into an ordered set of distinct NFT IDs. The selected IDs receive the highest scores." },
+      { title: "Select without replacement", text: "Decode the accepted index into an ordered set of distinct NFT numbers. The selected IDs receive the highest scores." },
     ], caption: "Finalization performs bounded work and can continue from the saved counter. This samples the winners; it does not randomly shuffle all losing NFTs.",
   }, {
     type: "formula", title: "An equal sample space for ordered winners", equations: ["M = N × (N − 1) × … × (N − k + 1)", "τ = 2²⁵⁶ mod M", "Accept c ≥ τ; then index = c mod M", "Winner score at rank r = N + 1 − r"],
@@ -99,14 +99,14 @@ const drawAlgorithm: DocSection = {
 const identity: DocSection = {
   id: "permanent-numbers", title: "Permanent numbers identify the NFT", blocks: [{
     type: "flow", title: "Ticket identity is separate from the draw", steps: [
-      { title: "Start with token ID − 1", text: "Every NFT has a distinct zero-based index within the collection." },
+      { title: "Start with the collection’s NFT number − 1", text: "Subtract one from the NFT’s number within its collection to get a distinct zero-based index." },
       { title: "Apply a reversible encoding", text: "Four Feistel rounds and the public collection key permute the 16-bit index into a unique code." },
       { title: "Display four numbers", text: "Split the code into four base-16 digits and add one to each. The numbers and artwork stay fixed after the draw." },
     ], caption: "The public key provides uniqueness, not secrecy or randomness. Buyers supply no numbers or seed. Read the finalized contract state for scores and winners.",
   }, {
     type: "formula", title: "Four numbers, 65,536 possible identities", equations: ["16⁴ = 65,536", "code = (A − 1) × 16³ + (B − 1) × 16² + (C − 1) × 16 + (D − 1)"],
-    definitions: [{ symbol: "A, B, C, D", meaning: "The four permanent numbers, each from 1 to 16." }, { symbol: "code", meaning: "A value from 0 to 65,535. Decoding it with the collection key and adding one recovers the token ID." }],
-    note: "Only actually minted, existing token IDs are valid NFTs. A larger number or code does not improve the chance of winning.",
+    definitions: [{ symbol: "A, B, C, D", meaning: "The four permanent numbers, each from 1 to 16." }, { symbol: "code", meaning: "A value from 0 to 65,535. Decoding it with the collection key and adding one recovers the NFT’s number within that collection." }],
+    note: "Only minted, unburned tokens are valid NFTs. A larger number or code does not improve the chance of winning.",
   }],
 };
 

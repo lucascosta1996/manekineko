@@ -17,7 +17,7 @@
 .minted img { width: 100%; height: auto; border: 1px solid rgb(23 23 23 / .15); border-radius: 4px; box-shadow: 0 9px 16px rgb(23 23 23 / .08); }
 .buckets { position: absolute; left: 28%; top: 31%; width: 43%; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
 .bucketGroup { display: grid; justify-items: center; align-content: start; text-align: center; min-width: 0; }
-.bucket { position: relative; width: 8.75rem; height: 10.25rem; }
+.bucket { position: relative; width: min(8.75rem, 76cqi); height: auto; aspect-ratio: 35 / 41; }
 .bucketBody { position: absolute; inset: 0; overflow: hidden; border: 1px solid #b8c1cf; border-radius: 50% / 10%; background: linear-gradient(90deg, rgb(228 233 241 / .6), rgb(255 255 255 / .72) 40%, rgb(215 224 236 / .55)); box-shadow: 10px 20px 25px -12px rgb(30 46 73 / .18); }
 .bucket::before { content: ""; position: absolute; z-index: 3; inset: 0 -1px auto; height: 2rem; border: 1px solid #aeb9c9; border-radius: 50%; background: linear-gradient(110deg, #f7faff, #e3e9f2); }
 .liquid { position: absolute; inset: 22% 0 0; transform: scaleY(var(--prize-fill, 1)); transform-origin: 50% 100%; border-top: 1px solid #9daac1; border-radius: 50% / 12%; background: linear-gradient(90deg, #bdc8dd, #e1e7f2 45%, #b6c4df); opacity: .75; }

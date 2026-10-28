@@ -7,7 +7,7 @@ import "@manekineko/ui/styles.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Tincta | On-chain rewards",
+  title: "Tincta | Onchain rewards",
   description:
     "Explore community-voted terms, ETH prizes, affiliate rewards and season holder pools. Each deployed collection retains its own contract rules.",
   robots: { index: false, follow: false },

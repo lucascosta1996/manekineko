@@ -40,8 +40,8 @@ test.describe('Landing asynchronous production states', () => {
    await expect(page.locator('.site')).toHaveClass(/motion-paused/);
    const announcement=page.getByRole('region',{name:'Collection status',exact:true});
    await expect(announcement).toHaveCount(1);
-   await expect(page.locator('.hero h1')).toHaveText('100% onchain autonomous rewards.');
-   await expect(page.locator('.hero-description')).toHaveText('You vote. You mint. You win. The next collection opens.');
+   await expect(page.locator('.hero h1')).toHaveText('Onchain art. ETH prizes.');
+   await expect(page.locator('.hero-description')).toHaveText('Vote on the terms. Mint an NFT. Claim a prize if you win.');
    await expect(page.locator('.hero').getByRole('region',{name:'Collection status',exact:true})).toHaveCount(0);
    expect(await announcement.evaluate(element => {
     const header=document.querySelector('.header');

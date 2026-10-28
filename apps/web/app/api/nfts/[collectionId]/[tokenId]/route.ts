@@ -19,6 +19,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ col
     const { factoryAddress: _factory, maxSupply: _supply, blockNumber: _block, ownerWallet: _owner, burned: _burned, ...nft } = record;
     return Response.json({ ...metadata, nft }, { headers });
   } catch {
-    return Response.json({ error: "This NFT's on-chain artwork is temporarily unavailable. Please try again." }, { status: 503, headers });
+    return Response.json({ error: "This NFT's onchain artwork is temporarily unavailable. Please try again." }, { status: 503, headers });
   }
 }

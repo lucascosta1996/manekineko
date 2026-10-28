@@ -94,15 +94,15 @@ test("V13 pending, pool verification error and recovery never expose an unsafe c
   );
   await page.unroute("https://v12.fixture.invalid/**");
   await rpc(page, 5, false, { holderState: "open", holderAllocationBps: 800 });
-  await page.getByRole("button", { name: "Retry network read" }).click();
+  await page.getByRole("button", { name: "Try again" }).click();
   await expect(page.locator(".protocol-page [role=alert]")).toContainText(
-    "Holder rewards policy verification failed"
+    "The holder reward rules could not be verified. Signing is disabled."
   );
   await expect(page.locator(".holder-total")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Review holder claim" })).toHaveCount(0);
   await page.unroute("https://v12.fixture.invalid/**");
   await rpc(page, 5, false, { holderState: "open" });
-  await page.getByRole("button", { name: "Retry network read" }).click();
+  await page.getByRole("button", { name: "Try again" }).click();
   await expect(page.locator(".holder-state")).toHaveText("Claims open");
 });
 for (const width of [390, 1440])
@@ -117,7 +117,7 @@ for (const width of [390, 1440])
     await page.goto(`${urls.web}/holders`);
     await expect(page.locator(".holder-state")).toHaveText("Claims open");
     await connectWebWallet(page, A);
-    await page.getByLabel("NFT token ID").fill("2");
+    await page.getByLabel("NFT number").fill("2");
     await page
       .getByRole("button", { name: "Review holder claim", exact: true })
       .click();
@@ -167,10 +167,10 @@ test("V13 first paint, keyboard, text reflow and stale refresh", async ({
   });
   await page.goto(`${urls.web}/holders`);
   await expect(
-    page.getByText("Reading the collection contracts…")
+    page.getByText("Loading collection details…")
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Retry network read" })
+    page.getByRole("button", { name: "Try again" })
   ).toHaveCount(0);
   await expect(page.locator(".holder-total")).toHaveCount(0);
   await page.screenshot({ path: "test-results/v13-holders-pending.png" });
@@ -195,7 +195,7 @@ test("V13 first paint, keyboard, text reflow and stale refresh", async ({
   await rpc(page, 5, true, { holderState: "open" });
   await page.clock.runFor(12_100);
   await expect(
-    page.getByText("Showing the last verified snapshot.", { exact: false })
+    page.getByText("Showing the last verified data.", { exact: false })
   ).toBeVisible();
   await expect(page.locator(".holder-total")).toBeVisible();
   await expect(
@@ -234,14 +234,14 @@ test("V13 unconfigured and V12 routes do not invent a holder balance", async ({
   await prepare(page);
   await page.goto(`${urls.web}/holders?state=unconfigured`);
   await expect(
-    page.getByText("Onchain seasons are being prepared.")
+    page.getByText("No collection is open yet.")
   ).toBeVisible();
   await expect(page.locator(".holder-total")).toHaveCount(0);
   await rpc(page, 5);
   await page.clock.resume();
   await page.goto(`${urls.web}/holders?state=v12`);
   await expect(
-    page.getByText("No holder pool in this deployment.")
+    page.getByText("This collection does not include season holder rewards. Check its prize and affiliate rewards instead.")
   ).toBeVisible();
   await expect(page.locator(".holder-total")).toHaveCount(0);
 });

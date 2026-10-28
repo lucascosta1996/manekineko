@@ -42,7 +42,7 @@ test('V14 bad Genesis pin fails closed and retry recovers', async ({ page }) => 
   expect(await page.locator('.public-primary').evaluate(el => el.getBoundingClientRect().height >= innerHeight)).toBe(true);
   await page.unroute('https://v12.fixture.invalid/**');
   await rpc(page, 0, false, { genesis: 'open' });
-  await page.getByRole('button', { name: 'Retry network read' }).click();
+  await page.getByRole('button', { name: 'Try again' }).click();
   await expect(page.getByRole('heading', { name: 'Tincta Genesis', exact: true })).toBeVisible();
 });
 test('V14 zero-value review and wallet rejection cannot submit a duplicate free mint', async ({ page }) => {
@@ -77,11 +77,12 @@ test('V14 mint closing during review never requests a wallet signature', async (
   await expect(page.getByRole('status').filter({ hasText: 'The free mint is closed.' })).toBeVisible();
   expect(await page.evaluate(() => (window as any).__v12Submissions.length)).toBe(0);
 });
-for (const width of [390, 1440]) test(`V14 documentation and landing explain first-only free votes ${width}`, async ({ page }, info) => {
+for (const width of [390, 1440]) test(`Current Genesis documentation and landing distinguish voting and affiliate rights ${width}`, async ({ page }, info) => {
   await page.setViewportSize({ width, height: 900 }); await prepare(page); await page.clock.resume();
   await page.goto(`${urls.web}/docs/onchain-voting`); await ready(page);
-  await expect(page.getByRole('heading', { name: /^The free mint before the first season/ })).toBeVisible();
-  await expect(page.getByText(/Genesis votes expire after this first paid ballot/)).toBeVisible();
+  await page.getByRole('link', { name: /Read the Tincta Genesis guide/ }).click(); await ready(page);
+  await expect(page.getByRole('heading', { name: 'Tincta Genesis', exact: true })).toBeVisible();
+  await expect(page.getByText(/Genesis votes expire after that first ballot/)).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: `test-results/v14-docs-${width}-${info.project.name}.png`, fullPage: true });
   await page.goto(`${urls.landing}/rewards`); await ready(page);
@@ -100,7 +101,7 @@ for (const width of [390, 1440]) test(`Viewport reservation and centered first r
   const gate = new Promise<void>(resolve => {release=resolve;});
   await page.route('https://v12.fixture.invalid/**', async route => {await gate; await route.fallback();});
   await page.goto(`${urls.web}/?state=v14`);
-  const loading = page.getByRole('status').filter({hasText:'Reading the collection contracts'});
+  const loading = page.getByRole('status').filter({hasText:'Loading collection details'});
   await expect(loading).toBeVisible();
   const metrics = await loading.evaluate(el => {
     const range = document.createRange(); range.selectNodeContents(el);

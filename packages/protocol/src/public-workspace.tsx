@@ -35,14 +35,14 @@ const stageLabels = [
   "Refunds available",
 ];
 const stageDescriptions = [
-  "Choose the mint price, supply and prize count. The winning option becomes final when voting closes.",
-  "Mint an NFT. Keep its onchain artwork. Join the draw.",
+  "Choose a package of mint price, supply, winner count and mint duration. The winning option becomes final when voting closes.",
+  "Mint an NFT with permanent onchain artwork to enter this collection’s draw.",
   "This collection sold out. Its randomness request needs to be submitted before the fixed cutoff.",
-  "This collection sold out. Chainlink is delivering the randomness that determines its winning tickets.",
+  "This collection sold out. The draw is waiting for verifiable randomness from Chainlink.",
   "Randomness is recorded. The results are fixed; anyone can complete the draw to make rewards claimable.",
   "The draw is complete. See every winning ticket and claim any rewards belonging to your wallet.",
   "Every ticket prize has been claimed. View the results or check for an unclaimed affiliate reward.",
-  "The collection is refundable. The current NFT holder can return a ticket for its full mint price at any time. Refunds do not expire.",
+  "The collection is refundable. The current NFT holder can burn a ticket to claim its full mint price at any time. Refunds do not expire.",
 ];
 
 export function PublicWorkspace({
@@ -106,17 +106,17 @@ export function PublicWorkspace({
             : "Tincta Rewards · Onchain seasons"}
         </p>
         <h1>
-          {view === "holders" ? "Not a winner, but still a holder?" : view === "claims"
-            ? "Your rewards."
+          {view === "holders" ? "Season holder rewards" : view === "claims"
+            ? "Prizes and refunds"
             : view === "affiliates"
-            ? "Grow the collection."
-            : r?.name ?? (state?.genesis ? "The first vote starts here." : "Your next move, onchain.")}
+            ? "Affiliate rewards"
+            : r?.name ?? (state?.genesis ? "Start with Tincta Genesis" : "Vote, mint and follow the draw")}
         </h1>
         <p>
-          {view === "holders" ? (protocolVersion >= 13 ? "A season of collecting. A shared pool of rewards." : "This collection does not include season holder rewards. Check its prize and affiliate rewards instead.") : view === "claims"
+          {view === "holders" ? (protocolVersion >= 13 ? "A share of the season pool for the first 5% of eligible NFTs to claim." : "This collection does not include season holder rewards. Check its prize and affiliate rewards instead.") : view === "claims"
             ? "See the winners. Claim prizes and refunds directly from the collection."
             : view === "affiliates"
-            ? "Share your link. Earn an equal share."
+            ? "Enroll, bring a qualifying paid referral and claim after a successful draw."
             : r
             ? beforeVote
               ? "The next collection is prepared. Voting begins at its onchain opening time."
@@ -147,7 +147,7 @@ export function PublicWorkspace({
       {!configured && (
         <section className="public-empty">
           <RewardsArtwork className="public-empty-art" />
-          <h2>Onchain seasons are being prepared.</h2>
+          <h2>No collection is open yet.</h2>
           <p>
             No collection is open here yet. The planned launch begins with Genesis.
           </p>
@@ -164,7 +164,7 @@ export function PublicWorkspace({
         </section>
       )}
       {view === "home" && state?.genesis && !r && genesis}
-      {view !== "home" && state?.genesis && !r && <section className="public-empty"><h2>The free mint comes first.</h2><p>{protocolVersion===16?"Genesis holders can enroll as affiliates in every collection and season. Enrollment opens with the first ballot after Genesis sells out.":"This connected test collection grants first-ballot voting only. Its original rules do not include Genesis affiliate eligibility."}</p><Link className={buttonClassName({ variant: "secondary" })} href="/">View test collection</Link></section>}
+      {view !== "home" && state?.genesis && !r && <section className="public-empty"><h2>The free mint comes first.</h2><p>{protocolVersion===16?"Genesis holders can enroll as affiliates in every collection and season. Enrollment opens with the first ballot after Genesis sells out.":"This connected test collection grants first-ballot voting only. Its original rules do not include Genesis affiliate eligibility."}</p><Link className={buttonClassName({ variant: "secondary" })} href="/">View Genesis</Link></section>}
       {state && !r && !state.genesis && (
         <section className="public-empty">
           <h2>The first collection is next.</h2>
@@ -250,17 +250,17 @@ export function PublicWorkspace({
                   <section className="public-outcome">
                     <h2>
                       {r.phase >= 5
-                        ? "Meet the winning tickets."
+                        ? "The winning NFTs"
                         : r.phase === 4
-                        ? "The results are on their way."
-                        : "Your tickets are in the draw."}
+                        ? "The draw is ready to finalize."
+                        : "The collection has sold out."}
                     </h2>
                     <p>
                       {r.phase >= 5
                         ? `${r.winners} winning NFTs. Equal prizes of ${
                             r.awards[0] ? formatEther(r.awards[0].amount) : "—"
                           } ETH each.`
-                        : "You do not need to keep this page open. Return here to see the results once the draw is finalized."}
+                        : "You don’t need to keep this page open. Return here to see the results once the draw is finalized."}
                     </p>
                     {r.phase >= 5 && (
                       <Link

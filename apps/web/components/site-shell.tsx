@@ -3,7 +3,7 @@ import { PublicFooter } from "@manekineko/ui/footer";
 import { publicLinks, publicXProfiles } from "@manekineko/ui/links";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { TinctaWordmark } from "./tincta-logo";
+import { TinctaMark } from "./tincta-logo";
 import { SiteNavigation, type SiteSection } from "./site-navigation";
 import { HeaderWallet } from "./header-wallet";
 
@@ -19,7 +19,7 @@ export function SiteShell({ children, section = "home", chainId = null, classNam
           href="/"
           aria-label="Tincta Rewards home"
         >
-          <RewardsBrand decorative compact><TinctaWordmark title="" /></RewardsBrand>
+          <RewardsBrand decorative variant="glyph"><TinctaMark title="" /></RewardsBrand>
         </Link>
         <SiteNavigation section={section} protocolEnabled={protocolEnabled} />
         <HeaderWallet chainId={chainId} />

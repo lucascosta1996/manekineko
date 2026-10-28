@@ -16,15 +16,15 @@ export const docPages: DocPage[] = withDocVisuals([
         "blocks": [
           {
             "type": "paragraph",
-            "text": "Tincta runs finite NFT collections in a published season order. Eligible NFT holders vote on the next collection’s mint price, supply, equal prize count and mint duration. Minting opens at the voting deadline without an operator activation."
+            "text": "Tincta organizes NFT collections into seasons. Eligible holders vote for a package that sets the next collection’s mint price, supply, winner count and mint duration. Minting opens when voting ends; no operator activation is needed."
           },
           {
             "type": "paragraph",
-            "text": "The planned launch begins with Genesis: 1,000 free NFTs, up to two lifetime primary mints per wallet, and no mint deadline. The first season starts only after all 1,000 mint. Genesis holders alone can enroll as affiliates in the first collection; later collections and seasons also accept eligible paid NFTs. The connected Sepolia deployment uses these rules. Mainnet has not launched."
+            "text": "The launch begins with Genesis: 1,000 free NFTs, up to two lifetime primary mints per wallet, and no mint deadline. The first season starts only after all 1,000 mint. Genesis holders alone can enroll as affiliates in the first collection; later collections and seasons also accept eligible paid NFTs. These rules are deployed on Sepolia for testing with test ETH. Mainnet minting has not launched."
           },
           {
             "type": "paragraph",
-            "text": "Tincta seasons allocate 60% of mint revenue to winning NFTs, 20% to qualified affiliates, 10% to season holder rewards and 10% to the protocol treasury for infrastructure costs, future functionality and Tincta projects. If no affiliate qualifies through a paid referral, the full 20% affiliate allocation joins the operator’s 10% protocol treasury after a successful draw, making 30% withdrawable by the operator. Prizes keep 60% and season holders keep 10%. These rules are planned for launch. Always review the terms of the selected collection before participating. These percentages cannot be voted away. Actual ETH allocations vary with the community-selected mint prices and supplies and the revenue received. All mint funds stay reserved until finalization. Unsold expiry or missing randomness at the fixed cutoff allows full mint-price refunds."
+            "text": "After a successful draw, 60% of mint revenue goes to winning NFTs, 20% to qualified affiliates, 10% to season holder rewards and 10% to the protocol treasury. If no affiliate qualifies through a paid referral, the full 20% affiliate allocation joins the operator’s 10% protocol treasury after a successful draw, making 30% withdrawable by the operator. Prizes keep 60% and season holders keep 10%. Voting cannot change these percentages. ETH amounts depend on the voted price and supply and the mint revenue received. Mint funds stay reserved until the draw is finalized. An unsold collection or missing randomness at the fixed cutoff makes full mint-price refunds available. Review the selected collection’s terms before participating."
           },
           {
             "type": "paragraph",
@@ -32,7 +32,7 @@ export const docPages: DocPage[] = withDocVisuals([
           },
           {
             "type": "paragraph",
-            "text": "The website reads contract state and helps you submit transactions from your wallet. Its availability and X announcements do not control opening, refunds or claims. Transactions still need a sender and gas; Chainlink provides verifiable randomness."
+            "text": "The website reads contract state and helps you submit transactions from your wallet. The website and X announcements do not determine when minting opens or who can claim. Transactions still need a sender and gas; Chainlink provides verifiable randomness."
           },
           {
             "type": "paragraph",
@@ -65,9 +65,9 @@ export const docPages: DocPage[] = withDocVisuals([
         "blocks": [
           { "type": "list", "ordered": true, "items": [
             "Vote on the first collection. Each Genesis NFT gives its owner one vote in the first paid collection’s ballot.",
-            "Enroll in the affiliate program across all collections and seasons. Share your referral URL to earn real ETH when it leads to a qualifying paid mint and the collection completes a successful draw."
+            "Enroll in the affiliate program across all collections and seasons. Share your referral URL to qualify for ETH rewards when it leads to a paid mint and the collection completes a successful draw. Sepolia uses test ETH."
           ] },
-          { "type": "callout", "title": "Planned launch terms", "text": "Mainnet minting has not launched. The connected Sepolia deployment uses these Genesis rules. Older test deployments keep their original terms." }
+          { "type": "callout", "title": "Testnet and Mainnet", "text": "Mainnet minting has not launched. The connected Sepolia deployment uses these Genesis rules. Older test deployments keep their original terms." }
         ]
       },
       {
@@ -118,7 +118,7 @@ export const docPages: DocPage[] = withDocVisuals([
       },
       {
         "id": "referral-rewards",
-        "title": "Earn real ETH through your referral URL",
+        "title": "Qualify for ETH referral rewards",
         "blocks": [
           { "type": "paragraph", "text": "After enrolling, share your referral URL. When someone uses it to mint at least one paid token, you qualify for an equal share of the collection’s 20% affiliate pool. Self-referrals and sponsored mints do not qualify. More referrals do not increase a qualified affiliate’s share." },
           { "type": "paragraph", "text": "Affiliate rewards are claimable only after sellout and a successful draw. Holding Genesis or enrolling alone does not create an ETH claim. Refundable collections create no affiliate payout." },
@@ -130,7 +130,7 @@ export const docPages: DocPage[] = withDocVisuals([
         "title": "What Genesis does not include",
         "blocks": [
           { "type": "paragraph", "text": "Genesis itself has no prize, sponsored mint credit or season holder reward entitlement. Those benefits belong to qualifying paid NFTs under their own collection rules." },
-          { "type": "paragraph", "text": "The earlier Sepolia test retains its one-mint limit, fixed window and voting-only Genesis rights. Existing contracts keep their original rules; check the app’s configured network and contract before participating. The new launch rules do not change historical NFTs." }
+          { "type": "paragraph", "text": "Earlier Sepolia deployments retain their one-mint limit, fixed window and voting-only Genesis rights. Existing contracts keep their original rules; check the app’s configured network and contract before participating. The new launch rules do not change historical NFTs." }
         ]
       },
       {
@@ -155,16 +155,16 @@ export const docPages: DocPage[] = withDocVisuals([
   {
     "slug": "holder-rewards",
     "title": "Season holder rewards",
-    "description": "The 10% season pool, 5% NFT coverage and first-come claims.",
+    "description": "How the 10% season pool funds rewards for the first 5% of eligible NFTs to claim.",
     "group": "The protocol",
     "minutes": 5,
     "sections": [
-      { "id": "pool", "title": "Not a winner, but still a holder?", "blocks": [
-        { "type": "paragraph", "text": "Tincta collections automatically send 10% of mint receipts to a separate season holder pool when a draw finalizes. This contract has no operator withdrawal. The 10% treasury allocation funds infrastructure costs, future functionality and Tincta projects. Season holder rewards are planned for launch. Check the selected collection’s terms and pool availability before participating." },
+      { "id": "pool", "title": "A pool for season NFT holders", "blocks": [
+        { "type": "paragraph", "text": "Each successful draw reserves 10% of its collection’s mint revenue in a separate season holder pool. The operator cannot withdraw holder funds. The 10% treasury allocation funds infrastructure costs, future functionality and Tincta projects. Check the selected collection’s terms and pool availability before participating." },
         { "type": "paragraph", "text": "The pool is locked until every collection in its sealed season has completed a successful draw or become refundable. Unpaid prizes and refunds do not delay the unlock. No calendar timer, website switch or operator approval releases the pool. Before completion, the page shows accumulated ETH, settled collections and provisional claim estimates. A season has at most ten collections. Preparing the next season is not required to unlock this one." }
       ]},
       { "id": "dynamic-amounts", "title": "Different seasons, different amounts", "blocks": [
-        { "type": "paragraph", "text": "The allocation percentages and 5% coverage are fixed. Voting selects each collection’s price and supply; successful mints determine the actual revenue and eligible NFT count. Each season adds its successful collections’ 10% contributions into its own pool. Pending and refundable collections do not inflate the funded balance." },
+        { "type": "paragraph", "text": "The allocation percentages and first-5% claim limit are fixed. Voting selects each collection’s price and supply; successful mints determine the actual revenue and eligible NFT count. Each season adds its successful collections’ 10% contributions into its own pool. Pending and refundable collections do not inflate the funded balance." },
         { "type": "paragraph", "text": "Claim slots equal 5% of the season’s eligible NFTs, rounded down. The ETH per claim equals the final pool divided by those slots, rounded down to whole wei. Estimates may change while collections are unsettled. Once the season ends, every successful claim receives the same final amount, even if individual NFTs had different mint prices. Claims reduce the remaining slots and available ETH; they do not change the amount paid to later claimants." },
         { "type": "table", "columns": ["Illustrative successful mints", "Result for that season"], "rows": [
           ["1,000 at 0.01 ETH + 2,000 at 0.02 ETH", "5 ETH pool · 150 claim slots · 5 ETH ÷ 150 per claim, rounded down to wei"],
@@ -173,9 +173,9 @@ export const docPages: DocPage[] = withDocVisuals([
       ]},
       { "id": "claims", "title": "Equal rewards for the first 5%", "blocks": [
         { "type": "paragraph", "text": "Only NFTs from successfully drawn collections qualify, including winning NFTs. The first 5% of eligible NFTs to claim receive equal rewards. Claims are paid in onchain execution order until the fixed slots run out; a pending transaction reserves nothing. Eligible ownership does not guarantee a payment. There is no per-wallet claim limit." },
-        { "type": "paragraph", "text": "Claim slots equal the total eligible NFT count multiplied by 5%, rounded down. Each payout equals the final funded pool divided by the slots, rounded down to whole wei. For 10,000 eligible NFTs and a 10 ETH pool, the first 500 NFT claims each receive 0.02 ETH. This is an example, not a fixed payout. Any rounding dust stays in the pool." },
+        { "type": "paragraph", "text": "For example, 10,000 eligible NFTs and a 10 ETH pool allow 500 claims of 0.02 ETH each. Actual payouts depend on the season. Any rounding dust stays in the pool." },
         { "type": "paragraph", "text": "The current owner submits the claim, once per NFT. Transfers carry any unclaimed opportunity; they never reset a completed claim. Approved NFT operators cannot claim on an owner’s behalf. Unclaimed winning NFTs remain transfer-locked until their ticket prize is claimed. Holder rewards do not consume a winning-ticket prize, affiliate claim or lifetime sponsored-mint benefit." },
-        { "type": "paragraph", "text": "There is no claim expiry. At /holders, select a prepared collection, enter an NFT token ID and connect its current owner. Review the exact amount, network, collection and recipient before signing. The website checks current ownership, used claims and remaining slots again after review; the contract enforces them at execution." }
+        { "type": "paragraph", "text": "There is no claim expiry. On Holders, select a prepared collection, enter the NFT number shown in that collection and connect its current owner’s wallet. Review the exact amount, network, collection and recipient before signing. The website checks current ownership, used claims and remaining slots again after review; the contract enforces them at execution." }
       ]},
       { "id": "open-page", "title": "Follow your season", "blocks": [
         { "type": "links", "items": [{ "label": "Open holder rewards", "description": "Select a collection to view its season pool, settlement progress and claim availability.", "href": "/holders" }] }
@@ -188,7 +188,7 @@ export const docPages: DocPage[] = withDocVisuals([
   {
     "slug": "onchain-voting",
     "title": "Onchain seasons and voting",
-    "description": "Choose the next collection’s economics with eligible NFTs.",
+    "description": "Use eligible NFTs to vote on the next collection’s mint terms.",
     "group": "The protocol",
     "minutes": 3,
     "sections": [
@@ -210,11 +210,11 @@ export const docPages: DocPage[] = withDocVisuals([
           },
           {
             "type": "paragraph",
-            "text": "Each ballot offers published economic packages. The package with the most votes wins; ties choose the lowest numbered tied option. No votes choose the first published option. The reviewed menu is fixed for the sealed catalog."
+            "text": "Each ballot offers complete packages of collection terms. The package with the most votes wins. A tie selects the lowest-numbered tied option; if nobody votes, option 1 wins. The menu is fixed for the sealed catalog."
           },
           {
             "type": "paragraph",
-            "text": "For paid collections, mint price is at least 0.01 ETH. Supply is 1,000–65,536 NFTs and remains fixed once minting opens. Mint duration is 1–24 hours. Equal winning NFTs number 1–10, excluding 7 and 9 because the prize allocation must divide exactly."
+            "text": "For paid collections, mint price is at least 0.01 ETH. Supply is 1,000–65,536 NFTs and remains fixed once minting opens. Mint duration is 1–24 hours. There can be 1–10 winning NFTs, excluding 7 and 9 because the prize allocation must divide exactly."
           },
           {
             "type": "paragraph",
@@ -222,7 +222,7 @@ export const docPages: DocPage[] = withDocVisuals([
           },
           {
             "type": "paragraph",
-            "text": "Paid votes use source groups of up to 16 collections. Each source balance can be consumed once per ballot. The planned single-contract launch does not automatically import NFTs from older deployments. Earlier releases retain their own voting-vault and historical eligibility rules."
+            "text": "Paid votes use source groups of up to 16 collections. Each source balance can be consumed once per ballot. The single-contract launch does not automatically import NFTs from older deployments. Earlier releases retain their own voting-vault and historical eligibility rules."
           }
         ]
       },
@@ -240,8 +240,8 @@ export const docPages: DocPage[] = withDocVisuals([
   },
   {
     "slug": "quickstart",
-    "title": "Your first ticket",
-    "description": "Connect, review the mint and follow your collection.",
+    "title": "Mint your first NFT",
+    "description": "Connect your wallet, review the terms and mint a paid NFT.",
     "group": "Start here",
     "minutes": 3,
     "sections": [
@@ -265,11 +265,11 @@ export const docPages: DocPage[] = withDocVisuals([
           },
           {
             "type": "paragraph",
-            "text": "Each recipient can receive at most 20 primary mints per paid collection across paid, referral and sponsored paths. A batch can contain at most 20 tickets. Transfers and refunds do not restore that allowance. The planned Genesis launch has a separate limit of two lifetime primary mints per wallet and no mint deadline; existing test contracts retain their original limits."
+            "text": "Each recipient can receive at most 20 primary mints per paid collection across paid, referral and sponsored paths. A batch can contain at most 20 tickets. Transfers and refunds do not restore that allowance. Genesis has a separate limit of two lifetime primary mints per wallet and no mint deadline in the current launch. Earlier deployments retain their original limits."
           },
           {
             "type": "paragraph",
-            "text": "Wait for a confirmed receipt. If the outcome is uncertain, recover the original transaction by its hash rather than sending it again. Keep your token IDs from the transaction’s Transfer events for ticket-specific actions. Follow Holders after a successful draw to see the season pool and its progress. Claims open only after every collection settles, with slots for the first 5% of eligible NFTs. Owning a ticket does not reserve a slot."
+            "text": "Wait for a confirmed receipt. If the outcome is uncertain, recover the original transaction by its hash rather than sending it again. Use the NFT number shown within the selected collection for ticket-specific actions. On the single-contract deployment, this is different from the global token ID in the transaction’s Transfer events. Follow Holders after a successful draw to see the season pool and its progress. Claims open only after every collection settles, with slots for the first 5% of eligible NFTs. Owning a ticket does not reserve a slot."
           }
         ]
       }
@@ -288,7 +288,7 @@ export const docPages: DocPage[] = withDocVisuals([
         "blocks": [
           {
             "type": "paragraph",
-            "text": "For the planned launch, Genesis must sell out before the first season starts. Its 1,000 free NFTs have no mint deadline and allow up to two lifetime primary mints per wallet. The final mint opens the first paid ballot for its full voting duration. If Genesis never sells out, no deadline or operator action can start the first season. Existing Sepolia test contracts retain their original timing."
+            "text": "Genesis must sell out before the first season starts under the current launch rules. Its 1,000 free NFTs have no mint deadline and allow up to two lifetime primary mints per wallet. The final mint opens the first paid ballot for its full voting duration. If Genesis never sells out, no deadline or operator action can start the first season. Earlier Sepolia deployments retain their original timing."
           },
           {
             "type": "paragraph",
@@ -296,7 +296,7 @@ export const docPages: DocPage[] = withDocVisuals([
           },
           {
             "type": "paragraph",
-            "text": "Preparation funds randomness, sponsorship and a 0.01 ETH executor reward separately from mint receipts, then publishes the voting schedule. After verified randomness arrives, the operator can finalize the draw and prepare the next collection in one transaction. The protocol treasury allocation funds infrastructure costs, future functionality and Tincta projects. A scheduled opening happens at the voting deadline without another signature. The dashboard shows pending actions and the current collection’s timing."
+            "text": "Preparation funds randomness, sponsorship and a 0.01 ETH executor reward separately from mint receipts, then publishes the voting schedule. After verified randomness arrives, anyone can finalize the draw. The current single-contract launch prepares the next collection in a separate, permissionless transaction once operating funds are available; earlier controller deployments can combine those actions. The protocol treasury allocation funds infrastructure costs, future functionality and Tincta projects. A scheduled opening happens at the voting deadline without another signature. The dashboard shows pending actions and the current collection’s timing."
           },
           {
             "type": "paragraph",
@@ -362,7 +362,7 @@ export const docPages: DocPage[] = withDocVisuals([
         "blocks": [
           {
             "type": "paragraph",
-            "text": "Under the planned launch rules, the first paid collection requires a Genesis NFT. Every later collection, including new seasons, accepts Genesis or an eligible NFT from an earlier successfully revealed paid collection. Enrollment is open during voting, subject to one of ten available positions and one enrollment per wallet per collection. The connected Sepolia deployment uses these rules; earlier deployments retain their original eligibility rules."
+            "text": "The first paid collection requires a Genesis NFT under the current launch rules. Every later collection, including new seasons, accepts Genesis or an eligible NFT from an earlier successfully revealed paid collection. Enrollment is open during voting, subject to one of ten available positions and one enrollment per wallet per collection. The connected Sepolia deployment uses these rules; earlier deployments retain their original eligibility rules."
           },
           {
             "type": "paragraph",
@@ -376,11 +376,11 @@ export const docPages: DocPage[] = withDocVisuals([
         "blocks": [
           {
             "type": "paragraph",
-            "text": "Affiliates earn real ETH by sharing their referral URL. At least one paid token mint through that URL qualifies an enrolled affiliate. Self-referrals are rejected. Sellout fixes equal shares of the 20% affiliate pool, claimable only after a successful draw, regardless of individual referral counts. The ETH pool follows actual mint revenue under the voted terms; it is not a fixed 2 ETH."
+            "text": "Affiliates qualify for ETH rewards by sharing their referral URL. At least one paid token mint through that URL qualifies an enrolled affiliate. Sepolia uses test ETH. Self-referrals are rejected. Sellout fixes equal shares of the 20% affiliate pool, claimable only after a successful draw, regardless of individual referral counts. The ETH pool follows actual mint revenue under the voted terms; it is not a fixed 2 ETH."
           },
           {
             "type": "paragraph",
-            "text": "If three out of ten positions qualify, each receives one third of the pool, rounded down to whole wei. An unfilled or unqualified position does not keep a separate share. Under the planned launch rules, if no affiliate qualifies, the entire 20% affiliate allocation joins the operator’s 10% protocol treasury after a successful draw, making 30% withdrawable by the operator. This includes collections with no enrolled affiliates. With one or more qualifiers, the treasury remains 10% and only division dust stays in the separately tracked unused affiliate reserve. The same funds cannot be withdrawn from both buckets. Prize and holder allocations remain 60% and 10%. Existing deployments retain their original accounting."
+            "text": "If three out of ten positions qualify, each receives one third of the pool, rounded down to whole wei. An unfilled or unqualified position does not keep a separate share. Under the current launch rules, if no affiliate qualifies, the entire 20% affiliate allocation joins the operator’s 10% protocol treasury after a successful draw, making 30% withdrawable by the operator. This includes collections with no enrolled affiliates. With one or more qualifiers, the treasury remains 10% and only division dust stays in the separately tracked unused affiliate reserve. The same funds cannot be withdrawn from both buckets. Prize and holder allocations remain 60% and 10%. Existing deployments retain their original accounting."
           },
           {
             "type": "paragraph",
@@ -407,7 +407,7 @@ export const docPages: DocPage[] = withDocVisuals([
           },
           {
             "type": "paragraph",
-            "text": "Select the collection, enter your token ID and review the refund transaction. Each ticket can be refunded once. Burned tickets no longer exist, and refunds do not restore the cumulative mint allowance. A refundable collection contributes neither ETH nor eligible NFTs to the holder pool, even if its holders have not requested refunds. Its full mint receipts remain reserved for those refunds."
+            "text": "Select the collection, enter your NFT number and review the refund transaction. Each ticket can be refunded once. Burned tickets no longer exist, and refunds do not restore the cumulative mint allowance. A refundable collection contributes neither ETH nor eligible NFTs to the holder pool, even if its holders have not requested refunds. Its full mint receipts remain reserved for those refunds."
           },
           {
             "type": "paragraph",
@@ -430,11 +430,11 @@ export const docPages: DocPage[] = withDocVisuals([
         "blocks": [
           {
             "type": "paragraph",
-            "text": "The website verifies the configured controller’s network and runtime code before reading the official collection bindings. The website also verifies the separate holder pool’s code, controller binding and fixed allocation and coverage. Displayed state is read at one block. Failed or stale reads disable signing rather than showing unavailable balances as zero."
+            "text": "The website checks the configured network and deployed code before loading collection data. The current launch uses one contract for Genesis, paid collections and holder pools; earlier deployments use separate contracts whose bindings are also checked. Displayed state comes from one block. Failed or stale reads disable signing, and unavailable balances are not shown as zero."
           },
           {
             "type": "paragraph",
-            "text": "Before a signature, the wallet provider independently checks the controller and collection bindings and simulates the transaction. Review the destination, function, amount, network and account in your wallet. A confirmed receipt establishes execution; a website message alone does not."
+            "text": "Before signing, the app checks the deployment and selected collection through your wallet’s provider, then simulates the transaction. Review the destination, function, amount, network and account in your wallet. A confirmed receipt establishes execution; a website message alone does not."
           }
         ]
       },
@@ -444,11 +444,19 @@ export const docPages: DocPage[] = withDocVisuals([
         "blocks": [
           {
             "type": "paragraph",
-            "text": "Use collectionPlan and roundCount on the season controller for catalog progress; ballots and winningOption on voting for deadlines and results; maxSupply, mintPrice, totalMinted and mintDeadline on the collection for mint terms."
+            "text": "On the current single-contract deployment, read catalogCount and prepared for catalog progress; collection(id) for a collection’s identity; round(id) for its schedule, mints and draw state; and terms(id), winningOption(id) and mintDeadline(id) for its selected terms. Collection 0 is Genesis. optionCount and option(index) expose the immutable ballot menu; option indexes start at zero."
           },
           {
             "type": "paragraph",
-            "text": "For settlement read phase, randomnessDeadline, randomnessReceived, executionReserve, executionRecipient, winningTokenIds, prizeClaimed, affiliateClaimable, refundsAvailable, operatorWithdrawable and protectedBalance. For permanent NFT identity read combination, tokenIdForCombination and tokenURI; score and scoreCombination require the finalized draw. Read holderRewards on the controller and collection to locate the pool. Its summary(seasonId) reports funded ETH, eligibleNfts, claimLimit, rewardPerNft, claims, paid, collections, settledCollections and unlocked. Check fundedCollection, claimed(collection, tokenId) and the NFT’s ownerOf before a holder claim. HOLDER_BPS is 1000 and COVERAGE_BPS is 500; neither fixes an ETH amount."
+            "text": "The app displays an NFT’s number within its collection. For ERC-721 calls, use tokenId(collectionId, serial) to obtain its global token ID, or tokenLocation(token) to decode one. Read combination(token) and tokenURI(token) for permanent paid-NFT identity; tokenForCombination(collectionId, numbers) reverses the encoding. score(token) requires a finalized draw. round(id) includes the winning NFT numbers and draw timestamps; awardRank(token) and awardBeneficiary(token) show prize status. refundsAvailable(id) reports whether refunds are open."
+          },
+          {
+            "type": "paragraph",
+            "text": "Read seasons(seasonId) for the season pool’s funded amount, eligible NFT count and claims. holderSummary(seasonId) returns its unlock state, claim limit and reward per NFT. holderClaimed(token) and ownerOf(token) help check an individual claim. Ownership alone does not reserve a slot."
+          },
+          {
+            "type": "paragraph",
+            "text": "Earlier deployments expose different functions across their controller, voting, collection and holder-pool contracts. Use the ABI and verified source for that exact deployment; do not apply the single-contract function names or token IDs to historical NFTs."
           }
         ]
       },

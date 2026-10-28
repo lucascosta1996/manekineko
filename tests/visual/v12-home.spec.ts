@@ -10,11 +10,11 @@ const connect = connectWebWallet;
 
 for (const width of [320, 390, 768, 1280, 1440]) {
   for (const [path, phase, heading] of [
-    ["/", 3, "Your tickets are in the draw."],
-    ["/", 5, "Meet the winning tickets."],
+    ["/", 3, "The collection has sold out."],
+    ["/", 5, "The winning NFTs"],
     ["/", 7, "Claim your refund"],
     ["/claims", 5, "Winning tickets"],
-    ["/affiliates", 0, "Invite people. Share the rewards."],
+    ["/affiliates", 0, "Enroll and share your referral link"],
   ] as const) {
     test(`public ${path} phase ${phase} at ${width}`, async ({
       page,
@@ -197,7 +197,7 @@ test("affiliate page exposes enrollment and a collection-bound referral after jo
   await page.goto(urls.web + "/affiliates");
   await connect(page);
   await expect(
-    page.getByRole("heading", { name: "Invite people. Share the rewards." })
+    page.getByRole("heading", { name: "Enroll and share your referral link" })
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Enroll for position 3" })
@@ -239,10 +239,10 @@ test("first read, stale recovery and retry preserve honest state and user input"
   await expect(
     page
       .getByRole("status", { name: "" })
-      .filter({ hasText: "Reading the collection contracts" })
+      .filter({ hasText: "Loading collection details" })
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Retry network read" })
+    page.getByRole("button", { name: "Try again" })
   ).toHaveCount(0);
   await page.screenshot({path: `test-results/v12-home-pending.png`, fullPage: true});
   release();
@@ -256,7 +256,7 @@ test("first read, stale recovery and retry preserve honest state and user input"
   await rpc(page, 1, true);
   await page.clock.fastForward(13000);
   await expect(page.locator(".public-workspace [role=alert]")).toContainText(
-    "last verified snapshot"
+    "last verified data"
   );
   await expect(
     page.getByLabel("Number of tickets", { exact: true })
@@ -266,7 +266,7 @@ test("first read, stale recovery and retry preserve honest state and user input"
   ).toBeDisabled();
   await page.unroute("https://v12.fixture.invalid/**");
   await rpc(page, 1);
-  await page.getByRole("button", { name: "Retry network read" }).click();
+  await page.getByRole("button", { name: "Try again" }).click();
   await expect(
     page.getByRole("button", { name: "Mint tickets", exact: true })
   ).toBeEnabled();

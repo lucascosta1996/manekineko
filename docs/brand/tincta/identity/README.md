@@ -8,7 +8,7 @@
 
 - Use the outlined wordmark in headers, sign-in, workspace/recovery shells and the off-chain mint preview signature. Preserve the `3947 × 780` view box and natural aspect ratio. Desktop wordmarks use 72 px; mobile wordmarks use 64 px, within the existing accessible link targets.
 - Use the TC companion in parent-brand square positions. SVG favicons and the 16/32/48 px ICO use the selected optical micro drawing on the existing dark rounded tile. Apple touch icons are 180 px PNGs. Rewards product artwork uses the separately approved Open form.
-- Generated Mainnet Rewards social-image headers pair Open with the Ligature wordmark. The parent TC + TINCTA lockup remains available for parent-brand uses. All lettering and symbols are paths, never font approximations. Parent static assets use #111111 or reversed white; Open retains its warm palette.
+- Generated Genesis, season and collection social-image headers use the TC glyph alone (user selection, 2026-10-28). The parent TC + TINCTA lockup remains available for parent-brand uses. All lettering and symbols are paths, never font approximations. Parent static assets use #111111 or reversed white; Open retains its warm palette.
 - Provide an accessible name for standalone logos; use `title=""` inside an already named home link. Keep at least 12 px exterior clear space around the lockup; its internal symbol, wordmark and badge gaps follow the shared 8 px token.
 - Do not stretch, retype, add a period, or combine old and new marks. Season colors and artwork retain their exact existing identities.
 
@@ -23,7 +23,7 @@ node scripts/generate-tincta-brand.mjs --check
 
 The generator produces 55 artifacts: parent wordmarks/marks/lockups, transparent campaign references, app logo components, SVG/ICO/Apple icons, the shared Open artwork component and public SVG copies, Open PFP exports, and the path-only social signature in `packages/contracts/src/tincta-brand.ts`. App copies are self-contained for independent deployment. Never patch generated copies individually.
 
-The worker and Launch social preview share `season-social-image.ts`. Its Mainnet images use Ligature; Sepolia retains the existing neutral “Sepolia collections” signature and visible test labels. The local social-template and upcoming-season renderers use the same outlined lockup. The [social gallery](../social/index.html) and downloadable kit are regenerated with it.
+The worker and Launch social preview share `season-social-image.ts`. Both Mainnet and Sepolia images use the canonical 56 px TC glyph in the existing 1600 × 900 frame. Sepolia retains visible test labels. The local social-template and upcoming-season renderers use the same generated glyph. Saved gallery images remain dated review artifacts until regenerated.
 
 Existing minted artwork, immutable contract renderers, saved deployment exports, sent posts and historical campaign originals retain their recorded signatures. This identity change is not a protocol, token-metadata, queue replay or X-account update. For new raster campaigns, use the canonical assets here as logo references; historical prompts under `output/social` are provenance, not the current identity specification.
 

@@ -12,6 +12,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 Follow the root visual-identity instructions and read [the shared standard](../../docs/design/visual-identity.md) and [quality gates](../../docs/design/quality-gates.md). Verify authenticated shells, forms, dialogs, mobile drawer and final coarse-pointer computed styles. Use isolated fixtures and intercepted writes for visual QA; changing presentation does not authorize operations.
 
+## 2026-10-28 authenticated Launch and X settings
+
+The user explicitly restored login for the entire Launch app. `/login` and `/api/auth/session` use the existing operator accounts and expiring database sessions. Every active page (`/dashboard`, `/social`, `/social/account`) checks its session before rendering, and social image/account APIs independently require authentication. The shared header provides sign-out. X settings reuse the existing network-separated encrypted profile store and never start a sender. These scoped additions supersede the old dashboard-only/no-login surface below; historical season editors and worker APIs remain retired. See [V16 social automation](../../docs/v16-social-automation.md).
+
 ## Current V12 interface
 
 The October 22 V12 interface replaces the legacy page workflows below. Read [the operator interface handoff](../../docs/v12-operator-interface-2026-10-22.md) before restoring or adding routes. Launch serves only the operator dashboard; Web uses `/` for stage-driven voting/minting, `/claims` for winning addresses/prizes/refunds, `/affiliates` for enrollment/referrals/rewards, and `/docs`. Older `/collections` and `/vote` links redirect home. See [the public workflow update](../../docs/v12-public-workflow-2026-10-23.md). Retired workflow APIs return 410. Historical helpers and tests remain versioned and do not authorize restoring database or worker control to V12.

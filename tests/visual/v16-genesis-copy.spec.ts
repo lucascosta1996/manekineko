@@ -13,13 +13,13 @@ for (const width of [320, 390, 599, 600, 601, 719, 720, 721, 768, 1280, 1440]) {
     await genesis.scrollIntoViewIfNeeded();
     await expect(genesis.getByRole('heading', { name: 'One free NFT. Two utilities.' })).toBeVisible();
     await expect(genesis).toContainText('Vote on the first collection. Enroll in the affiliate program across every collection and season.');
-    await expect(genesis).toContainText('Earn real ETH through referrals.');
+    await expect(genesis).toContainText('Qualify for ETH referral rewards.');
     await expect(genesis).toContainText('share your referral URL');
     await expect(genesis).toContainText('Up to two lifetime mints per wallet. No mint deadline.');
     await expect(genesis).toContainText('The first season starts only after Genesis sells out.');
     await expect(genesis).toContainText('requires Genesis for the first collection');
     await expect(genesis).toContainText('later collections and seasons accept Genesis or eligible paid NFTs');
-    await expect(genesis).toContainText('current Sepolia test uses earlier rules');
+    await expect(genesis).toContainText('These rules are deployed on Sepolia for testing');
     await expect(genesis).not.toContainText('24-hour');
     await expect(genesis).not.toContainText('no prize, affiliate');
     const rules = genesis.getByRole('link', { name: 'Read Genesis rules' });
@@ -106,7 +106,7 @@ for (const width of [390, 1440]) test(`Tincta Genesis has a searchable, readable
   await expect(article).toContainText('If Genesis never sells out, the first season never starts.');
   await expect(article).toContainText('Genesis holders only');
   await expect(article).toContainText('making 30% withdrawable by the operator');
-  await expect(article).toContainText('current Sepolia test retains its earlier one-mint limit');
+  await expect(article).toContainText('Earlier Sepolia deployments retain their one-mint limit');
   expect((await new AxeBuilder({page}).include('main').analyze()).violations).toEqual([]);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.screenshot({path:`test-results/genesis-docs-${width}-${info.project.name}.png`});

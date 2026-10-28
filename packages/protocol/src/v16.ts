@@ -17,7 +17,7 @@ export async function verifyV16(provider: Provider, config: ProtocolConfig, bloc
   if(code==='0x'||keccak256(code).toLowerCase()!==config.codeHash.toLowerCase())throw new Error('The deployment could not be verified. Signing is disabled.');
   const c=new Contract(config.controller,abi,provider),at=block===undefined?{}:{blockTag:block};
   const [version,algorithm,supply,limit,optionCount]=await Promise.all([c.CONTRACT_VERSION(at),c.ALGORITHM_VERSION(at),c.GENESIS_SUPPLY(at),c.GENESIS_MAX_MINTS_PER_WALLET(at),c.optionCount(at)]);
-  if(version!=='tincta-v16'||algorithm!=='unique-rank-v6'||supply!==1000n||limit!==2n||optionCount<3n||optionCount>8n)throw new Error('Protocol policy verification failed.');
+  if(version!=='tincta-v16'||algorithm!=='unique-rank-v6'||supply!==1000n||limit!==2n||optionCount<3n||optionCount>8n)throw new Error('The contract rules could not be verified. Signing is disabled.');
   return c;
 }
 export function v16Phase(r: {saleStart:bigint;soldOutAt:bigint;entropyAt:bigint;finalizedAt:bigint;requested:boolean;prizesClaimed:bigint}, timestamp: number, deadline: bigint, winners: bigint) {
@@ -34,7 +34,7 @@ export async function readV16(provider: Provider, config: ProtocolConfig, select
   const c=await verifyV16(provider,config,block.number),at={blockTag:block.number},address=getAddress(config.controller);
   const [settings,sealed,prepared,catalogCount,cost,operatingBalance,g,genesisStart,genesisSold,primary]=await Promise.all([c.settings(at),c.catalogSealed(at),c.prepared(at),c.catalogCount(at),c.preparationCost(at),c.operatingReserve(at),c.round(0,at),c.genesisStartsAt(at),c.genesisSoldOutAt(at),wallet?c.primaryMints(0,wallet,at):null]);
   const count=Number(prepared),total=Number(catalogCount);
-  if(total>256||count>total||!Number.isInteger(selected)||selected<0||selected>count||g.minted>1000n||primary!==null&&primary>2n)throw new Error('Invalid contract state.');
+  if(total>256||count>total||!Number.isInteger(selected)||selected<0||selected>count||g.minted>1000n||primary!==null&&primary>2n)throw new Error('The contract returned inconsistent collection data. Signing is disabled.');
   const genesis={version:16 as const,address,start:genesisStart,end:0n,minted:g.minted,supply:1000n,open:sealed&&g.minted<1000n,walletMinted:primary===null?null:primary>=2n,primaryMints:primary,maxMints:2n,soldOutAt:genesisSold};
   const latest=count?await c.round(count,at):null;
   const latestTerms=count?await c.terms(count,at):null;

@@ -109,7 +109,7 @@ export function LiveCollection() {
         {live && collection.remainingSupply !== null && <span className="collection-announcement-detail">{collection.remainingSupply.toLocaleString("en-US")} tickets remaining</span>}
         {seconds !== null && !failed && (fresh || collection.status === "scheduled") && <span className="collection-announcement-detail" role="timer" aria-live="off">{seconds === 0 ? "Scheduled time reached · checking availability" : `${collection.status === "live" ? "Mint closes" : "Mint scheduled"} in ${Math.floor(seconds / 3600)}h ${Math.floor(seconds % 3600 / 60)}m ${seconds % 60}s`}</span>}
         {fresh && collection.unpaidPrizes !== null && collection.unpaidPrizes > 0 && <span className="collection-announcement-detail">{collection.unpaidPrizes} prizes available to claim</span>}
-        <span id="collection-observation" className="visually-hidden">{unavailable ? "We couldn’t confirm the latest status. Details may be out of date. " : ""}{collection.status === "scheduled" ? "Published schedule; deployment and activation still require confirmation. " : ""}Last observed: {new Date(collection.updatedAt).toUTCString()}</span>
+        <span id="collection-observation" className="visually-hidden">{unavailable ? "We couldn’t confirm the latest status. Details may be out of date. " : ""}{collection.status === "scheduled" ? "Published schedule; check the current contract state before participating. " : ""}Last observed: {new Date(collection.updatedAt).toUTCString()}</span>
       </>}
       {failed && <TextAction ref={retry} busy={busy} onClick={() => request.current()} icon={<Icon name="refresh" />}>Refresh</TextAction>}
     </div>

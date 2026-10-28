@@ -8,7 +8,7 @@ import "./compact.css";
 export const metadata: Metadata = {
   title: "Tincta — Defined 100% onchain. Shaped by participation.",
   description:
-    "We build open systems where immutable code sets the rules—and participation creates what comes next. Explore Tincta’s research and onchain projects.",
+    "Tincta researches and builds onchain projects with fixed rules for voting, collecting and publishing. Explore Rewards, Morph, Assembly and the TAS-1 proposal.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

@@ -112,11 +112,13 @@
   "launch": {
     "routes": [
       "/",
-      "/dashboard"
+      "/login",
+      "/dashboard",
+      "/social",
+      "/social/account"
     ],
     "redirects": {
       "/": "/dashboard",
-      "/login": "/dashboard",
       "/settings": "/dashboard",
       "/activity": "/dashboard",
       "/seasons": "/dashboard",
@@ -143,7 +145,19 @@
       "confirm-cancel",
       "rejected-signature",
       "unknown-submission",
-      "network-change"
+      "network-change",
+      "genesis-social-preview",
+      "collection-social-preview",
+      "social-image-failure",
+      "social-account-sign-in",
+      "social-account-loading",
+      "social-account-save",
+      "social-account-unavailable",
+      "social-account-network-restriction",
+      "launch-sign-in",
+      "launch-sign-in-error",
+      "launch-sign-out",
+      "launch-session-rejection"
     ]
   },
   "fixtureBoundary": "Separate Next production-mode fixture applications import production components and styles. They do not import auth/database repositories. Browser requests intercept every API and block external origins and all real writes. Route SSR repositories, real sessions, real wallets, devices and hosted deployment require separate evidence."

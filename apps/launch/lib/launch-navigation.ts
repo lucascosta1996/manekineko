@@ -1,6 +1,6 @@
 import type { LaunchChainId } from "./chain-policy.ts";
 
-const destinations = new Set(["/dashboard", "/activity", "/settings", "/seasons", "/launch", "/earnings", "/active-collection", "/upcoming-collection"]);
+const destinations = new Set(["/social", "/social/account", "/dashboard", "/activity", "/settings", "/seasons", "/launch", "/earnings", "/active-collection", "/upcoming-collection"]);
 export function launchNetwork(value: unknown, fallback: LaunchChainId = "1"): LaunchChainId {
   return value === "1" || value === "11155111" ? value : fallback;
 }

@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import roundV12Abi from "@manekineko/contract-abi/round-v12" with { type: "json" };
-import holderV13Abi from "@manekineko/contract-abi/holder-rewards-v13" with { type: "json" };
+import protocolV16Abi from "@manekineko/contract-abi/protocol-v16" with { type: "json" };
 import { docPages } from "../lib/docs/content.ts";
 import { docGroups, docHref, docSearchEntry, searchDocs } from "../lib/docs/model.ts";
 
@@ -46,29 +45,17 @@ test("documentation search finds page titles and explanations without a server r
   assert.ok(searchDocs(entries, "gas").some(page => page.slug === "quickstart"));
   assert.ok(searchDocs(entries, "holder prize").some(page => page.slug === "prizes"));
   assert.ok(searchDocs(entries, "snapshot").some(page => page.slug === "onchain-voting"));
-  assert.ok(searchDocs(entries, "scoreCombination").some(page => page.slug === "verification"));
+  assert.ok(searchDocs(entries, "tokenForCombination").some(page => page.slug === "verification"));
 });
 
-test("verification documentation names real collection and V13 holder-pool reads", () => {
+test("verification documentation names real single-contract collection and holder-pool reads", () => {
   const text = docSearchEntry(docPages.find(page => page.slug === "verification")!).text;
-  const functions = new Map(roundV12Abi.filter(item => item.type === "function").map(item => [item.name, item.stateMutability]));
-  for (const name of ["maxSupply", "mintPrice", "totalMinted", "mintDeadline", "phase", "winningTokenIds", "prizeClaimed", "affiliateClaimable", "refundsAvailable", "operatorWithdrawable", "protectedBalance", "combination", "tokenIdForCombination", "tokenURI", "score", "scoreCombination"]) {
-    assert.ok(text.includes(name));
-    assert.ok(["view", "pure"].includes(functions.get(name) ?? ""));
-  }
-  const holderFunctions = new Map(holderV13Abi.filter(item => item.type === "function").map(item => [item.name, item]));
-  for (const name of ["summary", "fundedCollection", "claimed", "HOLDER_BPS", "COVERAGE_BPS"]) {
+  const functions = new Map(protocolV16Abi.filter(item => item.type === "function").map(item => [item.name, item.stateMutability]));
+  for (const name of ["catalogCount", "prepared", "collection", "round", "terms", "winningOption", "mintDeadline", "optionCount", "option", "tokenId", "tokenLocation", "combination", "tokenURI", "tokenForCombination", "score", "awardRank", "awardBeneficiary", "refundsAvailable", "seasons", "holderSummary", "holderClaimed", "ownerOf"]) {
     assert.ok(text.includes(name), name);
-    assert.equal(holderFunctions.get(name)?.stateMutability, "view", name);
+    assert.ok(["view", "pure"].includes(functions.get(name) ?? ""), name);
   }
-  const summary = holderFunctions.get("summary")!;
-  assert.ok(summary.outputs);
-  for (const output of summary.outputs) {
-    if (!("components" in output)) continue;
-    for (const field of output.components) {
-      assert.ok(text.includes(field.name), `Document the actual summary field: ${field.name}`);
-    }
-  }
+  assert.match(text, /Earlier deployments expose different functions/);
 });
 test("current guides preserve economic floors, holder claims and deployment boundaries", () => {
   const text = (slug: string) => docSearchEntry(docPages.find(page => page.slug === slug)!).text;
