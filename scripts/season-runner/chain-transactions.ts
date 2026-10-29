@@ -7,11 +7,13 @@ export class ChainPendingError extends DeploymentError {
   constructor(public readonly action: string, public readonly hash: string) { super(`Transaction ${action} is awaiting confirmation (${hash}); resume the same run.`); }
 }
 export type ChainTransaction = {
-  action: string; state: "prepared" | "submitted" | "confirmed";
+  action: string; state: "prepared" | "submitted" | "confirmed" | "reverted";
   rawTransaction: string; hash: string; nonce: number;
   blockNumber?: number; blockHash?: string; gasUsed?: string; gasPrice?: string;
   /** A prepared transaction may never first-broadcast or rebroadcast after this UTC chain timestamp. */
   broadcastDeadline?: number;
+  /** Explicit incident review; a failed receipt remains a failure, never a successful action. */
+  revertAcknowledgement?: { reason: string; at: string };
 };
 export type ChainJournal = {
   version: 1; chainId: number; from: string; maxFeePerGasWei: string; maxTotalSpendWei: string;
@@ -26,17 +28,19 @@ const confirmedPrefixes = new WeakMap<Provider, Map<string, ConfirmedPrefix>>();
 const prefixFingerprint = (entries: ChainTransaction[]) => createHash("sha256").update(JSON.stringify(entries.map(entry => [
   entry.action, entry.state, entry.rawTransaction, entry.hash, entry.nonce,
   entry.blockNumber, entry.blockHash, entry.gasUsed, entry.gasPrice, entry.broadcastDeadline,
+  entry.revertAcknowledgement,
 ]))).digest("hex");
 
 export function transactionSpend(entry: ChainTransaction): bigint {
   const signed = Transaction.from(entry.rawTransaction);
-  return signed.value + (entry.state === "confirmed" && entry.gasUsed !== undefined && entry.gasPrice !== undefined
+  return (entry.state === "reverted" ? 0n : signed.value) + ((entry.state === "confirmed" || entry.state === "reverted") && entry.gasUsed !== undefined && entry.gasPrice !== undefined
     ? BigInt(entry.gasUsed) * BigInt(entry.gasPrice) : signed.gasLimit * signed.maxFeePerGas!);
 }
 
 /** Caller must hold an exclusive run + signer lock across this adapter's lifetime. The store must durably save, not queue a write. */
 export function createTransactionPipeline(options: {
   provider: Provider; signer?: Signer; execute: boolean; journal: ChainJournal; save: () => Promise<void>; confirmations: number;
+  allowReconciledReverts?: boolean;
 }) {
   const { provider, signer, execute, journal, save, confirmations } = options;
   let persistenceFailed = false;
@@ -46,7 +50,7 @@ export function createTransactionPipeline(options: {
   const ceiling = BigInt(journal.maxFeePerGasWei), budget = BigInt(journal.maxTotalSpendWei);
   if (![1, 11155111].includes(journal.chainId) || journal.version !== 1 || ceiling <= 0n || budget <= 0n || !Number.isInteger(confirmations) || confirmations < 2)
     throw new DeploymentError("Invalid pinned chain, spending policy or confirmation depth.");
-  const policyIdentity = () => JSON.stringify([journal.version, journal.chainId, journal.from, journal.maxFeePerGasWei, journal.maxTotalSpendWei]);
+  const policyIdentity = () => JSON.stringify([journal.version, journal.chainId, journal.from, journal.maxFeePerGasWei, journal.maxTotalSpendWei, options.allowReconciledReverts === true]);
   const pinnedPolicy = policyIdentity();
   let validatedFingerprint: string | undefined;
   function validateEntry(entry: ChainTransaction, tx: Transaction) {
@@ -54,7 +58,10 @@ export function createTransactionPipeline(options: {
       || tx.nonce !== entry.nonce || tx.type !== 2 || tx.maxFeePerGas === null || tx.maxFeePerGas > ceiling
       || tx.maxPriorityFeePerGas === null || tx.maxPriorityFeePerGas > tx.maxFeePerGas || tx.gasLimit <= 0n
       || (tx.accessList?.length ?? 0) > 0 || (tx.authorizationList?.length ?? 0) > 0
-      || !["prepared", "submitted", "confirmed"].includes(entry.state)
+      || !["prepared", "submitted", "confirmed", "reverted"].includes(entry.state)
+      || (entry.state === "reverted" && !entry.revertAcknowledgement)
+      || (entry.revertAcknowledgement !== undefined && (!options.allowReconciledReverts || entry.state === "confirmed"
+        || entry.revertAcknowledgement.reason.trim().length < 25 || !Number.isFinite(Date.parse(entry.revertAcknowledgement.at))))
       || (entry.broadcastDeadline !== undefined && (!Number.isSafeInteger(entry.broadcastDeadline) || entry.broadcastDeadline <= 0)))
       throw new DeploymentError("The run journal has an invalid transaction, signer, policy or action order.");
   }
@@ -65,7 +72,7 @@ export function createTransactionPipeline(options: {
     const actions = new Set<string>();
     journal.transactions.forEach((entry, i) => {
       validateEntry(entry, Transaction.from(entry.rawTransaction));
-      if (actions.has(entry.action) || (i > 0 && (journal.transactions[i - 1].state !== "confirmed" || entry.nonce !== journal.transactions[i - 1].nonce + 1)))
+      if (actions.has(entry.action) || (i > 0 && (!["confirmed", "reverted"].includes(journal.transactions[i - 1].state) || entry.nonce !== journal.transactions[i - 1].nonce + 1)))
         throw new DeploymentError("The run journal has an invalid transaction, signer, policy or action order.");
       actions.add(entry.action);
     });
@@ -87,10 +94,10 @@ export function createTransactionPipeline(options: {
     const receipt = await provider.getTransactionReceipt(entry.hash);
     unchanged();
     if (!receipt) {
-      if (entry.state === "confirmed") throw new DeploymentError("A previously confirmed transaction lost its receipt; reconcile this run.");
+      if (entry.state === "confirmed" || entry.state === "reverted") throw new DeploymentError("A previously confirmed transaction lost its receipt; reconcile this run.");
       return null;
     }
-    if (receipt.status !== 1 || receipt.hash !== entry.hash || receipt.from !== getAddress(journal.from) || receipt.to !== signed.to)
+    if (receipt.status !== (entry.revertAcknowledgement ? 0 : 1) || receipt.hash !== entry.hash || receipt.from !== getAddress(journal.from) || receipt.to !== signed.to)
       throw new DeploymentError("Saved transaction reverted or receipt provenance differs; manual reconciliation is required.");
     const [block, head] = await Promise.all([provider.getBlock(receipt.blockNumber), provider.getBlock("latest")]);
     unchanged();
@@ -99,8 +106,9 @@ export function createTransactionPipeline(options: {
     if ((entry.gasUsed !== undefined && entry.gasUsed !== String(receipt.gasUsed)) || (entry.gasPrice !== undefined && entry.gasPrice !== String(receipt.gasPrice)))
       throw new DeploymentError("Saved transaction receipt gas accounting differs from canonical evidence.");
     if (!head || head.number - receipt.blockNumber + 1 < confirmations) return null;
-    if (entry.state !== "confirmed") {
-      entry.state = "confirmed"; entry.blockNumber = receipt.blockNumber; entry.blockHash = receipt.blockHash;
+    const terminalState = receipt.status === 0 ? "reverted" : "confirmed";
+    if (entry.state !== terminalState) {
+      entry.state = terminalState; entry.blockNumber = receipt.blockNumber; entry.blockHash = receipt.blockHash;
       entry.gasUsed = String(receipt.gasUsed); entry.gasPrice = String(receipt.gasPrice);
       const confirmedFingerprint = prefixFingerprint([entry]);
       await persist();
@@ -122,7 +130,7 @@ export function createTransactionPipeline(options: {
     if (!anchor?.hash || anchor.number !== head.number - confirmations + 1) throw new DeploymentError("Confirmed journal anchor is unavailable.");
     let cache = confirmedPrefixes.get(provider);
     if (!cache) { cache = new Map(); confirmedPrefixes.set(provider, cache); }
-    const key = JSON.stringify([journal.chainId, getAddress(journal.from), confirmations, journal.maxFeePerGasWei, journal.maxTotalSpendWei, journal.transactions[0].hash]);
+    const key = JSON.stringify([journal.chainId, getAddress(journal.from), confirmations, journal.maxFeePerGasWei, journal.maxTotalSpendWei, journal.transactions[0].hash, options.allowReconciledReverts === true]);
     const previous = cache.get(key);
     let reused = 0;
     if (previous && previous.count <= journal.transactions.length && previous.anchor.number <= anchor.number
@@ -192,7 +200,10 @@ export function createTransactionPipeline(options: {
     }
     const signed = checkSignedIntent(entry, request);
     const confirmed = await canonicalReceipt(entry);
-    if (confirmed) return confirmed;
+    if (confirmed) {
+      if (confirmed.status === 0) throw new DeploymentError("This action canonically reverted; its incident review permits later actions, never replay or success.");
+      return confirmed;
+    }
     const pending = await provider.getTransaction(entry.hash);
     if (!pending) {
       const [nonce, next, head] = await Promise.all([provider.getTransactionCount(journal.from, "latest"), provider.getTransactionCount(journal.from, "pending"), provider.getBlock("latest")]);

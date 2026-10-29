@@ -97,7 +97,7 @@ export function validateJournalAnchor(journal: DeploymentJournal, block: { numbe
   }
 }
 
-export function checkSignedIntent(entry: JournalEntry, request: TransactionRequest) {
+export function checkSignedIntent(entry: Pick<JournalEntry, 'rawTransaction' | 'hash'>, request: TransactionRequest) {
   const tx = Transaction.from(entry.rawTransaction);
   if (tx.hash !== entry.hash || tx.to !== (request.to ? getAddress(String(request.to)) : null) ||
       tx.data !== (request.data ?? "0x") || tx.value !== BigInt(String(request.value ?? 0))) {

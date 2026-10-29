@@ -144,3 +144,25 @@ test('V14 workers require explicit Genesis pins', async () => {
   assert.throws(() => runtimeVersion({ version: 14, holderRewardsCodeHash: pin }), /Genesis runtime pin/);
   assert.throws(() => runtimeVersion({ version: 13, holderRewardsCodeHash: pin, genesisCodeHash: pin }), /explicit version 14/);
 });
+
+test('completed PNG uploads survive a restart without the unsupported STATUS lookup', async () => {
+  const { prepareDeliveryMedia } = await import('./social.ts');
+  const e = { key: '1:opening', text: 'Opened', block: 1, blockHash: '0x01', status: 'pending' as const };
+  let uploads = 0, saves = 0;
+  const api = { upload: async () => { uploads++; return { id: '123', expiresAfterSecs: 3600, processingState: 'succeeded' as const, checkAfterSecs: 0 }; }, status: async (): Promise<never> => { throw new Error('Simple PNG STATUS returns HTTP 400'); } };
+  const args = [{ png: new Uint8Array(), sha256: 'image-hash' }, {} as any, { expectedAccountId: '1' }, async () => { saves++; }, api] as const;
+  assert.equal(await prepareDeliveryMedia(e, ...args), true);
+  assert.equal(await prepareDeliveryMedia(JSON.parse(JSON.stringify(e)), ...args), true);
+  assert.equal(uploads, 1); assert.equal(saves, 1);
+});
+test('pending media waits durably; legacy unpublished media remains in recovery evidence', async () => {
+  const { prepareDeliveryMedia } = await import('./social.ts');
+  const e: import('./social.ts').Delivery = { key: '1:opening', text: 'Opened', block: 1, blockHash: '0x01', status: 'pending', mediaId: '111', mediaExpiresAt: Date.now() + 3600000, imageHash: 'hash' };
+  let ready = false, uploads = 0;
+  const api = { upload: async () => { uploads++; return { id: '222', expiresAfterSecs: 3600, processingState: 'pending' as const, checkAfterSecs: 1 }; }, status: async () => ({ id: '222', expiresAfterSecs: 3600, processingState: ready ? 'succeeded' as const : 'pending' as const, checkAfterSecs: 1 }) };
+  const args = [{ png: new Uint8Array(), sha256: 'hash' }, {} as any, { expectedAccountId: '1' }, async () => {}, api] as const;
+  assert.equal(await prepareDeliveryMedia(e, ...args), false); assert.equal(e.status, 'pending');
+  ready = true; assert.equal(await prepareDeliveryMedia(e, ...args), true);
+  assert.equal(uploads, 1); assert.equal(e.supersededMedia?.[0].id, '111');
+  e.status = 'uncertain'; await assert.rejects(prepareDeliveryMedia(e, ...args), /Only pending/);
+});

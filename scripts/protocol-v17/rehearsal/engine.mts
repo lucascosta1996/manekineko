@@ -1,12 +1,13 @@
 import {readFile} from 'node:fs/promises';
+import {matchesWalletIntent} from '../../../packages/protocol/src/wallet-transaction.ts';
 import {Contract,Interface,Wallet,ZeroAddress,Transaction,keccak256,type JsonRpcProvider,type TransactionRequest} from 'ethers';
 import abi from '../../../packages/contracts/src/ManekinekoV17.json' with {type:'json'};
 import {createTransactionPipeline,ChainPendingError,type ChainJournal} from '../../season-runner/chain-transactions.ts';
 import {durable} from '../../protocol-v12/rehearsal/store.mts';
-import {Hold,assertCustody,assertMintBudget,digest,type Plan,type Scenario} from './plan.mts';
+import {Hold,assertCustody,assertMintBudget,assertRandomnessReserve,digest,type Plan,type Scenario} from './plan.mts';
 const iface=new Interface(abi),eth=10n**18n,token=(id:number,serial:bigint)=>(BigInt(id)<<17n)|serial;
 export type Gate={id:string;instruction:string;wallet?:string;walletIndex?:number;request?:{to:string;data:string;value:string};token?:string;collection?:number};
-export type RunState={version:17;planHash:string;addresses:string[];operatorBaseline:string;started:boolean;complete:boolean;current:number;gate:Gate|null;approvals:Record<string,{note:string;at:string;transaction?:string}>;custody:Record<string,{reason:string;token?:string}>;journals:Record<string,ChainJournal>;funding:{hash:string;value:string}[];genesisTokens:Record<string,string[]>;buyers:Record<string,number[]>;manualWinners:Record<string,{token:string;index:number}>;accounted:string[];gasWei:string;operatorBudgetWei:string;recoveries:Record<string,string>;vrfFeesWei:string;errors:{at:string;collection:number;code:string}[];outcomes:Record<string,unknown>;externalReceipts:string[];costReviews?:{limitWei:string;reason:string;at:string}[];overrides?:Record<string,{choice:0|1|2;outcome:'sellout'|'refund';referrals:Scenario['referrals'];reason:string;at:string;block:number}>};
+export type RunState={version:17;planHash:string;addresses:string[];operatorBaseline:string;started:boolean;complete:boolean;current:number;gate:Gate|null;approvals:Record<string,{note:string;at:string;transaction?:string}>;custody:Record<string,{reason:string;token?:string}>;journals:Record<string,ChainJournal>;funding:{hash:string;value:string}[];genesisTokens:Record<string,string[]>;buyers:Record<string,number[]>;manualWinners:Record<string,{token:string;index:number}>;accounted:string[];gasWei:string;operatorBudgetWei:string;recoveries:Record<string,string>;vrfFeesWei:string;errors:{at:string;collection:number;code:string}[];outcomes:Record<string,unknown>;externalReceipts:string[];failedManualTransactions?:{id:string;hash:string;note:string;at:string}[];extraRandomnessFundingWei?:Record<string,string>;costReviews?:{limitWei:string;reason:string;at:string}[];overrides?:Record<string,{choice:0|1|2;outcome:'sellout'|'refund';referrals:Scenario['referrals'];reason:string;at:string;block:number}>};
 export class RehearsalEngine{
  readonly plan:Plan;readonly state:RunState;readonly directory:string;
  private provider:JsonRpcProvider;private secondary:JsonRpcProvider;private wallets:Wallet[];private operator:Wallet;private c:Contract;private pollIntervalMs:number;
@@ -30,16 +31,17 @@ export class RehearsalEngine{
   await this.batch(Object.entries(this.state.journals).map(([k,j])=>async()=>{
    const index=Number(k),pipeline=this.pipeline(index);
    const last=j.transactions.at(-1);
-   if(resumePending&&last&&last.state!=="confirmed"){
+   if(resumePending&&last&&last.state!=="confirmed"&&last.state!=="reverted"){
     const tx=Transaction.from(last.rawTransaction);await this.send(index,last.action,{to:tx.to,data:tx.data,value:tx.value},last.broadcastDeadline);
    }
    await pipeline.confirmAll();
    for(const entry of j.transactions)if(!this.state.accounted.includes(entry.hash)){const receipt=await this.provider.getTransactionReceipt(entry.hash);if(receipt)await this.account(index,entry.action,receipt);}
   }));
   for(const proof of this.state.funding)await this.verifyFunding(proof.hash,BigInt(proof.value));
-  await this.batch(this.state.externalReceipts.map(hash=>async()=>{
+  const manualReceipts=[...this.state.externalReceipts.map(hash=>({hash,status:1})),...(this.state.failedManualTransactions??[]).map(p=>({hash:p.hash,status:0}))];
+  await this.batch(manualReceipts.map(({hash,status})=>async()=>{
    const receipt=await this.provider.getTransactionReceipt(hash),head=await this.provider.getBlock('latest');
-   if(!receipt||receipt.status!==1||!head||head.number-receipt.blockNumber<2||(await this.provider.getBlock(receipt.blockNumber))?.hash!==receipt.blockHash)throw new Error('A recorded manual receipt is no longer canonical.');
+   if(!receipt||receipt.status!==status||!head||head.number-receipt.blockNumber<2||(await this.provider.getBlock(receipt.blockNumber))?.hash!==receipt.blockHash)throw new Error('A recorded manual receipt is no longer canonical.');
   }));
   if(this.state.funding.reduce((sum,p)=>sum+BigInt(p.value),0n)>BigInt(this.plan.maxExternalFundingWei))throw new Error('Funding exceeds the 0.5 ETH ceiling.');
  }
@@ -47,12 +49,13 @@ export class RehearsalEngine{
   let pipeline=this.pipelines.get(index);if(pipeline)return pipeline;
   const signer=(index===-1?this.operator:this.wallets[index]).connect(this.provider);
   this.state.journals[index]??={version:1,chainId:11155111,from:signer.address,maxFeePerGasWei:this.plan.maxFeePerGasWei,maxTotalSpendWei:this.plan.maxGrossSpendWei,transactions:[],collections:{}};
-  pipeline=createTransactionPipeline({provider:this.provider,signer,execute:true,journal:this.state.journals[index],save:()=>this.save(),confirmations:2});this.pipelines.set(index,pipeline);return pipeline;
+  pipeline=createTransactionPipeline({provider:this.provider,signer,execute:true,journal:this.state.journals[index],save:()=>this.save(),confirmations:2,allowReconciledReverts:true});this.pipelines.set(index,pipeline);return pipeline;
  }
  private async account(index:number,action:string,receipt:any){
   if(this.state.accounted.includes(receipt.hash))return;
   const tx=await this.provider.getTransaction(receipt.hash);if(!tx)throw new Error('Confirmed transaction missing.');
   const gas=BigInt(receipt.gasUsed)*BigInt(receipt.gasPrice);this.state.gasWei=String(BigInt(this.state.gasWei)+gas);
+  if(receipt.status===0){if(index===-1)this.state.operatorBudgetWei=String(BigInt(this.state.operatorBudgetWei)-gas);this.state.accounted.push(receipt.hash);await this.save();return;}
   let operatorBudget=BigInt(this.state.operatorBudgetWei);
   if(index===this.plan.bankIndex&&tx.to?.toLowerCase()===this.operator.address.toLowerCase())operatorBudget+=tx.value;
   if(index===-1)operatorBudget-=tx.value+gas;
@@ -61,7 +64,8 @@ export class RehearsalEngine{
    if(e?.name==='Minted'&&e.args.collectionId===0n){const a=e.args.recipient.toLowerCase();this.state.genesisTokens[a]??=[];for(let n=0n;n<e.args.quantity;n++){const id=String(e.args.firstTokenId+n);if(!this.state.genesisTokens[a].includes(id))this.state.genesisTokens[a].push(id);}}
    if(e?.name==='Paid'&&e.args.recipient.toLowerCase()===this.operator.address.toLowerCase())operatorBudget+=e.args.amount;
   }
-  if(action.startsWith('recover-vrf:')){const recovered=BigInt(this.state.recoveries[action]??'0');operatorBudget+=recovered;this.state.vrfFeesWei=String(BigInt(this.state.vrfFeesWei)+BigInt(this.plan.settings.randomnessBudget)-recovered);}
+  if(action.startsWith('fund-vrf-buffer:')||action.startsWith('fund-vrf-clear:')){const id=action.split(':')[1];this.state.extraRandomnessFundingWei??={};this.state.extraRandomnessFundingWei[id]=String(BigInt(this.state.extraRandomnessFundingWei[id]??'0')+tx.value);}
+  if(action.startsWith('recover-vrf:')){const recovered=BigInt(this.state.recoveries[action]??'0'),funded=BigInt(this.plan.settings.randomnessBudget)+BigInt(this.state.extraRandomnessFundingWei?.[action.split(':')[1]]??'0');if(recovered>funded)throw new Error('Unrecorded subscription funding requires reconciliation.');operatorBudget+=recovered;this.state.vrfFeesWei=String(BigInt(this.state.vrfFeesWei)+funded-recovered);}
   this.state.operatorBudgetWei=String(operatorBudget);this.state.accounted.push(receipt.hash);await this.save();
  }
  async send(index:number,action:string,request:TransactionRequest,deadline?:number){
@@ -109,10 +113,29 @@ export class RehearsalEngine{
    if(!hash||!/^0x[0-9a-f]{64}$/i.test(hash))throw new Error('The wallet transaction hash is required.');hash=hash.toLowerCase();
    if(Object.entries(this.state.approvals).some(([key,a])=>key!==id&&a.transaction===hash))throw new Error('This receipt already proves a different manual checkpoint.');
    const tx=await this.provider.getTransaction(hash),r=await this.provider.getTransactionReceipt(hash),head=await this.provider.getBlock('latest');
-   if(!tx||!r||r.status!==1||!head||head.number-r.blockNumber<2||tx.chainId!==11155111n||tx.from.toLowerCase()!==gate.wallet!.toLowerCase()||tx.to?.toLowerCase()!==gate.request.to.toLowerCase()||tx.data!==gate.request.data||String(tx.value)!==gate.request.value||(await this.provider.getBlock(r.blockNumber))?.hash!==r.blockHash)throw new Error('Receipt does not match the reserved manual transaction.');
+   if(!tx||!r||r.status!==1||!head||head.number-r.blockNumber<2||!matchesWalletIntent(tx,{...gate.request,wallet:gate.wallet!,chainId:11155111})||(await this.provider.getBlock(r.blockNumber))?.hash!==r.blockHash)throw new Error('Receipt does not match the reserved manual transaction.');
    if(!this.state.externalReceipts.includes(hash)){this.state.externalReceipts.push(hash);await this.account(this.state.addresses.findIndex(a=>a.toLowerCase()===gate.wallet!.toLowerCase()),'manual:'+id,r);}
   }else if(hash)throw new Error('This checkpoint does not request a transaction.');
   this.state.approvals[id]={note:note.trim(),at:new Date().toISOString(),...(hash?{transaction:hash}:{})};this.state.gate=null;await this.save();
+ }
+ async acknowledgeFailure(id:string,note:string,hash:string){
+  const gate=this.state.gate;
+  if(!gate?.request||gate.id!==id||note.trim().length<8||!/^0x[0-9a-f]{64}$/i.test(hash))throw new Error('A current manual checkpoint, failed transaction hash and incident note are required.');
+  hash=hash.toLowerCase();const index=this.state.addresses.findIndex(a=>a.toLowerCase()===gate.wallet?.toLowerCase());
+  if(index<0||!this.state.custody[gate.wallet!.toLowerCase()])throw new Error('The failed transaction must belong to the reserved human wallet.');
+  let canonical:any;
+  for(const provider of [this.provider,this.secondary]){
+   const tx=await provider.getTransaction(hash),r=await provider.getTransactionReceipt(hash),head=await provider.getBlock('latest');
+   if(!tx||!r||r.status!==0||!head||head.number-r.blockNumber<2||(await provider.getBlock(r.blockNumber))?.hash!==r.blockHash||!matchesWalletIntent(tx,{...gate.request,wallet:gate.wallet!,chainId:11155111}))throw new Error('The failed receipt does not match this manual checkpoint on both RPCs.');
+   if(canonical&&(canonical.blockHash!==r.blockHash||canonical.gasUsed!==r.gasUsed||canonical.gasPrice!==r.gasPrice))throw new Error('Independent failed-receipt evidence disagrees.');
+   canonical=r;
+  }
+  this.state.failedManualTransactions??=[];
+  if(!this.state.failedManualTransactions.some(p=>p.hash===hash)){
+   const at=new Date().toISOString();this.state.failedManualTransactions.push({id,hash,note:note.trim(),at});
+   this.state.errors.push({at,collection:this.state.current,code:'manual-transaction-reverted:'+id});
+  }
+  await this.account(index,'failed-manual:'+id,canonical);await this.save();
  }
  private async prepareBuyers(s:Scenario){
   if(this.state.buyers[s.id])return;
@@ -121,6 +144,18 @@ export class RehearsalEngine{
   const option=this.plan.options[s.choice];assertMintBudget(option,s.outcome,await this.provider.getBalance(this.bank()),BigInt(this.plan.liquidReserveWei));
   for(const i of buyers)await this.ensureBalance(i,BigInt(option.price)*(s.outcome==='sellout'?(BigInt(option.supply)+BigInt(buyers.length)-1n)/BigInt(buyers.length):1n)+eth/500n,`collection-${s.id}`);
   this.state.buyers[s.id]=buyers;await this.save();
+ }
+ private async ensureRandomnessReserve(id:number,expired=false){
+  const target=assertRandomnessReserve(this.plan.settings,this.plan.randomnessReserveWei),r=await this.c.round(id);
+  const coordinator=new Contract(this.plan.settings.coordinator,['function getSubscription(uint256) view returns(uint96 balance,uint96 nativeBalance,uint64 reqCount,address owner,address[] consumers)','function fundSubscriptionWithNative(uint256) payable'],this.provider);
+  const sub=await coordinator.getSubscription(r.subscription);
+  if(sub.owner.toLowerCase()!==this.plan.address.toLowerCase()||!sub.consumers.some((a:string)=>a.toLowerCase()===this.plan.address.toLowerCase()))throw new Error('Unexpected subscription authority.');
+  if(sub.nativeBalance<target){
+   const amount=target-sub.nativeBalance;if(await this.provider.getBalance(this.bank())<amount+BigInt(this.plan.liquidReserveWei))throw new Hold('funding','The bank cannot cover the reviewed VRF reserve and protected liquid funds.');
+   const request=expired?await coordinator.fundSubscriptionWithNative.populateTransaction(r.subscription,{value:amount}):await this.c.fundRandomness.populateTransaction(id,{value:amount});
+   await this.send(this.plan.bankIndex,`${expired?'fund-vrf-clear':'fund-vrf-buffer'}:${id}`,request);
+  }
+  for(const p of [this.provider,this.secondary]){const current=await coordinator.connect(p).getFunction('getSubscription')(r.subscription);if(current.nativeBalance<target)throw new Hold('waiting','Waiting for both RPCs to confirm the full VRF reserve before minting.');}
  }
  private async openGenesis(){
   if(await this.c.genesisSoldOutAt()>0n){
@@ -141,6 +176,7 @@ export class RehearsalEngine{
    while(await this.c.primaryMints(0,this.address(index))<target)await this.send(index,`genesis:${index}:${await this.c.primaryMints(0,this.address(index))}`,await this.c.mintGenesis.populateTransaction());
   }));
   await this.prepareBuyers(this.plan.scenarios[0]);
+  await this.ensureRandomnessReserve(1);
   await this.gate({id:'before-genesis-sellout',instruction:`Be present for the first vote and affiliate enrollment. The final Genesis mint immediately opens the fixed ${this.plan.settings.votingDuration}-second ballot.`});
   if((await this.c.round(0)).minted<20n){const index=9;await this.ensureBalance(index,eth/500n,'final-genesis');await this.send(index,'genesis-final',await this.c.mintGenesis.populateTransaction());}
  }
@@ -194,9 +230,10 @@ export class RehearsalEngine{
    await this.ensureBalance(1,terms.price+eth/100n,'manual-referral');
    await this.manual(`referral-mint:${s.id}`,1,`Open /?collection=${s.id}&affiliate=1 with the buyer wallet. Mint one NFT through the affiliate link.`,await this.c.mint.populateTransaction(s.id,this.address(1),1,1,hash,{value:terms.price}),await this.c.primaryMints(s.id,this.address(1))>=1n&&(await this.c.affiliates(s.id,1)).referrals>=1n,{collection:s.id});
   }
-  if(s.id===2&&this.state.manualWinners[this.plan.scenarios[0].seasonId]){
-   const winner=this.state.manualWinners[this.plan.scenarios[0].seasonId];
-   await this.manual('sponsored-redemption',winner.index,'Use the winner wallet to redeem its one lifetime sponsored NFT into collection 2. The winning collection and NFT numbers are in the handoff.',await this.c.redeemSponsored.populateTransaction(winner.token,s.id),await this.c.lifetimeRewardUsed(this.address(winner.index)),{collection:s.id,token:winner.token});
+  const sponsorSeason=s.sponsoredFromSeason??(s.id===2?this.plan.scenarios[0].seasonId:undefined);
+  if(sponsorSeason&&this.state.manualWinners[sponsorSeason]){
+   const winner=this.state.manualWinners[sponsorSeason];
+   await this.manual('sponsored-redemption',winner.index,`Use the winner wallet to redeem its one lifetime sponsored NFT into collection ${s.id}. The winning collection and NFT numbers are in the handoff.`,await this.c.redeemSponsored.populateTransaction(winner.token,s.id),await this.c.lifetimeRewardUsed(this.address(winner.index)),{collection:s.id,token:winner.token});
   }
   const target=s.outcome==='sellout'?terms.supply:3n,current=await this.c.round(s.id);
   let remaining=BigInt(target)-BigInt(current.minted);if(remaining<=0n)return;
@@ -271,7 +308,12 @@ export class RehearsalEngine{
   }else if(r.executionReserve)await this.send(-1,`unused-execution:${s.id}`,await this.c.withdrawBucket.populateTransaction(s.id,3,r.executionReserve));
   if(r.sponsorReserve)await this.send(-1,`unused-sponsorship:${s.id}`,await this.c.withdrawBucket.populateTransaction(s.id,2,r.sponsorReserve));
   if(!r.subscriptionClosed){
-   const coordinator=new Contract(this.plan.settings.coordinator,['function getSubscription(uint256) view returns(uint96 balance,uint96 nativeBalance,uint64 reqCount,address owner,address[] consumers)'],this.provider);
+   const coordinator=new Contract(this.plan.settings.coordinator,['function getSubscription(uint256) view returns(uint96 balance,uint96 nativeBalance,uint64 reqCount,address owner,address[] consumers)','function pendingRequestExists(uint256) view returns(bool)'],this.provider);
+   if(await coordinator.pendingRequestExists(r.subscription)){
+    // A late response only clears the coordinator request; the contract permanently retains refunds.
+    if(!r.entropyAt&&await this.c.refundsAvailable(s.id)&&!this.state.extraRandomnessFundingWei?.[s.id])await this.ensureRandomnessReserve(s.id,true);
+    throw new Hold('waiting','Waiting for the existing expired oracle request to settle before recovering its subscription. Refunds remain available; no draw can reopen.');
+   }
    const sub=await coordinator.getSubscription(r.subscription);const action=`recover-vrf:${s.id}`;this.state.recoveries[action]=String(sub.nativeBalance);await this.save();
    await this.send(-1,action,await this.c.recoverRandomness.populateTransaction(s.id));
   }
@@ -337,9 +379,12 @@ export class RehearsalEngine{
   for(;this.state.current<=this.plan.scenarios.length;this.state.current++){
    const s={...this.plan.scenarios[this.state.current-1],...this.state.overrides?.[this.state.current]};
    if(Number(await this.c.prepared())<s.id){
+    const target=assertRandomnessReserve(this.plan.settings,this.plan.randomnessReserveWei),buffer=s.outcome==='sellout'?target-BigInt(this.plan.settings.randomnessBudget):0n;
+    assertMintBudget(this.plan.options[s.choice],s.outcome,await this.provider.getBalance(this.bank()),BigInt(this.plan.liquidReserveWei)+buffer+BigInt(await this.c.preparationCost()));
     await this.prepareBuyers(s);await this.gate({id:`ready:${s.id}`,instruction:`Confirm readiness for ${s.name}: option ${s.choice+1}, ${s.outcome}. Check the UI before starting its immutable voting clock.`});
     const cost=await this.c.preparationCost(),reserve=await this.c.operatingReserve();if(reserve<cost)await this.send(-1,`fund-prepare:${s.id}`,await this.c.fundOperating.populateTransaction({value:cost-reserve}));await this.send(-1,`prepare:${s.id}`,await this.c.prepareNext.populateTransaction());
    }
+   if(s.outcome==='sellout'&&!(await this.c.round(s.id)).soldOutAt)await this.ensureRandomnessReserve(s.id);
    let r=await this.c.round(s.id),now=(await this.provider.getBlock('latest'))!.timestamp;
    if(now<Number(r.voteStart))throw new Hold('waiting',`Voting opens at ${new Date(Number(r.voteStart)*1000).toISOString()}.`);
    if(now<Number(r.saleStart)){await this.enroll(s);await this.vote(s);throw new Hold('waiting',`Minting opens at ${new Date(Number(r.saleStart)*1000).toISOString()}.`);}

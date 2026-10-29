@@ -1,8 +1,33 @@
 # V17 rehearsal readiness report · October 29, 2026
 
-Status: **first attempt paused after a missed first vote; refund UI correction published and checked in Opera; ten-minute retry verified and stopped; Mainnet not ready**.
+## 2026-10-29 smart-account prize claim incident
+
+Aster Beacon NFT #13 paid Wallet 2 exactly 0.0002 Sepolia ETH in `0x81fd7deabb9c5b3c7bd5e9d619cfb5d51fd77fc3887603048404305c0d9f8843`. Both RPCs confirm its award beneficiary and gas-adjusted balance increase. Its 0.00044009400440094 ETH gas cost exceeded the deliberately small test prize. The following NFT #14 claim, `0x36b6153aad8c2a2919785e711c7044ed89e445bb52fb68cf9f4d0fd1a42ca846`, used MetaMask's EIP-7702 Delegation Manager and reverted. The trace contains the exact intended Tincta claim and an inner out-of-gas failure. The same wrapped call fails in a read-only simulation at its original 480864 gas limit and succeeds at 1000000; a current estimate returns 485563. This establishes insufficient execution gas, not a lost prize. It does not by itself prove which wallet estimation step introduced the shortfall.
+
+Wallet 2's smart-account authorization persisted even though the call reverted. NFT #14 and #15 remain unclaimed and eligible. Do not retry #13 or turn off wallet protections. Local client code now leaves submission gas estimation to the wallet instead of imposing a direct-call gas limit, while retaining independent preflight, chain/account checks, durable intent and rejection handling. Review and transaction feedback identify the NFT and exact gross prize; fees reduce the wallet's net balance. Wallet intent recovery and the runner recognize only exact self-funded, single atomic MetaMask executions with the reviewed target, calldata and value. Arbitrary envelopes, another executing account, batch and non-atomic modes are rejected.
+
+The recovery continuation is preserved and paused. A separate wallet continuation retains its journals, six scenarios and all three human-custody wallets. Runtime SHA-256: `946578d7f3012634d4d987db48be74b2a613cec53dd164891613573a07c31c6b`; plan SHA-256: `be1c1c2109d7ccef34505c709540688295bf1fe8f80ee83512e998d15449a877`. It remains at `prize:262158`; no next ballot has opened. Failed manual receipt reconciliation verifies both RPCs, counts 0.00042028500420285 ETH of actual gas once, preserves the failure, and never advances the pending checkpoint.
+
+Local verification: four wallet submission/envelope tests and seven rehearsal tests pass; the complete six-scenario local EVM runner passes. The initial full contract suite passed 568 tests and exposed an outdated runner funding fixture; its focused rerun also required the mock coordinator's pending-request view. Both fixture issues are corrected. The remaining workspace tests, typecheck and builds passed. These are local results; hosted wallet retry and Mainnet qualification remain pending.
+
+
+Status: **live continuation active; first paid draw failed, all 20 tickets refunded; Aster Beacon funded before minting; Mainnet not ready**.
 
 The user requested a faster alternative to the V16 eleven-day schedule and can attend for up to half a day. The [accelerated workflow](v17-fast-rehearsal.md) specifies six live collections across two seasons, with the full 216-collection catalog tested separately locally. Historical V16 and its paused run remain intact.
+
+## Live continuation update · 13:44 UTC
+
+This record supersedes the earlier paused preparation snapshots below. The active contract is `0xdb0A3f76DE225377B7B6D1b70C14F1A12aDbe480`; the original three-minute attempt remains paused. The ten-minute retry completed both manual Genesis caps, affiliate enrollment, the Option 3 vote and Wallet 1’s paid referral mint.
+
+Aster Atlas was intended to succeed. Its real Chainlink request remained pending because the 0.01 ETH subscription balance was insufficient. The additional 0.21 ETH bank deposit was confirmed, but a 0.20 ETH top-up reached the contract exactly at its immutable 12:49:12 UTC draw cutoff and reverted. This was an operational preparation failure, not a planned timeout test. The failed receipt, gas and original expected outcome remain in the audit. No prize or affiliate entitlement arose from this refunded collection.
+
+Wallet 1 subsequently refunded paid NFT #1 through MetaMask in Opera: [successful refund](https://sepolia.etherscan.io/tx/0xcc2d3230cd6be6b3295976f3131ff4d0599312d4b31ff4296e1c65a2bcbdb98d). Independent RPCs agreed on the receipt, burned token and exact 0.0001 ETH refund before gas; the gas cost was 0.0004869600048696 ETH. The other 19 paid NFTs were also refunded. Funding the expired subscription directly allowed its pending request to clear without restoring the draw. Unused oracle collateral was recovered; actual first-round oracle cost was 0.000008225356632113 ETH.
+
+The reviewed continuation retains all failed history, signed journal entries and human custody. It explicitly accepts the proven reverted top-up as a terminal failed transaction, accounts only its gas, and never retries it as a successful action. Its plan hash is `9edd3c706de3352028466dc24c4c225ed93452ff6260a15fa2cc27c71c6b997c` and frozen runtime hash is `cea347b57034a7fdad26db406612dd0d0aea730da082d6eba142e2439e81c517`. Total external funding across the attempts is 0.36 Sepolia ETH, counting each deposit once.
+
+The user authorized Aster Beacon at 13:31 UTC. Its ballot runs 13:34:37–13:44:37 UTC. Two RPCs confirmed zero mints and a full 0.25 ETH native oracle reserve at block 12019843 before minting. This reserve is reusable collateral, not an expected fee. Remaining coverage uses Beacon’s six-prize fallback, Current’s ten-prize draw with a real prior winner’s sponsored redemption, Beryl’s six- and four-prize draws, and the final three-mint unsold refund. The first failed draw remains failed even if the remaining coverage succeeds. Prize, sponsorship, affiliate payout, holder rewards and final recovery are still pending live acceptance.
+
+The saved Sepolia X profile alone did not start a sender, and the existing V16 observer could not observe V17. An explicit V17 observer now uses real finalized state and the 20-Genesis/15-minute timeout profile. After the user approved eight concrete drafts and later milestones for this six-collection run, the sender uploaded an image but encountered HTTP 400 from a redundant media STATUS call. The corrected durable path retains successful upload readiness and polls only media that reports asynchronous processing. The five first post IDs have been read back with exact author, text and media validation. Posting is to `@luckyOne9619` (account ID `805459104844103680`). Opera is signed into `@tinctaxyz`, which X currently prevents from viewing those posts; account visibility settings were not changed. Delivery remains separate from protocol execution, and finalized observation adds a chain-finality delay.
 
 ## Live rehearsal observations
 

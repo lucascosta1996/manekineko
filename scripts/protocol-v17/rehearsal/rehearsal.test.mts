@@ -43,3 +43,38 @@ test('parallel bank funding is serialized, and sibling bot failures settle befor
   let settled=false;await assert.rejects((e as any).batch([async()=>{throw new Error('injected');},async()=>{await new Promise(resolve=>setTimeout(resolve,10));settled=true;}]));assert.equal(settled,true);
  }finally{await rm(dir,{recursive:true,force:true});}
 });
+
+test('the reviewed native reserve rejects the former underfunding and unreviewed lane settings',async()=>{
+ const {assertRandomnessReserve}=await import('./plan.mts');const settings={keyHash:'0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae',callbackGas:'200000'};
+ assert.equal(assertRandomnessReserve(settings,'250000000000000000'),250000000000000000n);
+ for(const reserve of [undefined,'10000000000000000','203304500000000000'])assert.throws(()=>assertRandomnessReserve(settings,reserve),Hold);
+ assert.throws(()=>assertRandomnessReserve({...settings,callbackGas:'250000'},'250000000000000000'),Hold);
+ assert.throws(()=>assertRandomnessReserve({...settings,keyHash:'0x'+'0'.repeat(64)},'250000000000000000'),Hold);
+});
+test('failed topups consume gas only; recovered VRF collateral is not reported as a negative fee',async()=>{
+ const p=rehearsalPlan({...release,manifest:{...release.manifest,settings:{randomnessBudget:'10000000000000000'}}},'a'.repeat(64)),wallets=Array.from({length:11},()=>new Wallet(Wallet.createRandom().privateKey));
+ const state={gasWei:'0',vrfFeesWei:'0',operatorBudgetWei:'100',accounted:[],recoveries:{'recover-vrf:1':'209800000000000000'}} as unknown as RunState;
+ let value=200000000000000000n;const provider={getTransaction:async()=>({value,to:p.address})} as any;
+ const e=new RehearsalEngine({plan:p,state,directory:'/unused',provider,secondary:provider,wallets,operator:wallets[0]});e.save=async()=>{};
+ await (e as any).account(10,'fund-vrf-buffer:1',{hash:'failed',status:0,gasUsed:3n,gasPrice:4n,logs:[]});
+ assert.equal(state.gasWei,'12');assert.equal(state.extraRandomnessFundingWei,undefined);
+ await (e as any).account(10,'fund-vrf-buffer:1',{hash:'funded',status:1,gasUsed:3n,gasPrice:4n,logs:[]});
+ assert.equal(state.extraRandomnessFundingWei?.[1],'200000000000000000');value=0n;
+ await (e as any).account(-1,'recover-vrf:1',{hash:'recovered',status:1,gasUsed:3n,gasPrice:4n,logs:[]});
+ assert.equal(state.vrfFeesWei,'200000000000000');assert.equal(state.gasWei,'36');
+ await (e as any).account(-1,'recover-vrf:1',{hash:'recovered',status:1,gasUsed:3n,gasPrice:4n,logs:[]});assert.equal(state.gasWei,'36');
+});
+test('manual failure reconciliation requires two canonical matching failures, records gas once and never advances the checkpoint',async()=>{
+ const dir=await mkdtemp(join(tmpdir(),'v17-manual-failure-'));try{
+  const p=rehearsalPlan(release,'a'.repeat(64)),wallets=Array.from({length:11},()=>Wallet.createRandom()),wallet=wallets[2].address,hash='0x'+'4'.repeat(64),blockHash='0x'+'5'.repeat(64);
+  const gate={id:'prize:262158',instruction:'Claim the reserved prize.',wallet,walletIndex:2,request:{to:p.address,data:'0x12345678',value:'0'}};
+  const state={gate,addresses:wallets.map(w=>w.address),custody:{[wallet.toLowerCase()]:{reason:'Manual claim'}},approvals:{},current:2,errors:[],gasWei:'0',operatorBudgetWei:'0',accounted:[],externalReceipts:[]} as unknown as RunState;
+  const tx={from:wallet,to:p.address,data:gate.request.data,value:0n,nonce:15,chainId:11155111n},receipt={hash,status:0,blockNumber:100,blockHash,gasUsed:100n,gasPrice:3n,logs:[]};let secondaryReceipt={...receipt};
+  const provider={getTransaction:async()=>tx,getTransactionReceipt:async()=>receipt,getBlock:async(tag:any)=>tag==='latest'?{number:102}:{hash:blockHash}},secondary={...provider,getTransactionReceipt:async()=>secondaryReceipt};
+  const e=new RehearsalEngine({plan:p,state,directory:dir,provider:provider as any,secondary:secondary as any,wallets:wallets as any,operator:wallets[0] as any});
+  secondaryReceipt={...receipt,status:1};await assert.rejects(e.acknowledgeFailure(gate.id,'Confirmed failure evidence',hash),/both RPCs/);assert.equal(state.gasWei,'0');assert.equal(state.failedManualTransactions,undefined);
+  secondaryReceipt={...receipt,gasUsed:101n};await assert.rejects(e.acknowledgeFailure(gate.id,'Confirmed failure evidence',hash),/disagrees/);
+  secondaryReceipt={...receipt};await e.acknowledgeFailure(gate.id,'Confirmed failure evidence',hash);await e.acknowledgeFailure(gate.id,'Confirmed failure evidence',hash);
+  assert.equal(state.gasWei,'300');assert.equal(state.failedManualTransactions?.length,1);assert.equal(state.errors.length,1);assert.deepEqual(state.gate,gate);assert.deepEqual(state.approvals,{});assert.deepEqual(state.externalReceipts,[]);
+ }finally{await rm(dir,{recursive:true,force:true});}
+});

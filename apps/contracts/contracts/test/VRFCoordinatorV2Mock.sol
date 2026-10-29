@@ -83,6 +83,10 @@ contract VRFCoordinatorV2Mock {
         if (!success) revert TransferFailed();
     }
 
+    function pendingRequestExists(uint256 subId) external view returns (bool) {
+        return pendingRequests[subId] != 0;
+    }
+
     function requestRandomWords(VRFV2PlusClient.RandomWordsRequest calldata parameters)
         external returns (uint256 requestId)
     {

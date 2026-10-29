@@ -1,5 +1,13 @@
 # V17 accelerated Sepolia rehearsal · October 29, 2026
 
+## Live recovery update
+
+The user resumed the ten-minute retry. Its first planned draw failed because the 0.01 ETH Chainlink reserve was too low. All 20 paid NFTs were refunded, including a real manual Wallet 1 claim verified through two RPCs. Follow the current [architecture incident record](architecture.md#2026-10-29-oracle-funding-incident-and-recovery-continuation). Earlier preparation snapshots below are historical; do not restart their frozen runners.
+
+The active continuation directory is `/Users/admin/.local/share/tincta/v17-recovery-continuation-2026-10-29/`. It preserves the original failed outcome and errors, adds a 0.25 ETH oracle reserve check, and retains the same contract, bank and human wallet custody. Original external funding was 0.15 ETH, followed by 0.21 ETH: count each receipt once, for 0.36 ETH total. The reserve is recoverable collateral, not a predicted fee. Current scripts generate new plans with a 0.35 ETH minimum initial balance; the original 0.15 ETH recommendation below was insufficient for this VRF lane.
+
+Remaining continuation coverage: collection 2 Option 1/six prizes/no-vote fallback; collection 3 Option 3/ten prizes/sponsored redemption; collection 4 Option 1/manual cross-season affiliate and referral; collection 5 Option 2/four prizes/no affiliates; collection 6 Option 2/unsold refund. Both holder pools remain required. Collection 1 is a failed planned sellout draw with verified timeout refunds, not a substitute claim of clean six-scenario success.
+
 ## Current hold and retry profile
 
 The original 180-second first ballot closed before the manual vote after affiliate enrollment. It selected fallback Option 1, and the runner stopped before any paid mint. Preserve that failed attempt and its frozen files. The user asked to prepare a retry **but keep it stopped for later**. Future deployments use ten-minute ballots with the same Solidity, supplies, prices and short refund windows. No replacement Genesis or paid clock may be opened until the user returns. Existing deployment/preparation snapshots below retain their historical settings; they are not evidence of a completed rehearsal.
@@ -126,3 +134,7 @@ The complete 216-collection / 22-season catalog also runs locally against V17 wi
 The closing report separates local tests, isolated SQL, hosted rendering/indexer, real-wallet actions and genuine VRF. It lists defects/fixes, expected negative tests, untested paths, returned funds and remaining liabilities. X publishing is separate and is not activated by this runner.
 
 **No test report promises 100% correctness or automatically approves Mainnet.** The current approximately 40 KB runtime exceeds the traditional 24,576-byte Mainnet limit. Verify active network rules and qualify the exact production artifact, constructor settings, deployment cost, external services, security review and remaining acceptance items before a Mainnet release. [EIP-7954](https://eips.ethereum.org/EIPS/eip-7954) is a network-upgrade proposal, not proof of activation. See the [readiness report](v17-readiness-report-2026-10-29.md).
+
+### Smart-account claim continuation
+
+If a human wallet wraps an action in MetaMask Delegation Framework 1.3.0, match the exact single atomic inner call and executing wallet; an outer target mismatch alone does not prove that the user signed another action. Never accept another signer, extra executions or a non-atomic mode. A successful canonical receipt remains mandatory for checkpoint acknowledgement. `ack-failure <gate> <note> <hash>` separately records a failed canonical manual action on two RPCs, accounts its gas once, and leaves the gate pending. Browser submission delegates execution gas estimation to the wallet. Keep all existing frozen runtimes; use the reviewed wallet continuation for the current retry.

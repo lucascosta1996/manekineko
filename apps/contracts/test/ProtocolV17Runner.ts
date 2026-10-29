@@ -38,7 +38,7 @@ describe('V17 frozen runner through real local EVM transactions',function(){
    const plan=rehearsalPlan({version:17,chainId:11155111,sealed:false,prepared:0,genesisMints:0,address:await c.getAddress(),codeHash:ethers.keccak256(await ethers.provider.getCode(await c.getAddress())),manifest},'a'.repeat(64));
    const state:RunState={version:17,planHash:digest(plan),addresses:wallets.map(w=>w.address),operatorBaseline:String(await ethers.provider.getBalance(operator.address)),started:false,complete:false,current:1,gate:null,approvals:{},custody:{[wallets[0].address.toLowerCase()]:{reason:'Manual affiliate'},[wallets[1].address.toLowerCase()]:{reason:'Manual buyer'}},journals:{},funding:[],genesisTokens:{},buyers:{},manualWinners:{},accounted:[],gasWei:'0',operatorBudgetWei:'0',recoveries:{},vrfFeesWei:'0',errors:[],outcomes:{},externalReceipts:[]};
    await networkHelpers.setBalance(plan.recoveryAddress,ethers.parseEther('1'));const recovery=await ethers.getImpersonatedSigner(plan.recoveryAddress);
-   const funding=await recovery.sendTransaction({to:wallets[10].address,value:ethers.parseEther('0.15')});await funding.wait();await networkHelpers.mine(2);state.funding.push({hash:funding.hash,value:String(ethers.parseEther('0.15'))});
+   const funding=await recovery.sendTransaction({to:wallets[10].address,value:BigInt(plan.minimumInitialFundingWei)});await funding.wait();await networkHelpers.mine(2);state.funding.push({hash:funding.hash,value:plan.minimumInitialFundingWei});
    const engine=new RehearsalEngine({plan,state,directory,provider,secondary,wallets,operator,pollIntervalMs:0});
    let gates=0;
    for(let turn=0;!state.complete&&turn<150;turn++){

@@ -9,9 +9,9 @@ export function assertAccountRevision(saved: RuntimeProfile, current: RuntimePro
 /** Explicit opt-in: legacy private-file workers retain their original credentials. */
 export async function loadLaunchSocialAccount(config: Config, mode: string, env = process.env) {
   if (config.accountSource === undefined || config.accountSource === 'environment') return undefined;
-  if (config.accountSource !== 'launch' || config.version !== 16 || config.chainId !== 11155111 || env.MANEKINEKO_CHAIN_ID !== String(config.chainId) || !env.DATABASE_URL) throw new Error('The Launch account source requires the dedicated V16 Sepolia environment.');
+  if (config.accountSource !== 'launch' || (config.version !== 16 && config.version !== 17) || config.chainId !== 11155111 || env.MANEKINEKO_CHAIN_ID !== String(config.chainId) || !env.DATABASE_URL) throw new Error('The Launch account source requires the dedicated V16/V17 Sepolia environment.');
   const query = async <T>(read: (pool: pg.Pool) => Promise<T>) => {
-    const pool = new pg.Pool({ connectionString: env.DATABASE_URL, max: 1, connectionTimeoutMillis: 10000, statement_timeout: 10000, application_name: 'tincta-v16-social-account' });
+    const pool = new pg.Pool({ connectionString: env.DATABASE_URL, max: 1, connectionTimeoutMillis: 10000, statement_timeout: 10000, application_name: `tincta-v${config.version}-social-account` });
     try { return await read(pool); } finally { await pool.end(); }
   };
   const { profile, credentials } = await query(pool => getRuntimeWorkerProfile(pool, '11155111', env));

@@ -64,6 +64,9 @@ export function renderSeasonSocialSvg(message: SeasonSocialMessage, options: { p
 
 /** The free collection has no paid-season number or invented financial metrics. */
 function renderGenesisSvg(message: SeasonSocialMessage, options: { preview?: boolean }): string {
+  const supply = message.genesisSupply ?? 1000;
+  if (![20, 1000].includes(supply) || (supply === 20 && message.chainId !== 11155111)) throw new Error('Invalid Genesis artwork profile.');
+  const artwork = supply === 1000 ? genesisArtwork.image : 'data:image/svg+xml;base64,' + btoa(atob(genesisArtwork.image.split(',')[1]).replace('#1 / 1000', '#1 / 20'));
   const marker = [options.preview ? 'DESIGN PREVIEW' : '', message.chainId === 11155111 ? 'SEPOLIA TEST · TEST ETH' : ''].filter(Boolean).join(' · ');
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title description">
     <title id="title">Tincta Genesis — ${xml(message.header)}</title><desc id="description">${xml(`${options.preview ? 'Design preview. ' : ''}${message.alt}`)}</desc>
@@ -74,7 +77,7 @@ function renderGenesisSvg(message: SeasonSocialMessage, options: { preview?: boo
     <rect x="48" y="132" width="1504" height="640" fill="#FAFAFA" stroke="#E4E4E4"/>
     <text x="104" y="211" fill="#111111" class="mono" font-size="23" letter-spacing="2">TINCTA GENESIS / FREE COLLECTION</text>
     ${message.headline.map((line, i) => `<text x="104" y="${400 + i * 130}" fill="#111111" ${typography(line, 112, 800, -4)} font-weight="500" letter-spacing="-4">${xml(line)}</text>`).join('')}
-    <image href="${genesisArtwork.image}" x="960" y="230" width="500" height="500"/>
+    <image href="${artwork}" x="960" y="230" width="500" height="500"/>
     <text x="104" y="700" fill="#111111" class="mono" ${typography(message.detail ?? '', 20, 800, 0, true)}>${xml(message.detail ?? '')}</text>
     <text x="48" y="847" fill="#111111" font-size="23">${xml(message.footer)}</text>
     <text x="1552" y="847" text-anchor="end" fill="#111111" class="mono" font-size="21">${message.chainId === 11155111 ? 'SEPOLIA' : 'tincta.xyz'}</text>

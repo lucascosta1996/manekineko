@@ -1,16 +1,17 @@
 import { renderSeasonSocialSvg } from '@manekineko/contract-abi/season-social-image';
 import { previewMessage } from '@manekineko/contract-abi/v16-social-preview';
+import { previewMessage as fastPreviewMessage } from '@manekineko/contract-abi/v17-social-preview';
+import { socialPreviewCatalog } from './social-preview-catalog';
 import type { Stage } from '@manekineko/contract-abi/v16-social-content';
-import mainnet from '../catalog/mainnet.json';
-import sepolia from '../catalog/sepolia.json';
 export async function socialPreviewResponse(request: Request) {
   const params = new URL(request.url).searchParams;
   const network = params.get('chainId') ?? '11155111';
   const id = Number(params.get('collection') ?? '0');
   const stage = params.get('stage') ?? 'genesis-open';
   if (!['1', '11155111'].includes(network) || !Number.isSafeInteger(id) || id < 0 || id > 216) return new Response('Invalid preview selection.', { status: 400 });
+  const { catalog, fast } = socialPreviewCatalog(network === '1' ? 1 : 11155111);
   let svg: string;
-  try { svg = renderSeasonSocialSvg(previewMessage(network === '1' ? mainnet : sepolia, id, stage as Stage), { preview: true }); }
+  try { svg = renderSeasonSocialSvg((fast ? fastPreviewMessage : previewMessage)(catalog, id, stage as Stage), { preview: true }); }
   catch { return new Response('Invalid preview selection.', { status: 400 }); }
   if (params.get('format') === 'png') {
     const { default: sharp } = await import('sharp');

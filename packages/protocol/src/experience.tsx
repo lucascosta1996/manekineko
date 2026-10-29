@@ -34,6 +34,7 @@ import { ConfirmProvider, useConfirm } from "@manekineko/ui/confirm";
 import { WalletAccountPicker } from "./wallet-account-picker";
 import { useWalletSession } from "./use-wallet-session";
 import { assertWallet, shortWallet, walletError } from "./wallet";
+import { matchesWalletIntent, requestWalletTransaction } from "./wallet-transaction";
 import {
   controllerAbi,
   roundAbi,
@@ -422,7 +423,7 @@ function Experience({
           throw new Error("Unrecognized transaction target.");
       }
       tx.chainId = config.chainId;
-      const gas = await session.signer.estimateGas(tx);
+      await session.signer.estimateGas(tx);
       await assertWallet(session);
       if (liveSession.current !== session)
         throw new Error("Your wallet changed. Review again.");
@@ -439,13 +440,8 @@ function Experience({
       localStorage.setItem(key, JSON.stringify(intent));
       intentWritten = true;
       setPending(intent);
-      const sent = await session.signer.sendTransaction({
-        ...tx,
-        nonce,
-        from: session.address,
-        gasLimit: (gas * 120n) / 100n,
-      });
-      const submitted = { ...intent, hash: sent.hash };
+      const hash = await requestWalletTransaction(session.injected, intent);
+      const submitted = { ...intent, hash };
       localStorage.setItem(key, JSON.stringify(submitted));
       setPending(submitted);
     } catch (e) {
@@ -483,12 +479,8 @@ function Experience({
       const tx = await provider.getTransaction(recoveryHash);
       if (
         !tx ||
-        tx.from.toLowerCase() !== wallet.session.address.toLowerCase() ||
-        tx.to?.toLowerCase() !== pending.to.toLowerCase() ||
-        tx.data !== pending.data ||
-        tx.value !== BigInt(pending.value) ||
-        tx.nonce !== pending.nonce ||
-        tx.chainId !== BigInt(pending.chainId)
+        wallet.session.address.toLowerCase() !== pending.wallet.toLowerCase() ||
+        !matchesWalletIntent(tx, pending)
       )
         throw new Error("This hash does not match the pending action.");
       const next = { ...pending, hash: tx.hash };
@@ -1063,8 +1055,8 @@ function Experience({
               }
               onClick={() =>
                 void onRound(
-                  "Claim prize",
-                  `Claim ${eth(a.amount)} to your connected wallet.`,
+                  `Prize for NFT #${String(a.tokenId)} · ${eth(a.amount)}`,
+                  `You receive ${eth(a.amount)} for NFT #${String(a.tokenId)} at ${a.holder}. Network fees are paid separately and reduce your net balance. Your wallet may show 0 ETH sent without displaying the incoming prize.`,
                   "claimPrizeForRank",
                   (_, address) => [a.rank, address]
                 )

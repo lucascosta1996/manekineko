@@ -5,13 +5,14 @@ import { CompactSelect } from '@manekineko/ui/select';
 import { LinkButton } from '@manekineko/ui/button';
 import type { Catalog } from '@manekineko/protocol/progress';
 import { previewMessage, COPY, GENESIS_STAGES, COLLECTION_STAGES, SEASON_STAGES } from '@manekineko/contract-abi/v16-social-preview';
+import { previewMessage as fastPreviewMessage } from '@manekineko/contract-abi/v17-social-preview';
 import type { Stage } from '@manekineko/contract-abi/v16-social-content';
 import { SocialConnectionTest } from './social-connection-test';
 
-export function SocialPreview({ catalog }: { catalog: Catalog }) {
+export function SocialPreview({ catalog, fast = false }: { catalog: Catalog; fast?: boolean }) {
   const [id, setId] = useState(0), [stage, setStage] = useState<Stage>('genesis-open');
   const stages = id === 0 ? GENESIS_STAGES : [...COLLECTION_STAGES, ...SEASON_STAGES];
-  const content = previewMessage(catalog, id, stage);
+  const content = (fast ? fastPreviewMessage : previewMessage)(catalog, id, stage);
   const query = new URLSearchParams({ chainId: String(catalog.chainId), collection: String(id), stage });
   const imageUrl = `/api/social-preview?${query}`;
   // Keep option IDs pure: Field's render callback can run more than once in Strict Mode.

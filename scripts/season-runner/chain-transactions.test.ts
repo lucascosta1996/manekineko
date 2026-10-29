@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { Wallet, Transaction } from "ethers";
 import type { Provider, TransactionReceipt } from "ethers";
-import { createTransactionPipeline, ChainPendingError, type ChainJournal } from "./chain-transactions.ts";
+import { createTransactionPipeline, ChainPendingError, transactionSpend, type ChainJournal } from "./chain-transactions.ts";
 
 function fixture(options: { budget?: string; ceiling?: string; chainId?: number } = {}) {
   const signer = Wallet.createRandom(), events: string[] = [];
@@ -16,10 +16,10 @@ function fixture(options: { budget?: string; ceiling?: string; chainId?: number 
     broadcastTransaction: async (raw: string) => { events.push("broadcast"); pending = true; return { hash: Transaction.from(raw).hash }; },
   } as unknown as Provider;
   const save = async () => { events.push(`save:${journal.transactions.at(-1)?.state}`); if (saveFails) throw new Error("private backend failure"); };
-  const make = () => createTransactionPipeline({ provider, signer, execute: true, journal, save, confirmations: 2 });
-  return { journal, signer, provider, events, make, saveFails: () => { saveFails = true; }, confirm: () => {
+  const make = (allowReconciledReverts = false) => createTransactionPipeline({ provider, signer, execute: true, journal, save, confirmations: 2, allowReconciledReverts });
+  return { journal, signer, provider, events, make, saveFails: () => { saveFails = true; }, confirm: (status = 1) => {
     const entry = journal.transactions.at(-1)!, signed = Transaction.from(entry.rawTransaction); nonce++;
-    receipt = { status: 1, hash: entry.hash, from: signer.address, to: signed.to, blockNumber: 100, blockHash: canonicalHash, gasUsed: 21_000n, gasPrice: 12n } as TransactionReceipt;
+    receipt = { status, hash: entry.hash, from: signer.address, to: signed.to, blockNumber: 100, blockHash: canonicalHash, gasUsed: 21_000n, gasPrice: 12n } as TransactionReceipt;
   }, reorg: () => { canonicalHash = `0x${"cd".repeat(32)}`; }, setNonce: (value: number) => { nonce = value; }, setHead: (value: number) => { head = value; }, setTime: (value: number) => { timestamp = value; }, forgetPending: () => { pending = false; } };
 }
 const target = `0x${"12".repeat(20)}`;
@@ -248,4 +248,22 @@ test("warm ancestor lookup cannot transplant its original proof onto a journal c
   await assert.rejects(pipeline.confirmAll(), /prefix changed/);
   f.state.beforeBlock = undefined; f.state.receiptReads = 0;
   await f.make().confirmAll(); assert.equal(f.state.receiptReads, 4);
+});
+
+test('reviewed reverts retain canonical failure evidence, charge gas only, and can never replay as success', async () => {
+ const f=fixture();await assert.rejects(f.make().send('topup',{to:target,value:123n}),ChainPendingError);f.confirm(0);
+ await assert.rejects(f.make(true).confirmAll(),/reverted/);
+ const entry=f.journal.transactions[0],raw=entry.rawTransaction;
+ entry.revertAcknowledgement={reason:'Independent RPCs confirm the topup mined at the immutable deadline.',at:new Date().toISOString()};
+ assert.throws(()=>f.make(),/invalid transaction/);
+ await f.make(true).confirmAll();assert.equal(entry.state,'reverted');assert.equal(entry.rawTransaction,raw);assert.equal(transactionSpend(entry),252000n);
+ await assert.rejects(f.make(true).send('topup',{to:target,value:123n}),/canonically reverted/);
+ assert.equal(f.events.filter(e=>e==='broadcast').length,1);
+ f.reorg();await assert.rejects(f.make(true).confirmAll(),/canonical/);
+});
+test('a successful receipt cannot be relabeled as a reviewed revert',async()=>{
+ const f=fixture();await assert.rejects(f.make().send('topup',{to:target,value:123n}),ChainPendingError);f.confirm();
+ f.journal.transactions[0].revertAcknowledgement={reason:'A review note cannot change what the transaction receipt proves.',at:new Date().toISOString()};
+ await assert.rejects(f.make(true).confirmAll(),/reverted|provenance/);
+ assert.equal(f.journal.transactions[0].state,'submitted');
 });

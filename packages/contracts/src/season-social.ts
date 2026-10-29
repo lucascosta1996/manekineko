@@ -28,6 +28,7 @@ export type SeasonSocialInput = {
 };
 export type SeasonSocialMessage = {
   kind?: "genesis";
+  genesisSupply?: 20 | 1000;
   event: SeasonSocialEvent; chainId: 1 | 11155111; season: SeasonSocialIdentity; collection?: SeasonSocialCollection;
   generatedAt: string; validUntil: string | null;
   post: string; replies: string[]; replyKeys: string[];

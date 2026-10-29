@@ -4,16 +4,37 @@ import { readFile, writeFile, rename, open, unlink } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { dirname } from 'node:path';
 import votingAbi from '../../packages/contracts/src/ManekinekoVotingV12.json' with { type: 'json' };
-import { createXPost, verifyXPost, uploadXMedia, getXMediaStatus, setXMediaAltText, XApiError, AmbiguousDelivery, type XCredentials } from '../season-runner/social.ts';
+import { createXPost, verifyXPost, uploadXMedia, getXMediaStatus, setXMediaAltText, XApiError, AmbiguousDelivery, type XCredentials, type XRequestOptions } from '../season-runner/social.ts';
 import { renderSeasonSocialImage } from '../season-runner/social-image.ts';
 import { lifecycleMessages, socialImage, STAGES, SOCIAL_TEMPLATE_VERSION } from './social-content.ts';
 import type { SeasonSocialMessage } from '../../packages/contracts/src/season-social.ts';
 import { runtimeVersion, workerRuntime, verifyWorkerRound } from './runtime.ts';
 export { lifecycleMessages } from './social-content.ts';
 export type Observation = { key: string; text: string; block: number; blockHash: string; image?: SeasonSocialMessage };
-export type Delivery = Observation & { status: 'pending' | 'intent' | 'sent' | 'uncertain'; postId?: string; mediaId?: string; mediaExpiresAt?: number; imageHash?: string };
+export type Delivery = Observation & { status: 'pending' | 'intent' | 'sent' | 'uncertain'; postId?: string; mediaId?: string; mediaExpiresAt?: number; imageHash?: string; mediaProcessingState?: 'succeeded' | 'pending' | 'in_progress'; supersededMedia?: Array<{ id: string; expiresAt?: number }> };
+/** Simple PNG uploads complete in the upload response. STATUS is for media
+ * that actually reports asynchronous processing; it can reject simple images. */
+export async function prepareDeliveryMedia(e: Delivery, rendered: { png: Uint8Array; sha256: string }, credentials: XCredentials, options: XRequestOptions, save: () => Promise<void>, transport = { upload: uploadXMedia, status: getXMediaStatus }): Promise<boolean> {
+  if (e.status !== 'pending') throw new Error('Only pending media may be prepared.');
+  if (!e.mediaId || !e.mediaExpiresAt || e.mediaExpiresAt <= Date.now() + 60_000 || e.imageHash !== rendered.sha256 || !e.mediaProcessingState) {
+    const media = await transport.upload(credentials, rendered.png, options);
+    if (e.mediaId) (e.supersededMedia ??= []).push({ id: e.mediaId, expiresAt: e.mediaExpiresAt });
+    e.mediaId = media.id;
+    e.mediaExpiresAt = Date.now() + media.expiresAfterSecs * 1000;
+    e.mediaProcessingState = media.processingState;
+    e.imageHash = rendered.sha256;
+    await save();
+  }
+  if (e.mediaProcessingState !== 'succeeded') {
+    const media = await transport.status(credentials, e.mediaId, options);
+    if (media.id !== e.mediaId) throw new Error('X returned another media upload.');
+    e.mediaProcessingState = media.processingState;
+    await save();
+  }
+  return e.mediaProcessingState === 'succeeded';
+}
 export type Config = {
-  version?: 12 | 13 | 14 | 16;
+  version?: 12 | 13 | 14 | 16 | 17;
   holderRewardsCodeHash?: string;
   genesisCodeHash?: string;
   chainId: number;
@@ -40,7 +61,7 @@ export function mergeObservations(existing: Delivery[], observations: Observatio
   });
 }
 export async function observe(config: Config, suppliedProvider?: Provider): Promise<Observation[]> {
-  if (config.version === 16) throw new Error('V16 requires its single-address observer.');
+  if ((config.version === 16 || config.version === 17)) throw new Error('V16/V17 require their dedicated single-address observer.');
   if (![1, 11155111].includes(config.chainId) && !(suppliedProvider && config.chainId === 31337)) throw new Error('Unsupported social network.');
   const app = new URL(config.appUrl);
   if (app.protocol !== 'https:' || app.username || app.password || app.search || app.hash)
@@ -122,8 +143,8 @@ export function deliveryFailureStatus(error: unknown, writeStarted: boolean): 'p
   // Network/5xx/malformed-success ambiguity and persistence failure after a send require reconciliation.
   return !writeStarted || (error instanceof XApiError && !(error instanceof AmbiguousDelivery)) ? 'pending' : 'uncertain';
 }
-export async function run(requiredVersion?: 12 | 13 | 14 | 16, adapter?: {
-  version: 16; observe: (config: Config) => Promise<Observation[]>; templateVersion: string; stages: readonly string[];
+export async function run(requiredVersion?: 12 | 13 | 14 | 16 | 17, adapter?: {
+  version: 16 | 17; observe: (config: Config) => Promise<Observation[]>; templateVersion: string; stages: readonly string[];
   resolveAccount?: (config: Config, mode: string) => Promise<{ config: Config; credentials: XCredentials; assertCurrent: () => Promise<void> } | undefined>;
 }) {
   const [configFile, stateFile, mode = '--observe', eventKey, postId] = process.argv.slice(2);
@@ -132,11 +153,11 @@ export async function run(requiredVersion?: 12 | 13 | 14 | 16, adapter?: {
       'Usage: social.ts config.json state.json [--observe|--publish|--reconcile eventKey postId]'
     );
   const fileConfig: Config = JSON.parse(await readFile(configFile, 'utf8'));
-  if (fileConfig.accountSource === 'launch' && !adapter?.resolveAccount) throw new Error('The Launch account source requires the V16 sender.');
+  if (fileConfig.accountSource === 'launch' && !adapter?.resolveAccount) throw new Error('The Launch account source requires a dedicated single-address sender.');
   const account = await adapter?.resolveAccount?.(fileConfig, mode);
   const config = account?.config ?? fileConfig;
-  if (adapter && (config.version !== adapter.version || requiredVersion !== adapter.version || config.holderRewardsCodeHash || config.genesisCodeHash)) throw new Error('Explicit single-address V16 configuration required.');
-  if (!adapter && config.version === 16) throw new Error('V16 requires its single-address observer.');
+  if (adapter && (config.version !== adapter.version || requiredVersion !== adapter.version || config.holderRewardsCodeHash || config.genesisCodeHash)) throw new Error('Explicit single-address version configuration required.');
+  if (!adapter && (config.version === 16 || config.version === 17)) throw new Error('V16/V17 require their dedicated single-address observer.');
   const version = adapter ? adapter.version : runtimeVersion({ ...config, version: config.version as 12 | 13 | 14 | undefined });
   const observeCurrent = adapter?.observe ?? observe;
   const merge = (entries: Delivery[], observations: Observation[]) => mergeObservations(adapter ? entries.filter(e => e.status !== 'pending' || observations.some(o => o.key === e.key)) : entries, observations, adapter?.stages);
@@ -202,16 +223,8 @@ export async function run(requiredVersion?: 12 | 13 | 14 | 16, adapter?: {
       await account?.assertCurrent();
       if (!e.image) throw new Error('Branded image observation unavailable.');
       const rendered = await renderSeasonSocialImage(e.image);
-      if (!e.mediaId || !e.mediaExpiresAt || e.mediaExpiresAt <= Date.now() + 60_000 || e.imageHash !== rendered.sha256) {
-        const media = await uploadXMedia(credentials, rendered.png, options);
-        e.mediaId = media.id;
-        e.mediaExpiresAt = Date.now() + media.expiresAfterSecs * 1000;
-        e.imageHash = rendered.sha256;
-        await save();
-      }
-      const media = await getXMediaStatus(credentials, e.mediaId, options);
-      if (media.processingState !== 'succeeded') return; // Resume later without a public-post intent.
-      await setXMediaAltText(credentials, e.mediaId, e.image.alt, options);
+      if (!await prepareDeliveryMedia(e, rendered, credentials, options, save)) return;
+      await setXMediaAltText(credentials, e.mediaId!, e.image.alt, options);
       let writeStarted = false;
       const beforePost = async () => {
         const current = (await observeCurrent(config)).find(o => o.key === e.key);
@@ -233,7 +246,7 @@ export async function run(requiredVersion?: 12 | 13 | 14 | 16, adapter?: {
         await save();
         throw new Error(e.status === 'uncertain'
           ? 'X delivery stopped. Reconcile this entry before retrying. Protocol execution is unaffected.'
-          : 'X rejected this attempt before accepting a post. Resolve the failure before publishing again. Protocol execution is unaffected.');
+          : 'X rejected this attempt before accepting a post. Resolve the failure before publishing again. Protocol execution is unaffected.', { cause: error });
       }
     }
   } finally {
