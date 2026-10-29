@@ -9,7 +9,7 @@ export function readMirrorConfigs(env: Record<string, string | undefined> = proc
   if (!env.NFT_MIRROR_SOURCES_JSON) return [];
   try {
     const entries = JSON.parse(env.NFT_MIRROR_SOURCES_JSON);
-    if (!Array.isArray(entries) || !entries.length || entries.length > 4) throw new Error();
+    if (!Array.isArray(entries) || !entries.length || entries.length > 5) throw new Error();
     const seen = new Set<string>();
     return entries.map(entry => {
       if (!entry || ![1,11155111].includes(entry.chainId) || ![12,13,14,16,17].includes(entry.version)

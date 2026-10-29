@@ -32,6 +32,9 @@ test('mirror pins reject unsafe networks, unconfirmed indexing, duplicates and m
     assert.throws(()=>read(value),error=>error instanceof Error && error.message === 'invalid_nft_mirror_configuration');
   }
   assert.equal(fingerprint(config),fingerprint({...config,rpcUrl:'https://rotated.invalid/key'}));
+  const history=Array.from({length:5},(_,i)=>({...config,controller:`0x${String(i+1).repeat(40)}`}));
+  assert.deepEqual(read(history).map(p=>p.controller),history.map(p=>p.controller));
+  assert.throws(()=>read([...history,{...config,controller:`0x${'6'.repeat(40)}`}]),/invalid_nft_mirror_configuration/);
 });
 test('gallery inputs have a strict bounded page size and chain/address namespace',()=>{
   assert.equal(galleryPage(undefined),1); assert.equal(galleryPage('2'),2);
