@@ -31,6 +31,7 @@ import {
 } from "./public-workspace";
 import { Field, Input, Radio } from "@manekineko/ui/forms";
 import { ConfirmProvider, useConfirm } from "@manekineko/ui/confirm";
+import { FloatingNotice } from "@manekineko/ui/floating-notice";
 import { WalletAccountPicker } from "./wallet-account-picker";
 import { useWalletSession } from "./use-wallet-session";
 import { assertWallet, shortWallet, walletError } from "./wallet";
@@ -133,6 +134,14 @@ function Experience({
   const [busy, setBusy] = useState(false),
     [pending, setPending] = useState<Pending | null>(null),
     [recoveryHash, setRecoveryHash] = useState("");
+  const [activeAction, setActiveAction] = useState<string | null>(null);
+  const [actionPhase, setActionPhase] = useState<"checking" | "review" | "preparing" | "wallet">("checking");
+  const actionFeedback = (label: string) => ({
+    busy: (busy && activeAction === label) || pending?.label === label,
+    busyLabel: pending?.hash ? "Confirming…" : actionPhase === "wallet" ? "Check wallet…" : actionPhase === "review" ? "Reviewing…" : "Checking…",
+    reserveLabels: ["Checking…", "Reviewing…", "Check wallet…", "Confirming…"],
+  });
+  const [lastReceipt, setLastReceipt] = useState<{ message: string; hash: string; success: boolean } | null>(null);
   const locked = useRef(false),
     generation = useRef(0),
     liveSession = useRef(wallet.session);
@@ -254,11 +263,11 @@ function Experience({
         const receipt = await provider.getTransactionReceipt(pending.hash!);
         if (!stopped && receipt) {
           clearPending();
-          setMessage(
-            receipt.status === 1
-              ? `${pending.label} confirmed.`
-              : `${pending.label} reverted. The action did not complete; network fees may still apply.`
-          );
+          const text = receipt.status === 1
+            ? `${pending.label} confirmed.`
+            : `${pending.label} reverted. The action did not complete; network fees may still apply.`;
+          setMessage(text);
+          setLastReceipt({ message: text, hash: pending.hash!, success: receipt.status === 1 });
           void refresh();
         }
       } catch {
@@ -315,6 +324,8 @@ function Experience({
       return;
     locked.current = true;
     setBusy(true);
+    setActiveAction(label);
+    setActionPhase("checking");
     setMessage("");
     let intentWritten = false;
     try {
@@ -368,6 +379,7 @@ function Experience({
         const pool = await verifyHolderPool(session.provider, config);
         if (getAddress(await pool.getAddress()) !== fresh.holders.address) throw new Error("Your wallet and this page report different holder pool data. Refresh before signing.");
       }
+      setActionPhase("review");
       if (
         !(await requestConfirmation({
           title: label,
@@ -376,6 +388,7 @@ function Experience({
         }))
       )
         return;
+      setActionPhase("preparing");
       if (liveSession.current !== session)
         throw new Error("Reconnect your wallet before continuing.");
       await assertWallet(session);
@@ -440,6 +453,7 @@ function Experience({
       localStorage.setItem(key, JSON.stringify(intent));
       intentWritten = true;
       setPending(intent);
+      setActionPhase("wallet");
       const hash = await requestWalletTransaction(session.injected, intent);
       const submitted = { ...intent, hash };
       localStorage.setItem(key, JSON.stringify(submitted));
@@ -456,6 +470,7 @@ function Experience({
     } finally {
       locked.current = false;
       setBusy(false);
+      setActiveAction(null);
     }
   }
   function onRound(
@@ -542,7 +557,7 @@ function Experience({
         </dl>
         <p>{state.sealed ? `The first ballot opens when all ${state.genesis.supply.toLocaleString('en-US')} Genesis NFTs are minted.` : "The deployment is ready. Genesis minting has not opened yet."}</p>
         {state.genesis.primaryMints!==null && state.genesis.primaryMints!==undefined && <p>{String(2n-state.genesis.primaryMints)} free mints remaining for your wallet.</p>}
-        <Button disabled={disabled||!state.genesis.open||state.genesis.walletMinted!==false} onClick={()=>void submit("Mint free NFT","Mint one Genesis NFT for 0 ETH plus network gas. It grants one first-ballot vote and affiliate eligibility throughout all collections and seasons. Referral rewards require a paid referral and successful draw.",genesisMintTransaction)}>{state.genesis.walletMinted?"Wallet limit reached":"Mint free NFT"}</Button>
+        <Button {...actionFeedback("Mint free NFT")} disabled={disabled||!state.genesis.open||state.genesis.walletMinted!==false} onClick={()=>void submit("Mint free NFT","Mint one Genesis NFT for 0 ETH plus network gas. It grants one first-ballot vote and affiliate eligibility throughout all collections and seasons. Referral rewards require a paid referral and successful draw.",genesisMintTransaction)}>{state.genesis.walletMinted?"Wallet limit reached":"Mint free NFT"}</Button>
         <p className="protocol-note">Each Genesis NFT carries one first-ballot vote for its current holder. Transferring it never renews a used vote or mint allowance. Genesis has no prize, sponsored mint or season holder reward.</p>
       </> : <>
       <p>Connected test collection · original rules. These terms apply to the existing test NFT.</p>
@@ -556,7 +571,7 @@ function Experience({
       <p>{!state.genesis.start ? "The free mint has not opened yet." : state.timestamp >= Number(state.genesis.end) ? "The free mint has ended. The first paid ballot is next." : state.genesis.minted === state.genesis.supply ? "All free NFTs have been minted. The first paid ballot can be prepared after the 24-hour window ends." : "The free mint is open."}</p>
       {!wallet.session && <p>Connect your wallet to check and mint your free NFT.</p>}
       {state.genesis.walletMinted && <p>Your wallet has used its free mint. Voting power belongs to the NFT holder at the first ballot’s snapshot.</p>}
-      <Button disabled={disabled || !state.genesis.open || state.genesis.walletMinted !== false} onClick={() => void submit("Mint free NFT", "Mint one Tincta Genesis NFT for 0 ETH plus network gas. It votes only on the first paid collection and has no prize, affiliate, sponsored mint or holder reward entitlement.", genesisMintTransaction)}>
+      <Button {...actionFeedback("Mint free NFT")} disabled={disabled || !state.genesis.open || state.genesis.walletMinted !== false} onClick={() => void submit("Mint free NFT", "Mint one Tincta Genesis NFT for 0 ETH plus network gas. It votes only on the first paid collection and has no prize, affiliate, sponsored mint or holder reward entitlement.", genesisMintTransaction)}>
         {state.genesis.walletMinted ? "Free NFT minted" : "Mint free NFT"}
       </Button>
       <p className="protocol-note">This test collection has no prizes, affiliate eligibility, sponsored mints or season holder rewards. Transferring this NFT does not restore your free mint.</p>
@@ -638,7 +653,7 @@ function Experience({
             </Button>
           </div>
         )}
-        <Button
+        <Button {...actionFeedback("Cast vote")}
           disabled={disabled || !canVote || power === 0n || (v16 && r.id===1 && !genesisTokens.trim())}
           onClick={() =>
             void submit(
@@ -693,7 +708,7 @@ function Experience({
       {field("Eligible collection address", source, setSource)}
       {field("NFT number", sourceToken, setSourceToken)}
       <div className="protocol-actions">
-        <Button
+        <Button {...actionFeedback("Approve this NFT")}
           variant="secondary"
           disabled={disabled}
           onClick={() =>
@@ -721,7 +736,7 @@ function Experience({
         >
           Approve NFT
         </Button>
-        <Button
+        <Button {...actionFeedback("Deposit NFT for voting")}
           variant="secondary"
           disabled={disabled}
           onClick={() =>
@@ -740,7 +755,7 @@ function Experience({
         >
           Deposit NFT
         </Button>
-        <Button
+        <Button {...actionFeedback("Withdraw NFT")}
           variant="ghost"
           disabled={disabled}
           onClick={() =>
@@ -814,7 +829,7 @@ function Experience({
           ? eth(r.price * BigInt(quantity))
           : "Enter 1–20 tickets"}
       </p>
-      <Button
+      <Button {...actionFeedback("Mint tickets")}
         disabled={
           disabled ||
           r.phase !== 1 ||
@@ -893,7 +908,7 @@ function Experience({
           </div>
           <p>Claimable: {eth(r.affiliateAvailable)}</p>
 
-          <Button
+          <Button {...actionFeedback("Claim affiliate reward")}
             disabled={disabled || r.affiliateAvailable === 0n}
             onClick={() =>
               void onRound(
@@ -922,7 +937,7 @@ function Experience({
               {field("Qualifying NFT number", sourceToken, setSourceToken)}
             </>
           )}
-          <Button
+          <Button {...actionFeedback("Enroll as an affiliate")}
             disabled={disabled || !canVote || r.nextSlot === 0n}
             onClick={() =>
               void onRound(
@@ -957,7 +972,7 @@ function Experience({
         may differ from past prize recipients.
       </p>
       {r.phase === 2 && (
-        <Button
+        <Button {...actionFeedback("Request the draw")}
           variant="secondary"
           disabled={disabled}
           onClick={() =>
@@ -979,7 +994,7 @@ function Experience({
             {eth(r.executionReserve)} from separate operating funds. Network
             fees are paid by the executor.
           </p>
-          <Button
+          <Button {...actionFeedback(v16?"Finalize draw":"Finalize draw & collect reward")}
             variant="secondary"
             disabled={disabled}
             onClick={() =>
@@ -1000,7 +1015,7 @@ function Experience({
       {r.executionReserve > 0n &&
         r.executionRecipient.toLowerCase() ===
           wallet.session?.address.toLowerCase() && (
-          <Button
+          <Button {...actionFeedback("Claim executor reward")}
             variant="secondary"
             disabled={disabled}
             onClick={() =>
@@ -1046,7 +1061,7 @@ function Experience({
                 {a.holder}
               </a>
             </div>
-            <Button
+            <Button {...actionFeedback(`Prize for NFT #${String(a.tokenId)} · ${eth(a.amount)}`)}
               variant="secondary"
               disabled={
                 disabled ||
@@ -1090,7 +1105,7 @@ function Experience({
       </p>
       <p className="protocol-note">Enter a paid NFT from {r.name} held by your connected wallet.</p>
       {field("NFT number", token, setToken)}
-      <Button
+      <Button {...actionFeedback("Refund ticket")}
         variant="secondary"
         disabled={disabled || r.phase !== 7 || !validRefundNumber(token, r.minted)}
         onClick={() =>
@@ -1117,7 +1132,7 @@ function Experience({
       </p>
       {field(v16?"Winning collection number":"Winning collection address", rewardSource, setRewardSource)}
       {field(v16?"Winning NFT number":"Prize position", rank, setRank)}
-      <Button
+      <Button {...actionFeedback("Redeem sponsored ticket")}
         variant="secondary"
         disabled={disabled || r.phase !== 1 || (v16 && r.id <= 1)}
         onClick={() =>
@@ -1208,31 +1223,16 @@ function Experience({
       {!state && !error && (
         <p className="protocol-loading" role="status">Loading collection details…</p>
       )}
-      {message && (
-        <p className="protocol-feedback" role="status">
-          {message}
-        </p>
-      )}
-      {pending && (
-        <section className="protocol-panel">
-          <h2>
-            {pending.hash
-              ? "Confirming transaction"
-              : busy
-                ? "Confirm in your wallet"
-                : "Check transaction status"}
-          </h2>
-          <p role="status">
-            {pending.label}.{" "}
-            {pending.hash
-              ? "Your transaction was sent. Waiting for network confirmation."
-              : busy
-                ? "Review the transaction in your wallet. Confirm to continue, or cancel there."
-                : "We couldn’t confirm whether your wallet sent this transaction. Check your wallet activity before trying again."}
-          </p>
-          {pending.hash ? (
-            <p className="protocol-address">{pending.hash}</p>
-          ) : !busy ? (
+      {(busy || pending || message) && (
+        <FloatingNotice
+          title={pending?.hash ? "Confirming transaction" : pending ? busy ? "Confirm in your wallet" : "Check transaction status" : busy ? actionPhase === "preparing" ? "Preparing wallet request" : "Checking transaction" : lastReceipt?.message === message ? lastReceipt.success ? "Transaction confirmed" : "Transaction failed" : "Transaction update"}
+          detail={pending ? `${pending.label}. ${pending.hash ? "Sent. Waiting for network confirmation." : busy ? "Review the request in your wallet. Confirm to continue, or cancel there." : "We couldn’t confirm whether your wallet sent this transaction. Check wallet activity before trying again."}` : busy ? `${activeAction}. ${actionPhase === "preparing" ? "Checking the latest state before opening your wallet." : "Verifying your wallet and collection before opening the review."}` : message}
+          busy={busy || !!pending?.hash}
+          onDismiss={!busy && !pending ? () => setMessage("") : undefined}
+        >
+          {pending && message && <p role="alert">{message}</p>}
+          {(pending?.hash || (!busy && lastReceipt?.message === message)) && <a className={textActionClassName({})} href={`${config?.chainId === 1 ? "https://etherscan.io" : "https://sepolia.etherscan.io"}/tx/${pending?.hash ?? lastReceipt!.hash}`} target="_blank" rel="noreferrer">View transaction</a>}
+          {pending && !pending.hash && !busy && (
             <>
               <Disclosure title="Find a sent transaction">
                 {field("Transaction hash", recoveryHash, setRecoveryHash)}
@@ -1257,8 +1257,8 @@ function Experience({
                 I cancelled in my wallet
               </Button>
             </>
-          ) : null}
-        </section>
+          )}
+        </FloatingNotice>
       )}
     </>
   );
@@ -1290,7 +1290,7 @@ function Experience({
         refund={refundPanel}
         sponsored={sponsoredPanel}
         vault={vaultPanel}
-        holders={state && <HolderRewardsPanel state={state} token={token} onToken={setToken} disabled={disabled} busy={busy} connected={!!wallet.session} explorer={explorer} onClaim={() => {
+        holders={state && <HolderRewardsPanel state={state} token={token} onToken={setToken} disabled={disabled} busy={!!actionFeedback("Claim holder reward").busy} busyLabel={actionFeedback("Claim holder reward").busyLabel} connected={!!wallet.session} explorer={explorer} onClaim={() => {
           if (!provider || !config || !state.holders || !r) return;
           const reward = state.holders.rewardPerNft;
           void submit("Claim holder reward", `Claim ${eth(reward)} for NFT #${token} in ${r.name} (${r.address}) from pool ${state.holders.address}. Recipient: ${wallet.session!.address}. Network: ${config.chainId === 1 ? "Ethereum Mainnet" : "Sepolia testnet"}. First come, first served in onchain execution order; a pending transaction does not reserve a slot. Network fees are separate.`, (fresh, address) => holderClaimTransaction(provider, config, fresh, integerInput(token), address, reward));

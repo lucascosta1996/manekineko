@@ -11,6 +11,7 @@ export function HolderRewardsPanel({
   onClaim,
   disabled,
   busy,
+  busyLabel = "Reviewing claim",
   connected,
   explorer,
 }: {
@@ -20,6 +21,7 @@ export function HolderRewardsPanel({
   onClaim: () => void;
   disabled: boolean;
   busy: boolean;
+  busyLabel?: string;
   connected: boolean;
   explorer: (address: string) => string;
 }) {
@@ -148,7 +150,8 @@ export function HolderRewardsPanel({
             </Field>
             <Button
               busy={busy}
-              busyLabel="Reviewing claim"
+              busyLabel={busyLabel}
+              reserveLabels={["Checking…", "Reviewing…", "Check wallet…", "Confirming…"]}
               disabled={disabled || !available || !/^[1-9][0-9]*$/.test(token)}
               onClick={onClaim}
             >

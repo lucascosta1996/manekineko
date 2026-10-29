@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./floating-notice": "./src/floating-notice.tsx",
     "./mint-activity": "./src/mint-activity.ts",
     "./mint-notification": "./src/mint-notification.tsx",
     "./button": "./src/button.tsx",

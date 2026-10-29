@@ -151,11 +151,6 @@
 .protocol-address {
   overflow-wrap: anywhere;
 }
-.protocol-feedback {
-  padding: var(--ui-space-4);
-  background: var(--ui-surface);
-  overflow-wrap: anywhere;
-}
 @media (max-width: 700px) {
   .protocol-page {
     padding: var(--ui-section-space) 0;

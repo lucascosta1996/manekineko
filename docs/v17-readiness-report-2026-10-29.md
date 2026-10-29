@@ -15,6 +15,12 @@ Status: **live continuation active; first paid draw failed, all 20 tickets refun
 
 The user requested a faster alternative to the V16 eleven-day schedule and can attend for up to half a day. The [accelerated workflow](v17-fast-rehearsal.md) specifies six live collections across two seasons, with the full 216-collection catalog tested separately locally. Historical V16 and its paused run remain intact.
 
+### Live claim retry and participant feedback update
+
+Wallet 2 subsequently claimed Aster Beacon NFT #14 in `0xf03c100af51686428c955277bcd58001cf874b95f7a92aeea4f65475302b423a`. Two RPCs confirm 0.0002 ETH paid, 0.000297796503176496 ETH gas, the exact gas-adjusted balance increase and the recorded beneficiary. The failed earlier attempt remains recorded. The wallet continuation is now held at NFT #15 (`prize:262159`), with no new collection clock opened.
+
+The participant reported an unexplained disabled button during preflight and transaction updates outside the current scroll position. Shared transaction actions now show an immediate spinner and stage labels for checking, review, wallet confirmation and network confirmation. A shared persistent bottom-left notice carries the action, exact prize where applicable, receipt link, failures and uncertain-request recovery controls. Completed notices can be dismissed; pending actions cannot be silently dismissed. Notices yield to confirmation dialogs and temporarily take priority over background mint activity. There is no auto-dismiss timer or automatic transaction retry. Web and Launch tests, typechecks and all app builds pass locally; hosted Opera acceptance of this feedback update is still pending.
+
 ## Live continuation update · 13:44 UTC
 
 This record supersedes the earlier paused preparation snapshots below. The active contract is `0xdb0A3f76DE225377B7B6D1b70C14F1A12aDbe480`; the original three-minute attempt remains paused. The ten-minute retry completed both manual Genesis caps, affiliate enrollment, the Option 3 vote and Wallet 1’s paid referral mint.
