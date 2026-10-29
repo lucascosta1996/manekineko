@@ -57,7 +57,8 @@ test('Launch restores an unknown submission and rejects a wrong recovery hash', 
   await page.getByRole('button',{name:'Connect wallet',exact:true}).click();
   await page.getByRole('button',{name:'Browser wallet',exact:true}).click();
   await page.getByRole('button',{name:`Use account ${A}`}).click();
-  await expect(page.getByRole('heading',{name:'Check your wallet'})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Check transaction status'})).toBeVisible();
+  await page.getByText('Find a sent transaction',{exact:true}).click();
   await expect(page.getByRole('button',{name:'Review transaction'}).first()).toBeDisabled();
   await page.getByLabel('Transaction hash',{exact:true}).fill('0x'+'99'.repeat(32));
   await page.getByRole('button',{name:'Find receipt'}).click();

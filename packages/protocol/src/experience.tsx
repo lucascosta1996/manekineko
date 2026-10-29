@@ -445,7 +445,6 @@ function Experience({
       const submitted = { ...intent, hash: sent.hash };
       localStorage.setItem(key, JSON.stringify(submitted));
       setPending(submitted);
-      setMessage("Transaction submitted. Waiting for confirmation.");
     } catch (e) {
       if (
         intentWritten &&
@@ -1216,40 +1215,48 @@ function Experience({
       {pending && (
         <section className="protocol-panel">
           <h2>
-            {pending.hash ? "Confirming transaction" : "Check your wallet"}
+            {pending.hash
+              ? "Confirming transaction"
+              : busy
+                ? "Confirm in your wallet"
+                : "Check transaction status"}
           </h2>
-          <p>
+          <p role="status">
             {pending.label}.{" "}
             {pending.hash
-              ? "This action stays locked until a receipt is found."
-              : "A signature was requested. Do not submit it again. If your wallet broadcast the transaction, enter its hash to recover the receipt."}
+              ? "Your transaction was sent. Waiting for network confirmation."
+              : busy
+                ? "Review the transaction in your wallet. Confirm to continue, or cancel there."
+                : "We couldn’t confirm whether your wallet sent this transaction. Check your wallet activity before trying again."}
           </p>
           {pending.hash ? (
             <p className="protocol-address">{pending.hash}</p>
-          ) : (
+          ) : !busy ? (
             <>
-              {field("Transaction hash", recoveryHash, setRecoveryHash)}
-              <Button variant="secondary" onClick={() => void recover()}>
-                Find receipt
-              </Button>
+              <Disclosure title="Find a sent transaction">
+                {field("Transaction hash", recoveryHash, setRecoveryHash)}
+                <Button variant="secondary" onClick={() => void recover()}>
+                  Find receipt
+                </Button>
+              </Disclosure>
               <Button
                 variant="ghost"
                 onClick={async () => {
                   if (
                     await requestConfirmation({
-                      title: "Dismiss unsigned request?",
+                      title: "Clear this wallet request?",
                       description:
-                        "Only continue if your wallet confirms that you rejected the request and no transaction was broadcast. A broadcast transaction must be recovered by its hash.",
-                      confirmLabel: "I rejected it in my wallet",
+                        "Continue only if you cancelled in your wallet and its activity shows no sent transaction. If a transaction was sent, find it instead.",
+                      confirmLabel: "Allow retry",
                     })
                   )
                     clearPending();
                 }}
               >
-                I rejected the signature
+                I cancelled in my wallet
               </Button>
             </>
-          )}
+          ) : null}
         </section>
       )}
     </>

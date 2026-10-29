@@ -1,8 +1,14 @@
 # V17 rehearsal readiness report · October 29, 2026
 
-Status: **deployed and source verified; live rehearsal prepared and paused; Mainnet not ready**.
+Status: **deployed and source verified; live rehearsal started and waiting at the first manual Genesis mint; Mainnet not ready**.
 
 The user requested a faster alternative to the V16 eleven-day schedule and can attend for up to half a day. The [accelerated workflow](v17-fast-rehearsal.md) specifies six live collections across two seasons, with the full 216-collection catalog tested separately locally. Historical V16 and its paused run remain intact.
+
+## Live rehearsal observations
+
+The user started the V17 run in Opera on October 29. Funding of 0.15 Sepolia ETH from the pinned source was confirmed through two independent RPCs: [receipt](https://sepolia.etherscan.io/tx/0xfac9c203ccd4d0d559c48f36fc6e43ae12e2c873e5276c0b61d69b9e9eb699bf). Both fresh manual accounts were imported by the user. The runner funded operating requirements, sealed the catalog, funded manual wallet 0 and stopped at `genesis:0:1`. Genesis is open, with zero manual mints at this checkpoint; the first paid ballot has not started.
+
+The first real MetaMask rejection passed: the mint was not sent and the action became available again. The user identified a presentation defect: normal wallet confirmation also displayed receipt-recovery fields and an extra rejection action. The shared Web/Launch feedback now separates the active wallet prompt, submitted transaction and interrupted/restored request. Recovery fields remain available only for the latter, under a disclosure. Hosted acceptance of this fix is recorded with subsequent live observations. The contract and frozen runner/plan are unchanged.
 
 ## Confirmed local evidence
 

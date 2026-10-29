@@ -55,6 +55,28 @@ test('V14 zero-value review and wallet rejection cannot submit a duplicate free 
   await expect(page.getByRole('status').filter({ hasText: /declined/i })).toBeVisible();
   await expect.poll(() => page.evaluate(() => (window as any).__v12Submissions?.length ?? 0)).toBe(1);
 });
+
+for (const width of [390, 1440]) test(`Active wallet request hides recovery and cancellation allows retry ${width}`, async ({page}) => {
+  await page.setViewportSize({width,height:900});
+  await prepare(page); await rpc(page,0,false,{genesis:'open'}); await installRejectingWallet(page); await page.clock.resume();
+  await page.goto(`${urls.web}/?state=v14`); await connectWebWallet(page); await ready(page);
+  await page.evaluate(()=>{Object.assign(window,{__v12HoldSignature:true});});
+  const mint=page.getByRole('button',{name:'Mint free NFT',exact:true});
+  await mint.click(); await page.getByRole('alertdialog').getByRole('button',{name:'Continue to wallet'}).click();
+  await expect(page.getByRole('heading',{name:'Confirm in your wallet',exact:true})).toBeVisible();
+  await expect(page.getByText('Find a sent transaction',{exact:true})).toHaveCount(0);
+  await expect(page.getByLabel('Transaction hash',{exact:true})).toHaveCount(0);
+  await expect(page.getByRole('button',{name:'I cancelled in my wallet',exact:true})).toHaveCount(0);
+  await expect(mint).toBeDisabled();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.evaluate(()=>(window as unknown as {__v12RejectSignature:()=>void}).__v12RejectSignature());
+  await expect(page.getByRole('status').filter({hasText:/declined/i})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Confirm in your wallet',exact:true})).toHaveCount(0);
+  await expect(page.getByRole('heading',{name:'Check transaction status',exact:true})).toHaveCount(0);
+  await expect(mint).toBeEnabled();
+  expect(await page.evaluate(()=>Object.keys(localStorage).filter(k=>k.startsWith('tincta:v14:')).length)).toBe(0);
+  expect(await page.evaluate(()=>(window as unknown as {__v12Submissions:unknown[]}).__v12Submissions.length)).toBe(1);
+});
 test('V14 used primary mint stays unavailable and first paid ballot explains Genesis rights', async ({ page }) => {
   await prepare(page); await rpc(page, 0, false, { genesis: 'open', genesisMinted: true }); await installRejectingWallet(page); await page.clock.resume();
   await page.goto(`${urls.web}/?state=v14`); await connectWebWallet(page);

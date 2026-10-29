@@ -1,5 +1,7 @@
 # Visual-system adoption audit
 
+**2026-10-29 live wallet feedback:** Normal signing now shows a brief confirmation status; receipt recovery is reserved for interrupted/restored requests and its hash input is disclosed on demand. The real Opera/MetaMask rehearsal exposed the former confusing mixed state. See [the scoped record](wallet-request-feedback-2026-10-29.md) for local and hosted evidence boundaries.
+
 **2026-10-28 Rewards landing simplification:** Automatic machine playback, the removed lower collection summary, and the FAQ/Documentation navigation are covered in [the scoped verification record](rewards-landing-simplification-2026-10-28.md).
 
 **2026-10-27 consistency update:** The mounted Landing, Web/docs/gallery and Launch surfaces now share stricter control/card metrics, more section space and shorter public copy with contextual guide links. See [the component review](consistency-review-2026-10-27.md) for component scope, regression checks and local verification boundaries. The historical findings below are not the current metric specification; use [visual standard v1.1](visual-identity.md).

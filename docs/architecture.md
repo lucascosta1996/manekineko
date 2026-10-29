@@ -1,5 +1,9 @@
 # Tincta protocol architecture and agent handoff
 
+## 2026-10-29 V17 live rehearsal start
+
+The user explicitly started the accelerated run using Opera. The 0.15 Sepolia ETH bank funding was verified and the two manual accounts imported. The frozen runner opened Genesis and reached `genesis:0:1`; no first-ballot clock starts until Genesis sells out. Real MetaMask cancellation returned to the available mint action. The user found that the ordinary pending wallet prompt exposed recovery controls too early; the shared Web/Launch presentation now distinguishes active confirmation from interrupted request recovery. This is a UI correction, with no contract or frozen-runner change. Follow the private run’s checkpoint/report for current progress and the [readiness report](v17-readiness-report-2026-10-29.md) for evidence boundaries. Historical deployment preparation snapshots below remain dated records.
+
 ## 2026-10-29 accelerated V17 qualification
 
 The user requested a fast rehearsal within half a day. [V17](v17-fast-rehearsal.md) adds an immutable Sepolia/local accelerated profile to a new single-contract implementation; Mainnet rejects fast mode and production mode retains the V16 limits. The six live scenarios cover two seasons, all three sellout packages, two unsold refunds and manual wallet custody. The complete ordered 216-entry catalog is additionally exercised locally with controlled time and mocked VRF. Historical V16 source/deployment, pins and its frozen paused runner are preserved. This is a new deployment, not an upgrade or resumed V16 run.

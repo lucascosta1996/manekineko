@@ -156,6 +156,13 @@ export async function installRejectingWallet(page: Page, account = A, identity?:
           if (q.method === 'eth_estimateGas') return '0x100000';
           if (q.method === 'eth_sendTransaction') {
             submissions.push(q.params);
+            if ((window as unknown as { __v12HoldSignature?: boolean }).__v12HoldSignature)
+              return new Promise((_resolve, reject) => Object.assign(window, {
+                __v12RejectSignature: () => {
+                  Object.assign(window, { __v12HoldSignature: false });
+                  reject(Object.assign(new Error('User rejected'), { code: 4001 }));
+                },
+              }));
             throw Object.assign(new Error('User rejected'), { code: 4001 });
           }
           return (
