@@ -207,6 +207,8 @@ function Experience({
     };
   }, [config?.websocketUrl, refresh]);
   useEffect(() => {
+    setMessage("");
+    setRecoveryHash("");
     const sync = () => {
       try {
         const saved = key

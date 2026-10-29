@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { prepare, ready, urls } from './fixtures';
-import { rpc, installRejectingWallet } from './v12-rpc';
+import { rpc, installRejectingWallet, T } from './v12-rpc';
 import { connectWebWallet } from './web-wallet-fixture';
 test.use({ trace: 'on', video: 'on' });
 for (const width of [320, 390, 758, 759, 760, 768, 1280, 1440]) {
@@ -76,6 +76,8 @@ for (const width of [390, 1440]) test(`Active wallet request hides recovery and 
   await expect(mint).toBeEnabled();
   expect(await page.evaluate(()=>Object.keys(localStorage).filter(k=>k.startsWith('tincta:v14:')).length)).toBe(0);
   expect(await page.evaluate(()=>(window as unknown as {__v12Submissions:unknown[]}).__v12Submissions.length)).toBe(1);
+  await page.evaluate(address=>(window as unknown as {__v12ChangeAccount:(address:string)=>void}).__v12ChangeAccount(address),T);
+  await expect(page.getByRole('status').filter({hasText:/declined/i})).toHaveCount(0);
 });
 test('V14 used primary mint stays unavailable and first paid ballot explains Genesis rights', async ({ page }) => {
   await prepare(page); await rpc(page, 0, false, { genesis: 'open', genesisMinted: true }); await installRejectingWallet(page); await page.clock.resume();
