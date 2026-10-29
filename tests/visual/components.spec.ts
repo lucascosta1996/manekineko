@@ -75,6 +75,9 @@ test.describe('Shared production component contracts', () => {
   test('busy labels keep geometry, reject repeated activation and preserve focus', async ({ page }) => {
     await specimens(page);
     const button = page.getByTestId('button-busy'); const before = await button.boundingBox();
+    await expect(button.locator('.ui-button-icon')).toHaveCount(0);
+    const idleLabel = (await button.locator('.ui-button-label > span:not(.ui-button-reserve)').boundingBox())!;
+    expect(Math.abs(idleLabel.x + idleLabel.width / 2 - before!.x - before!.width / 2)).toBeLessThanOrEqual(1);
     await button.focus(); await button.click();
     await expect(button).toHaveAttribute('aria-busy','true'); await expect(button).toBeFocused();
     const during = await button.boundingBox(); expect(Math.abs(during!.width - before!.width)).toBeLessThanOrEqual(1); expect(during!.height).toBe(before!.height);
@@ -82,6 +85,7 @@ test.describe('Shared production component contracts', () => {
     await expect(page.getByTestId('specimen-result')).toHaveText('Saving changes.');
     await page.getByRole('button', { name:'Finish simulated request' }).click();
     await expect(button).not.toHaveAttribute('aria-busy', 'true');
+    await expect(button.locator('.ui-button-icon')).toHaveCount(0);
     const after = await button.boundingBox(); expect(after!.width).toBe(before!.width); expect(after!.height).toBe(before!.height);
   });
 

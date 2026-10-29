@@ -19,10 +19,12 @@ export function Spinner({ className = "" }: { className?: string }) {
 
 function Content({ children, icon, iconPosition = "start", busy, busyLabel, reserveLabels = [] }: ActionContent) {
   const labels = [...new Set(busyLabel ? [...reserveLabels, busyLabel] : reserveLabels)];
-  const slot = icon || busyLabel ? <span className="ui-button-icon">{busy ? <Spinner /> : icon}</span> : null;
+  const slot = icon || (busy && busyLabel) ? <span className="ui-button-icon">{busy ? <Spinner /> : icon}</span> : null;
+  // Keep the pending width without leaving an empty icon beside the idle label.
+  const reserveSpinner = busyLabel && !icon && !busy;
   return <>
     {iconPosition === "start" && slot}
-    <span className="ui-button-label">
+    <span className={`ui-button-label${reserveSpinner ? " ui-button-label-reserve-spinner" : ""}`}>
       <span>{busy && busyLabel ? busyLabel : children}</span>
       {labels.map((label) => <span className="ui-button-reserve" aria-hidden="true" key={label}>{label}</span>)}
       {busyLabel && <span className="ui-button-reserve" aria-hidden="true">{children}</span>}

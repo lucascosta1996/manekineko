@@ -65,6 +65,7 @@ button, input, textarea, select { font-family: var(--ui-font-sans); }
 .ui-button-destructive { background: var(--ui-danger); color: var(--ui-on-ink); border-color: var(--ui-danger); }
 .ui-button-full { width: 100%; }
 .ui-button-label { display: grid; min-width: 0; }
+.ui-button .ui-button-label-reserve-spinner { padding-inline: calc((var(--ui-icon-size) + var(--ui-space-2)) / 2); }
 .ui-button-label > span { display: inline-flex; align-items: center; justify-content: center; gap: var(--ui-space-2); grid-area: 1 / 1; overflow-wrap: anywhere; }
 .ui-button-reserve { visibility: hidden; pointer-events: none; }
 .ui-button-icon { display: inline-flex; align-items: center; justify-content: center; flex: none; width: var(--ui-icon-size); height: var(--ui-icon-size); }
@@ -94,6 +95,8 @@ button, input, textarea, select { font-family: var(--ui-font-sans); }
   font: inherit; letter-spacing: inherit; text-align: start; text-transform: none; text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer;
 }
 .ui-text-action-inline { display: inline; min-height: 0; min-width: 0; vertical-align: baseline; }
+.ui-text-action .ui-button-label-reserve-spinner { padding-inline-end: calc(var(--ui-icon-size) + var(--ui-space-2)); }
+.ui-text-action-inline .ui-button-label-reserve-spinner { padding-inline: 0; }
 .ui-text-action-inline .ui-button-label, .ui-text-action-inline .ui-button-label > span { display: inline; }
 .ui-text-action-inline .ui-button-reserve { display: none; }
 .ui-text-action:is(:disabled, [aria-disabled="true"]) { color: var(--ui-muted); cursor: not-allowed; text-decoration-style: dotted; }

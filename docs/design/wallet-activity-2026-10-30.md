@@ -15,8 +15,12 @@ The wallet page uses the shared wallet session and UI controls. It separates pri
 | UI source/harness | Source contracts and visual harness typecheck pass; new isolated wallet fixtures cover receipts, loading, failure/retry, account changes, unavailable and confirmed empty states |
 | Staging persistence | Migration 038 and restricted runtime grants verified; existing gallery row counts/content hashes unchanged |
 | Live projection | Active V17 caught up to block 12020564; six Wallet 2 NFTs, three prize payments (0.0006 ETH), one affiliate payment (0.000133333333333333 ETH) |
-| Hosted/native Opera | Pending publication in this source snapshot |
+| Hosted/native Opera | Release `42832c2` Ready on all five projects with matching production aliases; Opera shows the 20-NFT Aster Beacon gallery and Wallet 2’s exact totals and six holdings. Two RPCs independently confirm all six current owners. Mobile and account-switch browser checks remain pending |
 | Automated visual CI | New tests authored; not executed locally because the user requested Opera only. Remote result must be checked separately |
 | Accessibility/resilience | Semantic controls and financial state guards reviewed; browser axe, keyboard, reduced-motion and full responsive acceptance remain unverified until executed |
 
 The new fixture routes are confined to the isolated visual app; production has no synthetic wallet or fixture API. This record does not certify all visual gates or Mainnet readiness.
+
+## Idle button alignment follow-up
+
+The participant found that `busyLabel` reserved an empty leading icon even while idle, shifting button text. The shared content now renders an icon slot only for an actual icon or active spinner. Idle button labels are centered with symmetrical width reservation; inline text actions leave no phantom slot. Pending widths and duplicate-action guards are preserved. The existing component geometry test now also asserts centered idle text and absence of an empty icon slot. UI source/type checks and all five production builds pass; live Opera acceptance of this follow-up remains pending at this commit.
