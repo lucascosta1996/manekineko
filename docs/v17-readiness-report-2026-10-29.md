@@ -1,6 +1,6 @@
 # V17 rehearsal readiness report · October 29, 2026
 
-Status: **deployed and source verified; live rehearsal holding at 19/20 Genesis mints before the timed first ballot; Mainnet not ready**.
+Status: **first attempt paused after a missed first vote; retry preparation only, at the user's request; Mainnet not ready**.
 
 The user requested a faster alternative to the V16 eleven-day schedule and can attend for up to half a day. The [accelerated workflow](v17-fast-rehearsal.md) specifies six live collections across two seasons, with the full 216-collection catalog tested separately locally. Historical V16 and its paused run remain intact.
 
@@ -13,6 +13,12 @@ The first real MetaMask rejection passed: the mint was not sent and the action b
 The user requested removal of the accelerated-test header sentence from Web and Launch. Launch's reported disconnected state was an explicitly selected Mainnet view (`chainId=1`); a bare dashboard already defaults to Sepolia and correctly reads 19/20 Genesis mints. The Mainnet empty state now names its network and offers a Sepolia status link. A separate presentation defect labeled the prepared first paid collection as current while Genesis was still minting. The operator summary and catalog now wait for the actual Genesis sellout marker before showing the paid ballot as current. These source corrections do not change network pins, contract behavior or the frozen runner; hosted acceptance is recorded after publication.
 
 ## Confirmed local evidence
+
+### First-ballot and refund UI incident
+
+After the user confirmed readiness, the last Genesis mint opened the immutable 180-second ballot. Wallet 0 successfully enrolled as affiliate position 1 ([receipt](https://sepolia.etherscan.io/tx/0x8b20d276bfb3b6e726596bbe563d3a332e956308d85973d56e8e17aac53df755)). Guided enrollment and wallet confirmation left insufficient time for the vote. The ballot fell back to Option 1 rather than planned Option 3. The runner returned `ballot-result` and sent no paid mint. This is a failed manual timing test, not a completed six-scenario rehearsal. The user subsequently requested preparation for later without starting another deadline. Future deployment settings use ten-minute ballots; the old deployment and frozen records retain their actual 180 seconds.
+
+The user then attempted a refund using NFT number 1. Two independent RPCs agreed at block 12018381: collection 1 had zero paid mints, zero revenue and zero refunds; paid token 131073 did not exist; Genesis token 1 belonged to Wallet 0. Wallet 0 had nonce 3 with no additional pending transaction, matching its two Genesis mints and affiliate enrollment. The refund failed during preflight without a broadcast or gas charge. The UI wrongly offered an action without a minted ticket and showed a generic error plus a production-only 72-hour sentence. Source now removes the empty-collection form, distinguishes free Genesis from paid tickets, validates minted serial/current ownership, handles burned NFTs separately from unavailable verification, and uses the onchain randomness deadline. Its actual V17 timeout is 900 seconds. Positive paid-ticket refund and wrong-holder/burned-token cases passed against the local V17 EVM; these do not constitute a live Sepolia refund test. Hosted verification follows publication.
 
 - The accelerated profile and Mainnet rejection tests pass. Production-mode V17 enforces the original minimums and constants.
 - All 27 established production semantic cases pass against V17 with rehearsal disabled, including exact prizes for all three production packages, refund reserves, hostile receivers/reentrancy, snapshots, affiliate allocations and holder/sponsored limits.

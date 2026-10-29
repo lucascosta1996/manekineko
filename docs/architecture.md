@@ -1,5 +1,11 @@
 # Tincta protocol architecture and agent handoff
 
+## 2026-10-29 first-ballot incident; keep the retry stopped
+
+The first V17 attempt reached 20 Genesis mints and a confirmed manual affiliate enrollment, but the three-minute first ballot closed before the manual vote. Option 1 became final instead of the planned Option 3; the frozen runner stopped before spending on paid mints. No paid NFTs were minted. The user requested a later retry, so the original runner is paused and no replacement deadline may be started. Future deployment settings use ten-minute ballots with unchanged Solidity and small-supply/refund profiles; do not mutate the original contract, plan, runtime, vault or evidence.
+
+The Web then incorrectly offered a refund for NFT #1 in the empty paid collection. Independent RPCs confirmed zero paid NFTs/revenue, a nonexistent paid token and only the three known Wallet 0 transactions. Its Genesis #1 is a separate free NFT. The empty collection now has no refund form, claims verify collection-scoped serial/current ownership before wallet review, and timeout copy refers to the actual onchain deadline. A real local EVM paid-ticket refund passes; live Sepolia refunds remain untested. See the [readiness report](v17-readiness-report-2026-10-29.md).
+
 ## 2026-10-29 V17 live rehearsal start
 
 The user explicitly started the accelerated run using Opera. The 0.15 Sepolia ETH bank funding was verified and the two manual accounts imported. The frozen runner opened Genesis and reached `genesis:0:1`; no first-ballot clock starts until Genesis sells out. Real MetaMask cancellation returned to the available mint action. The user found that the ordinary pending wallet prompt exposed recovery controls too early; the shared Web/Launch presentation now distinguishes active confirmation from interrupted request recovery. This is a UI correction, with no contract or frozen-runner change. Follow the private run’s checkpoint/report for current progress and the [readiness report](v17-readiness-report-2026-10-29.md) for evidence boundaries. Historical deployment preparation snapshots below remain dated records.

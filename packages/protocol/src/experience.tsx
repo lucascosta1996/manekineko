@@ -51,6 +51,7 @@ import { operatorActions } from "./operator-actions";
 import { readCatalog, type Catalog } from "./progress";
 import { HolderRewardsPanel } from "./holder-rewards-panel";
 import { holderClaimTransaction, verifyHolderPool } from "./holder-rewards";
+import { refundTransaction, validRefundNumber } from "./refunds";
 
 type View = PublicView | "operations";
 type Pending = {
@@ -1083,30 +1084,36 @@ function Experience({
   );
   const refundPanel = r && state && (
     <section className="protocol-panel">
+      {r.minted === 0n ? <>
+        <h2>No ticket refunds to claim</h2>
+        <p>No paid NFTs were minted in {r.name}. No mint payments were collected.</p>
+        {state.genesis && <p className="protocol-note">Genesis NFTs are free NFTs in a separate collection. They are not paid tickets and cannot be refunded.</p>}
+      </> : <>
       <h2>Claim your refund</h2>
       <p>
         If the collection is unsold at its mint deadline, or no randomness is
-        recorded within 72 hours of sellout, the current holder can recover the
+        recorded before its onchain randomness deadline after sellout, the current holder can recover the
         full mint price. Refunding burns the ticket. Randomness recorded on time
         permanently commits the draw.
       </p>
+      <p className="protocol-note">Enter a paid NFT from {r.name} held by your connected wallet.</p>
       {field("NFT number", token, setToken)}
       <Button
         variant="secondary"
-        disabled={disabled || r.phase !== 7}
+        disabled={disabled || r.phase !== 7 || !validRefundNumber(token, r.minted)}
         onClick={() =>
-          void onRound(
+          void submit(
             "Refund ticket",
-            `Burn NFT #${token} and receive ${eth(
+            `Burn NFT #${token} in ${r.name} and receive ${eth(
               r.price
             )} in your connected wallet.`,
-            "refund",
-            (_, a) => [integerInput(token), a]
+            (fresh, address) => refundTransaction(provider!, config!, fresh, integerInput(token), address)
           )
         }
       >
         Refund ticket
       </Button>
+      </>}
     </section>
   );
   const sponsoredPanel = r && state && (

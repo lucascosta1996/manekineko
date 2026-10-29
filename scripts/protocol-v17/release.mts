@@ -9,7 +9,8 @@ import {rehearsalProvider} from '../protocol-v14/rehearsal/rpc.mts';
 import {createTransactionPipeline,ChainPendingError} from '../season-runner/chain-transactions.ts';
 import {durable,exclusive,privateRead} from '../protocol-v12/rehearsal/store.mts';
 import {v17FastBallotOptions} from '../../apps/contracts/config/v17-ballot.ts';
-export const releaseSettings={operator:'0x3b2571129c05bD71B6504596aB2ca52B3ffB7223',coordinator:'0x9DdfaCa8183c41ad55329BdeeD9F6A8d53168B1B',keyHash:'0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae',confirmations:3,callbackGas:200000,votingDuration:180,votingDelay:1,randomnessBudget:'10000000000000000',sponsorshipBudget:'1000000000000000'};
+// Future runs allow time for two guided wallet confirmations. The first 180-second deployment remains immutable.
+export const releaseSettings={operator:'0x3b2571129c05bD71B6504596aB2ca52B3ffB7223',coordinator:'0x9DdfaCa8183c41ad55329BdeeD9F6A8d53168B1B',keyHash:'0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae',confirmations:3,callbackGas:200000,votingDuration:600,votingDelay:1,randomnessBudget:'10000000000000000',sponsorshipBudget:'1000000000000000'};
 const normalize=(v:unknown)=>JSON.parse(JSON.stringify(v,(_,x)=>typeof x==='bigint'?String(x):x));
 export async function releaseManifest(){
  const source=JSON.parse(await readFile(new URL('../../apps/launch/catalog/sepolia.json',import.meta.url),'utf8'));

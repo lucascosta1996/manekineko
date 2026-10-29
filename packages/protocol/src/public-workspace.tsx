@@ -122,7 +122,7 @@ export function PublicWorkspace({
               ? "The next collection is prepared. Voting begins at its onchain opening time."
               : protocolVersion >= 13 && [5, 6].includes(r.phase)
               ? "The draw is complete. Discover the winners and your rewards."
-              : stageDescriptions[r.phase]
+              : r.phase === 7 && r.minted === 0n ? "Minting closed without any paid NFTs minted. No mint payments were collected, so there are no ticket refunds to claim." : stageDescriptions[r.phase]
             : state?.genesis ? "Start with a free NFT. Help choose the first paid collection." : "Vote. Mint. Follow the draw."}
         </p>
       </header>

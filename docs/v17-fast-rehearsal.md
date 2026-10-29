@@ -1,5 +1,9 @@
 # V17 accelerated Sepolia rehearsal · October 29, 2026
 
+## Current hold and retry profile
+
+The original 180-second first ballot closed before the manual vote after affiliate enrollment. It selected fallback Option 1, and the runner stopped before any paid mint. Preserve that failed attempt and its frozen files. The user asked to prepare a retry **but keep it stopped for later**. Future deployments use ten-minute ballots with the same Solidity, supplies, prices and short refund windows. No replacement Genesis or paid clock may be opened until the user returns. Existing deployment/preparation snapshots below retain their historical settings; they are not evidence of a completed rehearsal.
+
 This replaces the proposed eleven-day **test schedule**, preserving the unstarted V16 contract and its frozen vault/runner. V17 is a new deployment. Mainnet remains unconfigured.
 
 The user can attend for up to half a day. Target approximately **1–3 hours** for six live collections, subject to real block production, Chainlink, user actions and defect recovery. Never promise a fixed completion time or record a simulated receipt as live evidence.

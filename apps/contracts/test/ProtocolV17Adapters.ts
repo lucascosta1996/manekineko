@@ -1,4 +1,6 @@
 import {expect} from 'chai';
+import assert from 'node:assert/strict';
+import {refundTransaction} from '../../../packages/protocol/src/refunds.ts';
 import {network} from 'hardhat';
 import {v17FastBallotOptions} from '../config/v17-ballot.ts';
 import {readV16,v16Token,v16RoundTransaction} from '../../../packages/protocol/src/v16.ts';
@@ -45,7 +47,11 @@ describe('V17 accelerated application adapters against real local contract state
   await c.prepareNext();await networkHelpers.time.increaseTo((await c.round(2)).saleStart);s=await read(2);expect(s.round!.id).eq(2);expect(s.round!.address).eq(address);
   await buyer.sendTransaction(await v16RoundTransaction(s,'mintQuoted',[buyer.address,1,0,s.round!.termsHash],price));
   await networkHelpers.time.increaseTo(await c.mintDeadline(2));s=await read(2);expect(s.round!.phase).eq(7);expect(s.holders!.unlocked).eq(true);
-  await buyer.sendTransaction(await v16RoundTransaction(s,'refund',[1,buyer.address]));
+  await assert.rejects(refundTransaction(ethers.provider,config,s,1n,affiliate.address),/wallet that currently holds this paid NFT/);
+  const beforeRefund=await ethers.provider.getBalance(buyer.address);
+  const refundReceipt=(await(await buyer.sendTransaction(await refundTransaction(ethers.provider,config,s,1n,buyer.address))).wait())!;
+  expect(await ethers.provider.getBalance(buyer.address)+refundReceipt.gasUsed*refundReceipt.gasPrice-beforeRefund).eq(price);
+  await assert.rejects(refundTransaction(ethers.provider,config,await read(2),1n,buyer.address),/may already have been refunded/);
   s=await read(1);await buyer.sendTransaction(await holderClaimTransaction(ethers.provider,config,s,1n,buyer.address,s.holders!.rewardPerNft));expect(await c.holderClaimed(v16Token(1,1n))).eq(true);
   const mirrorConfig={...config,controller:address.toLowerCase(),fromBlock:deployment!.blockNumber,confirmations:2,blockRange:2000};
   const mirror=new V16MirrorChain(ethers.provider as any,mirrorConfig),head=await mirror.block((await ethers.provider.getBlock('latest'))!.number);
