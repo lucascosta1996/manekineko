@@ -141,7 +141,7 @@ export class RehearsalEngine{
    while(await this.c.primaryMints(0,this.address(index))<target)await this.send(index,`genesis:${index}:${await this.c.primaryMints(0,this.address(index))}`,await this.c.mintGenesis.populateTransaction());
   }));
   await this.prepareBuyers(this.plan.scenarios[0]);
-  await this.gate({id:'before-genesis-sellout',instruction:'Be present for the first vote and affiliate enrollment. The final Genesis mint opens a fixed three-minute ballot immediately.'});
+  await this.gate({id:'before-genesis-sellout',instruction:`Be present for the first vote and affiliate enrollment. The final Genesis mint immediately opens the fixed ${this.plan.settings.votingDuration}-second ballot.`});
   if((await this.c.round(0)).minted<20n){const index=9;await this.ensureBalance(index,eth/500n,'final-genesis');await this.send(index,'genesis-final',await this.c.mintGenesis.populateTransaction());}
  }
  private async enroll(s:Scenario){

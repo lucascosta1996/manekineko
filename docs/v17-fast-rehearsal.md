@@ -8,7 +8,23 @@ This replaces the proposed eleven-day **test schedule**, preserving the unstarte
 
 The user can attend for up to half a day. Target approximately **1–3 hours** for six live collections, subject to real block production, Chainlink, user actions and defect recovery. Never promise a fixed completion time or record a simulated receipt as live evidence.
 
-## Verified deployment and new wallet handoffs
+## Prepared ten-minute retry — do not start yet
+
+The separate retry contract is [0xdb0A3f76DE225377B7B6D1b70C14F1A12aDbe480](https://sepolia.etherscan.io/address/0xdb0A3f76DE225377B7B6D1b70C14F1A12aDbe480#code). Exact source and two-RPC checks passed: 600-second ballots, unsealed catalog, zero Genesis and zero prepared paid collections. The private runner is `/Users/admin/.local/share/tincta/v17-ten-minute-rehearsal-2026-10-29/`, with its pause marker present. Runtime SHA-256: `b9147cd9a61a818330ee03ca2ea131b1ca9c59ad7b79c70dec28b20c1b98bcca`; plan SHA-256: `d84f85fce65ed87bd05c5556648e82b0e3c9b540181c60ef0da7b87788626742`.
+
+The same bank and imported Wallets 0/1 are reused. Do not ask for another initial deposit or import. The original funding receipt is already registered as carryover proof and must be counted only once in the combined final report. Both attempts remain paused; opening balances and the reduced remaining gas/VRF review allowance are recorded in private `carryover.json`. Preserve the old contract's reserves and records. The public apps still point to the original attempt; update and verify Web/Launch/indexer pins before the user returns to start.
+
+Only these read-only commands are appropriate while waiting:
+
+```sh
+V17_RETRY=/Users/admin/.local/share/tincta/v17-ten-minute-rehearsal-2026-10-29
+node "$V17_RETRY/command.mjs" preflight
+node "$V17_RETRY/command.mjs" status
+```
+
+## Original deployment snapshot and wallet handoffs — superseded run
+
+The following records the original preparation and commands. That attempt subsequently missed its first manual vote and is paused. **Do not resume the original runner.** Follow the retry section above and the readiness report for current state.
 
 - Contract: [0x39f625904CC50C08797e52b909EE51F6eB66d26E](https://sepolia.etherscan.io/address/0x39f625904CC50C08797e52b909EE51F6eB66d26E#code). Exact source published; both RPCs agreed on code, all settings, three options, six catalog entries and inactive state. [Public deployment evidence](../output/v17-fast-rehearsal/deployment.json).
 - Runtime: `0x1e3bef6ef6d189205f9da3537b5dd5e530d05a6af67a708a49a386187c7c563c`.
@@ -43,7 +59,7 @@ node "$V17_RUN/command.mjs" recover --execute "$V17_PLAN"
 
 One V17 implementation has an immutable constructor `rehearsal` flag. Accelerated mode is permitted only on Sepolia and the isolated local chain. Mainnet rejects it. Disabling it retains production minima: 1,000 Genesis, two lifetime primary Genesis mints per wallet, at least 64 VRF confirmations, at least a one-hour ballot/paid window, at least 1,000 paid NFTs and 0.01 ETH, 72-hour randomness timeout and 0.01 ETH executor reserve. These rules cannot be changed after deployment.
 
-The accelerated profile has 20 Genesis NFTs, ten minting wallets, the same two-mint lifetime allowance, no Genesis deadline, a sellout-only first ballot, three-minute ballots, a one-second next-ballot delay, three real VRF confirmations, a fifteen-minute randomness timeout and a 0.0001 ETH executor reserve.
+The accelerated profile has 20 Genesis NFTs, ten minting wallets, the same two-mint lifetime allowance, no Genesis deadline, a sellout-only first ballot, a one-second next-ballot delay, three real VRF confirmations, a fifteen-minute randomness timeout and a 0.0001 ETH executor reserve. The original deployment has three-minute ballots; the prepared retry has ten-minute ballots. The option supplies, prices and paid mint windows below are unchanged.
 
 | Option | Supply | Price | Equal prizes | Each prize | Paid mint window |
 |---|---:|---:|---:|---:|---:|
