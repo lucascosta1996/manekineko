@@ -58,7 +58,11 @@ try{
      const stopAt=Date.now()+minutes*60000;
      for(;;){try{await engine.run();console.log(JSON.stringify({status:'complete'}));break;}catch(e){
       if(!wait||!(e instanceof Hold)||e.status!=='waiting'||Date.now()>=stopAt)throw e;
-      await saveReport(plan,state,providers[0]);await new Promise(resolve=>setTimeout(resolve,10000));
+      // Full historical reports can take longer than an accelerated mint window.
+      // Keep the canonical verification on every pass; write the complete report
+      // when the run reaches a checkpoint or ends, rather than between waits.
+      console.log(JSON.stringify({status:'waiting',detail:e.detail,collection:state.current,at:new Date().toISOString()}));
+      await new Promise(resolve=>setTimeout(resolve,10000));
      }}
     }
     catch(e:any){

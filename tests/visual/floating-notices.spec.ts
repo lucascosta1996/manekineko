@@ -4,6 +4,7 @@ import { prepare, urls } from './fixtures';
 
 for (const width of [390, 1101]) test(`wallet and transaction notifications remain visible while scrolling at ${width}px`, async ({ page }) => {
   await prepare(page);
+  await page.clock.resume();
   await page.setViewportSize({ width, height: 844 });
   await page.goto(`${urls.landing}/specimens/notifications`);
   await page.getByRole('button', { name: 'Show both notifications' }).click();

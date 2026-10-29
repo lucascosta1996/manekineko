@@ -89,6 +89,15 @@ test("disconnect cannot restore stale provider permissions; explicit new connect
   assert.equal((current as WalletSession | null)?.address, A);
   bridge.dispose();
 });
+test("provider account, network and disconnect events clear saved app selections", async () => {
+  const f = fixture(); let invalidations = 0;
+  const bridge = createConnectedWalletBridge(f.account, () => {}, () => { invalidations++; });
+  await bridge.sync(); await bridge.sync();
+  assert.equal(invalidations, 0);
+  f.emit("accountsChanged"); f.emit("chainChanged"); f.emit("disconnect");
+  assert.equal(invalidations, 3);
+  bridge.dispose();
+});
 test("a late restore result cannot replace a newer account or survive disposal", async () => {
   const f = fixture(); let current: WalletSession | null = null, selected = f.account();
   const original = f.provider.request;

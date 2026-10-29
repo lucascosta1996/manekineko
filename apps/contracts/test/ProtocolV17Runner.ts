@@ -12,7 +12,7 @@ import { v17FastBallotOptions, v17FastTiming } from '../config/v17-ballot.ts';
 const { ethers, networkHelpers }=await network.create('hardhatV16Adapters');
 describe('V17 frozen runner through real local EVM transactions',function(){
  this.timeout(180000);
- it('completes all six live-plan scenarios, exact manual receipts, parallel bot journals, custody, final audit and recovery',async()=>{
+ for(const automatedFinal of [false,true]) it(`completes all six scenarios, custody, exact audit and recovery (${automatedFinal?'automated final settlement':'guided settlement'})`,async()=>{
   const directory=await mkdtemp(join(tmpdir(),'tincta-v17-engine-')),originalNow=Date.now;
   try{
    let clock=Number((await ethers.provider.getBlock('latest'))!.timestamp)*1000;Date.now=()=>clock;
@@ -36,6 +36,7 @@ describe('V17 frozen runner through real local EVM transactions',function(){
    await c.connect(operator).appendCollections(catalog);
    const manifest={settings,options:JSON.parse(JSON.stringify(v17FastBallotOptions,(_,v)=>typeof v==='bigint'?String(v):v)),catalog,rehearsal:true};
    const plan=rehearsalPlan({version:17,chainId:11155111,sealed:false,prepared:0,genesisMints:0,address:await c.getAddress(),codeHash:ethers.keccak256(await ethers.provider.getCode(await c.getAddress())),manifest},'a'.repeat(64));
+   if(automatedFinal)plan.scenarios[5].automatedSettlement=true;
    const state:RunState={version:17,planHash:digest(plan),addresses:wallets.map(w=>w.address),operatorBaseline:String(await ethers.provider.getBalance(operator.address)),started:false,complete:false,current:1,gate:null,approvals:{},custody:{[wallets[0].address.toLowerCase()]:{reason:'Manual affiliate'},[wallets[1].address.toLowerCase()]:{reason:'Manual buyer'}},journals:{},funding:[],genesisTokens:{},buyers:{},manualWinners:{},accounted:[],gasWei:'0',operatorBudgetWei:'0',recoveries:{},vrfFeesWei:'0',errors:[],outcomes:{},externalReceipts:[]};
    await networkHelpers.setBalance(plan.recoveryAddress,ethers.parseEther('1'));const recovery=await ethers.getImpersonatedSigner(plan.recoveryAddress);
    const funding=await recovery.sendTransaction({to:wallets[10].address,value:BigInt(plan.minimumInitialFundingWei)});await funding.wait();await networkHelpers.mine(2);state.funding.push({hash:funding.hash,value:plan.minimumInitialFundingWei});
@@ -60,6 +61,8 @@ describe('V17 frozen runner through real local EVM transactions',function(){
    }
    expect(state.complete).eq(true);expect(gates).gt(20);expect(Object.keys(state.outcomes)).length(6);expect(state.externalReceipts.length).gt(10);
    const result=await report(plan,state,provider);expect(result.executionPassed).eq(true);expect(result.mainnetReady).eq(false);expect(renderReport(result)).includes('EXECUTION PASSED');
+   expect(result.collections[5].settlementMode).eq(automatedFinal?'automated-wallets-only':'guided');
+   if(automatedFinal){expect(state.approvals['refund:786433']).eq(undefined);expect(state.approvals[`holder:${catalog[5].seasonId}`]).eq(undefined);}
    const balances=await Promise.all(Object.keys(state.custody).map(a=>ethers.provider.getBalance(a)));
    await engine.recoverUnspent();expect(await ethers.provider.getBalance(plan.recoveryAddress)).gt(ethers.parseEther('0.85'));
    expect(await Promise.all(Object.keys(state.custody).map(a=>ethers.provider.getBalance(a)))).deep.eq(balances);

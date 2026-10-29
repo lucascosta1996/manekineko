@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 export const digest=(value:unknown)=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
-export type Scenario={id:number;seasonId:string;name:string;choice:0|1|2;outcome:'sellout'|'refund';referrals:'manual'|'three'|'none'|'ten';noVotes:boolean;seasonFirst:boolean;seasonLast:boolean;sponsoredFromSeason?:string};
+export type Scenario={id:number;seasonId:string;name:string;choice:0|1|2;outcome:'sellout'|'refund';referrals:'manual'|'three'|'none'|'ten';noVotes:boolean;seasonFirst:boolean;seasonLast:boolean;sponsoredFromSeason?:string;automatedSettlement?:true};
 export function rehearsalPlan(release:any,runtimeSha256:string){
   if(!/^[a-f0-9]{64}$/.test(runtimeSha256)||release.version!==17||release.chainId!==11155111||release.sealed!==false||release.prepared!==0||release.genesisMints!==0||release.manifest.catalog.length!==6||release.manifest.options.length!==3||release.manifest.rehearsal!==true)throw new Error('A verified, unstarted accelerated V17 release is required.');
   const choices=[2,0,1,0,1,1] as const;

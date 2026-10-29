@@ -1,5 +1,13 @@
 # Tincta protocol architecture and agent handoff
 
+## Autonomous V17 settlement continuation · 2026-10-30 local
+
+The user delegated the remaining work after the Beryl Atlas affiliate claim. The imported wallets remain protected; automation does not sign or sweep them. Beryl Beacon subsequently missed its three-minute mint deadline at 32/40 because full historical reports and repeated checks consumed the window. Its signed final eight-NFT transaction was stopped before broadcast. Both RPCs confirmed the absent transaction/receipt, unchanged latest and pending nonce, expired deadline and available refunds. The original signed journal is preserved; a private retirement record and public hash/reason distinguish this unbroadcast intent from spent gas.
+
+The separately frozen continuation is `/Users/admin/.local/share/tincta/v17-autonomous-continuation-2026-10-30/`, runtime `3a965f69803fdd6515e7768e942d7f40be3381e91953c7d6fd066a0f0c8d5b95`, plan `e4cdcc12dc16c62a673bf6467dbafb061d09cdbee4f3d1fcb1e7747c49a5bcde`. Its parent is paused and immutable. Collections 5–6 use explicit automated settlement: first refunds and Beryl holder claims use only bot-controlled wallets, while imported owners still stop at a manual gate. Refunds run concurrently across distinct wallets and sequentially within each wallet. Reports identify this coverage as automated. The failed four-prize sellout remains a failure; no contract terms changed.
+
+The wait loop retains canonical verification on every pass but writes its full historical report at checkpoints/end instead of before each ten-second wait. Lightweight wait status is logged between passes. Ten focused tests and both complete local EVM runner modes passed, including exact accounting, custody exclusion and recovery. Live cleanup/final settlement are in progress; Mainnet remains unqualified.
+
 ## Wallet activity and gallery correction · 2026-10-30
 
 `/wallet` shows confirmed payments received by the connected address and its current NFTs for the active, verified V16/V17 Sepolia deployment. Amounts are exact integer wei; prize, affiliate, holder and execution rewards are separate from refunds and operator receipts. Payment history follows the `Paid` recipient, while NFT ownership follows the latest confirmed `Transfer`. A transferred winning NFT does not transfer the former recipient's payment history. This page is a display projection, never claim authorization, and does not aggregate historical deployments or qualify Mainnet.

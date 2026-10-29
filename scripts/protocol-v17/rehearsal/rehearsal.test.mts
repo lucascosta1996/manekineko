@@ -78,3 +78,47 @@ test('manual failure reconciliation requires two canonical matching failures, re
   assert.equal(state.gasWei,'300');assert.equal(state.failedManualTransactions?.length,1);assert.equal(state.errors.length,1);assert.deepEqual(state.gate,gate);assert.deepEqual(state.approvals,{});assert.deepEqual(state.externalReceipts,[]);
  }finally{await rm(dir,{recursive:true,force:true});}
 });
+
+test('autonomous settlement refunds a bot first ticket but preserves guided defaults and imported-wallet custody',async()=>{
+ const wallets=Array.from({length:11},()=>new Wallet(Wallet.createRandom().privateKey)),plan=rehearsalPlan(release,'a'.repeat(64));
+ const scenario={...plan.scenarios[5],id:6,outcome:'refund' as const};
+ for(const mode of ['guided','bot','imported'] as const){
+  const owner=wallets[2].address,state={addresses:wallets.map(w=>w.address),custody:mode==='imported'?{[owner.toLowerCase()]:{reason:'Imported before continuation'}}:{},approvals:{},journals:{}} as unknown as RunState;
+  const engine=new RehearsalEngine({plan,state,directory:'/unused',provider:{} as any,secondary:{} as any,wallets,operator:wallets[0]});
+  const sends:number[]=[],manual:string[]=[],recipients:string[]=[];
+  (engine as any).c={round:async()=>({finalizedAt:0n,minted:1n}),terms:async()=>({}),refundsAvailable:async()=>true,ownerOf:async()=>owner,refund:{populateTransaction:async(_token:bigint,recipient:string)=>{recipients.push(recipient);return{to:plan.address,data:'0x1234'};}}};
+  engine.save=async()=>{};engine.manual=async(id)=>{manual.push(id);};
+  (engine as any).send=async(index:number)=>{assertCustody(state.custody,engine.address(index));sends.push(index);return{};};
+  await (engine as any).claim({...scenario,...(mode==='guided'?{}:{automatedSettlement:true})});
+  if(mode==='bot'){assert.deepEqual(sends,[2]);assert.deepEqual(manual,[]);assert.deepEqual(recipients,[engine.bank()]);assert.deepEqual(state.custody,{});}
+  else{assert.deepEqual(sends,[]);assert.deepEqual(manual,['refund:786433']);assert.deepEqual(recipients,[owner]);assert.ok(state.custody[owner.toLowerCase()]);}
+ }
+});
+
+test('autonomous holder settlement uses only eligible bots and stops when imported holders are the only capacity',async()=>{
+ const wallets=Array.from({length:11},()=>new Wallet(Wallet.createRandom().privateKey)),plan=rehearsalPlan(release,'a'.repeat(64));
+ for(const botCapacity of [2,0]){
+  const state={addresses:wallets.map(w=>w.address),custody:{[wallets[4].address.toLowerCase()]:{reason:'Imported winner'}},manualWinners:{}} as unknown as RunState;
+  const engine=new RehearsalEngine({plan,state,directory:'/unused',provider:{} as any,secondary:{} as any,wallets,operator:wallets[0]});
+  let claims=0;const sent:{index:number;recipient:string;token:bigint}[]=[],gates:string[]=[];let prepared:{recipient:string;token:bigint};
+  (engine as any).c={holderSummary:async()=>({unlocked:true,limit:2n}),seasons:async()=>({first:4n,last:6n,claims:BigInt(claims)}),round:async(id:number)=>({finalizedAt:id===4?1n:0n,minted:3n}),holderClaimed:async()=>false,ownerOf:async(token:bigint)=>{const serial=Number(token&131071n);return wallets[serial===1||botCapacity===0?4:serial===2?3:5].address;},claimHolder:{populateTransaction:async(token:bigint,recipient:string)=>{prepared={recipient,token};return{to:plan.address,data:'0x1234'};}}};
+  engine.ensureBalance=async()=>{};engine.gate=async(gate)=>{gates.push(gate.id);};engine.manual=async()=>{assert.fail('Autonomous mode must not fabricate a manual holder check');};
+  (engine as any).send=async(index:number)=>{assertCustody(state.custody,engine.address(index));sent.push({index,...prepared});claims++;return{};};
+  const operation=(engine as any).holders({...plan.scenarios[5],automatedSettlement:true});
+  if(botCapacity===0){await assert.rejects(operation,(error:any)=>error instanceof Hold&&error.status==='holder-review');assert.deepEqual(sent,[]);assert.deepEqual(gates,[]);}
+  else{await operation;assert.deepEqual(sent.map(x=>x.index),[3,5]);assert.ok(sent.every(x=>x.recipient===engine.bank()));assert.deepEqual(sent.map(x=>String(x.token)),['524290','524291']);assert.equal(gates.length,1);}
+  assert.deepEqual(Object.keys(state.custody),[wallets[4].address.toLowerCase()]);
+ }
+});
+
+test('autonomous refunds overlap distinct wallets while preserving each wallet nonce order',async()=>{
+ const wallets=Array.from({length:11},()=>new Wallet(Wallet.createRandom().privateKey)),plan=rehearsalPlan(release,'a'.repeat(64));
+ const state={addresses:wallets.map(w=>w.address),custody:{},approvals:{},journals:{}} as unknown as RunState;
+ const engine=new RehearsalEngine({plan,state,directory:'/unused',provider:{} as any,secondary:{} as any,wallets,operator:wallets[0]});
+ const active=new Set<number>(),orders=new Map<number,string[]>();let maximum=0;
+ (engine as any).c={round:async()=>({finalizedAt:0n,minted:4n}),terms:async()=>({}),refundsAvailable:async()=>true,ownerOf:async(token:bigint)=>wallets[(token&131071n)<=2n?3:5].address,refund:{populateTransaction:async()=>({to:plan.address,data:'0x1234'})}};
+ engine.manual=async()=>{assert.fail('No human wallet owns these refunds');};
+ (engine as any).send=async(index:number,action:string)=>{assert.equal(active.has(index),false);active.add(index);maximum=Math.max(maximum,active.size);const order=orders.get(index)??[];order.push(action);orders.set(index,order);await new Promise(resolve=>setTimeout(resolve,5));active.delete(index);return{};};
+ await (engine as any).claim({...plan.scenarios[5],automatedSettlement:true});
+ assert.equal(maximum,2);assert.deepEqual(orders.get(3),['refund:786433','refund:786434']);assert.deepEqual(orders.get(5),['refund:786435','refund:786436']);
+});

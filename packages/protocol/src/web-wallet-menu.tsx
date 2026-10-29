@@ -13,9 +13,10 @@ import "./web-wallet-menu.css";
 type WalletKit = Awaited<ReturnType<typeof webWalletKit>>;
 
 /** First-party account management; Reown remains the connection/session authority. */
-export function WebWalletMenu({ modal, open, onClose, origin, invalidate, synchronize, openConnect, openNetworks }: {
+export function WebWalletMenu({ modal, open, onClose, origin, invalidate, synchronize, onSelected, openConnect, openNetworks }: {
   modal: WalletKit; open: boolean; onClose: () => void; origin: HTMLElement | null;
   invalidate: () => void; synchronize: () => Promise<void>;
+  onSelected: (connectorId: string, address: string) => Promise<void>;
   openConnect: () => void; openNetworks: () => void;
 }) {
   const [, refresh] = useState(0);
@@ -89,6 +90,7 @@ export function WebWalletMenu({ modal, open, onClose, origin, invalidate, synchr
                     await ConnectionController.switchConnection({ connection, address, namespace: "eip155", closeModalOnConnect: false });
                     if (modal.getAccount("eip155")?.address?.toLowerCase() !== address.toLowerCase() || ConnectorController.state.activeConnectorIds.eip155 !== connection.connectorId)
                       throw new Error("The wallet did not switch. Try again or choose the account in your wallet.");
+                    await onSelected(connection.connectorId, address);
                   }, "Active wallet updated.")}>Switch</Button>}
                 </div>
               </li>;

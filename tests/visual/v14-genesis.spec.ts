@@ -11,7 +11,7 @@ for (const width of [320, 390, 758, 759, 760, 768, 1280, 1440]) {
     await page.goto(`${urls.web}/?state=v14`); await ready(page);
     await expect(page.getByRole('heading', { name: 'Tincta Genesis', exact: true })).toBeVisible();
     await expect(page.getByText('0 ETH + network gas', { exact: true })).toBeVisible();
-    await expect(page.getByText('128 / 1000', { exact: true })).toBeVisible();
+    await expect(page.getByText('128 / 1,000', { exact: true })).toBeVisible();
     await expect(page.getByText('Only for the first vote.', {exact: true})).toBeVisible();
     await expect(page.getByText(/For future votes, you’ll need NFTs from successfully revealed paid season collections/)).toBeVisible();
     expect(await page.locator('.genesis-artwork img').evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
@@ -67,7 +67,7 @@ for (const width of [390, 1440]) test(`Active wallet request hides recovery and 
   await expect(page.getByText('Find a sent transaction',{exact:true})).toHaveCount(0);
   await expect(page.getByLabel('Transaction hash',{exact:true})).toHaveCount(0);
   await expect(page.getByRole('button',{name:'I cancelled in my wallet',exact:true})).toHaveCount(0);
-  await expect(mint).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Check wallet…', exact: true })).toBeDisabled();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.evaluate(()=>(window as unknown as {__v12RejectSignature:()=>void}).__v12RejectSignature());
   await expect(page.getByRole('status').filter({hasText:/declined/i})).toBeVisible();

@@ -7,7 +7,7 @@ import {durable} from '../../protocol-v12/rehearsal/store.mts';
 import {Hold,assertCustody,assertMintBudget,assertRandomnessReserve,digest,type Plan,type Scenario} from './plan.mts';
 const iface=new Interface(abi),eth=10n**18n,token=(id:number,serial:bigint)=>(BigInt(id)<<17n)|serial;
 export type Gate={id:string;instruction:string;wallet?:string;walletIndex?:number;request?:{to:string;data:string;value:string};token?:string;collection?:number};
-export type RunState={version:17;planHash:string;addresses:string[];operatorBaseline:string;started:boolean;complete:boolean;current:number;gate:Gate|null;approvals:Record<string,{note:string;at:string;transaction?:string}>;custody:Record<string,{reason:string;token?:string}>;journals:Record<string,ChainJournal>;funding:{hash:string;value:string}[];genesisTokens:Record<string,string[]>;buyers:Record<string,number[]>;manualWinners:Record<string,{token:string;index:number}>;accounted:string[];gasWei:string;operatorBudgetWei:string;recoveries:Record<string,string>;vrfFeesWei:string;errors:{at:string;collection:number;code:string}[];outcomes:Record<string,unknown>;externalReceipts:string[];failedManualTransactions?:{id:string;hash:string;note:string;at:string}[];extraRandomnessFundingWei?:Record<string,string>;costReviews?:{limitWei:string;reason:string;at:string}[];overrides?:Record<string,{choice:0|1|2;outcome:'sellout'|'refund';referrals:Scenario['referrals'];reason:string;at:string;block:number}>};
+export type RunState={version:17;planHash:string;addresses:string[];operatorBaseline:string;started:boolean;complete:boolean;current:number;gate:Gate|null;approvals:Record<string,{note:string;at:string;transaction?:string}>;custody:Record<string,{reason:string;token?:string}>;journals:Record<string,ChainJournal>;funding:{hash:string;value:string}[];genesisTokens:Record<string,string[]>;buyers:Record<string,number[]>;manualWinners:Record<string,{token:string;index:number}>;accounted:string[];gasWei:string;operatorBudgetWei:string;recoveries:Record<string,string>;vrfFeesWei:string;errors:{at:string;collection:number;code:string}[];outcomes:Record<string,unknown>;externalReceipts:string[];retiredTransactions?:{actor:number;action:string;hash:string;nonce:number;reason:string;at:string}[];failedManualTransactions?:{id:string;hash:string;note:string;at:string}[];extraRandomnessFundingWei?:Record<string,string>;costReviews?:{limitWei:string;reason:string;at:string}[];overrides?:Record<string,{choice:0|1|2;outcome:'sellout'|'refund';referrals:Scenario['referrals'];reason:string;at:string;block:number}>};
 export class RehearsalEngine{
  readonly plan:Plan;readonly state:RunState;readonly directory:string;
  private provider:JsonRpcProvider;private secondary:JsonRpcProvider;private wallets:Wallet[];private operator:Wallet;private c:Contract;private pollIntervalMs:number;
@@ -282,6 +282,7 @@ export class RehearsalEngine{
     else if(!a.claimed)await this.send(i,`affiliate-claim:${s.id}:${slot}`,await this.c.claimAffiliate.populateTransaction(s.id,this.bank()));
    }
   }else if(await this.c.refundsAvailable(s.id)){
+   const refundJobs=new Map<number,(()=>Promise<unknown>)[]>();
    for(let serial=1n;serial<=r.minted;serial++){
     const global=token(s.id,serial),action=`refund:${global}`;
     // Refunds burn their NFT. Reconciled receipts, rather than a provider's
@@ -292,11 +293,16 @@ export class RehearsalEngine{
      throw e;
     }
     const i=this.state.addresses.findIndex(a=>a.toLowerCase()===owner.toLowerCase());if(i<0)throw new Hold('external-refund','An external holder needs a manual refund.');
-    if(serial===1n||this.state.custody[owner.toLowerCase()]){
+    if((serial===1n&&!s.automatedSettlement)||this.state.custody[owner.toLowerCase()]){
      this.state.custody[owner.toLowerCase()]??={reason:'Manual refund test',token:String(global)};await this.save();
      await this.manual(`refund:${global}`,i,`Export/import this holder wallet and refund NFT ${serial} of ${s.name} through /claims?collection=${s.id}.`,await this.c.refund.populateTransaction(global,owner),false,{collection:s.id,token:String(global)});
-    }else await this.send(i,`refund:${global}`,await this.c.refund.populateTransaction(global,this.bank()));
+    }else{
+     const request=await this.c.refund.populateTransaction(global,this.bank());
+     if(s.automatedSettlement){const jobs=refundJobs.get(i)??[];jobs.push(()=>this.send(i,`refund:${global}`,request));refundJobs.set(i,jobs);}
+     else await this.send(i,`refund:${global}`,request);
+    }
    }
+   await this.batch([...refundJobs.values()].map(jobs=>async()=>{for(const job of jobs)await job();}));
   }else throw new Hold('waiting','The collection has not settled yet.');
  }
  private async recover(s:Scenario){
@@ -323,10 +329,14 @@ export class RehearsalEngine{
  }
  private async holders(s:Scenario){
   const summary=await this.c.holderSummary(s.seasonId);if(!summary.unlocked)throw new Hold('waiting','The season holder pool is still locked.');
+  // A separately frozen autonomous continuation may use only existing bot
+  // holders. It never releases custody or labels those claims as manual tests.
+  if(!s.automatedSettlement){
   const winner=this.state.manualWinners[s.seasonId];if(!winner)throw new Hold('holder-review','No eligible manual holder exists for this season.');
   const owner=await this.c.ownerOf(winner.token),collection=Number(BigInt(winner.token)>>17n),serial=BigInt(winner.token)&131071n;
   const holderIndex=this.state.addresses.findIndex(a=>a.toLowerCase()===owner.toLowerCase());if(holderIndex<0)throw new Hold('holder-review','The holder NFT moved outside the managed wallet set; review its current owner.');
   await this.manual(`holder:${s.seasonId}`,holderIndex,`Test the season holder reward before bots claim. Open /holders?collection=${collection}, enter NFT ${serial}, and claim to your wallet.`,await this.c.claimHolder.populateTransaction(winner.token,owner),await this.c.holderClaimed(winner.token),{collection,token:winner.token});
+  }
   const season=await this.c.seasons(s.seasonId);
   for(let id=Number(season.first);id<=Number(season.last);id++){
    const r=await this.c.round(id);if(!r.finalizedAt)continue;

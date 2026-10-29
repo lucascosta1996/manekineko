@@ -21,6 +21,9 @@ for (const coarse of [false, true]) test.describe(coarse ? 'Touch consumers' : '
   test.use({ hasTouch: coarse });
   for (const width of coarse ? [390, 1440] : [320, 390, 768, 1280, 1440, 1920, 2560]) {
   test(`current route control consistency ${width}`, async ({ page }, info) => {
+    // This case checks eleven routes, including decoded artwork and axe on each.
+    // CI reached the final route when its former one-minute aggregate budget expired.
+    test.setTimeout(120_000);
     test.skip(info.project.name !== 'chromium' && ![390, 1440].includes(width), 'Primary engine covers every layout size.');
     await page.setViewportSize({ width, height: 900 });
     await prepare(page); await page.clock.resume();

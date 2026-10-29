@@ -170,11 +170,11 @@ test("claims show all holders, support previous collections and guard paid prize
   );
   await page.getByRole("combobox", { name: "Collection", exact: true }).click();
   await page
-    .getByRole("option", { name: "Collection 2 · Latest", exact: true })
+    .getByRole("option", { name: "Fictional voting study", exact: true })
     .click();
   await expect(page).toHaveURL(/collection=2/);
   await expect(page.getByRole("combobox")).toContainText(
-    "2 · Fictional voting study"
+    "Fictional voting study"
   );
   await page.unroute("https://v12.fixture.invalid/**");
   await rpc(page, 6);

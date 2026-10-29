@@ -26,6 +26,7 @@ export async function readConnectedWallet(account: ConnectedAccount): Promise<Wa
 export function createConnectedWalletBridge(
   read: () => ConnectedAccount | null,
   publish: (session: WalletSession | null, error: string) => void,
+  onProviderChange: () => void = () => {},
 ) {
   let revision = 0, disposed = false;
   let current: WalletSession | null = null;
@@ -38,11 +39,12 @@ export function createConnectedWalletBridge(
     if (current) { invalidateWallet(current); current.provider.destroy(); current = null; }
   };
   const changed = () => {
+    onProviderChange();
     release(); publish(null, "");
     // Let the SDK process the same provider event before reading its new selection.
     queueMicrotask(() => { if (!disposed) void sync(); });
   };
-  const disconnected = () => { revoked = watched; release(); publish(null, "Wallet disconnected. Connect again to continue."); };
+  const disconnected = () => { onProviderChange(); revoked = watched; release(); publish(null, "Wallet disconnected. Connect again to continue."); };
   const watch = (provider: WalletProvider | null) => {
     if (watched === provider) return;
     for (const event of ["accountsChanged", "chainChanged"]) watched?.removeListener?.(event, changed);
