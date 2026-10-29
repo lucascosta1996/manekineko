@@ -1,5 +1,5 @@
 import { BrowserProvider, getAddress, JsonRpcSigner } from "ethers";
-import { assertWallet, invalidateWallet, type WalletProvider, type WalletSession } from "./wallet.ts";
+import { assertWallet, invalidateWallet, pinSelectedWalletAccounts, type WalletProvider, type WalletSession } from "./wallet.ts";
 
 export type ConnectedAccount = { address: string; chainId: number; provider: WalletProvider; name?: string };
 
@@ -11,12 +11,14 @@ export async function readConnectedWallet(account: ConnectedAccount): Promise<Wa
   const [accounts, chain] = await Promise.all([
     injected.request({ method: "eth_accounts" }), injected.request({ method: "eth_chainId" }),
   ]);
-  if (!Array.isArray(accounts) || typeof accounts[0] !== "string" || getAddress(accounts[0]) !== address || Number(BigInt(String(chain))) !== chainId)
+  if (Number(BigInt(String(chain))) !== chainId)
     throw new Error("Your wallet is updating. Check the selected account and network, then try again.");
   const provider = new BrowserProvider(injected, "any");
   // Constructing a signer here cannot prompt for accounts, unlike getSigner().
   const session = { address, chainId, providerName, provider, injected, signer: new JsonRpcSigner(provider, address) };
-  try { await assertWallet(session); return session; }
+  // AppKit can explicitly select any authorized account, not just eth_accounts[0].
+  // Pin the full ordered permission snapshot so later changes still revoke signing.
+  try { pinSelectedWalletAccounts(session, accounts); await assertWallet(session); return session; }
   catch (error) { provider.destroy(); throw error; }
 }
 

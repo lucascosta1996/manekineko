@@ -32,7 +32,7 @@ test('Wallet loading, failure, retry, account changes and unavailable data do no
   await page.goto(urls.web+'/wallet');
   await expect(page.getByRole('status')).toContainText('Loading your wallet activity');
   await expect(page.locator('.wallet-total')).toHaveCount(0);
-  state='failure';release();await expect(page.getByRole('alert')).toContainText('couldn’t update');
+  state='failure';release();await expect(page.locator('.wallet-page').getByRole('alert')).toContainText('couldn’t update');
   state='ready';await page.getByRole('button',{name:'Refresh activity'}).click();await expect(page.locator('.wallet-total')).toHaveText('0.000733333333333333 ETH');
   state='syncing';await page.getByRole('button',{name:'Use another fixture wallet'}).click();await expect(page.locator('.wallet-total')).toHaveCount(0);await expect(page.getByRole('heading',{name:'Your wallet activity is syncing.'})).toBeVisible();
   state='unavailable';await page.getByRole('button',{name:'Refresh activity'}).click();await expect(page.locator('.wallet-total')).toHaveCount(0);

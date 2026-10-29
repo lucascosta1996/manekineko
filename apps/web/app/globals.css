@@ -78,7 +78,6 @@ img {
 .header-wallet-small { display: none; }
 .header-wallet-mismatch { flex-basis: 100%; }
 
-.header-wallet-notice { flex-basis: 100%; max-width: 32ch; margin: 0; color: var(--ui-danger); font: 400 var(--ui-caption)/var(--ui-caption-line) var(--ui-font-sans); }
 
 .mint-header nav a:hover,
 .mint-header nav a[aria-current="page"] {
@@ -1949,5 +1948,4 @@ img {
   .header-wallet-wide { display: none; }
   .header-wallet-small { display: inline-flex; }
   .header-wallet-mismatch { display: none; }
-  .header-wallet-notice { position: absolute; inset: 100% 0 auto; max-width: none; padding: var(--ui-space-2); background: var(--ui-canvas); z-index: var(--ui-z-popover); }
 }

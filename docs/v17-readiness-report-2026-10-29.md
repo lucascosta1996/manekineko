@@ -1,6 +1,16 @@
 # V17 rehearsal readiness report · October 29, 2026
 
-## Latest checkpoint · 2026-10-29 16:01 UTC
+## Latest checkpoint · 2026-10-29 18:22 UTC
+
+Beryl Atlas (collection 4) sold out at 17:58:48 UTC before its 17:59:49 deadline, received real Chainlink randomness and finalized six winners. Wallet 1's referred mint is `0xb7ba68b5e49031c71b4c43c801f14a9ec18d698126551b97e1d3c662eb87161c`. The user imported winning Wallet 4 (`0x4AB1023896b83974F3c2DC25445E07d61bc0C5BE`) and claimed NFT #5 in `0x922f9d7c9eaa3d4f5c45756959353359d3937b74f731d2fd68e48bcd47ca66bd`, receiving 0.0002 Sepolia ETH before gas. Wallet 1 also independently claimed NFT #1; the runner is reconciling that receipt without submitting a duplicate. Remaining prize/affiliate settlement and collections 5–6 are outstanding. Their clocks have not started. The Aster Current unsold incident and completed refund/holder cleanup are detailed below; they remain failures of the intended sellout scenario.
+
+The shared SDK wallet bridge incorrectly required an explicitly selected account to be the first address returned by `eth_accounts`. The fix accepts an authorized selection and pins the complete ordered permission snapshot, while retaining immediate signer invalidation and network checks. Header errors now use the bottom-left shared notification stack, including dismissal and a wallet review action. Collection selectors load names from the verified onchain prepared catalog, with the existing reorg-checked cache; future drafts are not exposed as active collections.
+
+Local release checks: Web 311 passed / 3 existing database skips; Launch 197 passed / 6 existing database skips plus 5 preparation tests; Landing 35 passed / 2 opt-in skips across its two commands; focused wallet tests 35 passed. Web, Launch and Landing production builds passed, as did the 12 UI source tests and visual TypeScript checks. Native Opera verified simultaneous notices below the scroll position, nonoverlap, and independent dismissal in the isolated fixture. Mobile acceptance and the remote browser matrix remain separate pending checks. Publication of this source snapshot is underway; the old deployed header was still visible when the user reported the repeated error at 02:18 local time.
+
+X's Beryl Atlas opening post was API-verified as `2115867326327541865`. At 18:06 UTC the sender's finalized head lagged by 989 seconds. Sellout subsequently entered the sent outbox as `2115870600283746440`; draw-ready and revealed posts were still queued at the last check. Do not label queued milestones delivered or treat finalized-chain latency as an instant announcement test. Mainnet remains unqualified.
+
+## Earlier checkpoint · 2026-10-29 16:01 UTC
 
 This checkpoint supersedes the earlier pending-claim snapshots. All six Aster Beacon prizes and its affiliate rewards are settled. Wallet 2's NFT #15 receipt is `0x28c9b14347d83132534c282e2e30a3d8af19d71c57fe9963384dda585c8f8abc` (0.0002 ETH); its affiliate receipt is `0x0964a95fee454eb8a3bf4cfdf0ec7fb83b42094177f7b0048893a35daa81a4d5` (0.000133333333333333 ETH). Two independent RPCs agree on successful canonical receipts, exact intended actions and `Paid` events. One archival RPC additionally confirms each exact gas-adjusted balance increase; the other no longer serves those historical balance states. Wallet 2's total received rewards are 0.000733333333333333 ETH before gas. Its current deployment holdings are Genesis #7/#16 and Aster Beacon #13–16.
 
@@ -113,3 +123,28 @@ The initial application commit `35ab3cc` reached Ready on all five Vercel projec
 | Security and operations | Independent review, unresolved defects closed, production infrastructure and wallet/device acceptance | Open |
 
 No combination of local or compressed live passes proves universal correctness. Mainnet readiness must remain false while a material item above is open. Future `report.md`/`report.json` record actual evidence and failures; this preparation report is not a completed live audit.
+
+
+## Aster Current incident — 2026-10-29 UTC / 2026-10-30 local
+
+The third collection did **not** pass its intended Option 3 sellout test. Voting began at 16:27:49 UTC, minting opened at 16:37:49, and its immutable mint deadline was 16:47:49. Wallet 2 made an additional paid mint at 16:40:24, then redeemed its sponsored mint at 16:44:12. The runner confirmed its first automated mint group but reached the final-broadcast cutoff before the withheld sellout batch. It stopped with “Activation broadcast window expired; pause and review the immutable schedule.” Actual supply is 17 / 20, with no sellout, VRF request or draw. This was an orchestration failure, not the planned unsold scenario. The remaining guided mint must be prepared immediately at opening, with ample time reserved for receipt validation and both automated mint stages.
+
+Two independent RPCs verify the additional [paid NFT #1](https://sepolia.etherscan.io/tx/0xd8422ecbcc868b9b4eeb540de40466c32524a57282cb2a82493a3549410a96a8) and [sponsored NFT #2](https://sepolia.etherscan.io/tx/0xac239de8e15ae923f20563925b95648fa131cd5ba2128fd677bd07d7969eee01). The sponsored mint used Beacon NFT #13 and consumed Wallet 2’s lifetime redemption. The extra paid mint's gas is **1,132,822,511,328,225 wei** and must be added once to the frozen runner's final gas report because it was made outside a runner checkpoint; its 100,000,000,000,000 wei principal was subsequently refunded.
+
+Both manual refunds are verified through their exact wallet intent, canonical receipt, Paid event, burn event and historical balance delta plus gas on **both RPCs**:
+
+| NFT | Refund | Gas | Receipt |
+|---|---:|---:|---|
+| Current #1 / global 393217 | 0.0001 ETH | 0.000496437005626286 ETH | [Confirmed refund](https://sepolia.etherscan.io/tx/0x563b4ec4946041f4cee12c3d44f39a7e342f60943e6a65fc80b64cb4b6f5ef44) |
+| Current #2 / global 393218 | 0.0001 ETH | 0.000349557003961646 ETH | [Confirmed refund](https://sepolia.etherscan.io/tx/0x06a53412d803eac9ecb9d66d9350c0c66062d8d3e198071d884edac4b9ed9152) |
+
+The sponsored refund does not restore lifetime redemption. Bot refunds, subscription recovery, the Aster holder claim and the remaining Beryl scenarios are still in progress at this update. The successful sponsored-mint/refund evidence does not replace the missing ten-prize live draw evidence.
+
+The X sender remained healthy but waited for finalized chain state. At 16:47:11 UTC its finalized head was timestamped 16:33:24, while the latest head was 16:47:00. The [prepared](https://x.com/luckyOne9619/status/2115847937557455035) and [voting-opened](https://x.com/luckyOne9619/status/2115848011192606754) posts were published and independently verified through X's API as the expected account, text and artwork. This finality delay is longer than the accelerated ballot and must not be presented as timely notification coverage for the rehearsal. No finality policy was silently weakened.
+
+
+At 17:22 UTC, all 17 Current refunds were recorded and its unused 0.25 ETH oracle reserve was recovered. Wallet 2 then [claimed the Aster holder reward](https://sepolia.etherscan.io/tx/0x854a153917b3c4ce5e68dfd83563d96b28e5e3c89b81ca9c90b86a71e954539c): 0.0002 ETH, gas 0.000625041006250410 ETH, with the payout and balance reconciliation verified on both RPCs. Beacon NFT #13 remains owned by Wallet 2; the season's single holder slot is consumed. Resuming the original sellout expectation after subscription recovery stopped on a read of the closed subscription. The recorded incident reconciliation must carry the actual refund outcome while preserving the original failure and immutable terms.
+
+Before Beryl, manual wallets retain approximately 0.008907, 0.009713 and 0.005352 ETH respectively for the remaining enrollment, paid mint and claim transactions, including smart-account gas variability. Their custody remains human-controlled; final recovery is still due. The hosted wallet API independently reports six remaining NFTs and both Current refunds, without adding returned principal to reward earnings.
+
+The full local contract suite completed with **569 passing tests**. GitHub Checks passed for both `42832c2` and `dc88b25`. Their Visual UI contracts jobs were cancelled at the 45-minute job limit; the latest run also recorded failing browser cases. These are not passing visual runs. The new wallet amount/layout checks passed at 390, 1101 and 1440 in Chromium and Firefox before cancellation, but the loading/retry case failed and requires diagnosis. Browser-job separation is being prepared so each engine can finish and retain complete diagnostic output.

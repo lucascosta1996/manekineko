@@ -46,6 +46,13 @@ function canonicalAccounts(value: unknown): string[] {
   return [...new Set(value.map((account: string) => getAddress(account)))];
 }
 
+/** Pin an explicitly selected, already authorized account and its permission snapshot. */
+export function pinSelectedWalletAccounts(session: WalletSession, value: unknown): void {
+  const accounts = canonicalAccounts(value);
+  if (!accounts.includes(session.address)) throw new Error("This account is not connected to this site. Authorize it in your wallet, then select it again.");
+  selectedWalletAccounts.set(session, accounts);
+}
+
 export async function requestWalletAccounts(injected: WalletProvider, options: { selectAccount?: boolean } = {}): Promise<string[]> {
   if (options.selectAccount) {
     try {
@@ -85,7 +92,7 @@ export async function connectWallet(chainId: number, options: { injected?: Walle
   const provider = new BrowserProvider(injected, "any");
   try {
     const session = { address, chainId, providerName: options.providerName, provider, injected, signer: await provider.getSigner(address) };
-    if (selectedAddress !== undefined) selectedWalletAccounts.set(session, accounts);
+    if (selectedAddress !== undefined) pinSelectedWalletAccounts(session, accounts);
     await assertWallet(session);
     return session;
   } catch (error) {

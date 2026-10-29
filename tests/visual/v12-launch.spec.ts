@@ -184,7 +184,7 @@ for (const width of [390,1440]) test(`Launch randomness deadline and timeout ref
   await expect(page.getByText(/Checking the contract before showing refund availability/)).toBeVisible();
   await expect(page.getByRole('heading',{name:'Prepare the next collection',exact:true})).toHaveCount(0);
   await rpc(page,7,false,{drawTimeout:true}); await page.clock.runFor(12000);
-  await expect(page.getByText(/No randomness was recorded within 72 hours of sellout/)).toBeVisible();
+  await expect(page.getByText(/No randomness was recorded before this collection’s onchain deadline/)).toBeVisible();
   await expect(page.getByRole('heading',{name:'Prepare the next collection',exact:true})).toBeVisible();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.screenshot({path:`test-results/v12-draw-refunds-${width}.png`,fullPage:true});

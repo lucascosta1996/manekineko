@@ -8,16 +8,17 @@ export type Catalog = { chainId: number; seasons: CatalogSeason[] };
 const caches = new WeakMap<Provider, Map<string, { block: number; hash: string; catalog: Catalog }>>();
 
 /** The sealed catalog is immutable. Verify its anchor against reorgs before reuse. */
-export async function readCatalog(provider: Provider, config: ProtocolConfig, state: Snapshot): Promise<Catalog> {
-  const key = `${config.chainId}:${config.controller}:${config.codeHash}:${state.catalogCount}`;
+export async function readCatalog(provider: Provider, config: ProtocolConfig, state: Snapshot, preparedOnly = false): Promise<Catalog> {
+  const count = preparedOnly ? state.count : state.catalogCount;
+  const key = `${config.chainId}:${config.controller}:${config.codeHash}:${count}`;
   const cache = caches.get(provider) ?? new Map(); caches.set(provider, cache);
   const previous = cache.get(key);
   if (previous && state.sealed && (await provider.getBlock(previous.block))?.hash === previous.hash)
     return previous.catalog;
   const c = new Contract(config.controller, (config.version===16||config.version===17)?v16Abi:controllerAbi, provider), seasons: CatalogSeason[] = [];
   // Bounded batches avoid flooding public RPC providers for a 216-collection catalog.
-  for (let offset = 0; offset < state.catalogCount; offset += 8) {
-    const batch = await Promise.all(Array.from({ length: Math.min(8, state.catalogCount - offset) }, (_, i) => (config.version===16||config.version===17)?c.collection(offset+i+1,{blockTag:state.block}):c.collectionPlan(offset + i, { blockTag: state.block })));
+  for (let offset = 0; offset < count; offset += 8) {
+    const batch = await Promise.all(Array.from({ length: Math.min(8, count - offset) }, (_, i) => (config.version===16||config.version===17)?c.collection(offset+i+1,{blockTag:state.block}):c.collectionPlan(offset + i, { blockTag: state.block })));
     for (const p of batch) {
       let season = seasons.at(-1);
       if (season?.seasonId !== p.seasonId) { season = { seasonId: p.seasonId, name: p.seasonName, collections: [] }; seasons.push(season); }

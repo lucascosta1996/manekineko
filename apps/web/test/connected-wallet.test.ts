@@ -30,6 +30,41 @@ test("restoring a selected account is read-only and verifies its actual network"
   await assert.rejects(readConnectedWallet({ ...f.account(), chainId: 11155111 }), /updating/);
   session.provider.destroy();
 });
+test("an explicitly selected secondary account can sign while its full permission snapshot stays unchanged", async () => {
+  const f = fixture();
+  let accounts = [A, B];
+  const request = f.provider.request;
+  f.provider.request = async args => args.method === "eth_accounts" ? accounts : request(args);
+  const session = await readConnectedWallet({ ...f.account(), address: B });
+  assert.equal(session.address, B);
+  assert.equal(await session.signer.getAddress(), B);
+  await assertWallet(session);
+  assert.ok(f.calls.every(method => ["eth_accounts", "eth_chainId"].includes(method)));
+  accounts = [B, A];
+  await assert.rejects(assertWallet(session), /selected wallet changed/);
+  accounts = [A];
+  await assert.rejects(readConnectedWallet({ ...f.account(), address: B }), /not connected/);
+  session.provider.destroy();
+});
+test("switching between authorized SDK accounts revokes the previous signer without requiring provider account reordering", async () => {
+  const f = fixture();
+  const request = f.provider.request;
+  f.provider.request = async args => args.method === "eth_accounts" ? [A, B] : request(args);
+  let selected = f.account(), current: WalletSession | null = null;
+  const bridge = createConnectedWalletBridge(() => selected, next => { current = next; });
+  await bridge.sync();
+  const previous = current!;
+  selected = { ...selected, address: B };
+  const changing = bridge.sync();
+  assert.equal(current, null);
+  await changing;
+  await assert.rejects(assertWallet(previous), /selected wallet changed/);
+  assert.equal((current as WalletSession | null)?.address, B);
+  await assertWallet(current!);
+  f.emit("disconnect");
+  assert.equal(current, null);
+  bridge.dispose();
+});
 test("one session is reused across reads; account changes revoke the old signer immediately", async () => {
   const f = fixture(); let current: WalletSession | null = null;
   const bridge = createConnectedWalletBridge(f.account, next => { current = next; });

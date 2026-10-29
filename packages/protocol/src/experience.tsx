@@ -175,8 +175,8 @@ function Experience({
         sourcePage
       );
       const nextCatalog =
-        view === "operations"
-          ? await readCatalog(provider, config, next)
+        view !== "home"
+          ? await readCatalog(provider, config, next, view !== "operations")
           : null;
       if (version === generation.current) {
         setCatalog(nextCatalog);
@@ -1269,6 +1269,7 @@ function Experience({
       <PublicWorkspace
         view={view}
         state={state}
+        catalog={catalog}
         configured={!!config}
         stale={!!error}
         status={status}

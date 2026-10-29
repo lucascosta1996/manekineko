@@ -10,6 +10,10 @@ jobs:
   visual:
     runs-on: macos-15
     timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
     env:
       NEXT_TELEMETRY_DISABLED: '1'
     steps:
@@ -19,7 +23,7 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - run: npx playwright install chromium firefox webkit
+      - run: npx playwright install ${{ matrix.browser }}
       - run: npm run ui:source
       - run: npm run ui:typecheck
       - run: node scripts/generate-tincta-brand.mjs --check
@@ -28,11 +32,11 @@ jobs:
       - run: npm run typecheck --workspace @manekineko/landing-page && npm run typecheck --workspace @manekineko/web && npm run typecheck --workspace @manekineko/launch
       - run: npm run build:landing && npm run build:web && npm run build:launch
       - run: npm run ui:fixtures:build
-      - run: npm run ui:test
+      - run: npm run ui:test -- --project=${{ matrix.browser }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: visual-ui-${{ github.sha }}
+          name: visual-ui-${{ github.sha }}-${{ matrix.browser }}
           path: |
             test-results/
             playwright-report/

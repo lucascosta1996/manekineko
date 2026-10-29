@@ -14,6 +14,7 @@ import { CompactSelect } from "@manekineko/ui/select";
 import { Icon } from "@manekineko/ui/icons";
 import { RewardsArtwork } from "@manekineko/ui/rewards-artwork";
 import type { Snapshot } from "./chain";
+import type { Catalog } from "./progress";
 import { CollectionTiming } from "./collection-timing";
 import "./public-workspace.css";
 
@@ -48,6 +49,7 @@ const stageDescriptions = [
 export function PublicWorkspace({
   view,
   state,
+  catalog,
   configured,
   stale,
   status,
@@ -67,6 +69,7 @@ export function PublicWorkspace({
 }: {
   view: PublicView;
   state: Snapshot | null;
+  catalog?: Catalog | null;
   configured: boolean;
   stale: boolean;
   status: ReactNode;
@@ -85,6 +88,7 @@ export function PublicWorkspace({
   protocolVersion?: 12 | 13 | 14 | 16 | 17;
 }) {
   const r = state?.round;
+  const collections = catalog?.seasons.flatMap(season => season.collections);
   const step = r
     ? r.phase === 0
       ? 0
@@ -188,11 +192,7 @@ export function PublicWorkspace({
                   >
                     {Array.from({ length: state.count }, (_, i) => (
                       <option key={i + 1} value={String(i + 1)}>
-                        {i + 1 === r.id
-                          ? `${i + 1} · ${r.name}`
-                          : `Collection ${i + 1}${
-                              i + 1 === state.count ? " · Latest" : ""
-                            }`}
+                        {collections?.[i]?.name ?? (i + 1 === r.id ? r.name : "Loading collection name…")}
                       </option>
                     ))}
                   </CompactSelect>

@@ -8,5 +8,5 @@ export default async function Page({ params }: { params: Promise<{ route?: strin
  if (route[0] === "visual") return <LandingBoundary kind={route[1]} />;
  if (route[0] === "whitepaper") return <WhitepaperPage />;
  if (route[0] === "rewards") return <RewardsPage />;
- return route[0] === "specimens" ? <UISpecimens tabEntryFixture={route[1] === "tabs"} /> : <LandingPage />;
+ return route[0] === "specimens" ? <UISpecimens tabEntryFixture={route[1] === "tabs"} notificationFixture={route[1] === "notifications"} /> : <LandingPage />;
 }

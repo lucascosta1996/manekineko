@@ -8,6 +8,7 @@ import { Checkbox, Field, Input, Radio, Switch, Textarea } from "./forms";
 import { PublicFooter } from "./footer";
 import { Icon } from "./icons";
 import { CompactSelect } from "./select";
+import { FloatingNotice } from "./floating-notice";
 
 function Specimens({ brand }: { brand?: ReactNode }) {
   const [busy, setBusy] = useState(false);
@@ -47,7 +48,7 @@ function Specimens({ brand }: { brand?: ReactNode }) {
         </div>
         <div className="ui-specimen-row">
           <Button data-testid="button-busy" busy={busy} busyLabel="Saving…" reserveLabels={["Save changes", "Saving…", "Changes saved"]}
-            icon={<Icon name="check" />} onClick={() => { setBusy(true); setResult("Saving changes."); }}>Save changes</Button>
+            onClick={() => { setBusy(true); setResult("Saving changes."); }}>Save changes</Button>
           <TextAction onClick={() => { setBusy(false); setResult("Changes saved."); }}>Finish simulated request</TextAction>
         </div>
         <p>Inline recovery <TextAction inline>read the explanation</TextAction> stays in the text flow.</p>
@@ -129,6 +130,17 @@ function TabEntrySpecimen() {
 }
 
 /** Only mount in explicitly enabled local/test fixtures, never a public production route. */
-export function UISpecimens({ tabEntryFixture = false, ...props }: { brand?: ReactNode; tabEntryFixture?: boolean }) {
-  return tabEntryFixture ? <TabEntrySpecimen /> : <ConfirmProvider><Specimens {...props} /></ConfirmProvider>;
+export function UISpecimens({ tabEntryFixture = false, notificationFixture = false, ...props }: { brand?: ReactNode; tabEntryFixture?: boolean; notificationFixture?: boolean }) {
+  return notificationFixture ? <NotificationSpecimen /> : tabEntryFixture ? <TabEntrySpecimen /> : <ConfirmProvider><Specimens {...props} /></ConfirmProvider>;
+}
+
+function NotificationSpecimen() {
+  const [wallet, setWallet] = useState(false), [transaction, setTransaction] = useState(false);
+  return <main className="ui-specimens">
+    <h1>Notification fixtures</h1>
+    <Button onClick={() => { setWallet(true); setTransaction(true); }}>Show both notifications</Button>
+    {Array.from({ length: 30 }, (_, i) => <p key={i}>Collection activity {i + 1}</p>)}
+    {wallet && <FloatingNotice title="Check your wallet" detail="Select an authorized account and try again." label="Wallet updates" dismissLabel="Dismiss wallet notification" onDismiss={() => setWallet(false)} />}
+    {transaction && <FloatingNotice title="Transaction confirmed" detail="Your prize claim is confirmed." onDismiss={() => setTransaction(false)} />}
+  </main>;
 }

@@ -1,0 +1,29 @@
+import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
+import { prepare, urls } from './fixtures';
+
+for (const width of [390, 1101]) test(`wallet and transaction notifications remain visible while scrolling at ${width}px`, async ({ page }) => {
+  await prepare(page);
+  await page.setViewportSize({ width, height: 844 });
+  await page.goto(`${urls.landing}/specimens/notifications`);
+  await page.getByRole('button', { name: 'Show both notifications' }).click();
+  const wallet = page.getByRole('complementary', { name: 'Wallet updates' });
+  const transaction = page.getByRole('complementary', { name: 'Transaction updates' });
+  await expect(wallet).toBeVisible(); await expect(transaction).toBeVisible();
+  const before = await wallet.boundingBox(), other = await transaction.boundingBox();
+  expect(before!.y + before!.height).toBeLessThan(other!.y);
+  expect(before!.x).toBeGreaterThanOrEqual(0);
+  expect(before!.x + before!.width).toBeLessThanOrEqual(width);
+  expect(other!.y + other!.height).toBeLessThanOrEqual(844);
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await expect(wallet).toBeInViewport(); await expect(transaction).toBeInViewport();
+  expect((await wallet.boundingBox())!.y).toBeCloseTo(before!.y, 0);
+  expect((await new AxeBuilder({ page }).include('.ui-notice-viewport').analyze()).violations).toEqual([]);
+  await wallet.getByRole('button', { name: 'Dismiss wallet notification' }).click();
+  await expect(wallet).toHaveCount(0); await expect(transaction).toBeVisible();
+  await transaction.getByRole('button', { name: 'Dismiss transaction notification' }).click();
+  await expect(page.locator('.ui-notice-viewport')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Show both notifications' }).click();
+  await expect(wallet).toBeVisible(); await expect(transaction).toBeVisible();
+  await expect(page.locator('.ui-notice-viewport')).toHaveCount(1);
+});
