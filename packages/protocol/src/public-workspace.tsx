@@ -99,7 +99,6 @@ export function PublicWorkspace({
   return (
     <div className="protocol-page public-workspace" data-view={view}>
       <div className="public-primary">
-      {protocolVersion === 17 && <p className="protocol-note" role="status">Accelerated Sepolia rehearsal. Small supplies, test prices and short deadlines apply to this deployment.</p>}
       <header className="public-heading">
         <p className="protocol-eyebrow">
           {r

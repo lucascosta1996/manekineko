@@ -34,6 +34,9 @@ test('Launch planned catalog never invents deployed state or wallet approvals', 
   await page.getByRole('link',{name:'Ethereum Mainnet',exact:true}).click();
   // Changing network cannot carry an old wallet session or signing intent into a new instance.
   await expect(page.getByRole('link',{name:'Ethereum Mainnet',exact:true})).toHaveAttribute('aria-current','page');
+  await page.goto(`${urls.launch}/dashboard?chainId=1&state=unconfigured`);
+  await expect(page.getByRole('heading',{name:'Mainnet deployment not connected.'})).toBeVisible();
+  await expect(page.getByRole('link',{name:'View Sepolia status'})).toHaveAttribute('href','/dashboard?chainId=11155111');
 });
 test('Launch invalid pins disable signing and recover on retry', async ({page}) => {
   await prepare(page); await rpc(page,7,true); await page.clock.resume(); await page.goto(`${urls.launch}/dashboard`);

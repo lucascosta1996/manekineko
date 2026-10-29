@@ -6,6 +6,8 @@ The user explicitly started the accelerated run using Opera. The 0.15 Sepolia ET
 
 ## 2026-10-29 accelerated V17 qualification
 
+Live UI follow-up: both manual wallets completed two Genesis mints, and the runner is holding at 19/20 before the timed first ballot. At the user's request, the accelerated-test header sentence was removed from Web and Launch. Launch identifies an explicitly selected unconfigured Mainnet view and links to Sepolia; its default remains Sepolia. The operator summary and catalog use the Genesis sellout marker before identifying the first paid ballot as current, even though that collection is already prepared onchain.
+
 The user requested a fast rehearsal within half a day. [V17](v17-fast-rehearsal.md) adds an immutable Sepolia/local accelerated profile to a new single-contract implementation; Mainnet rejects fast mode and production mode retains the V16 limits. The six live scenarios cover two seasons, all three sellout packages, two unsold refunds and manual wallet custody. The complete ordered 216-entry catalog is additionally exercised locally with controlled time and mocked VRF. Historical V16 source/deployment, pins and its frozen paused runner are preserved. This is a new deployment, not an upgrade or resumed V16 run.
 
 V17 is exact-source verified on Sepolia at `0x39f625904CC50C08797e52b909EE51F6eB66d26E`, with three immutable fast packages and six catalog entries. Independent RPCs agree on the profile and catalog. Hosted Web/Launch/indexer use dedicated V17 pins; migration 037 admits its collection-aware projection while preserving historical rows. The new eleven-wallet runner is frozen, paused and unfunded; no Genesis mint or paid preparation has occurred. The old V16 run remains separately paused.

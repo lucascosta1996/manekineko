@@ -1,5 +1,7 @@
 # Visual-system adoption audit
 
+**2026-10-29 Genesis status update:** The user-requested accelerated-test header sentence was removed from Web and Launch. Launch now names an explicitly selected unconfigured Mainnet view and offers a Sepolia link; Genesis remains the current stage until sellout rather than labeling the prepared paid ballot as live. See the [V17 live observations](../v17-readiness-report-2026-10-29.md) for source and hosted evidence boundaries.
+
 **2026-10-29 live wallet feedback:** Normal signing now shows a brief confirmation status; receipt recovery is reserved for interrupted/restored requests and its hash input is disclosed on demand. The real Opera/MetaMask rehearsal exposed the former confusing mixed state. See [the scoped record](wallet-request-feedback-2026-10-29.md) for local and hosted evidence boundaries.
 
 **2026-10-28 Rewards landing simplification:** Automatic machine playback, the removed lower collection summary, and the FAQ/Documentation navigation are covered in [the scoped verification record](rewards-landing-simplification-2026-10-28.md).

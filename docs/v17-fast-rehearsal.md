@@ -47,7 +47,7 @@ The accelerated profile has 20 Genesis NFTs, ten minting wallets, the same two-m
 | 2 | 40 | 0.0002 ETH | 4 | 0.0012 ETH | 3 minutes |
 | 3 | 20 | 0.0001 ETH | 10 | 0.00012 ETH | 10 minutes |
 
-The full 60/20/10/10 allocation, zero-qualifier 30% treasury rule, affiliate eligibility, 20 paid primary mints per recipient, VRF authentication, permanent identities, NFT-holder prizes/refunds, sponsored lifetime limit and first-5% holder pool remain the production logic. The application shows a visible accelerated-test notice and reads the actual Genesis supply and timeout. Version, runtime and profile checks fail closed. V16 pins are never reinterpreted as V17.
+The full 60/20/10/10 allocation, zero-qualifier 30% treasury rule, affiliate eligibility, 20 paid primary mints per recipient, VRF authentication, permanent identities, NFT-holder prizes/refunds, sponsored lifetime limit and first-5% holder pool remain the production logic. At the user's request, the accelerated-test header notice was removed from Web and Launch; the application still reads the actual Genesis supply and timeout and identifies the selected network. Version, runtime and profile checks fail closed. V16 pins are never reinterpreted as V17.
 
 ## Six live collections
 

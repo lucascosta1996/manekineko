@@ -1,14 +1,16 @@
 # V17 rehearsal readiness report · October 29, 2026
 
-Status: **deployed and source verified; live rehearsal started and waiting at the first manual Genesis mint; Mainnet not ready**.
+Status: **deployed and source verified; live rehearsal holding at 19/20 Genesis mints before the timed first ballot; Mainnet not ready**.
 
 The user requested a faster alternative to the V16 eleven-day schedule and can attend for up to half a day. The [accelerated workflow](v17-fast-rehearsal.md) specifies six live collections across two seasons, with the full 216-collection catalog tested separately locally. Historical V16 and its paused run remain intact.
 
 ## Live rehearsal observations
 
-The user started the V17 run in Opera on October 29. Funding of 0.15 Sepolia ETH from the pinned source was confirmed through two independent RPCs: [receipt](https://sepolia.etherscan.io/tx/0xfac9c203ccd4d0d559c48f36fc6e43ae12e2c873e5276c0b61d69b9e9eb699bf). Both fresh manual accounts were imported by the user. The runner funded operating requirements, sealed the catalog, funded manual wallet 0 and stopped at `genesis:0:1`. Genesis is open, with zero manual mints at this checkpoint; the first paid ballot has not started.
+The user started the V17 run in Opera on October 29. Funding of 0.15 Sepolia ETH from the pinned source was confirmed through two independent RPCs: [receipt](https://sepolia.etherscan.io/tx/0xfac9c203ccd4d0d559c48f36fc6e43ae12e2c873e5276c0b61d69b9e9eb699bf). Both fresh manual accounts were imported by the user. The runner funded operating requirements and sealed the catalog. Each manual wallet confirmed two Genesis mints in MetaMask; both wallet limits were observed in Opera. Bot minting brought Genesis to 19/20. The run is holding at `before-genesis-sellout`; the first paid ballot has not started.
 
 The first real MetaMask rejection passed: the mint was not sent and the action became available again. The user identified a presentation defect: normal wallet confirmation also displayed receipt-recovery fields and an extra rejection action. The shared Web/Launch feedback now separates the active wallet prompt, submitted transaction and interrupted/restored request. Recovery fields remain available only for the latter, under a disclosure. Hosted acceptance of this fix is recorded with subsequent live observations. The contract and frozen runner/plan are unchanged.
+
+The user requested removal of the accelerated-test header sentence from Web and Launch. Launch's reported disconnected state was an explicitly selected Mainnet view (`chainId=1`); a bare dashboard already defaults to Sepolia and correctly reads 19/20 Genesis mints. The Mainnet empty state now names its network and offers a Sepolia status link. A separate presentation defect labeled the prepared first paid collection as current while Genesis was still minting. The operator summary and catalog now wait for the actual Genesis sellout marker before showing the paid ballot as current. These source corrections do not change network pins, contract behavior or the frozen runner; hosted acceptance is recorded after publication.
 
 ## Confirmed local evidence
 
@@ -44,7 +46,7 @@ The initial application commit `35ab3cc` reached Ready on all five Vercel projec
 | Area | Required evidence | Current boundary |
 |---|---|---|
 | Live release | Exact source, immutable/profile/settings/catalog readback through independent RPCs | Passed through both RPCs; unsealed, zero mints/funding |
-| Hosted application | Correct V17 pins, visible accelerated notice, desktop/mobile layouts, indexer catching up | Passed on hosted desktop/mobile Web and authenticated Launch; V17 gallery count/SVG are 20; all four indexer sources caught up |
+| Hosted application | Correct V17 pins, actual supply/deadlines, desktop/mobile layouts, indexer catching up | Initial hosted acceptance passed on desktop/mobile Web and authenticated Launch; V17 gallery count/SVG are 20; all four indexer sources caught up. The initial notice was subsequently removed at the user's request; see live observations above. |
 | Human wallets | Real Genesis, affiliate, referral, prize, sponsored, refund and holder receipts plus observed UI behavior | Pending live checkpoints |
 | Chainlink | Genuine request/fulfillment and actual fees for the four live sellouts | Local coordinator is mocked |
 | Final reconciliation | Six actual outcomes, claims, bank/manual returns, gas, fees, dust and all liabilities | Produced during/after the live run |

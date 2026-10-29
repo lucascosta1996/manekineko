@@ -1303,7 +1303,6 @@ function Experience({
     );
   return (
     <div className="protocol-page">
-      {config?.version === 17 && <p className="protocol-note" role="status">Accelerated Sepolia rehearsal. Small supplies, test prices and short deadlines apply to this deployment.</p>}
       <header className="protocol-intro">
         <p className="protocol-eyebrow">Tincta · Onchain seasons</p>
         <h1>Season control.</h1>
@@ -1315,10 +1314,11 @@ function Experience({
       {!config ? (
         <>
           <section className="protocol-panel">
-            <h2>No deployment connected.</h2>
+            <h2>{plannedCatalog?.chainId === 1 ? "Mainnet deployment not connected." : "No deployment connected."}</h2>
             <p>
-              No verified deployment is configured for this network. Existing collections and claims retain their original contracts and holder rights.
+              {plannedCatalog?.chainId === 1 ? "This dashboard is showing Ethereum Mainnet. No verified deployment is configured for this network." : "No verified deployment is configured for this network."} Existing collections and claims retain their original contracts and holder rights.
             </p>
+            {plannedCatalog?.chainId === 1 && <a className={textActionClassName()} href="/dashboard?chainId=11155111">View Sepolia status</a>}
           </section>
           <OperatorWorkspace
             state={null}
