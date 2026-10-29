@@ -51,7 +51,7 @@ export async function readV16(provider: Provider, config: ProtocolConfig, select
   const latest=count?await c.round(count,at):null;
   const latestTerms=count?await c.terms(count,at):null;
   const latestPhase=latest?v16Phase(latest,block.timestamp,await c.mintDeadline(count,at),latestTerms.winners,timeout):null;
-  const base={protocolVersion:version,rehearsalMode:version===17,block:block.number,timestamp:block.timestamp,operator:getAddress(settings.operator),voting:address,credits:address,bootstrap:false,sealed,count,catalogCount:total,cost,operatingBalance,canPrepare:sealed&&count<total&&latestPhase!==null&&[5,6,7].includes(latestPhase),latestPhase,sourceCount:0,sources:[],legacy:[],genesis};
+  const base={walletAddress:wallet?.toLowerCase(),protocolVersion:version,rehearsalMode:version===17,block:block.number,timestamp:block.timestamp,operator:getAddress(settings.operator),voting:address,credits:address,bootstrap:false,sealed,count,catalogCount:total,cost,operatingBalance,canPrepare:sealed&&count<total&&latestPhase!==null&&[5,6,7].includes(latestPhase),latestPhase,sourceCount:0,sources:[],legacy:[],genesis};
   const id=selected||count;
   if(!id||id===1&&genesisSold===0n)return{...base,round:null};
   const [rawRound,plan,t,hash,deadline,optionCount,used,affiliateId]=await Promise.all([c.round(id,at),c.collection(id,at),c.terms(id,at),c.termsHash(id,at),c.mintDeadline(id,at),c.optionCount(at),wallet?c.primaryMints(id,wallet,at):0n,wallet?c.affiliateId(id,wallet,at):0n]);
@@ -69,7 +69,7 @@ export async function readV16(provider: Provider, config: ProtocolConfig, select
   const awards:RoundState['awards']=r.finalizedAt>0n?await Promise.all(Array.from({length:Number(t.winners)},async(_,i)=>{
     const serial=r.winners[i],token=v16Token(id,serial);
     const [beneficiary,holder]=await Promise.all([c.awardBeneficiary(token,at),c.ownerOf(token,at)]);
-    return{rank:i+1,tokenId:serial,amount:r.revenue/10000n*(6000n/t.winners),claimed:beneficiary!==ZeroAddress,holder:getAddress(holder)};
+    return{rank:i+1,tokenId:serial,amount:r.revenue/10000n*(6000n/t.winners),claimed:beneficiary!==ZeroAddress,claimedBy:getAddress(beneficiary),holder:getAddress(holder)};
   })):[];
   const sourceCount=id===1?1:id-1;
   const sources=await Promise.all(Array.from({length:Math.min(16,Math.max(0,sourceCount-sourcePage*16))},async(_,i)=>{
@@ -83,7 +83,7 @@ export async function readV16(provider: Provider, config: ProtocolConfig, select
     const sr=await c.round(n,at);if(sr.finalizedAt>0n||await c.refundsAvailable(n,at))settled++;
   }
   const holders={address,seasonId:plan.seasonId,funded:season.funded,eligibleNfts:season.eligible,claimLimit:summary.limit,rewardPerNft:summary.reward,claims:season.claims,paid:season.paid,collections:BigInt(season.last)-BigInt(season.first)+1n,settledCollections:settled,unlocked:summary.unlocked};
-  return{...base,sourceCount,sources,holders,round:{address,id,name:plan.name,season:plan.seasonName,color:plan.color,phase,supply:t.supply,price:t.price,winners:t.winners,minted:r.minted,start:r.saleStart,deadline,termsHash:hash,voteStart:r.voteStart,totalVotes:options.reduce((n,o)=>n+o.votes,0n),options,operatorAvailable:available,operatorRemaining:available,canFinalize:phase===4,soldOutAt:r.soldOutAt,randomnessDeadline:r.soldOutAt?r.soldOutAt+timeout:0n,executionReserve:r.executionReserve,executionRecipient:getAddress(r.executor),reserve:await c.accountedBalance(at),growth,affiliateId,affiliateAvailable:slot&&slot.referrals>0n&&!slot.claimed&&r.finalizedAt>0n?r.affiliateShare:0n,nextSlot:BigInt(slots.findIndex(s=>s.wallet===ZeroAddress)+1),remaining:20n-used,sponsorship:r.sponsorReserve,subscriptionClosed:r.subscriptionClosed,awards}};
+  return{...base,sourceCount,sources,holders,round:{address,id,name:plan.name,season:plan.seasonName,color:plan.color,phase,supply:t.supply,price:t.price,winners:t.winners,minted:r.minted,start:r.saleStart,deadline,termsHash:hash,voteStart:r.voteStart,totalVotes:options.reduce((n,o)=>n+o.votes,0n),options,operatorAvailable:available,operatorRemaining:available,canFinalize:phase===4,soldOutAt:r.soldOutAt,randomnessDeadline:r.soldOutAt?r.soldOutAt+timeout:0n,executionReserve:r.executionReserve,executionRecipient:getAddress(r.executor),reserve:await c.accountedBalance(at),growth,affiliateId,...(wallet?{affiliateClaimed:slot?.claimed?r.affiliateShare:0n,walletPrizeClaimed:awards.filter(a=>a.claimedBy?.toLowerCase()===wallet.toLowerCase()).reduce((sum,a)=>sum+a.amount,0n),walletPrizeCount:awards.filter(a=>a.claimedBy?.toLowerCase()===wallet.toLowerCase()).length}:{}),affiliateAvailable:slot&&slot.referrals>0n&&!slot.claimed&&r.finalizedAt>0n?r.affiliateShare:0n,nextSlot:BigInt(slots.findIndex(s=>s.wallet===ZeroAddress)+1),remaining:20n-used,sponsorship:r.sponsorReserve,subscriptionClosed:r.subscriptionClosed,awards}};
 }
 
 /** Translate legacy UI action names only here; never call an old ABI at a V16 address. */

@@ -1,6 +1,7 @@
 import "@manekineko/ui/styles.css";
 import { MintNotification } from "@manekineko/ui/mint-notification";
 import "../../../../../apps/web/app/globals.css";
+import "../../../../../apps/web/app/wallet/wallet.css";
 import "../../../../../apps/web/app/collections/gallery.css";
 import "../../../../../apps/web/app/history/history.css";
 import "../../../../../apps/web/app/my-nfts/nfts.css";

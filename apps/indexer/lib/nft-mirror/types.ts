@@ -1,6 +1,6 @@
 import type { DecodedMetadata } from '@manekineko/contract-abi/onchain-metadata';
 export interface Anchor { number: number; hash: string }
-export interface MirrorSource { cursor: Anchor | null; anchor: Anchor | null; fingerprint: string }
+export interface MirrorSource { cursor: Anchor | null; anchor: Anchor | null; fingerprint: string; walletCursor?:Anchor|null }
 export interface MirrorCollection {
   kind?: 'paid' | 'genesis'; chainId: number; address: string; controller: string; roundId: number;
   name: string; seasonName: string; seasonId: string; color: string; textColor: string;
@@ -11,6 +11,7 @@ export interface MintEvent {
 }
 export interface CachedNft { metadata: DecodedMetadata; numbers: number[]; code: number | null }
 export interface MirrorChain {
+  walletEvents?(from:number,to:Anchor):Promise<import('./wallet-activity.ts').WalletEvent[]>;
   head(): Promise<Anchor>;
   block(number: number): Promise<Anchor>;
   verify(anchor: Anchor): Promise<void>;

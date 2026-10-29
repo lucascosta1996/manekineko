@@ -46,7 +46,8 @@
       "/docs/[slug]",
       "/holders",
       "/collections",
-      "/collections/[chainId]/[address]"
+      "/collections/[chainId]/[address]",
+      "/wallet"
     ],
     "redirects": {
       "/mint": "/",
@@ -106,7 +107,11 @@
       "collection-directory",
       "paginated-minted-artwork",
       "mirror-syncing",
-      "mirror-refunded"
+      "mirror-refunded",
+      "wallet-loading",
+      "wallet-confirmed",
+      "wallet-unavailable",
+      "wallet-account-change"
     ]
   },
   "launch": {

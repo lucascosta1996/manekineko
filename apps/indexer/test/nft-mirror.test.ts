@@ -55,7 +55,7 @@ test('mirror SQL: leases, retries, atomic replay, reorgs and paginated database-
   try {
     await admin.query(`CREATE SCHEMA ${schema}`);
     pool=new pg.Pool({connectionString,max:8,options:`-c search_path=${schema},public`});
-    for(const file of ['033_nft_mirror.sql','034_genesis_v14_mirror.sql','035_genesis_nft_gallery.sql','036_v16_nft_mirror.sql','037_v17_accelerated_rehearsal.sql']) await pool.query(await readFile(new URL('../../../database/migrations/'+file,import.meta.url),'utf8'));
+    for(const file of ['033_nft_mirror.sql','034_genesis_v14_mirror.sql','035_genesis_nft_gallery.sql','036_v16_nft_mirror.sql','037_v17_accelerated_rehearsal.sql','038_wallet_activity.sql']) await pool.query(await readFile(new URL('../../../database/migrations/'+file,import.meta.url),'utf8'));
     const db=pool, query=(sql: string,values: unknown[])=>db.query(sql,values);
     const stores=Array.from({length:4},()=>new MirrorStore(db,config));
     const leases=await Promise.all(stores.map(s=>s.claim()));

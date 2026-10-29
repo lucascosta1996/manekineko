@@ -8,7 +8,7 @@ import {V16MirrorChain} from './v16-chain.ts';
 import {V16MirrorStore} from './v16-store.ts';
 import type { Anchor, MirrorChain } from './types.ts';
 
-export async function mirrorSource(config: MirrorConfig, chain: MirrorChain, store: Pick<MirrorStore,keyof MirrorStore>, deadline: number, now = Date.now) {
+export async function mirrorSource(config: MirrorConfig, chain: MirrorChain, store: Pick<MirrorStore,keyof MirrorStore>&Partial<Pick<V16MirrorStore,'walletEvents'>>, deadline: number, now = Date.now) {
   const source = await store.claim();
   if (!source) return {ok:false,status:'leased'};
   const same = async (anchor: Anchor) => (await chain.block(anchor.number)).hash === anchor.hash;
@@ -16,14 +16,24 @@ export async function mirrorSource(config: MirrorConfig, chain: MirrorChain, sto
   try {
     const head = await chain.head();
     await chain.verify(head);
-    if (source.fingerprint !== fingerprint(config) || (source.anchor && !await same(source.anchor)) || (source.cursor && !await same(source.cursor))) {
-      await store.resetSource(); source.cursor = null;
+    if (source.fingerprint !== fingerprint(config) || (source.anchor && !await same(source.anchor)) || (source.cursor && !await same(source.cursor)) || (source.walletCursor && !await same(source.walletCursor))) {
+      await store.resetSource(); source.cursor = null; source.walletCursor=null;
     }
     ensure(!source.cursor || source.cursor.number<=head.number,'chain_head_stale');
     await store.verified(true,head);
     if (head.number < config.fromBlock) return {ok:false,status:'awaiting_confirmations'};
     // Alternate discovery, event ingestion and artwork so backfills cannot starve new jobs.
     for (let pass=0;pass<24 && now()<deadline;pass++) {
+      if(chain.walletEvents&&store.walletEvents){
+        ensure(!source.walletCursor||source.walletCursor.number<=head.number,'chain_head_stale');
+        const start=source.walletCursor?source.walletCursor.number+1:config.fromBlock;
+        if(start<=head.number){
+          const to=await chain.block(Math.min(head.number,start+config.blockRange-1));
+          await store.walletEvents(await chain.walletEvents(start,to),to,to.number===head.number,async()=>{await check(to);if(source.walletCursor)await check(source.walletCursor);});
+          source.walletCursor=to;
+        }
+      }
+      if(now()>=deadline)break;
       const from = source.cursor ? source.cursor.number+1 : config.fromBlock;
       if (from <= head.number) {
         const to = await chain.block(Math.min(head.number,from+config.blockRange-1));
@@ -59,7 +69,7 @@ export async function mirrorSource(config: MirrorConfig, chain: MirrorChain, sto
           await store.retry(job.collection,job.tokenId);
         }
       }
-      if (source.cursor?.number === head.number && await store.caughtUp(head.number))
+      if (source.cursor?.number === head.number && (!chain.walletEvents||source.walletCursor?.number===head.number) && await store.caughtUp(head.number))
         return {ok:true,status:'caught_up',confirmedBlock:head.number};
     }
     return {ok:false,status:'catching_up',confirmedBlock:head.number};

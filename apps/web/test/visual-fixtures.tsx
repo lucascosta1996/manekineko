@@ -1,4 +1,5 @@
 "use client";
+import {WalletProfileFixture} from "./wallet-profile-fixture";
 import v17VisualPin from './v17-visual-pin.json';
 
 /** Production components with isolated data. This module is never routed by apps/web. */
@@ -52,6 +53,7 @@ function ReviewControlsFixture() {
 
 export function WebVisualFixture({ path = "/", state = "loaded", page = 1 }: { path?: string; state?: string; page?: number }) {
   const [mirrorRecovered,setMirrorRecovered] = useState(false);
+  if(path === "/wallet")return <WalletProfileFixture state={state}/>;
   if (path === "/collections" || path.startsWith("/collections/") || path.startsWith("/visual/collections/")) {
     const data = path.endsWith('0x'+'5'.repeat(40)) ? genesisFixtureGallery(page,state) : mirrorFixtureGallery(page,state);
     const retry = () => setMirrorRecovered(true);

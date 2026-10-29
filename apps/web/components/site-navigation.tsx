@@ -6,7 +6,7 @@ import { Icon } from "@manekineko/ui/icons";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 
-export type SiteSection = "home" | "claims" | "affiliates" | "holders" | "seasons" | "history" | "nfts" | "docs" | "prizes" | "vote" | "operations";
+export type SiteSection = "home" | "claims" | "affiliates" | "holders" | "seasons" | "history" | "nfts" | "docs" | "prizes" | "vote" | "operations" | "wallet";
 
 export function SiteNavigation({ section, protocolEnabled = false }: { section: SiteSection; protocolEnabled?: boolean }) {
   const [open, setOpen] = useState(false);
@@ -58,6 +58,7 @@ export function SiteNavigation({ section, protocolEnabled = false }: { section: 
       <Link href="/affiliates" aria-current={section === "affiliates" ? "page" : undefined} onClick={() => setOpen(false)}>Affiliates</Link>
       <Link href="/holders" aria-current={section === "holders" ? "page" : undefined} onClick={() => setOpen(false)}>Holders</Link>
       <Link href="/collections" aria-current={section === "nfts" ? "page" : undefined} onClick={() => setOpen(false)}>NFTs</Link>
+      <Link href="/wallet" aria-current={section === "wallet" ? "page" : undefined} onClick={() => setOpen(false)}>Your wallet</Link>
       <Link href="/docs" aria-current={section === "docs" ? "page" : undefined} onClick={() => setOpen(false)}>How it works</Link>
     </nav>
   </div>;

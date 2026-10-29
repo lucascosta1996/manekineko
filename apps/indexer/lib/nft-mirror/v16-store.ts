@@ -4,6 +4,7 @@ import type pg from 'pg';
 import { ensure } from '../types.ts';
 import { fingerprint, type MirrorConfig } from './config.ts';
 import type { Anchor, CachedNft, MirrorCollection, MirrorSource, MintEvent } from './types.ts';
+import {storeWalletEvents,type WalletEvent} from './wallet-activity.ts';
 
 type Row = Record<string, any>;
 function collection(row: Row): MirrorCollection {
@@ -26,7 +27,7 @@ export class V16MirrorStore {
     const {rows} = await this.pool.query(`UPDATE manekineko_nft_mirror_sources SET lease_owner=$3,lease_until=now()+interval '150 seconds'
       WHERE chain_id=$1 AND controller=$2 AND (lease_until IS NULL OR lease_until<now()) RETURNING *`,[...this.key,this.owner]);
     const row = rows[0];
-    return row ? {fingerprint:row.fingerprint,cursor:row.cursor_block === null ? null : {number:Number(row.cursor_block),hash:row.cursor_hash},
+    return row ? {fingerprint:row.fingerprint,walletCursor:row.wallet_cursor_block == null ? null : {number:Number(row.wallet_cursor_block),hash:row.wallet_cursor_hash},cursor:row.cursor_block === null ? null : {number:Number(row.cursor_block),hash:row.cursor_hash},
       anchor:row.anchor_block === null ? null : {number:Number(row.anchor_block),hash:row.anchor_hash}} : null;
   }
   async release(): Promise<void> {
@@ -48,11 +49,15 @@ export class V16MirrorStore {
   }
   async resetSource(): Promise<void> {
     await this.transaction(async client => {
+      await client.query('DELETE FROM manekineko_wallet_activity WHERE chain_id=$1 AND controller=$2',this.key);
       await client.query('DELETE FROM manekineko_nft_mirror_v16_collections WHERE chain_id=$1 AND controller=$2',this.key);
-      await client.query(`UPDATE manekineko_nft_mirror_sources SET cursor_block=NULL,cursor_hash=NULL,anchor_block=NULL,anchor_hash=NULL,verified=false,
+      await client.query(`UPDATE manekineko_nft_mirror_sources SET wallet_cursor_block=NULL,wallet_cursor_hash=NULL,wallet_synced_at=NULL,cursor_block=NULL,cursor_hash=NULL,anchor_block=NULL,anchor_hash=NULL,verified=false,
         verified_at=NULL,fingerprint=$3,code_hash=$4,version=$5,from_block=$6 WHERE chain_id=$1 AND controller=$2`,
         [...this.key,fingerprint(this.config),this.config.codeHash,this.config.version,this.config.fromBlock]);
     });
+  }
+  async walletEvents(events:WalletEvent[],to:Anchor,caughtUp:boolean,check:()=>Promise<void>){
+    await this.transaction(client=>storeWalletEvents(client,this.config,events,to,caughtUp,check));
   }
   async verified(value: boolean, anchor?: Anchor): Promise<void> {
     await this.transaction(async client => { await client.query(`UPDATE manekineko_nft_mirror_sources SET verified=$3,

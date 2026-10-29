@@ -907,6 +907,7 @@ function Experience({
             </Button>
           </div>
           <p>Claimable: {eth(r.affiliateAvailable)}</p>
+          {wallet.session&&state?.walletAddress===wallet.session.address.toLowerCase()&&r.affiliateClaimed!==undefined&&<p>Already claimed: {eth(r.affiliateClaimed)} · <a href="/wallet">View wallet activity</a></p>}
 
           <Button {...actionFeedback("Claim affiliate reward")}
             disabled={disabled || r.affiliateAvailable === 0n}
@@ -967,6 +968,7 @@ function Experience({
   const awardsPanel = r && state && (
     <section className="protocol-panel">
       <h2 id="winning-tickets">Winning tickets</h2>
+      {wallet.session&&state?.walletAddress===wallet.session.address.toLowerCase()&&r.walletPrizeClaimed!==undefined&&<p>Your claims in this collection: {r.walletPrizeCount} {r.walletPrizeCount===1?'prize':'prizes'} · {eth(r.walletPrizeClaimed)}. <a href="/wallet">View wallet activity</a></p>}
       <p>
         Only the current NFT holder can claim an unpaid prize. Current holders
         may differ from past prize recipients.

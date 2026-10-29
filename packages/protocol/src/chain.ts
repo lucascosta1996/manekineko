@@ -38,13 +38,17 @@ export type RoundState = {
   growth: bigint;
   affiliateId: bigint;
   affiliateAvailable: bigint;
+  affiliateClaimed?: bigint;
+  walletPrizeClaimed?: bigint;
+  walletPrizeCount?: number;
   nextSlot: bigint;
   remaining: bigint;
   sponsorship: bigint;
   subscriptionClosed: boolean;
-  awards: { rank: number; tokenId: bigint; amount: bigint; claimed: boolean; holder: string }[];
+  awards: { rank: number; tokenId: bigint; amount: bigint; claimed: boolean; holder: string; claimedBy?: string }[];
 };
 export type Snapshot = {
+  walletAddress?: string;
   protocolVersion?: 16 | 17;
   rehearsalMode?: boolean;
   holders?: HolderSeason;

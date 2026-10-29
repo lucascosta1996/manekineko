@@ -7,7 +7,7 @@ import { loadStagingDatabaseConfig, inspectStagingDatabase, migrateStagingDataba
 
 export const INDEXER_ROLE = 'manekineko_staging_indexer';
 export const INDEXER_READ_TABLES = ['manekineko_networks','manekineko_series','manekineko_collections','manekineko_deployments','manekineko_affiliate_programs','manekineko_sepolia_app_archive'];
-export const INDEXER_WRITE_TABLES = ['manekineko_collection_awards','manekineko_collection_state','manekineko_collection_history','manekineko_history_winners','manekineko_indexer_checkpoints','manekineko_chain_events','manekineko_nft_metadata_jobs','manekineko_nft_metadata_providers','manekineko_nft_mirror_sources','manekineko_nft_mirror_collections','manekineko_nft_mirror_tokens','manekineko_nft_mirror_v16_collections','manekineko_nft_mirror_v16_tokens'];
+export const INDEXER_WRITE_TABLES = ['manekineko_collection_awards','manekineko_collection_state','manekineko_collection_history','manekineko_history_winners','manekineko_indexer_checkpoints','manekineko_chain_events','manekineko_nft_metadata_jobs','manekineko_nft_metadata_providers','manekineko_nft_mirror_sources','manekineko_nft_mirror_collections','manekineko_nft_mirror_tokens','manekineko_nft_mirror_v16_collections','manekineko_nft_mirror_v16_tokens','manekineko_wallet_activity'];
 const root = new URL('../', import.meta.url);
 const envPath = new URL('.env.staging.local', root);
 const quote = value => `"${value.replaceAll('"','""')}"`;

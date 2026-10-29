@@ -7,6 +7,7 @@ import {normalizeSeasonAppearance} from '@manekineko/contract-abi/season-appeara
 import {ensure} from '../types.ts';
 import type {MirrorConfig} from './config.ts';
 import type {Anchor,CachedNft,MirrorChain,MirrorCollection,MintEvent} from './types.ts';
+import {decodeWalletEvents,walletEventTopics} from './wallet-activity.ts';
 const iface=new Interface(abi),zeroTopic='0x'+'0'.repeat(64);
 export class V16MirrorChain implements MirrorChain{
   private provider:JsonRpcProvider; private config:MirrorConfig; private contract:Contract;
@@ -22,6 +23,9 @@ export class V16MirrorChain implements MirrorChain{
     if(c.version===17)ensure(await this.contract.REHEARSAL_MODE(at)===true&&await this.contract.RANDOMNESS_TIMEOUT(at)===900n,'collection_trust_mismatch');
   }
   private check(logs:Log[],from:number,to:Anchor){ensure(logs.length<=140000&&logs.every(l=>!l.removed&&l.blockNumber>=from&&l.blockNumber<=to.number),'canonical_block_changed');}
+  async walletEvents(from:number,to:Anchor){
+    return decodeWalletEvents(await this.provider.getLogs({address:this.config.controller,fromBlock:from,toBlock:to.number,topics:[walletEventTopics]}),this.config,from,to);
+  }
   async discover(from:number,to:Anchor):Promise<MirrorCollection[]>{
     const c=this.config,logs=await this.provider.getLogs({address:c.controller,fromBlock:from,toBlock:to.number,topics:[iface.getEvent('CollectionPrepared')!.topicHash]});this.check(logs,from,to);
     const common={chainId:c.chainId,address:c.controller,controller:c.controller,renderer:c.controller,cursor:null};

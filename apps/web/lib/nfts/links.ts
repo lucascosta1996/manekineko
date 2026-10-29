@@ -3,7 +3,7 @@ export interface NftLinks { openSea: string | null; blockscout: string | null; e
 /** OpenSea retired its testnets: https://support.opensea.io/en/articles/11833955-farewell-testnets */
 export function nftLinks(chainId: number, contract: string, tokenId: string): NftLinks {
   if (!/^0x[0-9a-f]{40}$/i.test(contract) || /^0x0{40}$/i.test(contract)
-    || !/^[1-9][0-9]{0,4}$/.test(tokenId) || Number(tokenId) > 65536) {
+    || !/^[1-9][0-9]{0,77}$/.test(tokenId) || BigInt(tokenId) >= (1n << 256n)) {
     throw new Error("Invalid NFT identifier.");
   }
   const address = contract.toLowerCase();

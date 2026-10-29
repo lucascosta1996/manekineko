@@ -132,9 +132,15 @@ test("Sepolia NFT links point to Blockscout artwork and retain the Etherscan rec
 });
 test("NFT links reject injected identifiers, zero addresses, and unsupported networks", () => {
   const contract = `0x${"a".repeat(40)}`;
-  for (const [chain, at, id] of [[137, contract, "3"], [1, "https://evil.invalid", "3"], [1, contract, "3?bad"], [1, contract, "0"], [1, contract, "65537"], [11155111, contract, "16/../../"], [11155111, contract, "16#metadata"], [11155111, `0x${"0".repeat(40)}`, "16"]] as const) {
+  for (const [chain, at, id] of [[137, contract, "3"], [1, "https://evil.invalid", "3"], [1, contract, "3?bad"], [1, contract, "0"], [1, contract, String(1n<<256n)], [1,contract,'01'], [11155111, contract, "16/../../"], [11155111, contract, "16#metadata"], [11155111, `0x${"0".repeat(40)}`, "16"]] as const) {
     assert.throws(() => nftLinks(chain, at, id));
   }
+});
+test('NFT links retain the complete single-contract token ID',()=>{
+  const address='0xdb0a3f76de225377b7b6d1b70c14f1a12adbe480';
+  const global=String((2n<<17n)|15n);
+  assert.equal(nftLinks(11155111,address,global).blockscout,`https://eth-sepolia.blockscout.com/token/${address}/instance/262159`);
+  assert.ok(nftLinks(1,address,String((1n<<256n)-1n)).openSea?.endsWith(String((1n<<256n)-1n)));
 });
 
 const contract = `0x${"1".repeat(40)}`, factory = `0x${"2".repeat(40)}`, renderer = `0x${"3".repeat(40)}`, owner = `0x${"4".repeat(40)}`;

@@ -1,0 +1,34 @@
+.wallet-page { max-width: 70rem; margin-inline: auto; padding-block: var(--ui-space-10); display: grid; gap: var(--ui-space-10); }
+.wallet-heading { text-align: center; display: grid; gap: var(--ui-space-4); padding-block: var(--ui-space-8); }
+.wallet-heading h1,.wallet-heading p,.wallet-summary p,.wallet-stats p,.wallet-section-heading h2,.wallet-section-heading p,.wallet-payments h3,.wallet-payments p,.wallet-nft-caption p,.wallet-nft-caption h3 { margin: 0; }
+.wallet-heading>p:not(.eyebrow),.wallet-summary>p:last-child,.wallet-stats p,.wallet-toolbar p,.wallet-sync,.wallet-payments p,.wallet-nft-caption p { color: var(--ui-muted); }
+.wallet-address { overflow-wrap: anywhere; font-size: var(--ui-caption); }
+.wallet-page a { text-underline-offset: .2em; }
+.wallet-page a svg { width: 1em; height: 1em; margin-inline-start: var(--ui-space-2); vertical-align: middle; }
+.wallet-toolbar,.wallet-section-heading,.wallet-pagination { display: flex; align-items: center; justify-content: space-between; gap: var(--ui-space-4); flex-wrap: wrap; }
+.wallet-message { padding: var(--ui-space-6); border: 1px solid var(--ui-line); border-radius: var(--ui-radius); }
+.wallet-message .ui-spinner { vertical-align: middle; margin-inline-end: var(--ui-space-2); }
+.wallet-summary { display: grid; gap: var(--ui-space-4); }
+.wallet-summary .wallet-total { font-size: var(--ui-page); line-height: 1.3; color: var(--ui-ink); overflow-wrap: anywhere; }
+.wallet-stats { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: var(--ui-space-8); margin: var(--ui-space-6) 0 0; }
+.wallet-stats>div { border-top: 1px solid var(--ui-line); padding-top: var(--ui-space-5); }
+.wallet-stats dt { color: var(--ui-muted); }
+.wallet-stats dd { margin: var(--ui-space-3) 0; font-size: var(--ui-section); overflow-wrap: anywhere; }
+.wallet-stats dd p { margin-top: var(--ui-space-3); }
+.wallet-stats p,.wallet-sync { font-size: var(--ui-caption); }
+.wallet-section-heading { margin-bottom: var(--ui-space-6); }
+.wallet-nft-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: var(--ui-space-6); }
+.wallet-nft { min-width: 0; border: 1px solid var(--ui-line); border-radius: var(--ui-radius); overflow: hidden; }
+.wallet-artwork { display: grid; place-items: center; aspect-ratio: 4/5; background: var(--ui-surface); }
+.wallet-artwork img { display: block; width: 100%; height: auto; }
+.wallet-genesis img { aspect-ratio: 1; }
+.wallet-nft-caption { padding: var(--ui-space-5); display: grid; gap: var(--ui-space-3); }
+.wallet-nft-caption p { font-size: var(--ui-caption); }
+.wallet-payments { list-style: none; padding: 0; margin: 0; }
+.wallet-payments li { display: flex; justify-content: space-between; gap: var(--ui-space-6); padding-block: var(--ui-space-6); border-top: 1px solid var(--ui-line); }
+.wallet-payments li>div { min-width: 0; display: grid; gap: var(--ui-space-3); }
+.wallet-payments li>div:last-child { text-align: right; }
+.wallet-payments .wallet-payment-amount { color: var(--ui-ink); overflow-wrap: anywhere; }
+.wallet-pagination { margin-top: var(--ui-space-6); }
+@media(max-width: 48rem) { .wallet-nft-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media(max-width: 36rem) { .wallet-stats,.wallet-nft-grid { grid-template-columns: minmax(0,1fr); } .wallet-payments li { flex-direction: column; } .wallet-payments li>div:last-child { text-align: left; } }
