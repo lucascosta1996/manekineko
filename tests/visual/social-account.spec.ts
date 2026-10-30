@@ -9,7 +9,7 @@ for (const width of [390, 1440]) test(`X account sign-in, verified save and secr
     const request = route.request();
     if (request.url().includes('/session')) {
       if (request.method() === 'POST') signedIn = true;
-      if (request.method() === 'DELETE') signedIn = false;
+      if (request.method() === 'DELETE') { signedIn = false; return route.fulfill({ json: { signedOut: true } }); }
       return route.fulfill({ status: signedIn ? 200 : 401, json: signedIn ? { username: 'operator' } : { error: 'Sign in.' } });
     }
     if (!signedIn) return route.fulfill({ status: 401, json: { error: 'Sign in.' } });
