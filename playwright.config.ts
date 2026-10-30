@@ -5,7 +5,8 @@ export default defineConfig({
   testMatch: '**/*.spec.ts',
   forbidOnly: !!process.env.CI,
   retries: 0,
-  workers: 3,
+  // Three application servers and browser video compete for the hosted Mac's CPUs.
+  workers: process.env.CI ? 2 : 3,
   timeout: 60000,
   expect: { timeout: 10000, toHaveScreenshot: { threshold: 0.1, maxDiffPixels: 0, animations: 'disabled' } },
   outputDir: 'test-results/visual',

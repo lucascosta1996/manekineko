@@ -23,7 +23,7 @@ for (const coarse of [false, true]) test.describe(coarse ? 'Touch consumers' : '
   test(`current route control consistency ${width}`, async ({ page }, info) => {
     // This case checks eleven routes, including decoded artwork and axe on each.
     // CI reached the final route when its former one-minute aggregate budget expired.
-    test.setTimeout(120_000);
+    test.setTimeout(180_000);
     test.skip(info.project.name !== 'chromium' && ![390, 1440].includes(width), 'Primary engine covers every layout size.');
     await page.setViewportSize({ width, height: 900 });
     await prepare(page); await page.clock.resume();

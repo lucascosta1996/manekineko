@@ -49,6 +49,9 @@ for (const width of [320,390,768,1440]) {
     await expect(bar(page)).toBeVisible();
     expect(await bar(page).evaluate(el => {const r=el.getBoundingClientRect();return r.left>=0 && r.right<=innerWidth && r.bottom<=innerHeight;})).toBe(true);
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+    // Keep the real notification available through axe and the enlarged-text check.
+    // Its normal eight-second dismissal is covered separately above.
+    await bar(page).getByRole('link').focus();
     await page.clock.resume();
     expect((await new AxeBuilder({page}).include('.ui-mint-notification').analyze()).violations).toEqual([]);
     await page.screenshot({path:`test-results/mint-bar-${width}-${info.project.name}.png`});
