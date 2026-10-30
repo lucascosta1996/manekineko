@@ -34,7 +34,11 @@ test('mirror pins reject unsafe networks, unconfirmed indexing, duplicates and m
   assert.equal(fingerprint(config),fingerprint({...config,rpcUrl:'https://rotated.invalid/key'}));
   const history=Array.from({length:5},(_,i)=>({...config,controller:`0x${String(i+1).repeat(40)}`}));
   assert.deepEqual(read(history).map(p=>p.controller),history.map(p=>p.controller));
-  assert.throws(()=>read([...history,{...config,controller:`0x${'6'.repeat(40)}`}]),/invalid_nft_mirror_configuration/);
+  const production={...config,chainId:1,version:18,confirmations:12,controller:`0x${'6'.repeat(40)}`};
+  assert.equal(read([...history,production]).length,6); // Keep all five historical sources on Mainnet activation.
+  const maximum=[...history,production,...[7,8].map(i=>({...config,controller:`0x${String(i).repeat(40)}`}))];
+  assert.equal(read(maximum).length,8);
+  assert.throws(()=>read([...maximum,{...config,controller:`0x${'9'.repeat(40)}`}]),/invalid_nft_mirror_configuration/);
 });
 test('gallery inputs have a strict bounded page size and chain/address namespace',()=>{
   assert.equal(galleryPage(undefined),1); assert.equal(galleryPage('2'),2);

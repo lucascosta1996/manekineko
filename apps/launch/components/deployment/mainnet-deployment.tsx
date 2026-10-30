@@ -48,7 +48,7 @@ function Deployment({ configuredAddress }: { configuredAddress?: string }) {
   async function run(label: string, task: () => Promise<void>) {
     if (running.current) return;
     running.current = true; setBusy(label); setNotice(label);
-    try { await task(); } catch (e) { setNotice(e instanceof Error ? e.message : walletError(e)); }
+    try { await task(); } catch (e) { setNotice(walletError(e)); }
     finally { running.current = false; setBusy(''); }
   }
   async function prepare() {
