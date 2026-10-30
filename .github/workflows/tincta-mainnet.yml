@@ -20,6 +20,7 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      - run: npm exec --workspace @manekineko/contracts -- hardhat build contracts/TinctaRewards.sol contracts/TinctaEngine.sol --no-tests
       - name: Test the real coordinator on a disposable fork
         run: |
           node scripts/tincta/fork-rpc.mjs > fork-transport.log 2>&1 &
@@ -29,5 +30,5 @@ jobs:
             if curl --fail --silent -H 'Content-Type: application/json' --data '{"jsonrpc":"2.0","id":1,"method":"eth_chainId","params":[]}' http://127.0.0.1:18547 | grep -q '0x1'; then break; fi
             sleep 1
           done
-          npm exec --workspace @manekineko/contracts -- hardhat test test/TinctaMainnetFork.ts
+          npm exec --workspace @manekineko/contracts -- hardhat test --no-compile test/TinctaMainnetFork.ts
       - run: node scripts/tincta/export.mjs --check
