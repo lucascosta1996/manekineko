@@ -22,7 +22,7 @@ The prize claimant earns one lifetime sponsored mint across later collections, s
 
 The deployment is **TinctaRewards**, ERC-721 name **Tincta Rewards**, symbol **TINCTA**, metadata identity `tincta-rewards-1`. Its constructor creates **TinctaEngine**, an immutable helper for permanent artwork, number encoding and pure draw calculations. All NFTs, custody, accounting, voting and claims remain at the root address. There is no proxy, upgrade mechanism or replaceable renderer.
 
-The two-source dependency graph, standard compiler input and public metadata contain only current branding. Internal package/database identifiers and authentic historical deployment records are not renamed. The existing 22-season, 216-collection names, IDs, order, colors and motifs are preserved.
+The two Tincta contracts, their dependency graph, the standard compiler input and public metadata contain only current branding. Internal package/database identifiers and authentic historical deployment records are not renamed. The existing 22-season, 216-collection names, IDs, order, colors and motifs are preserved.
 
 The [whitepaper](https://tincta.xyz/whitepaper) allows immutable helper contracts. Chainlink randomness is an explicitly disclosed external dependency; this release does **not** claim unqualified TAS-1 certification or that randomness originates entirely onchain.
 
@@ -81,4 +81,4 @@ Before activation, verify the intended Mainnet X author, media permissions, publ
 
 ## Evidence and remaining launch steps
 
-See [production verification](tincta-mainnet-verification.md). Local tests, read-only deployment estimates, a disposable fork, hosted UI checks and actual Mainnet execution are different evidence. Owner approval is still required for the real deployment, followed by explorer verification, source activation and opening Genesis. This preparation is not an independent security audit or a guarantee of defect-free operation.
+See [production verification](tincta-mainnet-verification.md) and the [portable owner checklist](../output/pdf/tincta-mainnet-launch-2026-10-30.pdf). Local tests, read-only deployment estimates, a disposable fork, hosted UI checks and actual Mainnet execution are different evidence. Owner approval is still required for the real deployment, followed by explorer verification, source activation and opening Genesis. This preparation is not an independent security audit or a guarantee of defect-free operation.
