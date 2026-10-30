@@ -65,6 +65,14 @@ Apply migration `040_tincta_production.sql` before new source activation. Merge 
 
 The internal adapter discriminator is 18; the public contract identity is `tincta-rewards-1`. Historical adapters keep their original identities. A partial Mainnet pin fails closed.
 
+## Following an open collection
+
+Watch Launch for the ballot result, paid mint deadline, sellout, randomness and finalized winners. The final mint attempts the randomness request automatically. If it was never accepted, **Request the draw** retries that request; it cannot replace an accepted request. After entropy arrives, **Finalize the draw** processes bounded attempts against that same entropy. Anyone can perform permissionless progress and claim the reserved execution reward if they finalize the draw.
+
+This preparation does not install a Mainnet transaction-signing daemon. Use the visible Launch actions for finalization, funding and preparation of the next collection, or separately configure and qualify an executor before promising unattended season progression. The always-running X sender observes and publishes; it has no authority to send blockchain transactions. A delay in finalization after timely randomness cannot turn a committed draw into refunds.
+
+Only prepare the next collection when its full 24-hour ballot can be announced. Later collections never start merely because the previous mint deadline elapsed. The fixed operating recipient handles treasury and unused-budget recovery; unpaid user claims remain reserved.
+
 ## X delivery
 
 The hosted sender and independent watchdog already run continuously. Production support uses separate `SOCIAL_MAINNET_RPC_PRIMARY` and `SOCIAL_MAINNET_RPC_SECONDARY` endpoints, a Mainnet X profile, a separately registered disabled source and the explicit `SOCIAL_MAINNET_ENABLED=true` switch. No Mainnet source, account or delivery is activated by deployment or this preparation.
