@@ -40,11 +40,13 @@ test('Launch planned catalog never invents deployed state or wallet approvals', 
   await expect(page.getByRole('link',{name:'View Sepolia status'})).toHaveAttribute('href','/dashboard?chainId=11155111');
 });
 test('Launch invalid pins disable signing and recover on retry', async ({page}) => {
+  // Both the rejected initial read and the successful recovery perform pin checks.
+  test.setTimeout(90_000);
   await prepare(page); await rpc(page,7,true); await page.clock.resume(); await page.goto(`${urls.launch}/dashboard`);
-  await expect(page.locator('.protocol-panel[role=alert]')).toContainText('deployment could not be verified');
+  await expect(page.locator('.protocol-panel[role=alert]')).toContainText('deployment could not be verified',{timeout:30_000});
   await expect(page.getByRole('button',{name:'Review transaction'})).toHaveCount(0);
   await rpc(page,7,false); await page.getByRole('button',{name:'Try again'}).click();
-  await expect(page.getByRole('heading',{name:'Actions to review'})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Actions to review'})).toBeVisible({timeout:30_000});
 });
 test('Launch restores an unknown submission and rejects a wrong recovery hash', async ({page}) => {
   await prepare(page); await rpc(page,7); await page.clock.resume();

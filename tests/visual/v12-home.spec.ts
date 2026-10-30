@@ -19,6 +19,9 @@ for (const width of [320, 390, 768, 1280, 1440]) {
     test(`public ${path} phase ${phase} at ${width}`, async ({
       page,
     }, info) => {
+      // Includes browser setup, a complete contract read, axe and a full-page capture.
+      // Hosted Firefox can exhaust the default minute during axe after the UI assertions pass.
+      test.setTimeout(90_000);
       // Main engine covers all sizes; both other engines cover the critical narrow/wide views.
       test.skip(
         !["chromium", "opera"].includes(info.project.name) && ![390, 1440].includes(width),
@@ -31,7 +34,7 @@ for (const width of [320, 390, 768, 1280, 1440]) {
       await page.goto(urls.web + path);
       await expect(
         page.getByRole("heading", { name: heading, exact: true })
-      ).toBeVisible();
+      ).toBeVisible({ timeout: 30_000 });
       await ready(page);
       if (phase === 7) {
         await expect(page.locator('.public-timing').getByText('No expiration', {exact:true})).toBeVisible();
