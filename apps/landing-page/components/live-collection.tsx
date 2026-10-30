@@ -13,7 +13,7 @@ function readResponse(data: unknown): FeaturedCollectionSummary | null {
   if (!value || typeof value !== "object" || !("href" in value) || typeof value.href !== "string") throw new Error("Invalid collection response");
   const url = new URL(value.href, window.location.origin);
   if (!["https:", "http:"].includes(url.protocol) || url.username || url.password) throw new Error("Invalid collection link");
-  return parseLiveCollection({ ...value, href: url.pathname }, url);
+  return parseLiveCollection({ ...value, href: `${url.pathname}${url.search}${url.hash}` }, url);
 }
 export function LiveCollection() {
   const [observation, setObservation] = useState<Observation>({ collection: null, phase: "pending", busy: true });

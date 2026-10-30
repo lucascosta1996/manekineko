@@ -3,6 +3,26 @@ import AxeBuilder from '@axe-core/playwright';
 import { prepare, ready, urls, collection, metrics } from './fixtures';
 
 test.use({ trace: 'on', video: 'on' });
+test('Landing preserves the collection selected by an absolute protocol link', async ({ page }) => {
+ await prepare(page);
+ const href = 'https://app.tincta.xyz/collections?collection=6';
+ await page.route('**/api/live-collection', route => route.fulfill({ json: { collection: {
+  ...collection, name: 'Beryl Current', href, status: 'refundable', label: 'Refunds available', target: null,
+ } } }));
+ await page.goto(`${urls.landing}/rewards`);
+ const bar = page.getByRole('region', { name: 'Collection status', exact: true });
+ await expect(bar).toHaveAttribute('data-phase', 'ready');
+ await expect(bar.getByRole('link', { name: 'Beryl Current', exact: true })).toHaveAttribute('href', href);
+ await expect(bar.locator('.lifecycle-badge')).toHaveText('Refunds available');
+ await expect(bar).not.toContainText('temporarily unavailable');
+ // Never silently discard unvalidated query parameters or fragments.
+ for (const suffix of ['&redirect=evil', '#ignored']) {
+  await page.route('**/api/live-collection', route => route.fulfill({ json: { collection: { ...collection, href: href + suffix } } }));
+  await page.clock.runFor(20000);
+  await expect(bar).toHaveAttribute('data-phase', 'stale');
+  await expect(bar.getByRole('link', { name: 'Beryl Current', exact: true })).toHaveAttribute('href', href);
+ }
+});
 test('Landing announcement follows the received palette and tolerates older responses', async ({page}) => {
  await prepare(page);await page.goto(`${urls.landing}/rewards`);
  const bar=page.getByRole('region',{name:'Collection status',exact:true});
