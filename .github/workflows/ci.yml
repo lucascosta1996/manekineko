@@ -14,6 +14,7 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      - run: npm run protocol:v17:rehearsal:test
       - run: npm run check
       - run: npm run protocol:v12:test
       - run: node --import tsx --test scripts/protocol-v13/rehearsal/rehearsal.test.mts
