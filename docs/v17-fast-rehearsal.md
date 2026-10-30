@@ -138,3 +138,9 @@ The closing report separates local tests, isolated SQL, hosted rendering/indexer
 ### Smart-account claim continuation
 
 If a human wallet wraps an action in MetaMask Delegation Framework 1.3.0, match the exact single atomic inner call and executing wallet; an outer target mismatch alone does not prove that the user signed another action. Never accept another signer, extra executions or a non-atomic mode. A successful canonical receipt remains mandatory for checkpoint acknowledgement. `ack-failure <gate> <note> <hash>` separately records a failed canonical manual action on two RPCs, accounts its gas once, and leaves the gate pending. Browser submission delegates execution gas estimation to the wallet. Keep all existing frozen runtimes; use the reviewed wallet continuation for the current retry.
+
+## Read-transport recovery follow-up · 2026-10-30
+
+The unattended final ballot exposed an unhandled `ECONNRESET` during RPC observation. The already-frozen runner stopped before the three-minute mint window, and collection 6 minted zero. It is an incomplete three-mint scenario, even though the empty collection later became refundable. Its failure and immutable deadlines are preserved.
+
+Newly built runtimes retry an allowlist of read-only JSON-RPC requests at most twice after a socket reset or transport timeout, retaining the shared 500 ms request pacing. Transaction submission, signing, unknown methods and any mixed batch containing them are not retried by this transport. Contract reverts also propagate immediately. The durable transaction journal and independent canonical checks remain responsible for writes and recovery. Existing frozen V16/V17 binaries are unchanged. Thirteen focused rehearsal tests and TypeScript pass, including a real dropped HTTP socket, bounded persistent failure, and non-replay of transaction/signing requests. This local fault test does not complete the missed live scenario or qualify unattended production operation.

@@ -4,6 +4,8 @@ import { mkdtemp, rm, readFile, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { Wallet } from 'ethers';
+import {createServer} from 'node:http';
+import {rehearsalProvider,retryReadTransport} from '../../protocol-v14/rehearsal/rpc.mts';
 import { rehearsalPlan, digest, Hold, assertCustody, assertMintBudget } from './plan.mts';
 import { createVault, readVault } from './vault.mts';
 import { auditBalances } from './audit.mts';
@@ -121,4 +123,41 @@ test('autonomous refunds overlap distinct wallets while preserving each wallet n
  (engine as any).send=async(index:number,action:string)=>{assert.equal(active.has(index),false);active.add(index);maximum=Math.max(maximum,active.size);const order=orders.get(index)??[];order.push(action);orders.set(index,order);await new Promise(resolve=>setTimeout(resolve,5));active.delete(index);return{};};
  await (engine as any).claim({...plan.scenarios[5],automatedSettlement:true});
  assert.equal(maximum,2);assert.deepEqual(orders.get(3),['refund:786433','refund:786434']);assert.deepEqual(orders.get(5),['refund:786435','refund:786436']);
+});
+
+test('a dropped RPC read connection recovers without changing the requested read',async()=>{
+  let dropped=false;const balanceRequests:any[]=[];
+  const server=createServer(async(req,res)=>{
+    let body='';for await(const part of req)body+=part;
+    const parsed=JSON.parse(body),requests=Array.isArray(parsed)?parsed:[parsed];
+    const balances=requests.filter((p:any)=>p.method==='eth_getBalance');balanceRequests.push(...balances);
+    if(balances.length&&!dropped){dropped=true;req.socket.destroy();return;}
+    const replies=requests.map((p:any)=>({jsonrpc:'2.0',id:p.id,result:p.method==='eth_chainId'?'0xaa36a7':'0x123'}));
+    res.setHeader('content-type','application/json');res.end(JSON.stringify(Array.isArray(parsed)?replies:replies[0]));
+  });
+  await new Promise<void>(r=>server.listen(0,'127.0.0.1',r));
+  const provider=rehearsalProvider('http://127.0.0.1:'+(server.address() as any).port);
+  try{
+    assert.equal(await provider.send('eth_getBalance',['0x'+'1'.repeat(40),'0x1234']),'0x123');
+    assert.equal(dropped,true);assert.equal(balanceRequests.length,2);assert.deepEqual(balanceRequests[0],balanceRequests[1]);
+  }finally{provider.destroy();server.closeAllConnections();await new Promise<void>(r=>server.close(()=>r()));}
+});
+
+test('persistent read failures exhaust three attempts and propagate the original error',async()=>{
+  const error=Object.assign(new Error('socket reset'),{code:'ECONNRESET'});let attempts=0;
+  await assert.rejects(retryReadTransport({jsonrpc:'2.0',id:1,method:'eth_call',params:[]},async()=>{attempts++;throw error;}),e=>e===error);
+  assert.equal(attempts,3);
+});
+
+test('submission, signing, mixed batches and contract reverts are never replayed',async()=>{
+  for(const method of ['eth_sendRawTransaction','eth_sendTransaction','personal_sign','wallet_sendCalls','unknown_read']){
+    for(const mixed of [false,true]){
+      let attempts=0;const payload={jsonrpc:'2.0' as const,id:2,method,params:[]};
+      await assert.rejects(retryReadTransport(mixed?[{...payload,id:1,method:'eth_getBalance'},payload]:payload,async()=>{attempts++;throw Object.assign(new Error('lost response'),{code:'ECONNRESET'});}));
+      assert.equal(attempts,1);
+    }
+  }
+  let attempts=0;const revert=Object.assign(new Error('execution reverted'),{code:'CALL_EXCEPTION'});
+  await assert.rejects(retryReadTransport({jsonrpc:'2.0',id:1,method:'eth_call',params:[]},async()=>{attempts++;throw revert;}),e=>e===revert);
+  assert.equal(attempts,1);
 });
