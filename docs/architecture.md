@@ -1,5 +1,9 @@
 # Tincta protocol architecture and agent handoff
 
+## Final V17 closeout · 2026-10-30
+
+The [final closeout report](v17-closeout-report-2026-10-30.md) supersedes pending-run checkpoints below. Settlement is complete, both V17 contracts have zero liabilities, and 0.307800200290244037 Sepolia ETH was returned to the original funding account. Global accounting reconciles exactly; imported wallets remain under manual custody. Only two planned collections completed their draws. The six-scenario rehearsal did not pass and Mainnet remains unqualified. Historical reports, deployments and frozen runtimes are preserved.
+
 ## Autonomous V17 settlement continuation · 2026-10-30 local
 
 The user delegated the remaining work after the Beryl Atlas affiliate claim. The imported wallets remain protected; automation does not sign or sweep them. Beryl Beacon subsequently missed its three-minute mint deadline at 32/40 because full historical reports and repeated checks consumed the window. Its signed final eight-NFT transaction was stopped before broadcast. Both RPCs confirmed the absent transaction/receipt, unchanged latest and pending nonce, expired deadline and available refunds. The original signed journal is preserved; a private retirement record and public hash/reason distinguish this unbroadcast intent from spent gas.

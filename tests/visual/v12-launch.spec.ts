@@ -10,7 +10,8 @@ for (const width of [320,390,768,1280,1440]) {
   test(`Launch pending signatures and progress tree ${width}`, async ({page}) => {
     await page.setViewportSize({width,height:1000}); await prepare(page); await rpc(page,7); await page.clock.resume();
     await page.goto(`${urls.launch}/dashboard`);
-    await expect(page.getByRole('heading',{name:'Actions to review'})).toBeVisible();
+    // The initial dashboard performs the complete pinned contract read in the hosted fixture.
+    await expect(page.getByRole('heading',{name:'Actions to review'})).toBeVisible({timeout:30_000});
     await expect(page.getByRole('heading',{name:'Fictional voting study'})).toBeVisible();
     await ready(page);
     await expect(page.getByRole('heading',{name:'Prepare the next collection',exact:true})).toBeVisible();

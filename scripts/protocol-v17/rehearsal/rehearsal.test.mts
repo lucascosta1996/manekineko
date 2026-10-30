@@ -8,9 +8,17 @@ import {createServer} from 'node:http';
 import {rehearsalProvider,retryReadTransport} from '../../protocol-v14/rehearsal/rpc.mts';
 import { rehearsalPlan, digest, Hold, assertCustody, assertMintBudget } from './plan.mts';
 import { createVault, readVault } from './vault.mts';
-import { auditBalances } from './audit.mts';
+import { auditBalances,auditScenario } from './audit.mts';
 import { RehearsalEngine, type RunState } from './engine.mts';
 const release={version:17,chainId:11155111,sealed:false,prepared:0,genesisMints:0,address:'0x'+'1'.repeat(40),codeHash:'0x'+'2'.repeat(64),manifest:{rehearsal:true,settings:{},options:[{supply:'20',price:'100000000000000',winners:'6',duration:'600'},{supply:'40',price:'200000000000000',winners:'4',duration:'180'},{supply:'20',price:'100000000000000',winners:'10',duration:'600'}],catalog:Array.from({length:6},(_,i)=>({seasonId:i<3?'A':'B',name:`Fast ${i+1}`}))}};
+test('coverage requires the planned quantity, terms and payouts, not only a terminal phase',()=>{
+ const refund={expected:'refund' as const,actual:'refund',supply:40n,winners:4n,minted:3n,refunded:3n,prizesClaimed:0n,termsMatch:true};
+ assert.deepEqual(auditScenario(refund),{expectedMinted:'3',scenarioPassed:true});
+ for(const change of [{minted:0n,refunded:0n},{minted:2n,refunded:2n},{refunded:2n},{termsMatch:false}])assert.equal(auditScenario({...refund,...change}).scenarioPassed,false);
+ const draw={...refund,expected:'sellout' as const,actual:'sellout',minted:40n,refunded:0n,prizesClaimed:4n};
+ assert.equal(auditScenario(draw).scenarioPassed,true);
+ for(const change of [{minted:32n},{prizesClaimed:3n},{actual:'refund'},{termsMatch:false}])assert.equal(auditScenario({...draw,...change}).scenarioPassed,false);
+});
 test('separate six-collection plan covers every package sellout, both refunds, cross-season manual referrals and no-vote fallback',()=>{
  const p=rehearsalPlan(release,'a'.repeat(64));assert.equal(p.version,17);assert.equal(p.walletCount,11);assert.equal(p.scenarios.length,6);
  assert.equal(p.scenarios.filter(s=>s.outcome==='sellout').length,4);assert.equal(p.scenarios.filter(s=>s.outcome==='refund').length,2);

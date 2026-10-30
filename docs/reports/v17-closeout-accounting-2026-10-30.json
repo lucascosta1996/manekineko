@@ -1,0 +1,226 @@
+{
+  "at": "2026-10-30T02:06:12.757Z",
+  "chainId": 11155111,
+  "block": 12023585,
+  "blockHash": "0xed3f43b7728e3525d9c0ba98d23a9e63e23ccbdee437a444d51f1446992c2886",
+  "twoRpcsAgreed": true,
+  "receiptCount": 327,
+  "receiptHashesSha256": "7a76a992877614d341e8d2dbf29f9e4710b0ce52900477de11acbc4d0f5561f9",
+  "fundingWei": "360000000000000000",
+  "returnedWei": "307800200290244037",
+  "returns": [
+    {
+      "hash": "0x08715aea022a7edc2e6b033976a8803d1139717c32288b07ced53c5228b16eb6",
+      "from": "0xe8e110B2b9344200300Eb9528671A47337aBAb78",
+      "valueWei": "293716043597691798",
+      "block": 12023492
+    },
+    {
+      "hash": "0xc810feded940c1f8f4dd8ef669b8755ac3e422e709fcf8dda48644b4c3f1b2fc",
+      "from": "0x3b2571129c05bD71B6504596aB2ca52B3ffB7223",
+      "valueWei": "14084156692552239",
+      "block": 12023516
+    }
+  ],
+  "walletResidualWei": "33770533238352983",
+  "operatorResidualWei": "14999998460480",
+  "gasWei": {
+    "original": "3759727268344684",
+    "current": "13077798655243646",
+    "retryDeployment": "826647882435",
+    "extraPaidMint": "1132822511328225",
+    "extraWalletTransaction": "386769003867690",
+    "closing": "22959232"
+  },
+  "gasTotalWei": "18357944109625912",
+  "vrfWei": "56322363316588",
+  "fundingTransactionGasOutsideDepositWei": "338400003588600",
+  "accountedWei": "360000000000000000",
+  "differenceWei": "0",
+  "balanced": true,
+  "contracts": [
+    {
+      "address": "0x39f625904CC50C08797e52b909EE51F6eB66d26E",
+      "balanceWei": "0",
+      "accountedWei": "0",
+      "rounds": [
+        {
+          "id": 1,
+          "minted": "0",
+          "subscriptionClosed": true
+        }
+      ]
+    },
+    {
+      "address": "0xdb0A3f76DE225377B7B6D1b70C14F1A12aDbe480",
+      "balanceWei": "0",
+      "accountedWei": "0",
+      "rounds": [
+        {
+          "id": 1,
+          "minted": "20",
+          "subscriptionClosed": true
+        },
+        {
+          "id": 2,
+          "minted": "20",
+          "subscriptionClosed": true
+        },
+        {
+          "id": 3,
+          "minted": "17",
+          "subscriptionClosed": true
+        },
+        {
+          "id": 4,
+          "minted": "20",
+          "subscriptionClosed": true
+        },
+        {
+          "id": 5,
+          "minted": "32",
+          "subscriptionClosed": true
+        },
+        {
+          "id": 6,
+          "minted": "0",
+          "subscriptionClosed": true
+        }
+      ]
+    }
+  ],
+  "retiredUnbroadcastCostWei": "0",
+  "importedWalletBalances": [
+    {
+      "address": "0xd20d2De0f415ef35948699B6f663A9B6f827bA92",
+      "balanceWei": "8511396480385066",
+      "humanCustody": true
+    },
+    {
+      "address": "0xDADbF94Fde7ac02f229a27919c820e2BA39128D3",
+      "balanceWei": "9859887995305472",
+      "humanCustody": true
+    },
+    {
+      "address": "0x472E1F008DaDC5f8AC666Bf1699a8c5cB5bFc02c",
+      "balanceWei": "5352480775198285",
+      "humanCustody": true
+    },
+    {
+      "address": "0x4AB1023896b83974F3c2DC25445E07d61bc0C5BE",
+      "balanceWei": "9906767997067680",
+      "humanCustody": true
+    }
+  ],
+  "supplementalVoteReceipt": {
+    "hash": "0x642d0ea057ac58d3b86743853c754b703b41620083fd9d096df8d9acc3ea8f16",
+    "from": "0x472E1F008DaDC5f8AC666Bf1699a8c5cB5bFc02c",
+    "to": "0xdb0A3f76DE225377B7B6D1b70C14F1A12aDbe480",
+    "nonce": 18,
+    "valueWei": "0",
+    "status": 1,
+    "block": 12020753,
+    "blockHash": "0x2760953bff47b887bde95707ca7d9c2064271eff43903be628bf34e00eb40a32",
+    "gasUsed": "257846",
+    "gasPriceWei": "1500000015",
+    "gasWei": "386769003867690",
+    "method": "castVote",
+    "args": [
+      "3",
+      "0",
+      [
+        "2"
+      ]
+    ],
+    "twoRpcsAgreed": true
+  },
+  "supplementalPaidMintHash": "0xd8422ecbcc868b9b4eeb540de40466c32524a57282cb2a82493a3549410a96a8",
+  "executionPassed": false,
+  "mainnetReady": false,
+  "collections": [
+    {
+      "id": 1,
+      "name": "Aster Atlas",
+      "expected": "sellout",
+      "actual": "refund",
+      "minted": "20",
+      "refunded": "20",
+      "prizesClaimed": "0",
+      "revenueWei": "2000000000000000"
+    },
+    {
+      "id": 2,
+      "name": "Aster Beacon",
+      "expected": "sellout",
+      "actual": "sellout",
+      "minted": "20",
+      "refunded": "0",
+      "prizesClaimed": "6",
+      "revenueWei": "2000000000000000"
+    },
+    {
+      "id": 3,
+      "name": "Aster Current",
+      "expected": "sellout",
+      "actual": "refund",
+      "minted": "17",
+      "refunded": "17",
+      "prizesClaimed": "0",
+      "revenueWei": "1700000000000000"
+    },
+    {
+      "id": 4,
+      "name": "Beryl Atlas",
+      "expected": "sellout",
+      "actual": "sellout",
+      "minted": "20",
+      "refunded": "0",
+      "prizesClaimed": "6",
+      "revenueWei": "2000000000000000"
+    },
+    {
+      "id": 5,
+      "name": "Beryl Beacon",
+      "expected": "sellout",
+      "actual": "refund",
+      "minted": "32",
+      "refunded": "32",
+      "prizesClaimed": "0",
+      "revenueWei": "6400000000000000"
+    },
+    {
+      "id": 6,
+      "name": "Beryl Current",
+      "expected": "refund",
+      "actual": "refund",
+      "minted": "0",
+      "refunded": "0",
+      "prizesClaimed": "0",
+      "revenueWei": "0"
+    }
+  ],
+  "seasons": [
+    {
+      "seasonId": "0xdf3b80c2c7b93cdf304b349a2cb72a68ba433574bd76706dd1184e8cdf3ba7c1",
+      "first": "1",
+      "last": "3",
+      "fundedWei": "200000000000000",
+      "paidWei": "200000000000000",
+      "eligibleNfts": "20",
+      "claimLimit": "1",
+      "claims": "1",
+      "unlocked": true
+    },
+    {
+      "seasonId": "0xc47ab000587df536da66cdb738f5bb5608b90a827719051ab6d55109ae379807",
+      "first": "4",
+      "last": "6",
+      "fundedWei": "200000000000000",
+      "paidWei": "200000000000000",
+      "eligibleNfts": "20",
+      "claimLimit": "1",
+      "claims": "1",
+      "unlocked": true
+    }
+  ]
+}

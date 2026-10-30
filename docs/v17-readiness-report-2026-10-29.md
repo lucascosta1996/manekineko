@@ -1,5 +1,9 @@
 # V17 rehearsal readiness report · October 29, 2026
 
+## Final V17 closeout · 2026-10-30
+
+The [final closeout report](v17-closeout-report-2026-10-30.md) supersedes pending-run checkpoints below. Settlement is complete, both V17 contracts have zero liabilities, and 0.307800200290244037 Sepolia ETH was returned to the original funding account. Global accounting reconciles exactly; imported wallets remain under manual custody. Only two planned collections completed their draws. The six-scenario rehearsal did not pass and Mainnet remains unqualified. Historical reports, deployments and frozen runtimes are preserved.
+
 ## Latest checkpoint · 2026-10-29 18:36 UTC
 
 Beryl Atlas (collection 4) sold out at 17:58:48 UTC before its 17:59:49 deadline, received real Chainlink randomness and finalized six winners. Wallet 1's referred mint is `0xb7ba68b5e49031c71b4c43c801f14a9ec18d698126551b97e1d3c662eb87161c`. The user imported winning Wallet 4 (`0x4AB1023896b83974F3c2DC25445E07d61bc0C5BE`) and claimed NFT #5 in `0x922f9d7c9eaa3d4f5c45756959353359d3937b74f731d2fd68e48bcd47ca66bd`, receiving 0.0002 Sepolia ETH before gas. Wallet 1 independently claimed NFT #1 in `0x49ce78df2c70f7c9a96aeef1e2899fd72c69398443d15784e819759492cbbf2d`; it was reconciled without a duplicate. Both manual prize receipts and exact balance changes passed two-RPC checks. Wallet 0's affiliate claim `0x59e6d9d75bb4977eb0506ab4970b382fbf75753b228efa4bae55567b80506700` paid 0.0004 ETH at 18:31:36 UTC; both RPCs confirm 254,433,002,544,330 wei gas and a 145,566,997,455,670 wei net increase. All six prizes and the affiliate payout are recorded; reserve recovery and collections 5–6 remain outstanding. Their clocks have not started. The Aster Current unsold incident and completed refund/holder cleanup remain failures of the intended sellout scenario.

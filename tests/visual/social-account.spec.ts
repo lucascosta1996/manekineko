@@ -7,7 +7,11 @@ for (const width of [390, 1440]) test(`X account sign-in, verified save and secr
   let signedIn = false, saves = 0;
   await page.route(/\/api\/(social-account|auth\/session)/, async route => {
     const request = route.request();
-    if (request.url().includes('/session')) { signedIn = request.method() === 'POST'; return route.fulfill({ json: { username: 'operator' } }); }
+    if (request.url().includes('/session')) {
+      if (request.method() === 'POST') signedIn = true;
+      if (request.method() === 'DELETE') signedIn = false;
+      return route.fulfill({ status: signedIn ? 200 : 401, json: signedIn ? { username: 'operator' } : { error: 'Sign in.' } });
+    }
     if (!signedIn) return route.fulfill({ status: 401, json: { error: 'Sign in.' } });
     if (request.method() === 'PUT') {
       saves++; const body = request.postDataJSON();
@@ -21,7 +25,9 @@ for (const width of [390, 1440]) test(`X account sign-in, verified save and secr
   await expect(page.getByRole('heading', { name: 'Sign in to Launch' })).toBeVisible();
   await page.getByLabel('Launch username', { exact: true }).fill('operator'); await page.getByLabel('Launch password', { exact: true }).fill('fictional-password-for-test');
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Posting account: @tincta_test' })).toBeVisible();
+  // A full authenticated navigation must finish before the account-content assertion.
+  await page.waitForURL(/\/social\/account(?:\?|$)/);
+  await expect(page.getByRole('heading', { name: 'Posting account: @tincta_test' })).toBeVisible({ timeout: 30_000 });
   for (const [label, value] of [['Consumer Key (API key)', 'fictional-key'], ['Consumer Secret (API key secret)', 'fictional-secret'], ['Access token', 'fictional-token'], ['Access token secret', 'fictional-token-secret']]) await page.getByLabel(label, { exact: true }).fill(value);
   await page.getByRole('button', { name: 'Verify and save account', exact: true }).click();
   await expect(page.getByRole('status')).toContainText('Verified @tincta_test'); expect(saves).toBe(1);

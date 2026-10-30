@@ -24,7 +24,11 @@ for (const width of [320, 390, 768, 1440]) test(`Launch social previews, keyboar
   await page.getByRole('option').nth(1).click();
   await expect(page.locator('.social-preview-copy')).toContainText('NFT-holder voting opened');
   await page.getByRole('combobox', { name: 'Event', exact: true }).click();
-  await page.getByRole('option', { name: 'SEASON COMPLETE', exact: true }).click();
+  const finalStage = page.getByRole('option', { name: 'SEASON COMPLETE', exact: true });
+  // Complete popup scrolling before starting a pointer sequence on its last item.
+  await finalStage.scrollIntoViewIfNeeded();
+  await finalStage.click();
+  await expect(page.getByRole('listbox')).toHaveCount(0);
   await expect(page.locator('.social-preview-copy')).toContainText('Every collection has finalized or reached a refund outcome');
   await expect(page.locator('.social-preview-copy a')).toHaveAttribute('href', /format=png/);
   await page.getByRole('combobox', { name: 'Event', exact: true }).focus();
