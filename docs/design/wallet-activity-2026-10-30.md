@@ -63,3 +63,25 @@ Checks `40997811283` passed on `55705db`. Its visual run `40997811153` passed Ch
 
 
 Run `41001677018` on `d7344ca` passed Chromium, WebKit and Firefox shard 2 (148 passed, 56 skipped). Shard 1 passed 144, skipped 69 and failed one generic readiness poll on Launch's unconfigured dashboard. The retained trace resolves that failure: `queryCount` returned zero after 204 ms, but serializing its after-snapshot took another 14.4 seconds. The outer Node-side `expect.poll` expired at ten seconds before receiving the successful result. The saved page shows the fully loaded unconfigured dashboard. Resource isolation alone did not address this recorder overhead. The shared readiness helper now uses the native `toHaveCount(0)` assertion, preserving the ten-second condition timeout, complete pending-state check and trace evidence without an additional outer polling deadline. Source checks (12) and visual TypeScript pass; this correction requires a fresh remote result.
+
+
+## Terminal closeout evidence · October 30
+
+The tested source is `7cdcfac48a28cad1b316d35e0df0106fb67cdf81`. [Checks 41005791206](https://github.com/lucascosta1996/manekineko/actions/runs/41005791206) passed, including the dedicated V17 rehearsal gate. All five hosting projects were Ready with matching stable aliases on this revision. The subsequent closeout publication changes documentation/PDF only; it does not change the tested application, protocol or test source.
+
+[Visual 41005791163](https://github.com/lucascosta1996/manekineko/actions/runs/41005791163) finished with **failure**:
+
+| Job | Passed | Skipped | Failed |
+| --- | ---: | ---: | ---: |
+| Chromium | 415 | 3 | 0 |
+| WebKit | 293 | 125 | 0 |
+| Firefox shard 1 | 144 | 69 | 1 |
+| Firefox shard 2 | 147 | 56 | 1 |
+
+All 418 cases per engine remain represented. Each secondary engine intentionally skips 122 viewport samples and three live-server development cases; Chromium skips only those three development cases. No failed test is counted as skipped.
+
+Firefox shard 1 exceeded the 120-second aggregate budget in `rewards-machine.spec.ts`, the loop/visibility/reduced-motion case. Its trace shows earlier assertions completing; the final 12,500 ms simulated-clock advance took approximately 41 seconds of wall time and extended beyond the case deadline. The case remains failed. Static reduced-motion frames and enlarged-text cases passed.
+
+Firefox shard 2 failed `web-wallet.spec.ts:12`: the fixture wallet connected and its address appeared in the header, but the enabled Mint tickets button was not found within ten seconds. The saved page still shows Loading collection details. The trace contains successful mocked RPC responses followed by a roughly ten-second gap before another request. The cause remains unestablished; the fixture's intentionally blocked vendor requests are not production-network evidence. This is distinct from the previous outer readiness-poll serialization failure, whose affected dashboard cases passed in this run.
+
+Logs, failure images, contexts and traces are retained in the run artifacts and private closeout evidence. No assertion or screenshot tolerance was relaxed to report a pass. **Full automated cross-browser acceptance remains failed.** Native Opera observations and user-signed receipt evidence above stand independently; this closeout does not qualify Mainnet.
