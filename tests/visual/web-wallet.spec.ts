@@ -20,7 +20,9 @@ test('Reown connects from the header and survives navigation', async ({ page }) 
   expect(await page.evaluate(() => (window as any).__v12Submissions.length)).toBe(0);
   await expect(page.getByRole('button', { name: 'Mint tickets', exact: true })).toBeEnabled();
   await page.reload();
-  await expect(page.getByRole('button', { name: /^Manage wallet/ })).toBeVisible();
+  // A hosted Firefox trace completed restoration just after the 10s assertion;
+  // keep a bounded hydration budget without reconnecting or weakening persistence checks.
+  await expect(page.getByRole('button', { name: /^Manage wallet/ })).toBeVisible({ timeout: 30000 });
   await page.getByRole('button', { name: /^Manage wallet/ }).click();
   await expect(page.getByText('Disconnect', { exact: true })).toBeVisible();
   await page.getByText('Disconnect', { exact: true }).click();

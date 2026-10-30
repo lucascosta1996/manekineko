@@ -39,6 +39,12 @@ for(const width of [320,390,768,1440]) test(`Mainnet deployment review is readab
  await expect(page.getByRole('table')).toContainText('0.02 ETH');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  await page.clock.resume(); // Axe schedules work with timers; the fixture clock starts paused.
+ if(width===320){
+  const comparison=page.getByRole('region',{name:'Voting package comparison'});
+  await comparison.focus();await expect(comparison).toBeFocused();
+  await page.keyboard.press('ArrowRight');
+  await expect.poll(()=>comparison.evaluate(el=>el.scrollLeft)).toBeGreaterThan(0);
+ }
  expect((await new AxeBuilder({page}).include('.operator-shell').analyze()).violations).toEqual([]);
  await page.screenshot({path:`test-results/tincta-deploy-${width}.png`,fullPage:true});
 });

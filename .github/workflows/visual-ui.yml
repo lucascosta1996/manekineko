@@ -1,5 +1,12 @@
 name: Visual UI contracts
 on:
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: Browser coverage to run
+        type: choice
+        options: [full, deploy-wallet]
+        default: full
   pull_request:
     paths: ['apps/web/**', 'apps/launch/**', 'apps/landing-page/**', 'packages/ui/**', 'packages/protocol/**', 'scripts/protocol-v12/**', 'tests/visual/**', 'scripts/visual/**', 'playwright.config.ts', 'package.json', 'package-lock.json', 'docs/design/**', 'scripts/generate-tincta-brand.mjs', 'scripts/generate-landing-artwork.mjs', 'packages/contracts/src/tincta-artwork.ts', 'packages/contracts/src/season-appearance.ts', 'packages/contracts/src/permanent-combinations.ts', 'docs/brand/tincta/identity/**', 'seasons.json', 'collection-names.json', '.github/workflows/visual-ui.yml']
   push:
@@ -39,7 +46,7 @@ jobs:
       - run: npm run typecheck --workspace @manekineko/landing-page && npm run typecheck --workspace @manekineko/web && npm run typecheck --workspace @manekineko/launch
       - run: npm run build:landing && npm run build:web && npm run build:launch
       - run: npm run ui:fixtures:build
-      - run: npm run ui:test -- --project=${{ matrix.browser }} --workers=${{ matrix.workers }} --shard=${{ matrix.shard }}
+      - run: npm run ui:test -- --project=${{ matrix.browser }} --workers=${{ matrix.workers }} --shard=${{ matrix.shard }} ${{ github.event_name == 'workflow_dispatch' && inputs.scope == 'deploy-wallet' && 'tests/visual/tincta-deploy.spec.ts tests/visual/web-wallet.spec.ts' || '' }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
