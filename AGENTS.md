@@ -6,6 +6,10 @@ Read [docs/architecture.md](docs/architecture.md) before changing protocol behav
 
 Before frontend work, read [the cross-app visual standard](docs/design/visual-identity.md) and [its quality gates](docs/design/quality-gates.md). They govern Landing, Web/docs, Launch and `packages/ui`, including first paint, loading, error, retry and footer states. Use the [reusable agent prompt](docs/design/agent-prompt.md) for scoped UI tasks and check the [adoption audit](docs/design/adoption-audit.md) for known gaps. Preserve the approved Tincta identity, use shared tokens/components and verify final rendered behavior. A build alone is not visual acceptance; the documented browser/CI pipeline must not be reported as installed or passed until it actually exists and runs.
 
+## Current production preparation
+
+The 2026-10-30 user-approved draft is TinctaRewards; read [the Mainnet guide](docs/tincta-mainnet.md) and [verification evidence](docs/tincta-mainnet-verification.md). Packages use 24-hour ballots and paid mint windows, indefinite Genesis and a 72-hour randomness timeout. Launch has a manual wallet deployment review; **do not deploy until the user approves through their wallet**. This new source does not relabel or upgrade historical contracts below. Keep Mainnet X disabled until its intended account and exact source are approved and registered.
+
 ## Current baseline
 
 - **2026-10-29 accelerated V17:** the user replaced the eleven-day V16 test schedule with the [fast V17 workflow](docs/v17-fast-rehearsal.md). Read the [readiness report](docs/v17-readiness-report-2026-10-29.md) for current evidence. V17 has an immutable Sepolia/local rehearsal profile and a production profile retaining V16 limits; Mainnet rejects accelerated mode. The six live scenarios and separate 216-collection local catalog evidence must never be conflated. Preserve the old V16 contract, frozen runner, vault and pause marker. Mainnet remains unqualified, including its active contract-size/gas rules.

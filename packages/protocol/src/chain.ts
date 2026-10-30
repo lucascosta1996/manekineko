@@ -49,7 +49,7 @@ export type RoundState = {
 };
 export type Snapshot = {
   walletAddress?: string;
-  protocolVersion?: 16 | 17;
+  protocolVersion?: 16 | 17 | 18;
   rehearsalMode?: boolean;
   holders?: HolderSeason;
   genesis?: GenesisState;
@@ -72,7 +72,7 @@ export type Snapshot = {
   round: RoundState | null;
 };
 export async function verifyController(provider: Provider, config: ProtocolConfig, blockTag?: number) {
-  if((config.version===16||config.version===17))return verifySingleContract(provider,config,blockTag);
+  if((config.version===16||config.version===17||config.version===18))return verifySingleContract(provider,config,blockTag);
   if (Number((await provider.getNetwork()).chainId) !== config.chainId)
     throw new Error('The RPC network does not match this deployment.');
   const code = await provider.getCode(config.controller, blockTag);
@@ -88,7 +88,7 @@ export async function readProtocol(
   wallet?: string,
   sourcePage = 0
 ): Promise<Snapshot> {
-  if((config.version===16||config.version===17))return readV16(provider,config,selectedId,wallet,sourcePage);
+  if((config.version===16||config.version===17||config.version===18))return readV16(provider,config,selectedId,wallet,sourcePage);
   const block = await provider.getBlock('latest');
   if (!block || Date.now() / 1000 - block.timestamp > 180)
     throw new Error('The network data is out of date. Retry before signing.');

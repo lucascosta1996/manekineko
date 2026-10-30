@@ -114,7 +114,10 @@
     "protocol:v17:rehearsal:build": "node --import tsx scripts/protocol-v17/rehearsal/build.mts",
     "protocol:v17:release": "node --import tsx scripts/protocol-v17/release.mts",
     "protocol:v17:social": "node --import tsx scripts/protocol-v17/social.mts",
-    "protocol:v17:social:test": "node --import tsx --test scripts/protocol-v17/social.test.ts scripts/protocol-v16/social.test.ts scripts/protocol-v16/social-account.test.ts"
+    "protocol:v17:social:test": "node --import tsx --test scripts/protocol-v17/social.test.ts scripts/protocol-v16/social.test.ts scripts/protocol-v16/social-account.test.ts",
+    "tincta:test": "npm exec --workspace @manekineko/contracts -- hardhat test test/TinctaRewards.ts test/TinctaCatalog.ts",
+    "tincta:export": "npm run contracts:compile && node scripts/tincta/export.mjs",
+    "tincta:verify": "node --import tsx scripts/tincta/verify.mts"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.11.1",

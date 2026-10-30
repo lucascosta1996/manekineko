@@ -1,8 +1,10 @@
+import productionAbi from '@manekineko/contract-abi/tincta-rewards' with {type:'json'};
+import {verifyTincta} from '../../../../packages/protocol/src/tincta.ts';
 import {Contract,Interface,ZeroAddress,ZeroHash,keccak256,type JsonRpcProvider,type Log} from 'ethers';
 import abi from '@manekineko/contract-abi/protocol-v16' with {type:'json'};
 import v17Abi from '@manekineko/contract-abi/protocol-v17' with {type:'json'};
 import {decodeGenesisMetadata,decodeOnChainMetadata} from '@manekineko/contract-abi/onchain-metadata';
-import {derivePermanentCombinationKey,encodePermanentCombination} from '@manekineko/contract-abi/permanent-combinations';
+import {derivePermanentCombinationKey,deriveTinctaPermanentCombinationKey,encodePermanentCombination} from '@manekineko/contract-abi/permanent-combinations';
 import {normalizeSeasonAppearance} from '@manekineko/contract-abi/season-appearance';
 import {ensure} from '../types.ts';
 import type {MirrorConfig} from './config.ts';
@@ -11,15 +13,16 @@ import {decodeWalletEvents,walletEventTopics} from './wallet-activity.ts';
 const iface=new Interface(abi),zeroTopic='0x'+'0'.repeat(64);
 export class V16MirrorChain implements MirrorChain{
   private provider:JsonRpcProvider; private config:MirrorConfig; private contract:Contract;
-  constructor(provider:JsonRpcProvider,config:MirrorConfig){this.provider=provider;this.config=config;this.contract=new Contract(config.controller,config.version===17?v17Abi:abi,provider);}
+  constructor(provider:JsonRpcProvider,config:MirrorConfig){this.provider=provider;this.config=config;this.contract=new Contract(config.controller,config.version===18?productionAbi:config.version===17?v17Abi:abi,provider);}
   async block(number:number):Promise<Anchor>{const b=await this.provider.getBlock(number);ensure(b?.hash,'canonical_block_unavailable');return{number,hash:b.hash.toLowerCase()};}
   async head(){const b=await this.provider.getBlock('latest');ensure(b&&Math.abs(Date.now()/1000-b.timestamp)<180,'chain_head_stale');return this.block(Math.max(0,b.number-this.config.confirmations));}
   async verify(anchor:Anchor){
     const c=this.config,at={blockTag:anchor.number};
-    ensure((c.version===16||c.version===17)&&c.chainId===11155111&&await this.provider.send('eth_chainId',[])==='0xaa36a7','collection_trust_mismatch');
+    ensure((c.version===16||c.version===17||c.version===18)&&c.chainId===(c.version===18?1:11155111)&&BigInt(await this.provider.send('eth_chainId',[]))===BigInt(c.chainId),'collection_trust_mismatch');
+    if(c.version===18)await verifyTincta(this.provider,c.controller,anchor.number);
     const code=await this.provider.getCode(c.controller,anchor.number);
     ensure(code!=='0x'&&keccak256(code)===c.codeHash&&(c.fromBlock===0||await this.provider.getCode(c.controller,c.fromBlock-1)==='0x'),'collection_trust_mismatch');
-    ensure(await this.contract.CONTRACT_VERSION(at)===`tincta-v${c.version}`&&await this.contract.GENESIS_SUPPLY(at)===(c.version===17?20n:1000n)&&await this.contract.GENESIS_MAX_MINTS_PER_WALLET(at)===2n,'collection_trust_mismatch');
+    ensure(await this.contract.CONTRACT_VERSION(at)===(c.version===18?'tincta-rewards-1':`tincta-v${c.version}`)&&await this.contract.GENESIS_SUPPLY(at)===(c.version===17?20n:1000n)&&await this.contract.GENESIS_MAX_MINTS_PER_WALLET(at)===2n,'collection_trust_mismatch');
     if(c.version===17)ensure(await this.contract.REHEARSAL_MODE(at)===true&&await this.contract.RANDOMNESS_TIMEOUT(at)===900n,'collection_trust_mismatch');
   }
   private check(logs:Log[],from:number,to:Anchor){ensure(logs.length<=140000&&logs.every(l=>!l.removed&&l.blockNumber>=from&&l.blockNumber<=to.number),'canonical_block_changed');}
@@ -54,8 +57,9 @@ export class V16MirrorChain implements MirrorChain{
     const uri=await this.contract.tokenURI(global,{blockTag:mintBlock});
     if(c.roundId===0)return{metadata:decodeGenesisMetadata(uri,serial),numbers:[],code:null};
     const at={blockTag:anchor.number},[terms,key]=await Promise.all([this.contract.terms(c.roundId,at),this.contract.combinationKey(c.roundId,at)]);
-    ensure(serial<=Number(terms.supply)&&key===derivePermanentCombinationKey({chainId:c.chainId,collectionAddress:c.address,roundId:c.roundId,seasonId:c.seasonId,maxSupply:terms.supply}),'collection_trust_mismatch');
-    const identity=encodePermanentCombination(serial,key),metadata=decodeOnChainMetadata(uri,this.config.version===17?'tincta-v17':'tincta-v16'),attrs=new Map(metadata.attributes.map(a=>[a.trait_type,a.value]));
+    const deriveKey=this.config.version===18?deriveTinctaPermanentCombinationKey:derivePermanentCombinationKey;
+    ensure(serial<=Number(terms.supply)&&key===deriveKey({chainId:c.chainId,collectionAddress:c.address,roundId:c.roundId,seasonId:c.seasonId,maxSupply:terms.supply}),'collection_trust_mismatch');
+    const identity=encodePermanentCombination(serial,key),metadata=decodeOnChainMetadata(uri,this.config.version===18?'tincta-rewards-1':this.config.version===17?'tincta-v17':'tincta-v16'),attrs=new Map(metadata.attributes.map(a=>[a.trait_type,a.value]));
     ensure(metadata.name===`${c.name} #${serial}`&&attrs.size===5&&['A','B','C','D'].every((k,i)=>attrs.get(k)===identity.numbers[i])&&attrs.get('Combination code')===Number(identity.combinationCode),'metadata_identity_mismatch');
     return{metadata,numbers:identity.numbers,code:Number(identity.combinationCode)};
   }

@@ -14,9 +14,13 @@ const reviewedCompiler = {
 // V6's reversible display encoding needs a smaller creation template. Keep every
 // historical artifact on its original settings, and use identical V6 settings for verification.
 const v6Compiler = { ...reviewedCompiler, settings: { ...reviewedCompiler.settings, optimizer: { enabled: true, runs: 1 }, viaIR: true } };
+// Production root uses a pinned size-oriented Yul sequence. Historical builds keep their exact profiles.
+const tinctaCompiler = { ...v6Compiler, settings: { ...v6Compiler.settings,
+  optimizer: { enabled: true, runs: 1, details: { yulDetails: { optimizerSteps: "dhfoDgvulfnTUtnIf[xa[r]EscLMcCTUtTOntnfDIlLculVcul[jmul[jul]VcTOculjmul]jmul]jxifDnTOcmu" } } },
+} };
 const compilerProfile = {
   compilers: [reviewedCompiler],
-  overrides: { "contracts/ManekinekoV17.sol": v6Compiler, "contracts/ManekinekoArtworkV17.sol": v6Compiler, "contracts/ManekinekoV16.sol": v6Compiler, "contracts/ManekinekoArtworkV16.sol": v6Compiler, "contracts/ManekinekoV15.sol": v6Compiler, "contracts/ManekinekoArtworkV15.sol": v6Compiler, "contracts/ManekinekoSeasonControllerV14.sol": v6Compiler, "contracts/ManekinekoVotingV14.sol": v6Compiler, "contracts/ManekinekoGenesisV14.sol": v6Compiler, "contracts/ManekinekoVotingV12.sol": v6Compiler, "contracts/ManekinekoSeasonControllerV12.sol": v6Compiler, "contracts/ManekinekoWinnerCreditsV8.sol": v6Compiler, "contracts/ManekinekoWinnerCreditsV9.sol": v6Compiler, "contracts/ManekinekoSeasonControllerV13.sol": v6Compiler, "contracts/ManekinekoHolderRewardsV13.sol": v6Compiler, ...Object.fromEntries(["Factory", "Round", "Renderer", "RoundDeployer"].flatMap(component =>
+  overrides: { "contracts/TinctaRewards.sol": tinctaCompiler, "contracts/TinctaEngine.sol": tinctaCompiler, "contracts/ManekinekoV17.sol": v6Compiler, "contracts/ManekinekoArtworkV17.sol": v6Compiler, "contracts/ManekinekoV16.sol": v6Compiler, "contracts/ManekinekoArtworkV16.sol": v6Compiler, "contracts/ManekinekoV15.sol": v6Compiler, "contracts/ManekinekoArtworkV15.sol": v6Compiler, "contracts/ManekinekoSeasonControllerV14.sol": v6Compiler, "contracts/ManekinekoVotingV14.sol": v6Compiler, "contracts/ManekinekoGenesisV14.sol": v6Compiler, "contracts/ManekinekoVotingV12.sol": v6Compiler, "contracts/ManekinekoSeasonControllerV12.sol": v6Compiler, "contracts/ManekinekoWinnerCreditsV8.sol": v6Compiler, "contracts/ManekinekoWinnerCreditsV9.sol": v6Compiler, "contracts/ManekinekoSeasonControllerV13.sol": v6Compiler, "contracts/ManekinekoHolderRewardsV13.sol": v6Compiler, ...Object.fromEntries(["Factory", "Round", "Renderer", "RoundDeployer"].flatMap(component =>
     [6, 7, 8, 9, 10, 11, 12, 13].map(version => [`contracts/Manekineko${component}V${version}.sol`, v6Compiler]))), },
 };
 
@@ -32,6 +36,8 @@ export default defineConfig({
     },
   },
   networks: {
+    ...(process.env.MAINNET_FORK_URL ? { tinctaMainnetFork: { type: "edr-simulated" as const, chainType: "l1" as const, chainId: 1, hardfork: "osaka", forking: { url: process.env.MAINNET_FORK_URL, ...(process.env.MAINNET_FORK_BLOCK ? {blockNumber:Number(process.env.MAINNET_FORK_BLOCK)} : {}) } } } : {}),
+    tinctaMainnetModel: { type: "edr-simulated", chainType: "l1", chainId: 1, hardfork: "osaka" },
     hardhatMainnet: { type: "edr-simulated", chainType: "l1", hardfork: "cancun" },
     // EDR currently stops at Osaka. These isolated models test V15/V16 behavior;
     // tests separately enforce the 64 KiB Sepolia bound. Actual network gas

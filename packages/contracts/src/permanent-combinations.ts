@@ -7,11 +7,20 @@ export type PermanentCombinationDeployment = { chainId: bigint | number | string
 
 /** Mirrors the V10 constructor. Deployment identity is public; this key is not draw entropy. */
 export function derivePermanentCombinationKey(input: PermanentCombinationDeployment): string {
+  return deriveKey(input, DOMAIN);
+}
+
+/** Production Tincta identity domain; historical deployments retain their original key. */
+export function deriveTinctaPermanentCombinationKey(input: PermanentCombinationDeployment): string {
+  return deriveKey(input, keccak256(toUtf8Bytes("TINCTA_REWARDS_PERMANENT_COMBINATION")));
+}
+
+function deriveKey(input: PermanentCombinationDeployment, domain: string): string {
   if ([input.chainId, input.roundId, input.maxSupply].some(value => typeof value === "number" && !Number.isSafeInteger(value))) throw new Error("Deployment integers must be exact.");
   const chainId = BigInt(input.chainId), roundId = BigInt(input.roundId), maxSupply = BigInt(input.maxSupply);
   const collectionAddress = getAddress(input.collectionAddress);
   if (chainId < 1n || roundId < 1n || maxSupply < 1n || maxSupply > 65536n || collectionAddress === ZeroAddress || (!/^0x[0-9a-f]{64}$/i.test(input.seasonId) || /^0x0{64}$/.test(input.seasonId))) throw new Error("Invalid permanent combination deployment.");
-  return keccak256(coder.encode(["bytes32", "uint256", "address", "uint256", "bytes32", "uint256"], [DOMAIN, chainId, collectionAddress, roundId, input.seasonId, maxSupply]));
+  return keccak256(coder.encode(["bytes32", "uint256", "address", "uint256", "bytes32", "uint256"], [domain, chainId, collectionAddress, roundId, input.seasonId, maxSupply]));
 }
 
 /** Identity only: the legacy permutation's decoded rank now represents token ID, never score. */

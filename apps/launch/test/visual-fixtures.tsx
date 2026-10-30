@@ -5,14 +5,16 @@ import { ProtocolExperience } from '@manekineko/protocol/experience';
 import { SocialPreview } from '../components/social-preview';
 import { LaunchLogin } from '../components/launch/launch-login';
 import { SocialAccount } from '../components/social-account';
+import { MainnetDeployment } from '../components/deployment/mainnet-deployment';
 import { OperatorShell } from '../components/operator-shell';
 import sepolia from '../catalog/sepolia.json';
 import mainnet from '../catalog/mainnet.json';
 import LaunchError from '../app/error';
 import NotFound from '../app/not-found';
 import Loading from '../app/loading';
-export const launchVisualRoutes = ['/login', '/dashboard', '/social', '/social/account'] as const;
+export const launchVisualRoutes = ['/deploy', '/login', '/dashboard', '/social', '/social/account'] as const;
 export function LaunchVisualFixture({ path, state, chainId = 11155111, destination = '/dashboard' }: { path: string; state?: string; chainId?: number; destination?: string }) {
+  if (path === '/deploy') return <OperatorShell chainId={1} section="deploy"><MainnetDeployment configuredAddress={state === 'configured' ? '0x1111111111111111111111111111111111111111' : undefined} /></OperatorShell>;
   if (path === '/login') return <OperatorShell authenticated={false}><LaunchLogin destination={destination} /></OperatorShell>;
   if (path === '/social/account') return <OperatorShell chainId={chainId} section="social/account"><SocialAccount key={chainId} chainId={chainId} /></OperatorShell>;
   if (path === '/social') return <OperatorShell chainId={chainId} section="social"><SocialPreview catalog={chainId === 1 ? mainnet : sepolia} /></OperatorShell>;

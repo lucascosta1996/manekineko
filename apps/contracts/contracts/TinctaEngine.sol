@@ -1,0 +1,197 @@
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.37;
+
+import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
+import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+
+/// @notice Immutable Tincta artwork and pure identity/draw calculations. No owner, setters, or external calls.
+import {MultiAwardRank} from "./libraries/MultiAwardRank.sol";
+import {ScrambledRank} from "./libraries/ScrambledRank.sol";
+
+contract TinctaEngine {
+    using Strings for uint256;
+    struct Appearance { bytes32 seasonId; string seasonName; string collectionName; string collectionColor; string textColor; }
+    error InvalidAppearance();
+
+    /// @notice Contrast is selected before deployment; immutable colors have no executable content.
+    function validateAppearance(string memory seasonName, string memory collectionName, string memory collectionColor, string memory textColor) external pure {
+        _validateName(bytes(seasonName), 64);
+        _validateName(bytes(collectionName), 80);
+        bytes memory color = bytes(collectionColor);
+        if (color.length != 7 || color[0] != "#") revert InvalidAppearance();
+        for (uint256 i = 1; i < 7; ++i) {
+            bytes1 c = color[i];
+            if (!((c >= "0" && c <= "9") || (c >= "A" && c <= "F") || (c >= "a" && c <= "f"))) revert InvalidAppearance();
+        }
+        bytes32 foreground = keccak256(bytes(textColor));
+        if (foreground != keccak256("#000000") && foreground != keccak256("#FFFFFF")) revert InvalidAppearance();
+    }
+
+    /// @notice No mutable lifecycle, score or prize data enters the permanent metadata renderer.
+    function paidTokenURI(Appearance memory appearance, uint256 tokenId, uint256[4] memory n, uint256 code)
+        external pure returns (string memory)
+    {
+        string memory details = string.concat('"attributes":[', _trait("A", n[0]), ",", _trait("B", n[1]), ",", _trait("C", n[2]), ",", _trait("D", n[3]), ",", _trait("Combination code", code), "]");
+        string memory svg = _artwork(appearance, tokenId, n, code);
+        return string.concat("data:application/json;base64,", Base64.encode(bytes(string.concat(
+            '{"name":"', Strings.escapeJSON(appearance.collectionName), " #", tokenId.toString(),
+            '","description":"Tincta color edition. Four permanent numbers identify this NFT through a reversible Solidity permutation. ',
+            'Combinations are public and do not predict prizes. After sellout, Chainlink VRF selects distinct winning NFTs and assigns unique scores; the highest scores receive equal prizes. ',
+            'Read scoreCombination(collectionId,[a,b,c,d]) after draw finalization to verify the result. Scores, prizes and claim status are separate from this permanent artwork.",',
+            '"artwork_version":"tincta-v3","contract_version":"tincta-rewards-1","algorithm_version":"unique-rank-v6","randomness_provider":"chainlink-vrf-v2.5","combination_generation":"solidity-permutation-v1",',
+            '"season_id":"', Strings.toHexString(uint256(appearance.seasonId), 32), '","season_name":"', Strings.escapeJSON(appearance.seasonName),
+            '","collection_name":"', Strings.escapeJSON(appearance.collectionName), '","collection_color":"', appearance.collectionColor,
+            '","text_color":"', appearance.textColor, '","background_color":"', _backgroundColor(appearance.collectionColor), '",',
+            '"image":"data:image/svg+xml;base64,', Base64.encode(bytes(svg)), '",', details, "}"
+        ))));
+    }
+
+    function _backgroundColor(string memory color) private pure returns (string memory) {
+        bytes memory input = bytes(color); bytes memory output = new bytes(6);
+        for (uint256 i; i < 6; ++i) output[i] = input[i + 1];
+        return string(output);
+    }
+
+    // BEGIN GENERATED TINCTA MOTIFS
+    bytes private constant MOTIFS = hex"6464000000c864646464c800c8c8646464640000c8006464646400c8c8c864640abe0a501e0a640a640aaa0abe50bebebebeaabe96be82be46be32be1ebe0abe008723003c00646464648cc8a5c8c84100641e32463c646464648c96af96c86464009b00c82dc864c864c89b9bc864c864c82dc8009b00640064002d2d00640064005a3c0050008c008c00be46c864c864c86e8cc878c83cc83cc80a820064006400645a645ac864c8646e646e6464c864c8646e646e006400645a645a64640064c800a000001e0064c8238c3214500a64c8a58c9614780a64c8c8a0c800aa0000641e46461e64006400821eaa46c86400c81eaa4682646464648282aaaac8c86464320000000064006400c832c8646464649600c800c864c864c8c896c8646464647d4b9664967d967d96af32af323232323200c800c864c864c8c800c8000000143c288ca0c8b400b43ca08c28c814003c50b47814c88c008c501478b4c83c64008521a642c864c864a68585a664c864c842a62185006400642142422164001400c81400b4b4c82800be1e0aaaa0c83c00b42814a08cc85000aa321e9678c8a0003200003c0064006400a064c8a0c8a0c85ab43caa3c643c643c286e1ea0003c0a5a0a6e0a8c0a8c0ac80ac8be8cbe8cbe6ebe5abe3cbe3cbe00be000a3c0a6400783c8c5ac8a0c8a082a046a000a000a03c6450326400640064326464649600b4009600003c283c283c50505a64006400785a8c508c288c28c800c896c8b464326400000000640064008c3cb464c864c88cb4c88cc864c864c800640064320014781478b4c8b4c8b450b450140014c814501450b400b400b478b47814c8146414c800c800b464b464c8c8c8c864b464b400c800c81464146400000000641400283c468c0ac82800a03c828cbec8a0280046640a6428c8a0008264be64a0c8000042008500c800c800c842c885c8c8c8c885c842c800c800c8008500420000";
+    // END GENERATED TINCTA MOTIFS
+
+    /// @notice Catalog seasons retain distinct motifs on both supported networks, even after renaming.
+    /// Custom season IDs deterministically select from the same reviewed vocabulary.
+    function artworkMotif(bytes32 identity) internal pure returns (uint256) {
+        bytes memory identities = hex"751d48ff48d8b240e1d699e858d53579ae13f38eed9215183f687d24734d3c6bdc76c6d84f910e3275be19ecd1d7b54a9bb779a1b906aa361be3fc01023896e9020d6f9f115e38208a4a1d1df8b6a9922579c7c3a420745c53df76454c7d6ad3f411f2c1c3ec37720d9cbda862e33086a5b2d66d8d8b70ab2accf50b6967a52b2af77d493026ef552a2a27a1e066a296fd33d8c4c5f2fecc50f27cf82b436d60f26c1615b93c62848ca2778040f9c462977efa5ba502bf9a8bb568c98efb973f2d116744ddb96838db4467c1b038898a6ee01adb211920ca12de4223934cc88dd8c957f46e8bbd9ba108daa0cefc8116210b85ac8590adcf060f7b3b7b31c83ebe95fb5deadb87fdbbc9a463b9f56d8554d1c3972f0f172a04d30f1afd85e494cee7c781df34524983d64c97663e54bb5ca4fc52c11cc0677c35eb08c532f8b8be6bf1e72c88bbeab339d8f0895da327851128fb6a7f84e14860a2630abdaa8e889931f4aea876e5a1830037b12239204e38600d3d0d9147091bdc0eff6e1534fbd5fc7d6a37a0efdf4dad6b706c40ee2016cf9a1837618379b5a90bc624d84d777306c2e47b8e63b08e8041a85b636d5f23b8da270d549b785a0030595e2a1d487e241687feadcf1d7d33ad2f7201f3039cd3e7a8b10f4b5b8c3e323247df3836e9a2925f1e2f586df391c7732610ce6cc75abf30eeb4f416b25f62a25d9f055786a752180448b7e8b0801aa0392dfcb6c0075bf750f53d8fc7c0214dd962f8a0fe53f9201ac7839e2e63632dc69f5230cd1c9cc172b69a5ab627c8ca3e665e6cf108d26c3b432267a85f34e3c14e993747f52ddf0e9dae62fd19c5913c14ef55fe85abf6f5fd707575c1f005dc8cadccf5179f0a6e2ecc8f6056616a6322ea5712abc1ffd4724fd97b27b2e698d76f48f50b7563233d8ced20cb17c0c7512d83069685ecbe687ccb1d76f3f59ccccf81fa28f39ecfcc58a517eb14c1078ad2";
+        for (uint256 i; i < 22; ++i) {
+            bytes32 known;
+            assembly ("memory-safe") { known := mload(add(add(identities, 32), mul(i, 32))) }
+            if (identity == known) return i;
+        }
+        return uint256(identity) % 22;
+    }
+
+    /// @dev Original curve constants and integer transforms; never used by scoring or randomness.
+    function _linework(Appearance memory a, uint256 tokenId, uint256[4] memory n) private pure returns (string memory lines) {
+        bytes memory points = MOTIFS;
+        uint256 start = artworkMotif(a.seasonId) * 32;
+        uint256 rgb;
+        bytes memory color = bytes(a.collectionColor);
+        for (uint256 i = 1; i < 7; ++i) {
+            uint8 c = uint8(color[i]);
+            rgb = rgb * 16 + (c <= 57 ? c - 48 : c <= 70 ? c - 55 : c - 87);
+        }
+        uint256 variation = (tokenId + n[0] * 3 + n[1] * 5 + n[2] * 7 + n[3] * 11) % 3;
+        int256 shear = int256((rgb & 255) / 16) - 8;
+        for (uint256 layer; layer < 16; ++layer) {
+            uint256 scale = 60 + layer * 3;
+            int256 sx = int256((180 + (rgb >> 16) / 8 + variation) * scale / 100);
+            int256 sy = int256((112 + ((rgb >> 8) & 255) / 12) * scale / 100);
+            string memory path;
+            for (uint256 point; point < 16; ++point) {
+                int256 px = int256(uint256(uint8(points[start + point * 2]))) - 100;
+                int256 py = int256(uint256(uint8(points[start + point * 2 + 1]))) - 100;
+                uint256 x = uint256(320 + px * sx / 100 + py * shear / 100);
+                uint256 y = uint256(350 + py * sy / 100);
+                path = string.concat(path, point == 0 ? "M" : point % 4 == 0 ? " M" : point % 4 == 1 ? " C" : " ", x.toString(), " ", y.toString());
+            }
+            lines = string.concat(lines, '<path d="', path, '"/>');
+        }
+    }
+
+    function _artwork(Appearance memory a, uint256 tokenId, uint256[4] memory n, uint256 code) private pure returns (string memory) {
+        string memory serial = tokenId.toString();
+        while (bytes(serial).length < 4) serial = string.concat("0", serial);
+        string memory top = string.concat(
+            '<svg xmlns="http://www.w3.org/2000/svg" width="640" height="800" viewBox="0 0 640 800"><rect width="640" height="800" fill="', a.collectionColor,
+            '"/><g fill="', a.textColor, '" font-family="sans-serif"><text x="48" y="52" font-size="12" font-weight="500" letter-spacing="3">TINCTA</text><text x="592" y="52" font-family="monospace" font-size="12" text-anchor="end">No. ', serial,
+            '</text><text x="48" y="112" font-size="', _fontSize(a.seasonName, 30, false), '" font-weight="500">', _escapeXML(a.seasonName),
+            '</text><text x="48" y="148" font-family="monospace" font-size="', _fontSize(a.collectionName, 18, true), '">', _escapeXML(a.collectionName), '</text>'
+        );
+        string memory middle = string.concat(
+            '<g fill="none" stroke="', a.textColor, '" stroke-width="1" opacity="0.6">', _linework(a, tokenId, n),
+            '</g><path d="M58 202 L70 202 M64 196 L64 208 M570 202 L582 202 M576 196 L576 208 M58 502 L70 502 M64 496 L64 508 M570 502 L582 502 M576 496 L576 508 M48 548 L592 548 M48 742 L592 742" fill="none" stroke="', a.textColor, '" stroke-width="1" opacity="0.4"/><g font-family="monospace">'
+        );
+        for (uint256 i; i < 4; ++i) {
+            string memory x = (48 + i * 144).toString();
+            middle = string.concat(middle, '<text x="', x, '" y="585" font-size="11" letter-spacing="2">', string(abi.encodePacked(bytes1(uint8(65 + i)))), '</text><text x="', x, '" y="628" font-size="38">', n[i].toString(), '</text>');
+        }
+        return string.concat(top, middle,
+            '<text x="48" y="680" font-size="11" letter-spacing="2">COMBINATION CODE</text><text x="48" y="712" font-size="24">', code.toString(),
+            '</text></g><text x="592" y="680" font-size="11" letter-spacing="1" text-anchor="end">', "PERMANENT EDITION",
+            '</text><text x="592" y="712" font-size="18" text-anchor="end">', "Numbers fixed at mint",
+            '</text><text x="48" y="770" font-size="10" letter-spacing="2">COLOR, COLLECTED.</text><text x="592" y="770" font-family="monospace" font-size="10" text-anchor="end">', a.collectionColor, '</text></g></svg>'
+        );
+    }
+
+    /// @dev Conservative glyph widths fit wide ASCII and UTF-8 names without external fonts.
+    function _fontSize(string memory value, uint256 preferred, bool mono) private pure returns (string memory) {
+        bytes memory data = bytes(value);
+        uint256 units;
+        for (uint256 i; i < data.length; ++i) {
+            uint8 c = uint8(data[i]);
+            if (c >= 128) { if (c >= 192) units += 1000; }
+            else if (mono) units += 600;
+            else if (c == 32) units += 300;
+            else if (c == 77 || c == 87 || c == 64) units += 1050;
+            else if (c == 109 || c == 119) units += 900;
+            else if (c >= 65 && c <= 90) units += 850;
+            else units += 650;
+        }
+        uint256 fit = units == 0 ? preferred : 540000 / units;
+        return (preferred > fit ? fit : preferred).toString();
+    }
+
+    function _validateName(bytes memory value, uint256 maxLength) private pure {
+        if (value.length == 0 || value.length > maxLength) revert InvalidAppearance();
+        for (uint256 i; i < value.length; ++i) {
+            uint8 c = uint8(value[i]);
+            if (c < 32 || c == 127) revert InvalidAppearance();
+            if (c < 128) continue;
+            uint256 trailing = c >= 0xC2 && c <= 0xDF ? 1 : c >= 0xE0 && c <= 0xEF ? 2 : c >= 0xF0 && c <= 0xF4 ? 3 : 0;
+            if (trailing == 0 || i + trailing >= value.length) revert InvalidAppearance();
+            uint8 next = uint8(value[i + 1]);
+            if ((c == 0xE0 && next < 0xA0) || (c == 0xED && next >= 0xA0) ||
+                (c == 0xF0 && next < 0x90) || (c == 0xF4 && next >= 0x90)) revert InvalidAppearance();
+            if (c == 0xEF && next == 0xBF && uint8(value[i + 2]) >= 0xBE) revert InvalidAppearance();
+            for (uint256 j; j < trailing; ++j) {
+                uint8 continuation = uint8(value[++i]);
+                if (continuation < 0x80 || continuation > 0xBF) revert InvalidAppearance();
+            }
+        }
+    }
+
+    function _escapeXML(string memory value) private pure returns (string memory) {
+        bytes memory input = bytes(value); bytes memory output = new bytes(input.length * 6); uint256 length;
+        for (uint256 i; i < input.length; ++i) {
+            bytes memory escaped;
+            if (input[i] == "&") escaped = bytes("&amp;");
+            else if (input[i] == "<") escaped = bytes("&lt;");
+            else if (input[i] == ">") escaped = bytes("&gt;");
+            else if (input[i] == '"') escaped = bytes("&quot;");
+            else if (input[i] == "'") escaped = bytes("&apos;");
+            else { output[length++] = input[i]; continue; }
+            for (uint256 j; j < escaped.length; ++j) output[length++] = escaped[j];
+        }
+        assembly ("memory-safe") { mstore(output, length) }
+        return string(output);
+    }
+
+    function _trait(string memory key, uint256 value) private pure returns (string memory) {
+        return string.concat('{"trait_type":"', key, '","value":', value.toString(), "}");
+    }
+    function genesisURI(uint256 serial) external pure returns (string memory) {
+        string memory id = serial.toString();
+        string memory svg = string.concat('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600"><rect width="600" height="600" fill="#fff"/><g fill="none" stroke="#181818" stroke-width="1.5"><rect x="120" y="120" width="360" height="360"/><circle cx="300" cy="300" r="180"/><path d="M120 300h360M300 120v360"/></g><circle cx="300" cy="300" r="12" fill="#181818"/><g fill="#181818" font-family="sans-serif" font-size="16"><text x="40" y="58">Tincta</text><text x="560" y="58" text-anchor="end">Genesis</text><text x="40" y="554">The first vote.</text><text x="560" y="554" text-anchor="end">#',id,' / ',uint256(1000).toString(),'</text></g></svg>');
+        return string.concat('data:application/json;base64,',Base64.encode(bytes(string.concat('{"name":"Tincta Genesis #',id,'","description":"Two utilities: vote on the first paid collection and enroll as an affiliate across every collection and season. Share your referral URL; one attributed paid mint qualifies you for an equal share of the ETH affiliate pool after sellout and a successful draw. Free collectible. Up to two lifetime primary mints per wallet. Minting has no deadline; the first paid ballot opens only when all ',uint256(1000).toString(),' are minted. Each NFT grants its current holder one vote in that first ballot only. Transferring an NFT does not renew a used vote. Holders may enroll as affiliates throughout all collections and seasons, subject to available positions and one use per NFT per collection. Affiliate rewards require a qualifying paid referral and a successful draw. No prize, sponsored mint or season holder reward entitlement. Network gas applies.","image":"data:image/svg+xml;base64,',Base64.encode(bytes(svg)),'"}'))));
+    }
+    function tryWinners(bytes32 candidate, uint256 supply, uint256 count) external pure returns (bool, uint256[10] memory) {
+        return MultiAwardRank.tryWinners(candidate, supply, count);
+    }
+    function rank(uint256 serial, uint256 supply, uint256[10] calldata winners, uint256 count) external pure returns (uint256) {
+        return MultiAwardRank.rank(serial, supply, winners, count);
+    }
+    function combination(uint256 serial, bytes32 key) external pure returns (uint256[4] memory numbers, uint256 code) {
+        code = ScrambledRank.encode(serial - 1, key); numbers = ScrambledRank.numbers(code);
+    }
+    function serialForNumbers(uint256[4] calldata numbers, bytes32 key, uint256 supply) external pure returns (uint256) {
+        return ScrambledRank.score(numbers, key, supply);
+    }
+}

@@ -14,8 +14,9 @@ function pins(): MirrorPin[] {
   if (!Array.isArray(entries) || entries.length>5) throw new Error('Invalid mirror pins.');
   const seen = new Set<string>();
   return entries.map(entry=>{
-    if (!entry || ![1,11155111].includes(entry.chainId) || ![12,13,14,16,17].includes(entry.version) || !isHexString(entry.codeHash,32)) throw new Error('Invalid mirror pins.');
+    if (!entry || ![1,11155111].includes(entry.chainId) || ![12,13,14,16,17,18].includes(entry.version) || !isHexString(entry.codeHash,32)) throw new Error('Invalid mirror pins.');
     if((entry.version===16||entry.version===17)&&entry.chainId!==11155111)throw new Error('Invalid mirror pins.');
+    if(entry.version===18&&entry.chainId!==1)throw new Error('Invalid mirror pins.');
     const controller = getAddress(entry.controller).toLowerCase(), key = `${entry.chainId}:${controller}`;
     if (controller === ZeroAddress || seen.has(key)) throw new Error('Invalid mirror pins.');
     seen.add(key);

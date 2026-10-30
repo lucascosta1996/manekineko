@@ -13,7 +13,7 @@ export type HolderSeason = {
 };
 
 export async function verifyHolderPool(provider: Provider, config: ProtocolConfig, blockTag?: number) {
-  if((config.version===16||config.version===17))return verifySingleContract(provider,config,blockTag);
+  if((config.version===16||config.version===17||config.version===18))return verifySingleContract(provider,config,blockTag);
   if ((config.version !== 13 && config.version !== 14) || !config.holderRewardsCodeHash) throw new Error('This deployment has no season holder pool.');
   const at = blockTag === undefined ? {} : { blockTag };
   const controller = new Contract(config.controller, controllerAbi, provider);
@@ -38,7 +38,7 @@ export async function readHolderSeason(provider: Provider, config: ProtocolConfi
 /** Built again after review. Contract execution, not a browser quote, reserves a slot. */
 export async function holderClaimTransaction(provider: Provider, config: ProtocolConfig, state: Snapshot, tokenId: bigint, wallet: string, expectedReward: bigint) {
   const h = state.holders, r = state.round;
-  if((config.version===16||config.version===17)){
+  if((config.version===16||config.version===17||config.version===18)){
     if(!h||!r||!h.unlocked||h.claims>=h.claimLimit||h.rewardPerNft===0n||h.rewardPerNft!==expectedReward)throw new Error('This season has no available holder claim at the reviewed amount.');
     const c=await verifySingleContract(provider,config,state.block),global=v16Token(r.id,tokenId),at={blockTag:state.block};
     const [round,claimed,owner]=await Promise.all([c.round(r.id,at),c.holderClaimed(global,at),c.ownerOf(global,at)]);

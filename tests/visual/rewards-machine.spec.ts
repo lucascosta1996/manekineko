@@ -30,7 +30,9 @@ for (const width of [320,390,768,1280,1440]) test(`Rewards machine static reduce
 
 test('Rewards machine automatically loops, suspends offscreen and in hidden tabs, and respects motion preferences',async({page},info)=>{
   // Advancing every animation frame in WebKit is CPU work, even with a fake clock.
-  test.setTimeout(120_000);
+  // The recorded WebKit trace spends over 110 seconds executing every frame;
+  // retain every phase assertion and allow the final loop assertion to execute.
+  test.setTimeout(240_000);
   await prepare(page); await page.emulateMedia({reducedMotion:'no-preference'}); await page.goto(`${urls.landing}/rewards`); await ready(page);
   const machine=page.locator('[data-rewards-machine]');
   await expect(machine).toHaveAttribute('data-motion','running');

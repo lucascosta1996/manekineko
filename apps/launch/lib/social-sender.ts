@@ -64,23 +64,23 @@ export async function deliveryCycle(s: Sender, d: CycleDependencies) {
   return {observed:true,delivered:delivered>0};
 }
 async function account(db: Pool, s: Sender) {
-  if (s.config.version!==17 || s.config.chainId!==11155111) throw new SenderError('unsupported_deployment');
-  const saved=await getRuntimeWorkerProfile(db,'11155111');
+  if (!(s.config.version===17 && s.config.chainId===11155111) && !(s.config.version===18 && s.config.chainId===1)) throw new SenderError('unsupported_deployment');
+  const saved=await getRuntimeWorkerProfile(db,String(s.config.chainId) as '1'|'11155111');
   const check=async()=>{
-    const p=await getRuntimeProfile(db,'11155111');
+    const p=await getRuntimeProfile(db,String(s.config.chainId) as '1'|'11155111');
     if (!p?.enabled || p.revision!==saved.profile.revision || p.expectedAccountId!==s.config.xAccountId || p.publicBaseUrl.replace(/\/$/,'')!==s.config.appUrl.replace(/\/$/,'') || p.chainId!==String(s.config.chainId)) throw new SenderError('profile_changed');
     await assertSenderLease(db,s);
   };
   await check();return {credentials:saved.credentials as XCredentials,check};
 }
 export async function runSocialSender(db: Pool) {
-  if (process.env.MANEKINEKO_CHAIN_ID!=='11155111') throw new SenderError('unsupported_environment');
   const s=await claimSender(db);
   if (!s) return {status:'idle'};
   let providers: [Provider,Provider] | undefined;
   try {
+    if(s.config.chainId===1 && process.env.SOCIAL_MAINNET_ENABLED!=='true') throw new SenderError('mainnet_sender_not_enabled');
     const a=await account(db,s), options={expectedAccountId:s.config.xAccountId,timeoutMs:10_000};
-    providers=senderProviders();
+    providers=senderProviders(process.env,s.config.chainId);
     const save=()=>saveSender(db,s), observe=()=>observeSender(s.config,providers!);
     const result=await deliveryCycle(s,{
       observe,save,assertCurrent:a.check,

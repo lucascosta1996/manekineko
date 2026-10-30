@@ -1,5 +1,7 @@
 # Visual-system adoption audit
 
+**2026-10-30 Mainnet preparation:** The authenticated `/deploy` page uses shared wallet selection, confirmation and floating status components, with durable recovery and no automatic signing. The landing absolute-link parser preserves collection queries. See [the production verification record](../tincta-mainnet-verification.md) for actual local, hosted and remote browser evidence; builds and simulations do not establish real Mainnet execution.
+
 **2026-10-29 refund eligibility update:** An empty paid collection now shows no refund action. Before wallet review, refunds validate the selected collection's minted serial and current holder, with a separate burned-ticket message. Deadline copy no longer assumes 72 hours. The [V17 incident record](../v17-readiness-report-2026-10-29.md) distinguishes the zero-mint Sepolia observation from a passing real paid-ticket refund on the local EVM.
 
 **2026-10-29 Genesis status update:** The user-requested accelerated-test header sentence was removed from Web and Launch. Launch now names an explicitly selected unconfigured Mainnet view and offers a Sepolia link; Genesis remains the current stage until sellout rather than labeling the prepared paid ballot as live. See the [V17 live observations](../v17-readiness-report-2026-10-29.md) for source and hosted evidence boundaries.

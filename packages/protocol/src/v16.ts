@@ -3,6 +3,7 @@ import abi from '@manekineko/contract-abi/protocol-v16' with {type:'json'};
 import type {ProtocolConfig} from './config.ts';
 import type {Snapshot, RoundState} from './chain.ts';
 import v17Abi from '@manekineko/contract-abi/protocol-v17' with {type:'json'};
+import {verifyTincta} from './tincta.ts';
 export {abi as v16Abi};
 type RawRound = Record<'voteStart'|'saleStart'|'soldOutAt'|'entropyAt'|'finalizedAt'|'minted'|'refunded'|'revenue'|'subscription'|'requestId'|'word'|'counter'|'executionReserve'|'sponsorReserve'|'affiliateShare'|'qualified'|'growthWithdrawn'|'treasuryWithdrawn'|'prizesClaimed',bigint> & {requested:boolean;subscriptionClosed:boolean;executor:string;winners:bigint[]};
 
@@ -21,6 +22,12 @@ export async function verifyV17(provider: Provider, config: ProtocolConfig, bloc
   return verifySingleContract(provider,config,block);
 }
 export async function verifySingleContract(provider: Provider, config: ProtocolConfig, block?: number) {
+  if(config.version===18){
+    if(config.chainId!==1)throw new Error('Select Ethereum Mainnet.');
+    const c=await verifyTincta(provider,config.controller,block);
+    if(keccak256(await provider.getCode(config.controller,block)).toLowerCase()!==config.codeHash.toLowerCase())throw new Error('The deployment pin does not match the reviewed contract.');
+    return c;
+  }
   if((config.version!==16&&config.version!==17)||config.chainId!==11155111||Number((await provider.getNetwork()).chainId)!==config.chainId)throw new Error('This deployment requires the verified Sepolia network.');
   const code=await provider.getCode(config.controller,block);
   if(code==='0x'||keccak256(code).toLowerCase()!==config.codeHash.toLowerCase())throw new Error('The deployment could not be verified. Signing is disabled.');
@@ -39,7 +46,7 @@ export function v16Phase(r: {saleStart:bigint;soldOutAt:bigint;entropyAt:bigint;
   return BigInt(timestamp)>=deadline?7:1;
 }
 export async function readV16(provider: Provider, config: ProtocolConfig, selected=0, wallet?:string, sourcePage=0,now=Date.now()):Promise<Snapshot> {
-  if(config.version!==16&&config.version!==17)throw new Error('Select a single-contract deployment.');
+  if(config.version!==16&&config.version!==17&&config.version!==18)throw new Error('Select a single-contract deployment.');
   const version=config.version,supply=version===17?20n:1000n,timeout=version===17?900n:259200n;
   const block=await provider.getBlock('latest');
   if(!block||Math.abs(now/1000-block.timestamp)>180)throw new Error('The network data is out of date. Retry before signing.');
@@ -88,7 +95,7 @@ export async function readV16(provider: Provider, config: ProtocolConfig, select
 
 /** Translate legacy UI action names only here; never call an old ABI at a V16 address. */
 export async function v16RoundTransaction(state:Snapshot,method:string,args:unknown[],value=0n):Promise<TransactionRequest>{
-  const r=state.round;if(!r||(state.protocolVersion!==16&&state.protocolVersion!==17))throw new Error('Select a V16 collection.');
+  const r=state.round;if(!r||(state.protocolVersion!==16&&state.protocolVersion!==17&&state.protocolVersion!==18))throw new Error('Select a verified collection.');
   const c=new Contract(r.address,abi);
   switch(method){
     case'mintQuoted':return c.mint.populateTransaction(r.id,...args,{value});
@@ -99,6 +106,6 @@ export async function v16RoundTransaction(state:Snapshot,method:string,args:unkn
     case'requestRandomness':return c.requestRandomness.populateTransaction(r.id);
     case'finalizeDrawAndClaim':return c.finalizeDraw.populateTransaction(r.id,8);
     case'claimExecutionReward':return c.claimExecution.populateTransaction(r.id,args[0]);
-    default:throw new Error('Unsupported V16 action.');
+    default:throw new Error('Unsupported collection action.');
   }
 }

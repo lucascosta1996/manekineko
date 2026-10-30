@@ -1,0 +1,25 @@
+name: Tincta Mainnet preparation
+on:
+  workflow_dispatch:
+  push:
+    paths: ['apps/contracts/contracts/Tincta*.sol', 'apps/contracts/test/Tincta*.ts', 'apps/contracts/hardhat.config.ts', 'packages/protocol/src/tincta*.ts', 'packages/contracts/src/tincta-rewards-*.json', '.github/workflows/tincta-mainnet.yml']
+permissions:
+  contents: read
+jobs:
+  fork:
+    name: Read-only Mainnet fork
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      MAINNET_FORK_URL: https://ethereum-rpc.publicnode.com
+      MAINNET_FORK_BLOCK: '26304305'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Test the real coordinator on a disposable fork
+        run: npm exec --workspace @manekineko/contracts -- hardhat test test/TinctaMainnetFork.ts
+      - run: node scripts/tincta/export.mjs --check

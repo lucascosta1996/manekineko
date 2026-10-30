@@ -13,7 +13,7 @@ export async function refundTransaction(provider: Provider, config: ProtocolConf
   if (!r || r.phase !== 7) throw new Error('Refunds are not available for this collection.');
   if (r.minted === 0n) throw new Error('No paid NFTs were minted in this collection. There are no mint payments to refund.');
   if (serial < 1n || serial > r.minted) throw new Error(`NFT #${serial} was never minted in ${r.name}. Choose a paid NFT from this collection.`);
-  const single = config.version === 16 || config.version === 17;
+  const single = config.version === 16 || config.version === 17 || config.version === 18;
   const c = new Contract(r.address, single ? v16Abi : roundAbi, provider);
   let holder: string;
   try {

@@ -1,6 +1,6 @@
-# Tincta · Manekineko monorepo
+# Tincta Rewards
 
-Tincta publishes onchain NFT collections with community-voted mint terms, permanent SVG artwork and ETH rewards claimed by eligible holders and affiliates. Collections run in a fixed season order. The public brand is **Tincta**; internal code and package names remain **manekineko**.
+Tincta publishes onchain NFT collections with community-voted mint terms, permanent SVG artwork and ETH rewards claimed by eligible holders and affiliates. Collections run in a fixed season order. The production contract is **TinctaRewards**. See the [Mainnet launch guide](docs/tincta-mainnet.md) and [verification record](docs/tincta-mainnet-verification.md). Mainnet deployment requires manual wallet approval in Launch.
 
 Start with [the architecture guide](docs/architecture.md) for the code map, protocol rules, application boundaries and dated verification evidence. [AGENTS.md](AGENTS.md) contains repository instructions.
 
@@ -61,7 +61,7 @@ Open [the collection app](http://localhost:3100) or [the landing page](http://lo
 
 The indexer runs separately with `npm run dev:indexer` at port 3300. Configure its restricted database role, RPC and authentication variables before invoking its routes; Vercel cron scheduling is configured for the deployed service, not for the local dev server. See the [indexer setup and verification runbook](docs/automatic-indexing.md).
 
-Manekineko uses dedicated local ports to avoid other projects on 3000/3001. Run only one development server per app: `npm run dev` already starts both Web and Landing, so do not also start their individual commands. If Next.js reports an existing server, reuse the printed URL or stop that app with Ctrl+C in its terminal before restarting. Changing ports does not allow two Next.js development servers to share the same app directory.
+This workspace uses dedicated local ports to avoid other projects on 3000/3001. Run only one development server per app: `npm run dev` already starts both Web and Landing, so do not also start their individual commands. If Next.js reports an existing server, reuse the printed URL or stop that app with Ctrl+C in its terminal before restarting. Changing ports does not allow two Next.js development servers to share the same app directory.
 
 ```sh
 npm run contracts:test       # Compile and run contract/factory tests

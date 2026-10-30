@@ -26,7 +26,7 @@ export async function prepareDeliveryMedia(e: Delivery, rendered: { png: Uint8Ar
   return e.mediaProcessingState === 'succeeded';
 }
 export type Config = {
-  version?: 12 | 13 | 14 | 16 | 17;
+  version?: 12 | 13 | 14 | 16 | 17 | 18;
   holderRewardsCodeHash?: string;
   genesisCodeHash?: string;
   chainId: number;

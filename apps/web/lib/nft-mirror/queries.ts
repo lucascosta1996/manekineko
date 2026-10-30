@@ -30,14 +30,14 @@ export async function queryMintActivity(query: Query, pins: MirrorPin[]) {
   ), ranked AS (
     SELECT *,row_number() OVER (PARTITION BY chain_id ORDER BY mint_block DESC,address,token_id DESC) AS position
     FROM transactions
-  ) SELECT chain_id AS "chainId",address AS collection,CASE WHEN protocol_version IN (16,17) THEN round_id END AS "collectionId",name,kind,token_id AS "tokenId",mint_transaction AS transaction
+  ) SELECT chain_id AS "chainId",address AS collection,CASE WHEN protocol_version IN (16,17,18) THEN round_id END AS "collectionId",name,kind,token_id AS "tokenId",mint_transaction AS transaction
     FROM ranked WHERE position<=20 ORDER BY position,chain_id`, [pinsJson(pins)]);
   return { events: rows };
 }
 const summary = `SELECT count(*)::integer AS minted,count(*) FILTER (WHERE metadata IS NOT NULL)::integer AS ready
   FROM all_tokens t WHERE t.chain_id=c.chain_id AND t.collection_address=c.address AND t.round_id=c.round_id`;
 function collection(row: Record<string, any>): GalleryCollection {
-  return {...((row.protocol_version===16||row.protocol_version===17)?{collectionId:Number(row.round_id)}:{}),...(row.kind==='genesis'?{genesisSupply:row.protocol_version===17?20:1000}:{}),kind:row.kind,chainId:row.chain_id,address:row.address,name:row.name,seasonName:row.season_name,color:row.color,textColor:row.text_color,
+  return {...((row.protocol_version===16||row.protocol_version===17||row.protocol_version===18)?{collectionId:Number(row.round_id)}:{}),...(row.kind==='genesis'?{genesisSupply:row.protocol_version===17?20:1000}:{}),kind:row.kind,chainId:row.chain_id,address:row.address,name:row.name,seasonName:row.season_name,color:row.color,textColor:row.text_color,
     minted:Number(row.minted),ready:Number(row.ready),cover:row.cover ?? null,
     syncedAt:row.synced_at ? new Date(row.synced_at).toISOString() : null,
     blockNumber:row.cursor_block === null ? null : Number(row.cursor_block),catchingUp:row.catching_up};
@@ -80,6 +80,6 @@ export async function queryGallery(query: Query, pins: MirrorPin[], chainId: num
       SELECT t.token_id AS "tokenId",t.metadata->>'name' AS name,t.metadata->>'image' AS image,t.numbers,t.burned
       FROM all_tokens t WHERE t.chain_id=c.chain_id AND t.collection_address=c.address AND t.round_id=c.round_id AND t.metadata IS NOT NULL
       ORDER BY t.token_id LIMIT $4 OFFSET $5) nft) nfts ON true
-    WHERE c.chain_id=$2 AND c.address=$3 AND (($6::integer IS NULL AND s.version NOT IN (16,17)) OR (s.version IN (16,17) AND c.round_id=$6))`,[pinsJson(pins),chainId,address,NFT_PAGE_SIZE,start,collectionId??null]);
+    WHERE c.chain_id=$2 AND c.address=$3 AND (($6::integer IS NULL AND s.version NOT IN (16,17,18)) OR (s.version IN (16,17,18) AND c.round_id=$6))`,[pinsJson(pins),chainId,address,NFT_PAGE_SIZE,start,collectionId??null]);
   return rows[0] ? {page,collection:collection(rows[0]),tokens:rows[0].items} : null;
 }

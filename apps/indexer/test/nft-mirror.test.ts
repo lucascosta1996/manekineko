@@ -55,7 +55,7 @@ test('mirror SQL: leases, retries, atomic replay, reorgs and paginated database-
   try {
     await admin.query(`CREATE SCHEMA ${schema}`);
     pool=new pg.Pool({connectionString,max:8,options:`-c search_path=${schema},public`});
-    for(const file of ['033_nft_mirror.sql','034_genesis_v14_mirror.sql','035_genesis_nft_gallery.sql','036_v16_nft_mirror.sql','037_v17_accelerated_rehearsal.sql','038_wallet_activity.sql']) await pool.query(await readFile(new URL('../../../database/migrations/'+file,import.meta.url),'utf8'));
+    for(const file of ['033_nft_mirror.sql','034_genesis_v14_mirror.sql','035_genesis_nft_gallery.sql','036_v16_nft_mirror.sql','037_v17_accelerated_rehearsal.sql','038_wallet_activity.sql','039_social_sender.sql','040_tincta_production.sql']) await pool.query(await readFile(new URL('../../../database/migrations/'+file,import.meta.url),'utf8'));
     const db=pool, query=(sql: string,values: unknown[])=>db.query(sql,values);
     const stores=Array.from({length:4},()=>new MirrorStore(db,config));
     const leases=await Promise.all(stores.map(s=>s.claim()));
@@ -174,6 +174,23 @@ test('mirror SQL: leases, retries, atomic replay, reorgs and paginated database-
       assert.equal((await queryGallery(query,[fast],fast.chainId,fast.controller,1,1))!.collection.collectionId,1);
       assert.equal((await queryDirectory(query,[fast],1)).genesis![0].genesisSupply,20);
       await assert.rejects(db.query("INSERT INTO manekineko_nft_mirror_sources(chain_id,controller,fingerprint,code_hash,version,from_block) VALUES(1,$1,$2,$3,17,1)",['0x'+'8'.repeat(40),'x',hash(1)]));await store17.release();
+    });
+    await t.test('Tincta Mainnet gallery is network scoped and does not register or enable X delivery',async()=>{
+      const production={...config,chainId:1,controller:'0x'+'9'.repeat(40),version:18 as const},store=new V16MirrorStore(db,production);
+      assert.ok(await store.claim());await store.verified(true,{number:22,hash:hash(22)});
+      const item={...c,chainId:1,address:production.controller,controller:production.controller,renderer:production.controller,roundId:1,name:'Velvet Ember'};
+      const genesis={...item,kind:'genesis' as const,roundId:0,name:'Tincta Genesis'};
+      await store.discover([item,genesis],{number:22,hash:hash(22)},check);await store.events(item,[mint(1)],{number:22,hash:hash(22)},true,check);await store.cache(item,1,hash(11),artwork(1),check);
+      assert.equal((await queryGallery(query,[production],1,production.controller,1,1))!.collection.name,'Velvet Ember');
+      assert.equal((await queryDirectory(query,[production],1)).genesis![0].genesisSupply,1000);
+      assert.equal(await queryGallery(query,[production],11155111,production.controller,1,1),null);
+      await assert.rejects(db.query("INSERT INTO manekineko_nft_mirror_sources(chain_id,controller,fingerprint,code_hash,version,from_block) VALUES(11155111,$1,$2,$3,18,1)",['0x'+'8'.repeat(40),'x',hash(1)]));
+      const sender={version:18,chainId:1,controller:production.controller,controllerCodeHash:hash(1),appUrl:'https://app.tincta.xyz',xAccountId:'123'};
+      assert.equal((await db.query('SELECT count(*)::int AS n FROM manekineko_social_senders')).rows[0].n,0);
+      await db.query('INSERT INTO manekineko_social_senders(id,config) VALUES($1,$2)',['mainnet-fixture',JSON.stringify(sender)]);
+      assert.equal((await db.query('SELECT enabled FROM manekineko_social_senders')).rows[0].enabled,false);
+      await assert.rejects(db.query('INSERT INTO manekineko_social_senders(id,config) VALUES($1,$2)',['wrong-network',JSON.stringify({...sender,chainId:11155111})]));
+      await store.release();
     });
     await t.test('expired workers cannot commit after lease takeover',async()=>{
       const old=new MirrorStore(db,config); assert.ok(await old.claim());

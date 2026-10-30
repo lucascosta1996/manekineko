@@ -1,11 +1,12 @@
 import { FetchRequest, JsonRpcProvider, type Provider } from 'ethers';
+import { observeTinctaAt } from '../../../packages/protocol/src/social-tincta.ts';
 import { observeV17At } from '../../../packages/protocol/src/social-v17.ts';
 import type { Observation } from '../../../packages/contracts/src/social-delivery.ts';
 import { SenderError, type SenderConfig } from './social-sender-store.ts';
 
 export type Anchor = { number: number; hash: string; timestamp: number };
-export function senderProviders(env: NodeJS.ProcessEnv = process.env): [JsonRpcProvider, JsonRpcProvider] {
-  const urls = [env.SOCIAL_RPC_PRIMARY,env.SOCIAL_RPC_SECONDARY].map(raw=>{
+export function senderProviders(env: NodeJS.ProcessEnv = process.env, chainId = 11155111): [JsonRpcProvider, JsonRpcProvider] {
+  const urls = (chainId===1?[env.SOCIAL_MAINNET_RPC_PRIMARY,env.SOCIAL_MAINNET_RPC_SECONDARY]:[env.SOCIAL_RPC_PRIMARY,env.SOCIAL_RPC_SECONDARY]).map(raw=>{
     if (!raw) throw new SenderError('rpc_configuration');
     const u = new URL(raw);
     if (u.protocol!=='https:' || u.username || u.password || u.hash) throw new SenderError('rpc_configuration');
@@ -15,9 +16,9 @@ export function senderProviders(env: NodeJS.ProcessEnv = process.env): [JsonRpcP
   return urls.map(u=>{const req=new FetchRequest(u.href);req.timeout=10_000;
     return new JsonRpcProvider(req,undefined,{batchMaxCount:20,cacheTimeout:-1});}) as [JsonRpcProvider,JsonRpcProvider];
 }
-export async function confirmedAnchor(providers: readonly Provider[], now = Date.now()): Promise<Anchor> {
+export async function confirmedAnchor(providers: readonly Provider[], now = Date.now(), chainId = 11155111): Promise<Anchor> {
   const chains = await Promise.all(providers.map(p=>p.getNetwork()));
-  if (chains.length!==2 || chains.some(n=>n.chainId!==11155111n)) throw new SenderError('network_mismatch');
+  if (chains.length!==2 || chains.some(n=>n.chainId!==BigInt(chainId))) throw new SenderError('network_mismatch');
   const heads = await Promise.all(providers.map(p=>p.getBlock('latest')));
   if (heads.some(b=>!b?.hash || Math.abs(now/1000-b.timestamp)>120)) throw new SenderError('rpc_stale');
   const number = Math.min(...heads.map(b=>b!.number))-2;
@@ -31,10 +32,10 @@ export async function assertCanonical(providers: readonly Provider[], anchor: {b
   if (blocks.some(b=>b?.hash!==anchor.blockHash)) throw new SenderError('chain_reorganized');
 }
 export async function observeSender(config: SenderConfig, providers: readonly Provider[]): Promise<Observation[]> {
-  if (config.version!==17 || config.chainId!==11155111) throw new SenderError('unsupported_deployment');
-  const anchor=await confirmedAnchor(providers);
+  if (!(config.version===17 && config.chainId===11155111) && !(config.version===18 && config.chainId===1)) throw new SenderError('unsupported_deployment');
+  const anchor=await confirmedAnchor(providers,Date.now(),config.chainId);
   // Both RPCs must independently return the same verified projection, not only headers.
-  const results=await Promise.all(providers.map(p=>observeV17At({...config,rpcUrl:''},p,anchor)));
+  const results=await Promise.all(providers.map(p=>(config.version===18?observeTinctaAt:observeV17At)({...config,rpcUrl:''},p,anchor)));
   if (JSON.stringify(results[0])!==JSON.stringify(results[1])) throw new SenderError('rpc_disagreement');
   await assertCanonical(providers,{block:anchor.number,blockHash:anchor.hash});
   return results[0];

@@ -21,7 +21,9 @@ for (const path of ['/', '/rewards']) {
       const before = await heading.evaluate(el => getComputedStyle(el).transform);
       // Leave the neutral reading zone, including on tall desktop viewports.
       await page.evaluate(() => window.scrollBy({ top: innerHeight * .45, behavior: 'instant' }));
-      await expect.poll(() => heading.evaluate(el => getComputedStyle(el).transform)).not.toBe(before);
+      // A busy Firefox runner can spend >10 seconds resolving this locator.
+      // Keep the movement assertion, with a bounded allowance for that work.
+      await expect.poll(() => heading.evaluate(el => getComputedStyle(el).transform), {timeout:30000}).not.toBe(before);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
       await page.screenshot({ path: info.outputPath('scroll.png'), animations: 'allow' });
       await page.emulateMedia({ reducedMotion: 'reduce' });

@@ -10,7 +10,7 @@ export function v16OperatorActions(s:Snapshot,config:ProtocolConfig):OperatorAct
   // Sealing starts Genesis and is deliberately absent from the deployed, stopped app.
   if(s.canPrepare){
     if(s.operatingBalance<s.cost)add('fund-operating','Fund the next preparation',`Add ${formatEther(s.cost-s.operatingBalance)} ETH of separate operating funds. This does not prepare a collection or start its clock.`,'fundOperating',[],false,s.cost-s.operatingBalance);
-    else add('prepare','Prepare the next collection','Start the next fixed voting schedule. Confirm that manual testers are ready first; its onchain clock cannot be paused.','prepareNext');
+    else add('prepare','Prepare the next collection','Start the next fixed voting schedule. Review the published schedule before continuing; its onchain clock cannot be paused.','prepareNext');
   }
   if(r){
     if(r.phase===2)add('request','Request the draw','Retry a request that never reached Chainlink. An accepted request cannot be rerolled.','requestRandomness',[r.id]);

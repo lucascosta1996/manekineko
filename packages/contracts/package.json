@@ -152,7 +152,12 @@
     "./v17-social-preview": "./src/v17-social-preview.ts",
     "./x-transport": "./src/x-transport.ts",
     "./protocol-v17": "./src/ManekinekoV17.json",
-    "./protocol-v17-source": "./src/ManekinekoV17.source.json"
+    "./protocol-v17-source": "./src/ManekinekoV17.source.json",
+    "./tincta-rewards": "./src/TinctaRewards.json",
+    "./tincta-engine": "./src/TinctaEngine.json",
+    "./tincta-rewards-verification": "./src/tincta-rewards-verification.json",
+    "./tincta-rewards-build": "./src/tincta-rewards-build.json",
+    "./tincta-rewards-source": "./src/tincta-rewards-source.json"
   },
   "dependencies": {
     "ethers": "6.17.0"

@@ -1,6 +1,6 @@
 import { getAddress, isHexString } from 'ethers';
 export type ProtocolConfig = {
-  version?: 12 | 13 | 14 | 16 | 17;
+  version?: 12 | 13 | 14 | 16 | 17 | 18;
   holderRewardsCodeHash?: string;
   genesisCodeHash?: string;
   chainId: number;
@@ -11,6 +11,8 @@ export type ProtocolConfig = {
 };
 /** Dedicated PUBLIC endpoint only: never reuse authenticated worker RPC configuration. */
 export function protocolConfig(selectedChain?: number): ProtocolConfig | null {
+  const production = {controller:process.env.NEXT_PUBLIC_TINCTA_MAINNET_ADDRESS,codeHash:process.env.NEXT_PUBLIC_TINCTA_MAINNET_CODE_HASH,rpcUrl:process.env.NEXT_PUBLIC_TINCTA_MAINNET_RPC_URL,websocketUrl:process.env.NEXT_PUBLIC_TINCTA_MAINNET_WS_URL};
+  if ((!selectedChain || selectedChain === 1) && Object.values(production).some(Boolean)) return validateProtocolConfig({...production,version:18,chainId:1});
   const v17 = {controller:process.env.NEXT_PUBLIC_V17_SEPOLIA_ADDRESS,codeHash:process.env.NEXT_PUBLIC_V17_SEPOLIA_CODE_HASH,rpcUrl:process.env.NEXT_PUBLIC_V17_SEPOLIA_RPC_URL,websocketUrl:process.env.NEXT_PUBLIC_V17_SEPOLIA_WS_URL};
   if((!selectedChain||selectedChain===11155111)&&Object.values(v17).some(Boolean))return validateProtocolConfig({...v17,version:17,chainId:11155111});
   const v16 = {controller:process.env.NEXT_PUBLIC_V16_SEPOLIA_ADDRESS,codeHash:process.env.NEXT_PUBLIC_V16_SEPOLIA_CODE_HASH,rpcUrl:process.env.NEXT_PUBLIC_V16_SEPOLIA_RPC_URL,websocketUrl:process.env.NEXT_PUBLIC_V16_SEPOLIA_WS_URL};
@@ -35,14 +37,15 @@ export function protocolConfig(selectedChain?: number): ProtocolConfig | null {
   const rpcUrl = process.env.NEXT_PUBLIC_V12_RPC_URL ?? '';
   return validateProtocolConfig({ controller, chainId, codeHash, rpcUrl, websocketUrl: process.env.NEXT_PUBLIC_V12_WS_URL });
 }
-export function validateProtocolConfig(input: { version?: 12 | 13 | 14 | 16 | 17; holderRewardsCodeHash?: string; genesisCodeHash?: string; controller?: string; chainId?: number; codeHash?: string; rpcUrl?: string; websocketUrl?: string }): ProtocolConfig {
+export function validateProtocolConfig(input: { version?: 12 | 13 | 14 | 16 | 17 | 18; holderRewardsCodeHash?: string; genesisCodeHash?: string; controller?: string; chainId?: number; codeHash?: string; rpcUrl?: string; websocketUrl?: string }): ProtocolConfig {
   const { controller, chainId, codeHash, rpcUrl, websocketUrl } = input;
-  if (input.version !== undefined && input.version !== 12 && input.version !== 13 && input.version !== 14 && input.version !== 16 && input.version !== 17) throw new Error('Unsupported protocol version.');
+  if (input.version !== undefined && input.version !== 12 && input.version !== 13 && input.version !== 14 && input.version !== 16 && input.version !== 17 && input.version !== 18) throw new Error('Unsupported protocol version.');
   if ((input.version === 13 || input.version === 14) && !isHexString(input.holderRewardsCodeHash, 32)) throw new Error('A verified holder rewards runtime pin is required.');
   if (input.version === 14 && !isHexString(input.genesisCodeHash, 32)) throw new Error('A verified Genesis runtime pin is required.');
   if (!controller || !chainId || !rpcUrl || !codeHash || ![1, 11155111].includes(chainId) || !isHexString(codeHash, 32))
     throw new Error('Invalid deployment pins.');
   if((input.version===16||input.version===17)&&chainId!==11155111)throw new Error('This protocol version is Sepolia only.');
+  if(input.version===18&&chainId!==1)throw new Error('Tincta Rewards production requires Ethereum Mainnet.');
   const url = new URL(rpcUrl);
   if (url.protocol !== 'https:' || url.username || url.password)
     throw new Error('A public HTTPS RPC endpoint is required.');
@@ -51,5 +54,5 @@ export function validateProtocolConfig(input: { version?: 12 | 13 | 14 | 16 | 17
     if (ws.protocol !== 'wss:' || ws.username || ws.password)
       throw new Error('Invalid public WebSocket endpoint.');
   }
-  return { ...((input.version===16||input.version===17)?{version:input.version}:{}), chainId, controller: getAddress(controller), codeHash, rpcUrl, websocketUrl, ...((input.version === 13 || input.version === 14) ? { version: input.version, holderRewardsCodeHash: input.holderRewardsCodeHash } : {}), ...(input.version === 14 ? { genesisCodeHash: input.genesisCodeHash } : {}) };
+  return { ...((input.version===16||input.version===17||input.version===18)?{version:input.version}:{}), chainId, controller: getAddress(controller), codeHash, rpcUrl, websocketUrl, ...((input.version === 13 || input.version === 14) ? { version: input.version, holderRewardsCodeHash: input.holderRewardsCodeHash } : {}), ...(input.version === 14 ? { genesisCodeHash: input.genesisCodeHash } : {}) };
 }

@@ -120,7 +120,8 @@
       "/login",
       "/dashboard",
       "/social",
-      "/social/account"
+      "/social/account",
+      "/deploy"
     ],
     "redirects": {
       "/": "/dashboard",
@@ -162,7 +163,11 @@
       "launch-sign-in",
       "launch-sign-in-error",
       "launch-sign-out",
-      "launch-session-rejection"
+      "launch-session-rejection",
+      "mainnet-deployment-disconnected",
+      "mainnet-deployment-review",
+      "mainnet-deployment-rejected",
+      "mainnet-deployment-recovery"
     ]
   },
   "fixtureBoundary": "Separate Next production-mode fixture applications import production components and styles. They do not import auth/database repositories. Browser requests intercept every API and block external origins and all real writes. Route SSR repositories, real sessions, real wallets, devices and hosted deployment require separate evidence."

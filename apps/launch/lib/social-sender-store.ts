@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import type { Pool } from 'pg';
 import type { Delivery, Config } from '../../../packages/contracts/src/social-delivery.ts';
 
-export type SenderConfig = Pick<Config, 'chainId'|'controller'|'controllerCodeHash'|'appUrl'|'xAccountId'> & { version: 17 };
+export type SenderConfig = Pick<Config, 'chainId'|'controller'|'controllerCodeHash'|'appUrl'|'xAccountId'> & { version: 17 | 18 };
 export type SenderEntry = Delivery & { queuedAt?: number; intentAt?: number; sentAt?: number; finalized?: boolean };
 export type Sender = { id: string; config: SenderConfig; entries: SenderEntry[]; lease_token: string; failures: number };
 export class SenderError extends Error {

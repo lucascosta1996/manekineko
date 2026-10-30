@@ -4,7 +4,7 @@ import type {MirrorPin} from '../nft-mirror/model.ts';
 type Query=(sql:string,values:unknown[])=>Promise<{rows:Record<string,any>[]} >;
 /** One statement keeps totals, ownership and history on the same confirmed cursor. */
 export async function queryWalletProfile(query:Query,pin:MirrorPin,wallet:string,nftPage=1,activityPage=1):Promise<WalletProfile>{
-  if(![16,17].includes(pin.version)||pin.chainId!==11155111||![nftPage,activityPage].every(n=>Number.isSafeInteger(n)&&n>=1&&n<=9999))throw new Error('Invalid wallet profile request.');
+  if(![16,17,18].includes(pin.version)||pin.chainId!==(pin.version===18?1:11155111)||![nftPage,activityPage].every(n=>Number.isSafeInteger(n)&&n>=1&&n<=9999))throw new Error('Invalid wallet profile request.');
   const address=getAddress(wallet).toLowerCase(),contract=getAddress(pin.controller).toLowerCase();
   const {rows}=await query(`WITH source AS (
     SELECT * FROM manekineko_nft_mirror_sources WHERE chain_id=$1 AND controller=$2 AND code_hash=$3 AND version=$4

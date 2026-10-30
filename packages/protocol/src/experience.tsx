@@ -49,6 +49,8 @@ import {
 import type { ProtocolConfig } from "./config";
 import "./protocol.css";
 import { OperatorWorkspace } from "./operator-workspace";
+import { verifyReviewedOracleBudget } from "./tincta";
+import { assertCatalogPrefix } from "./tincta-setup";
 import { operatorActions } from "./operator-actions";
 import { readCatalog, type Catalog } from "./progress";
 import { HolderRewardsPanel } from "./holder-rewards-panel";
@@ -349,7 +351,7 @@ function Experience({
         );
       const walletController = await verifyController(session.provider, config);
       const walletVoting = fresh.voting;
-      if((config.version===16||config.version===17)){
+      if((config.version===16||config.version===17||config.version===18)){
         const independent=await readProtocol(session.provider,config,selected,session.address,sourcePage);
         if(independent.count!==fresh.count||independent.round?.id!==fresh.round?.id||independent.round?.termsHash!==fresh.round?.termsHash||independent.genesis?.primaryMints!==fresh.genesis?.primaryMints)throw new Error("Your wallet and this page report different contract data. Refresh before signing.");
       }else{
@@ -482,7 +484,7 @@ function Experience({
   ) {
     return submit(label, description, async (s, address) => {
       if (!s.round) throw new Error("Select a prepared collection.");
-      if((config?.version===16||config?.version===17))return v16RoundTransaction(s,method,args(s,address),value(s));
+      if((config?.version===16||config?.version===17||config?.version===18))return v16RoundTransaction(s,method,args(s,address),value(s));
       return new Contract(s.round.address, roundAbi)
         .getFunction(method)
         .populateTransaction(...args(s, address), { value: value(s) });
@@ -508,7 +510,7 @@ function Experience({
     }
   }
   const [genesisTokens, setGenesisTokens] = useState("");
-  const v16 = (config?.version === 16 || config?.version === 17);
+  const v16 = (config?.version === 16 || config?.version === 17 || config?.version === 18);
   const r = state?.round,
     disabled = !wallet.session || wallet.session.chainId !== config?.chainId || busy || !!pending || !!error || !state;
   const canVote =
@@ -1344,7 +1346,7 @@ function Experience({
                 disabled={disabled}
                 stale={!!error}
                 operator={operator}
-                actions={operatorActions(state, config)}
+                actions={operatorActions(state, config, plannedCatalog)}
                 onSelect={setSelected}
                 onAction={(action) => {
                   void submit(
@@ -1359,7 +1361,9 @@ function Experience({
                         : "Sepolia testnet"
                     }.`,
                     async (fresh) => {
-                      const current = operatorActions(fresh, config).find(
+                      if (config.version === 18 && ["prepare","open-genesis","initial-funding","fund-operating"].includes(action.id)) await Promise.all([verifyReviewedOracleBudget(provider!), verifyReviewedOracleBudget(wallet.session!.provider)]);
+                      if (config.version === 18 && !fresh.sealed && plannedCatalog) assertCatalogPrefix(plannedCatalog, await readCatalog(provider!, config, fresh));
+                      const current = operatorActions(fresh, config, plannedCatalog).find(
                         (a) => a.id === action.id
                       );
                       if (

@@ -14,7 +14,9 @@
     "./web-wallet-provider": "./src/web-wallet-provider.tsx",
     "./experience": "./src/experience.tsx",
     "./styles.css": "./src/protocol.css",
-    "./progress": "./src/progress.ts"
+    "./progress": "./src/progress.ts",
+    "./tincta": "./src/tincta.ts",
+    "./tincta-deployment": "./src/tincta-deployment.ts"
   },
   "dependencies": {
     "@manekineko/contract-abi": "0.1.0",

@@ -1,5 +1,18 @@
 # Tincta protocol architecture and agent handoff
 
+## Tincta Rewards production preparation · 2026-10-30
+
+The current production draft is [TinctaRewards](../apps/contracts/contracts/TinctaRewards.sol), with an immutable [TinctaEngine](../apps/contracts/contracts/TinctaEngine.sol) created by its constructor. All NFT ownership, financial reserves, votes and claims remain at one root. The helper carries permanent onchain artwork and pure computation so both contracts fit active Mainnet code limits. No proxy or administrator can replace it. New source and metadata are versionless in product naming; authentic historical sources below are preserved.
+
+The user approved three fixed packages (1,000 × 0.01 ETH / 6 prizes; 2,000 × 0.02 ETH / 4 prizes; 1,000 × 0.01 ETH / 10 prizes), all with 24-hour paid mint windows and 24-hour ballots. Genesis remains indefinite, supply 1,000, two lifetime primary mints per wallet. Randomness timeout is 72 hours. Mainnet settings pin the 200-gwei Chainlink lane, 64 confirmations and a 200,000-gas callback. There is no accelerated branch in this contract. Read the [launch guide](tincta-mainnet.md) for financial rules, initial reserves, custody and the explicit external randomness dependency.
+
+Launch `/deploy` is authenticated and supports selected installed-wallet accounts and configured WalletConnect. It reviews fees, pins two independent Mainnet RPCs and saves creation intent before wallet submission. Recovery validates exact creation data, sender, nonce, canonical receipts, root and helper code. Catalog upload, first funding and opening Genesis are separately reviewed transactions. No blockchain deployment or funding was performed for this preparation. Source verification and public activation follow the user's deployment. See [current evidence](tincta-mainnet-verification.md), which supersedes broad historical qualification wording only for this new source and does not turn failed live tests into passes.
+
+Web, Launch and the NFT/wallet indexer admit the new Mainnet identity through internal adapter discriminator 18, with exact runtime/dependency checks. Migration 040 adds network-scoped projection support without registering a source. Historical single-address tables retain their names and old rows. The hosted X sender has separate production templates, endpoints, profile and explicit enable gate; Mainnet posting remains disabled. The deployment and preparation UI rejects a changed oracle fee/limit configuration until its budget is reviewed; existing user claims do not depend on that admission guard.
+
+The landing status parser now preserves query-selected collection links. The old parser dropped `?collection=6` and rejected an otherwise valid projection; it was corrected and checked live in Opera before production preparation.
+
+
 ## Hosted X delivery · 2026-10-30
 
 The user authorized an always-running social sender after the V17 closeout. The [hosted sender runbook](social-sender-2026-10-30.md) describes the minute-based Launch cron, migration 039 durable outbox and expiring leases, independent watchdog, automatic safe retries and evidence-based recovery of uncertain X responses. The sender observes only a registered V17 Sepolia source and has no blockchain signing authority. It uses two agreeing RPC projections at two-block confirmation; the historical CLI retains finalized observations. Account settings alone still do not register a source. Read the runbook's activation evidence rather than treating source publication as worker verification. Completed settlement and Mainnet qualification boundaries below are unchanged.

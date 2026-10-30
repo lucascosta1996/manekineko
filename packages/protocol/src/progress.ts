@@ -15,10 +15,10 @@ export async function readCatalog(provider: Provider, config: ProtocolConfig, st
   const previous = cache.get(key);
   if (previous && state.sealed && (await provider.getBlock(previous.block))?.hash === previous.hash)
     return previous.catalog;
-  const c = new Contract(config.controller, (config.version===16||config.version===17)?v16Abi:controllerAbi, provider), seasons: CatalogSeason[] = [];
+  const c = new Contract(config.controller, (config.version===16||config.version===17||config.version===18)?v16Abi:controllerAbi, provider), seasons: CatalogSeason[] = [];
   // Bounded batches avoid flooding public RPC providers for a 216-collection catalog.
   for (let offset = 0; offset < count; offset += 8) {
-    const batch = await Promise.all(Array.from({ length: Math.min(8, count - offset) }, (_, i) => (config.version===16||config.version===17)?c.collection(offset+i+1,{blockTag:state.block}):c.collectionPlan(offset + i, { blockTag: state.block })));
+    const batch = await Promise.all(Array.from({ length: Math.min(8, count - offset) }, (_, i) => (config.version===16||config.version===17||config.version===18)?c.collection(offset+i+1,{blockTag:state.block}):c.collectionPlan(offset + i, { blockTag: state.block })));
     for (const p of batch) {
       let season = seasons.at(-1);
       if (season?.seasonId !== p.seasonId) { season = { seasonId: p.seasonId, name: p.seasonName, collections: [] }; seasons.push(season); }

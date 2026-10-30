@@ -14,7 +14,7 @@ export { prepareDeliveryMedia, mergeObservations, assertPublishable, deliveryFai
 export type { Observation, Delivery, Config } from '../../packages/contracts/src/social-delivery.ts';
 import { prepareDeliveryMedia, mergeObservations, assertPublishable, deliveryFailureStatus, type Observation, type Delivery, type Config } from '../../packages/contracts/src/social-delivery.ts';
 export async function observe(config: Config, suppliedProvider?: Provider): Promise<Observation[]> {
-  if ((config.version === 16 || config.version === 17)) throw new Error('V16/V17 require their dedicated single-address observer.');
+  if (config.version === 16 || config.version === 17 || config.version === 18) throw new Error('Single-address deployments require their dedicated observer.');
   if (![1, 11155111].includes(config.chainId) && !(suppliedProvider && config.chainId === 31337)) throw new Error('Unsupported social network.');
   const app = new URL(config.appUrl);
   if (app.protocol !== 'https:' || app.username || app.password || app.search || app.hash)

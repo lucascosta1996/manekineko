@@ -12,6 +12,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 Follow the root visual-identity instructions and read [the shared standard](../../docs/design/visual-identity.md) and [quality gates](../../docs/design/quality-gates.md). Verify authenticated shells, forms, dialogs, mobile drawer and final coarse-pointer computed styles. Use isolated fixtures and intercepted writes for visual QA; changing presentation does not authorize operations.
 
+## 2026-10-30 Mainnet preparation
+
+`/deploy` and `/api/deployment/source` require the existing operator session. The page creates only the reviewed TinctaRewards artifact after an explicit wallet approval. It never autodeploys, funds, seals or activates X. Production catalog setup reuses the shared transaction review/recovery engine. The user's instruction remains **do not deploy yet**. Read `docs/tincta-mainnet.md` and its verification record. Mainnet social support is prepared but remains disabled until the intended account and exact deployed source are separately approved and registered.
+
 ## 2026-10-28 authenticated Launch and X settings
 
 The 2026-10-30 hosted social sender adds `/api/social-sender/run`, authenticated with the exact server-only cron bearer token, and `/api/social-sender/status`, authenticated with that token or an operator session. This scoped service exception does not open pages, account settings or retired season APIs. Read `docs/social-sender-2026-10-30.md` before changing delivery, source registration or credentials. The sender has no signing authority and Mainnet is not enabled.
