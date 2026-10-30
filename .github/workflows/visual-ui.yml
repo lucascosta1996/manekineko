@@ -8,12 +8,19 @@ permissions:
   contents: read
 jobs:
   visual:
+    name: visual (${{ matrix.browser }}, ${{ matrix.shard }})
     runs-on: macos-15
     timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
-        browser: [chromium, firefox, webkit]
+        include:
+          - { browser: chromium, shard: '1/1', part: 1, workers: 2 }
+          - { browser: webkit, shard: '1/1', part: 1, workers: 2 }
+          # Firefox's startup reads compete with three application servers and video.
+          # Isolate its workers while preserving the complete test set and wall-clock bounds.
+          - { browser: firefox, shard: '1/2', part: 1, workers: 1 }
+          - { browser: firefox, shard: '2/2', part: 2, workers: 1 }
     env:
       NEXT_TELEMETRY_DISABLED: '1'
     steps:
@@ -32,11 +39,11 @@ jobs:
       - run: npm run typecheck --workspace @manekineko/landing-page && npm run typecheck --workspace @manekineko/web && npm run typecheck --workspace @manekineko/launch
       - run: npm run build:landing && npm run build:web && npm run build:launch
       - run: npm run ui:fixtures:build
-      - run: npm run ui:test -- --project=${{ matrix.browser }}
+      - run: npm run ui:test -- --project=${{ matrix.browser }} --workers=${{ matrix.workers }} --shard=${{ matrix.shard }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: visual-ui-${{ github.sha }}-${{ matrix.browser }}
+          name: visual-ui-${{ github.sha }}-${{ matrix.browser }}-${{ matrix.part }}
           path: |
             test-results/
             playwright-report/
