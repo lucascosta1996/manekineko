@@ -2,7 +2,7 @@ name: Tincta Mainnet preparation
 on:
   workflow_dispatch:
   push:
-    paths: ['apps/contracts/contracts/Tincta*.sol', 'apps/contracts/test/Tincta*.ts', 'apps/contracts/hardhat.config.ts', 'packages/protocol/src/tincta*.ts', 'packages/contracts/src/tincta-rewards-*.json', '.github/workflows/tincta-mainnet.yml']
+    paths: ['apps/contracts/contracts/Tincta*.sol', 'apps/contracts/test/Tincta*.ts', 'apps/contracts/hardhat.config.ts', 'packages/protocol/src/tincta*.ts', 'packages/contracts/src/tincta-rewards-*.json', 'scripts/tincta/**', '.github/workflows/tincta-mainnet.yml']
 permissions:
   contents: read
 jobs:
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      MAINNET_FORK_URL: https://ethereum-rpc.publicnode.com
+      MAINNET_FORK_URL: http://127.0.0.1:18547
       MAINNET_FORK_BLOCK: '26304305'
     steps:
       - uses: actions/checkout@v4
@@ -21,5 +21,13 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Test the real coordinator on a disposable fork
-        run: npm exec --workspace @manekineko/contracts -- hardhat test test/TinctaMainnetFork.ts
+        run: |
+          node scripts/tincta/fork-rpc.mjs > fork-transport.log 2>&1 &
+          relay_pid=$!
+          trap 'kill "$relay_pid"' EXIT
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent -H 'Content-Type: application/json' --data '{"jsonrpc":"2.0","id":1,"method":"eth_chainId","params":[]}' http://127.0.0.1:18547 | grep -q '0x1'; then break; fi
+            sleep 1
+          done
+          npm exec --workspace @manekineko/contracts -- hardhat test test/TinctaMainnetFork.ts
       - run: node scripts/tincta/export.mjs --check
