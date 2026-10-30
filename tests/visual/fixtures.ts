@@ -40,7 +40,9 @@ export async function ready(page: Page) {
   await Promise.all(Array.from(document.images).map(image => { image.loading = 'eager'; return image.decode().catch(() => {}); }));
  });
  // Wait for React's effects/fixture requests, without relying on networkidle polling.
- if (!new URL(page.url()).pathname.endsWith('/loading')) await expect.poll(() => page.locator('[aria-busy="true"]').count()).toBe(0);
+ // Keep the readiness timeout inside the browser assertion. A Node-side poll
+ // also times trace snapshot serialization, which can delay an already-zero result.
+ if (!new URL(page.url()).pathname.endsWith('/loading')) await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
  expect(browserErrors.get(page) ?? [], 'No page or hydration errors').toEqual([]);
 }
 export async function metrics(page: Page, selector: string) {
