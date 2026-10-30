@@ -103,7 +103,10 @@ async function request(credentials: XCredentials, method: "GET" | "POST", path: 
       try { diagnostics = safeXDiagnostics(await limitedJson(response, 4096)); } catch { /* No raw response is retained. */ }
       if (publicPost && (response.status >= 500 || response.status === 408)) throw new AmbiguousDelivery(undefined, response.status);
       const retryAfter = response.headers.get("retry-after");
-      const seconds = retryAfter && /^\d{1,8}$/.test(retryAfter) ? Number(retryAfter) : undefined;
+      const reset = Number(response.headers.get('x-rate-limit-reset'));
+      const seconds = retryAfter && /^\d{1,8}$/.test(retryAfter) ? Number(retryAfter)
+        : response.status === 429 && Number.isSafeInteger(reset) && reset > 0
+          ? Math.max(1, Math.ceil(reset - (options.now?.() ?? Date.now()) / 1000)) : undefined;
       throw new XApiError(`X API request rejected (HTTP ${response.status})`, response.status, seconds, diagnostics);
     }
     const result = await limitedJson(response);
@@ -209,4 +212,38 @@ export async function verifyXPost(credentials: XCredentials, postId: string, exp
   }
   if (actual.normalize("NFC") !== expected.text.normalize("NFC")) fail();
   return { id: postId, authorId: post.author_id };
+}
+
+/** Recover a lost POST acknowledgement using read-only evidence. Absence in a
+ * bounded timeline is NOT proof of non-delivery and never authorizes resending. */
+export async function findXPost(credentials: XCredentials, expected: { text: string; mediaId: string }, options: XRequestOptions): Promise<string | undefined> {
+  id(expected.mediaId);
+  await verifyXAccount(credentials, options);
+  let token: string | undefined;
+  const matches = new Set<string>();
+  for (let page=0; page<3; page++) {
+    const params = new URLSearchParams({ max_results:'20', 'post.fields':'attachments' });
+    if (token) params.set('pagination_token',token);
+    let result: Record<string, any>;
+    try { result=await request(credentials,'GET',`/2/users/${id(options.expectedAccountId)}/tweets?${params}`,undefined,options); }
+    catch(error) {
+      if (!(error instanceof XApiError) || error.status!==400) throw error;
+      params.delete('post.fields');params.set('tweet.fields','attachments');
+      result=await request(credentials,'GET',`/2/users/${id(options.expectedAccountId)}/tweets?${params}`,undefined,options);
+    }
+    if (result.data!==undefined && !Array.isArray(result.data)) throw new XApiError('Invalid X timeline');
+    for (const post of result.data ?? []) {
+      const keys=post.attachments?.media_keys;
+      if (Array.isArray(keys) && keys.length===1 && new RegExp(`^\\d+_${expected.mediaId}$`).test(keys[0])) {
+        await verifyXPost(credentials,id(post.id),expected,options);
+        matches.add(post.id);
+      }
+    }
+    if (matches.size>1) throw new XApiError('Multiple posts match the delivery intent');
+    if (matches.size===1) return [...matches][0];
+    token=result.meta?.next_token;
+    if (!token) break;
+    if (typeof token!=='string' || token.length>2048) throw new XApiError('Invalid X pagination');
+  }
+  return undefined;
 }

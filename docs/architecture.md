@@ -1,5 +1,9 @@
 # Tincta protocol architecture and agent handoff
 
+## Hosted X delivery · 2026-10-30
+
+The user authorized an always-running social sender after the V17 closeout. The [hosted sender runbook](social-sender-2026-10-30.md) describes the minute-based Launch cron, migration 039 durable outbox and expiring leases, independent watchdog, automatic safe retries and evidence-based recovery of uncertain X responses. The sender observes only a registered V17 Sepolia source and has no blockchain signing authority. It uses two agreeing RPC projections at two-block confirmation; the historical CLI retains finalized observations. Account settings alone still do not register a source. Read the runbook's activation evidence rather than treating source publication as worker verification. Completed settlement and Mainnet qualification boundaries below are unchanged.
+
 ## Final V17 closeout · 2026-10-30
 
 The [final closeout report](v17-closeout-report-2026-10-30.md) supersedes pending-run checkpoints below. Settlement is complete, both V17 contracts have zero liabilities, and 0.307800200290244037 Sepolia ETH was returned to the original funding account. Global accounting reconciles exactly; imported wallets remain under manual custody. Only two planned collections completed their draws. The six-scenario rehearsal did not pass and Mainnet remains unqualified. Historical reports, deployments and frozen runtimes are preserved.

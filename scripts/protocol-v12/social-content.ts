@@ -2,7 +2,8 @@
 import { assertSocialText } from '../../packages/contracts/src/season-social.ts';
 import type { SeasonSocialMessage, SeasonSocialIdentity, SeasonSocialCollection } from '../../packages/contracts/src/season-social.ts';
 export const SOCIAL_TEMPLATE_VERSION = 'v12-v13-ligature-open-3';
-export const STAGES = ['prepared', 'voting', 'opening', 'soldout', 'draw-ready', 'draw-refunds', 'refunds', 'revealed', 'paid'] as const;
+import { DEFAULT_SOCIAL_STAGES } from '../../packages/contracts/src/social-delivery.ts';
+export const STAGES = DEFAULT_SOCIAL_STAGES;
 export type Stage = typeof STAGES[number];
 export type LifecycleInput = {
   version?: 12 | 13 | 14; prefix: string; name: string; id: number; link: string; now: bigint; voteStart: bigint; saleStart: bigint;

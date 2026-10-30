@@ -1,6 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
+  "crons": [{"path":"/api/social-sender/run","schedule":"* * * * *"}],
   "git": {
     "deploymentEnabled": { "main": true, "*": false }
   }

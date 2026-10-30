@@ -14,6 +14,8 @@ Follow the root visual-identity instructions and read [the shared standard](../.
 
 ## 2026-10-28 authenticated Launch and X settings
 
+The 2026-10-30 hosted social sender adds `/api/social-sender/run`, authenticated with the exact server-only cron bearer token, and `/api/social-sender/status`, authenticated with that token or an operator session. This scoped service exception does not open pages, account settings or retired season APIs. Read `docs/social-sender-2026-10-30.md` before changing delivery, source registration or credentials. The sender has no signing authority and Mainnet is not enabled.
+
 The user explicitly restored login for the entire Launch app. `/login` and `/api/auth/session` use the existing operator accounts and expiring database sessions. Every active page (`/dashboard`, `/social`, `/social/account`) checks its session before rendering, and social image/account APIs independently require authentication. The shared header provides sign-out. X settings reuse the existing network-separated encrypted profile store and never start a sender. These scoped additions supersede the old dashboard-only/no-login surface below; historical season editors and worker APIs remain retired. See [V16 social automation](../../docs/v16-social-automation.md).
 
 ## Current V12 interface

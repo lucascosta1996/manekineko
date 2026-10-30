@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { createXPost, uploadXMedia, setXMediaAltText, verifyXAccount, verifyXPost, xOAuth1Authorization, AmbiguousDelivery, XApiError, type XRequestOptions } from "./social.ts";
+import { createXPost, findXPost, uploadXMedia, setXMediaAltText, verifyXAccount, verifyXPost, xOAuth1Authorization, AmbiguousDelivery, XApiError, type XRequestOptions } from "./social.ts";
 
 const credentials = { apiKey: "consumer-key", apiKeySecret: "consumer-secret", accessToken: "access-token", accessTokenSecret: "token-secret" };
 const account = { id: "12345", username: "tincta_test", name: "Test account" };
@@ -86,4 +86,34 @@ test("reconciliation expands original links, removes only its media suffix, and 
     await assert.rejects(verifyXPost(credentials, "765", expected, options(forCandidate({ ...candidate, ...change }))), /does not match/);
   }
   assert.equal(writes, 0);
+});
+
+test('automatic reconciliation discovers and verifies an exact media-bound post using GET only', async()=>{
+  const methods:string[]=[];
+  const fetch:typeof globalThis.fetch=async(url,init)=>{
+    methods.push(init?.method ?? 'GET');
+    const path=String(url);
+    if(path.endsWith('/users/me'))return json({data:account});
+    if(path.includes('/users/12345/tweets'))return json({data:[{id:'765',attachments:{media_keys:['3_987']}}]});
+    return json({data:{id:'765',author_id:'12345',conversation_id:'765',text:'Minting opened',attachments:{media_keys:['3_987']}}});
+  };
+  assert.equal(await findXPost(credentials,{text:'Minting opened',mediaId:'987'},options(fetch)),'765');
+  assert.ok(methods.every(method=>method==='GET'));
+});
+test('an empty timeline is inconclusive and no public write is attempted',async()=>{
+  let reads=0;
+  const fetch:typeof globalThis.fetch=async(url,init)=>{assert.equal(init?.method,'GET');reads++;return String(url).endsWith('/users/me')?json({data:account}):json({meta:{result_count:0}});};
+  assert.equal(await findXPost(credentials,{text:'Minting opened',mediaId:'987'},options(fetch)),undefined);assert.equal(reads,2);
+});
+test('timeline candidate with wrong author or copy is rejected',async()=>{
+  const fetch:typeof globalThis.fetch=async(url)=>{
+    if(String(url).endsWith('/users/me'))return json({data:account});
+    if(String(url).includes('/users/12345/tweets'))return json({data:[{id:'765',attachments:{media_keys:['3_987']}}]});
+    return json({data:{id:'765',author_id:'999',conversation_id:'765',text:'Minting opened',attachments:{media_keys:['3_987']}}});
+  };
+  await assert.rejects(findXPost(credentials,{text:'Minting opened',mediaId:'987'},options(fetch)),/does not match/);
+});
+test('rate-limit reset header supplies the durable retry deadline',async()=>{
+  const fetch:typeof globalThis.fetch=async()=>json({},429,{'x-rate-limit-reset':'1700000900'});
+  await assert.rejects(verifyXAccount(credentials,options(fetch)),error=>error instanceof XApiError && error.retryAfterSeconds===900);
 });

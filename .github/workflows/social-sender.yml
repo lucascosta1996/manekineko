@@ -1,0 +1,23 @@
+name: X sender watchdog
+on:
+  schedule:
+    - cron: '2-59/5 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: social-sender-watchdog
+  cancel-in-progress: false
+jobs:
+  recover:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - run: node scripts/social-sender-watchdog.mjs
+        env:
+          SOCIAL_SENDER_CRON_SECRET: ${{ secrets.SOCIAL_SENDER_CRON_SECRET }}
