@@ -3,7 +3,7 @@ import type { Provider } from 'ethers';
 import { mergeObservations, prepareDeliveryMedia, deliveryFailureStatus, type Observation } from '../../../packages/contracts/src/social-delivery.ts';
 import { STAGES } from '../../../packages/contracts/src/v17-social-content.ts';
 import { createXPost, findXPost, verifyXPost, setXMediaAltText, XApiError, type XCredentials } from '../../../packages/contracts/src/x-transport.ts';
-import { renderSeasonSocialImage } from '../../../scripts/season-runner/social-image.ts';
+import { renderSenderImage } from './social-sender-image.ts';
 import { getRuntimeProfile, getRuntimeWorkerProfile } from './season-runtime-store.ts';
 import { assertCanonical, observeSender, senderProviders } from './social-sender-chain.ts';
 import { claimSender, saveSender, assertSenderLease, finishSender, SenderError, type Sender, type SenderEntry } from './social-sender-store.ts';
@@ -86,7 +86,7 @@ export async function runSocialSender(db: Pool) {
       observe,save,assertCurrent:a.check,
       prepare:async e=>{
         if (!e.image) throw new SenderError('missing_artwork');
-        const rendered=await renderSeasonSocialImage(e.image);
+        const rendered=await renderSenderImage(e.image);
         if (!await prepareDeliveryMedia(e,rendered,a.credentials,options,save)) return false;
         await setXMediaAltText(a.credentials,e.mediaId!,e.image.alt,options);return true;
       },
